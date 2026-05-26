@@ -203,17 +203,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     },
 };
 
-// Add hover effect using CSS class (you can also do this with onMouseEnter/Leave)
-// For simplicity, I'll add a style tag to handle hover.
-// Alternatively, attach event handlers to each card.
 
-// To enable hover effect without inline JS, we can inject a style tag.
-// But since you use inline styles, here's a quick way: attach onMouseEnter/Leave
-// I'll update the card rendering below.
-
-// Actually, let's modify the card rendering to include hover state.
-// I'll replace the static card style with a component that handles hover.
-// For brevity, I'll show the final return with hover handlers.
-
-// Final version of component with hover effect:
 export default CricketKeychains;
