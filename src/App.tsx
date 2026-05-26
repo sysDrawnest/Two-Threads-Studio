@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import CricketKeychains from './components/CricketKeychains';
 
 // Type definitions
 interface IntroAnimationProps {
@@ -161,10 +162,10 @@ function Navbar() {
         {/* Icons */}
         <div style={{ display: "flex", gap: "1.2rem", alignItems: "center" }}>
           <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-            <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
           </button>
           <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-            <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
           </button>
           {/* Hamburger */}
           <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", flexDirection: "column", gap: 4 }} className="hamburger">
@@ -549,7 +550,7 @@ function Learning() {
                 {/* Play button */}
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <div style={{ width: 52, height: 52, borderRadius: "50%", backgroundColor: "rgba(245,240,235,0.92)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#2d2520"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#2d2520"><polygon points="5 3 19 12 5 21 5 3" /></svg>
                   </div>
                 </div>
                 {/* Duration badge */}
@@ -665,17 +666,17 @@ function Footer() {
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
   const [showIntro, setShowIntro] = useState<boolean>(() => {
-    try { 
-      return !sessionStorage.getItem("tt_visited"); 
-    } catch { 
-      return true; 
+    try {
+      return !sessionStorage.getItem("tt_visited");
+    } catch {
+      return true;
     }
   });
 
   const handleIntroComplete = (): void => {
-    try { 
-      sessionStorage.setItem("tt_visited", "1"); 
-    } catch {}
+    try {
+      sessionStorage.setItem("tt_visited", "1");
+    } catch { }
     setShowIntro(false);
   };
 
@@ -689,6 +690,7 @@ export default function App() {
         <ExploreByRoom />
         <Banner />
         <JustForYou />
+        <CricketKeychains />
         <OurStory />
         <Reviews />
         <Learning />

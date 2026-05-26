@@ -43,7 +43,7 @@ const keychains = [
 
 const CricketKeychains: React.FC = () => {
     return (
-        <section style={styles.section}>
+        <section style={styles.section} className="cricket-keychains-section">
             <div style={styles.container}>
                 {/* Section Header */}
                 <div style={styles.header}>
@@ -58,7 +58,7 @@ const CricketKeychains: React.FC = () => {
                 {/* Product Grid */}
                 <div style={styles.grid}>
                     {keychains.map((item) => (
-                        <div key={item.id} style={styles.card}>
+                        <div key={item.id} className="cricket-card">
                             <div style={styles.imageWrapper}>
                                 <img src={item.image} alt={item.alt} style={styles.image} />
                                 <span style={styles.badge}>{item.badge}</span>
@@ -68,7 +68,7 @@ const CricketKeychains: React.FC = () => {
                                 <p style={styles.productDesc}>{item.description}</p>
                                 <div style={styles.priceRow}>
                                     <span style={styles.price}>{item.price}</span>
-                                    <button style={styles.button}>Add to Cart</button>
+                                    <button className="cricket-button">Add to Cart</button>
                                 </div>
                             </div>
                         </div>
