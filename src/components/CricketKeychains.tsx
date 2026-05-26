@@ -58,11 +58,8 @@ const CricketKeychains: React.FC = () => {
             {/* Editorial Header Section */}
             <section className="max-w-[1440px] mx-auto px-margin-desktop pt-section-gap pb-gutter text-center">
                 <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm mb-6 tracking-widest">
-                    HANDMADE COLLECTION
-                </div>
-                <h1 className="font-display-lg text-display-lg text-primary mb-4 transition-transform duration-100 ease-out">
                     Cricket Lover’s Keychains
-                </h1>
+                </div>
                 <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto italic">
                     Each piece tells a story of patience, precision, and passion for the game. Crafted by hand in our sun-drenched atelier.
                 </p>
@@ -75,10 +72,10 @@ const CricketKeychains: React.FC = () => {
                     {/* Product 1: Mini Willow Bat */}
                     <article className="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
                         <div className="relative aspect-square overflow-hidden bg-surface-container">
-                            <img 
+                            <img
                                 alt="Mini Willow Bat Keychain"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                src={miniWillowBat} 
+                                src={miniWillowBat}
                             />
                             <span className="absolute top-4 left-4 font-label-sm text-label-sm bg-background/90 px-3 py-1 rounded-sm border border-dashed border-outline-variant">
                                 Handmade
@@ -103,10 +100,10 @@ const CricketKeychains: React.FC = () => {
                     {/* Product 2: Leather Cricket Ball */}
                     <article className="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
                         <div className="relative aspect-square overflow-hidden bg-surface-container">
-                            <img 
+                            <img
                                 alt="Leather Cricket Ball Keychain"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                src={leatherCricketBall} 
+                                src={leatherCricketBall}
                             />
                             <span className="absolute top-4 left-4 font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-sm border border-dashed border-on-tertiary-fixed/20">
                                 Limited Edition
@@ -131,10 +128,10 @@ const CricketKeychains: React.FC = () => {
                     {/* Product 3: Wicket Stumps Trio */}
                     <article className="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
                         <div className="relative aspect-square overflow-hidden bg-surface-container">
-                            <img 
+                            <img
                                 alt="Wicket Stumps Trio"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                src={wicketStumpsTrio} 
+                                src={wicketStumpsTrio}
                             />
                             <span className="absolute top-4 left-4 font-label-sm text-label-sm bg-surface-bright text-primary px-3 py-1 rounded-sm border border-dashed border-outline-variant">
                                 New Arrival
@@ -159,10 +156,10 @@ const CricketKeychains: React.FC = () => {
                     {/* Product 4: Embroidered Crest */}
                     <article className="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
                         <div className="relative aspect-square overflow-hidden bg-surface-container">
-                            <img 
+                            <img
                                 alt="Embroidered Cricket Crest Keychain"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                src={embroideredCrest} 
+                                src={embroideredCrest}
                             />
                             <span className="absolute top-4 left-4 font-label-sm text-label-sm bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-sm border border-dashed border-on-secondary-fixed/20">
                                 Artisan Made
