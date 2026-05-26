@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cricket Lover’s Keychains | TwoThreads Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+    :root {
+      --linen-texture: url("https://www.transparenttextures.com/patterns/linen-design.png");
+    }
+
+    .linen-bg {
+      background-color: #fef8f3;
+      background-image: var(--linen-texture);
+    }
+
+    .stitch-divider {
+      background-image: linear-gradient(to right, #d1c4bd 50%, rgba(255, 255, 255, 0) 0%);
+      background-position: bottom;
+      background-size: 8px 1px;
+      background-repeat: repeat-x;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .custom-shadow {
+      box-shadow: 0 10px 30px -15px rgba(23, 17, 12, 0.08);
+    }
+
+    .hover-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -20px rgba(23, 17, 12, 0.12);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#f5f0eb",
+            "surface-dim": "#ded9d4",
+            "inverse-surface": "#32302d",
+            "background": "#fef8f3",
+            "tertiary-fixed": "#ffdad5",
+            "tertiary-container": "#560001",
+            "on-primary-container": "#988b84",
+            "primary-container": "#2d2520",
+            "on-surface-variant": "#4e4540",
+            "tertiary": "#2f0000",
+            "on-primary-fixed": "#211a15",
+            "surface-variant": "#e6e2dd",
+            "on-secondary-container": "#785d4b",
+            "primary-fixed-dim": "#d2c4bc",
+            "outline": "#7f756f",
+            "on-primary-fixed-variant": "#4e453f",
+            "surface-container-highest": "#e6e2dd",
+            "secondary-fixed": "#ffdcc5",
+            "surface-bright": "#fef8f3",
+            "outline-variant": "#d1c4bd",
+            "inverse-primary": "#d2c4bc",
+            "on-tertiary": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-background": "#1d1b19",
+            "on-tertiary-fixed": "#410001",
+            "secondary": "#735947",
+            "on-tertiary-container": "#eb6151",
+            "surface-container": "#f2ede8",
+            "surface-container-high": "#ece7e2",
+            "on-secondary": "#ffffff",
+            "on-surface": "#1d1b19",
+            "tertiary-fixed-dim": "#ffb4a9",
+            "surface-container-low": "#f8f3ee",
+            "primary": "#17110c",
+            "surface-tint": "#675c56",
+            "primary-fixed": "#efe0d8",
+            "on-error": "#ffffff",
+            "surface": "#fef8f3",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#8a1b13",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed-dim": "#e2c0aa",
+            "error-container": "#ffdad6"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin-mobile": "24px",
+            "base": "8px",
+            "gutter": "24px",
+            "margin-desktop": "64px",
+            "section-gap": "120px"
+          },
+          "fontFamily": {
+            "headline-lg": ["EB Garamond"],
+            "label-sm": ["DM Sans"],
+            "display-lg-mobile": ["EB Garamond"],
+            "display-lg": ["EB Garamond"],
+            "body-lg": ["DM Sans"],
+            "headline-md": ["EB Garamond"],
+            "body-md": ["DM Sans"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-secondary-fixed">
+<!-- Top Navigation -->
+<header class="w-full top-0 sticky bg-background dark:bg-inverse-surface border-b border-dashed border-outline-variant z-50">
+<div class="flex justify-between items-center px-margin-desktop py-base max-w-[1440px] mx-auto w-full">
+<div class="font-headline-lg text-headline-lg tracking-tighter text-primary dark:text-inverse-primary">TwoThreads</div>
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors duration-300 font-body-md text-body-md" href="#">Atelier</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors duration-300 font-body-md text-body-md" href="#">Bespoke</a>
+<a class="text-primary dark:text-inverse-primary border-b border-primary pb-1 font-body-md text-body-md" href="#">Collections</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors duration-300 font-body-md text-body-md" href="#">Story</a>
+</nav>
+<div class="flex items-center gap-base">
+<button class="p-2 transition-opacity active:opacity-80">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary">shopping_bag</span>
+</button>
+<button class="p-2 transition-opacity active:opacity-80">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="linen-bg">
+<!-- Editorial Header Section -->
+<section class="max-w-[1440px] mx-auto px-margin-desktop pt-section-gap pb-gutter text-center">
+<div class="inline-flex items-center px-4 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm mb-6 tracking-widest">
+        HANDMADE COLLECTION
+      </div>
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Cricket Lover’s Keychains</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto italic">
+        Each piece tells a story of patience, precision, and passion for the game. Crafted by hand in our sun-drenched atelier.
+      </p>
+<div class="w-24 h-px bg-outline-variant mx-auto mt-12 stitch-divider"></div>
+</section>
+<!-- Product Grid Section -->
+<section class="max-w-[1440px] mx-auto px-margin-desktop py-gutter">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Product 1 -->
+<article class="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="relative aspect-square overflow-hidden bg-surface-container">
+<img alt="Mini Willow Bat Keychain" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2Gx6jylrD_rjl94WU-CCRw_Ep94JQdeKOxjufSp8bltEAXENmIWYOoz2W0N16h4Mrng4UgImkoOfkZ2Kpkyp46qAFNOTvK7L86bqfkspdttd6RNWm7berikpC9IR1XBdf-bh19ZVqjjgIKzvuT-yd-55azPkf8AB9qVeZKir1zB-s5-EZNzquLnyVeNumMMrRouBsJcna6szyw-P08Qp3k5gGM4Ch6U8uq_FVopKmOJb4tbhC4SnXSoza0Qw1a6hTW-gLY9PyFuU"/>
+<span class="absolute top-4 left-4 font-label-sm text-label-sm bg-background/90 px-3 py-1 rounded-sm border border-dashed border-outline-variant">Handmade</span>
+</div>
+<div class="p-gutter flex flex-col items-center text-center">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Mini Willow Bat</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 tracking-tighter uppercase italic">Carved Maple • Engraved Stitching</p>
+<span class="font-headline-md text-[20px] text-secondary mb-6">$45.00</span>
+<button class="w-full py-3 px-6 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm tracking-widest hover:bg-primary transition-colors duration-300 active:scale-95">
+              ADD TO CART
+            </button>
+</div>
+</article>
+<!-- Product 2 -->
+<article class="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="relative aspect-square overflow-hidden bg-surface-container">
+<img alt="Leather Cricket Ball Keychain" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjbubdul98WuJPz8JiavzLf1dgzjhdirLE9cKruwXN_FdIYcvlGlpw4W3R18n2Q2Woh_JldrzlDdFiSFkl4WRYNXh9mjYNHMdRIdjM6irG0HtLe0MWJyAr6yfSk00TaXqVSq1wmDvpCPcABQd2gU3Y9bFoYZbarLPgjY0QaWmiOiK0lJudaGhOqg09-DdmL4wQTfYAMjtE74YhljYyednoADrXHRn11J201dnwUmuhg9t7Z4SXWmG5FHIWd1wNGbPn9BqnHE6KpDQ"/>
+<span class="absolute top-4 left-4 font-label-sm text-label-sm bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-sm border border-dashed border-on-tertiary-fixed/20">Limited Edition</span>
+</div>
+<div class="p-gutter flex flex-col items-center text-center">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Leather Cricket Ball</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 tracking-tighter uppercase italic">Genuine Leather • Hand-painted Seam</p>
+<span class="font-headline-md text-[20px] text-secondary mb-6">$38.00</span>
+<button class="w-full py-3 px-6 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm tracking-widest hover:bg-primary transition-colors duration-300 active:scale-95">
+              ADD TO CART
+            </button>
+</div>
+</article>
+<!-- Product 3 -->
+<article class="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="relative aspect-square overflow-hidden bg-surface-container">
+<img alt="Wicket Stumps Trio" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-pxD3z-9Zy9ByH_ZuudSfRmncswOUj6koJaPHFzfCPHQpiqIrUq6G9G3dVuN41gb1Wy44aZ0rxEzvvQplO-_IhzUkSZNR11hQ7YiUoX-1i7BDR0xe2-6vXwI4DpqmkUj_vcOklckK8LC8-8n4-Akv48axgwIHLQjlm2r34jcTsox_qzLrJfLJlj4qqP0y5rSDbWrjYAFvTURad5ihnrvkmBEDhqWLp1RSK0RV1r-ZX2r7FBLbdRYgM7dxIJASnVQa9CU_Xdaa4xI"/>
+<span class="absolute top-4 left-4 font-label-sm text-label-sm bg-surface-bright text-primary px-3 py-1 rounded-sm border border-dashed border-outline-variant">New Arrival</span>
+</div>
+<div class="p-gutter flex flex-col items-center text-center">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Wicket Stumps Trio</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 tracking-tighter uppercase italic">Polished Wood • Jute Binding</p>
+<span class="font-headline-md text-[20px] text-secondary mb-6">$42.00</span>
+<button class="w-full py-3 px-6 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm tracking-widest hover:bg-primary transition-colors duration-300 active:scale-95">
+              ADD TO CART
+            </button>
+</div>
+</article>
+<!-- Product 4 -->
+<article class="group hover-card transition-all duration-500 ease-out bg-surface-container-lowest rounded-lg overflow-hidden">
+<div class="relative aspect-square overflow-hidden bg-surface-container">
+<img alt="Embroidered Cricket Crest Keychain" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAw5WJMACw68DF6wvAT9CgZwI7GhliN61pNGpxhiGAmBylKx4B5XBR2g-d1nEruzjM59GqGIS0QzrM6DaD5nqCts4i8edC2TnqG2igXqAucqn7pYTeC7hZIxz5N5bV_yKevT_3LoFpfQKkU_hpDHHTGMoqpO3Qpjvax7erpD9fNgpfGvZVJRWEFRZoL53zi5kuShYPkEkZlUzzD7-jGT9SXeFVHy8tp0EARkUprPFdufgPd98aPdJ12oZ32kL37kFox_mmF2LhfbA"/>
+<span class="absolute top-4 left-4 font-label-sm text-label-sm bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-sm border border-dashed border-on-secondary-fixed/20">Artisan Made</span>
+</div>
+<div class="p-gutter flex flex-col items-center text-center">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Embroidered Crest</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-4 tracking-tighter uppercase italic">Gold Thread • Navy Embroidery</p>
+<span class="font-headline-md text-[20px] text-secondary mb-6">$32.00</span>
+<button class="w-full py-3 px-6 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm tracking-widest hover:bg-primary transition-colors duration-300 active:scale-95">
+              ADD TO CART
+            </button>
+</div>
+</article>
+</div>
+</section>
+<!-- Artisanal Details Section -->
+<section class="max-w-[1440px] mx-auto px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-3 gap-gutter text-center border-t border-dashed border-outline-variant mt-section-gap">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-4" data-icon="auto_awesome">auto_awesome</span>
+<h4 class="font-headline-md text-[24px] text-primary mb-2">Heritage Craft</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Traditional techniques passed down through generations of artisans.</p>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-4" data-icon="nature">nature</span>
+<h4 class="font-headline-md text-[24px] text-primary mb-2">Sustainably Sourced</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Ethically harvested English willow and premium vegetable-tanned leathers.</p>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-[40px] text-secondary mb-4" data-icon="history_edu">history_edu</span>
+<h4 class="font-headline-md text-[24px] text-primary mb-2">Bespoke Stories</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Each item is numbered and signed by the master craftsman who finished it.</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-section-gap bg-surface-container-low dark:bg-primary-container border-t border-dashed border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop py-gutter gap-base max-w-[1440px] mx-auto w-full">
+<div class="flex flex-col md:items-start items-center">
+<div class="font-headline-md text-headline-md text-primary mb-2">TwoThreads Studio</div>
+<p class="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed">© 2024 TwoThreads Studio. Crafted for the Cricket Connoisseur.</p>
+</div>
+<nav class="flex gap-gutter">
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:underline decoration-dashed decoration-outline transition-all active:scale-95" href="#">Provenance</a>
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:underline decoration-dashed decoration-outline transition-all active:scale-95" href="#">Shipping</a>
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:underline decoration-dashed decoration-outline transition-all active:scale-95" href="#">Care Guide</a>
+<a class="font-label-sm text-label-sm text-on-secondary-fixed-variant hover:underline decoration-dashed decoration-outline transition-all active:scale-95" href="#">Privacy</a>
+</nav>
+</div>
+</footer>
+<script>
+    // Subtle parallax or mouse-tracking effect for headers
+    document.addEventListener('mousemove', (e) => {
+      const moveX = (e.clientX - window.innerWidth / 2) * 0.005;
+      const moveY = (e.clientY - window.innerHeight / 2) * 0.005;
+      const headers = document.querySelectorAll('h1, h2');
+      headers.forEach(header => {
+        header.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
+    });
+
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          entry.target.classList.remove('opacity-0', 'translate-y-10');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('article').forEach(el => {
+      el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
+      observer.observe(el);
+    });
+  </script>
+</body></html>
