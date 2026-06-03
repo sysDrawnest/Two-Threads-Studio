@@ -21,6 +21,10 @@ import Artisans from './pages/Artisans';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import Wishlist from './pages/Wishlist';
+import Account from './pages/Account';
+import Checkout from './pages/Checkout';
+import Membership from './pages/Membership';
+import NotFound from './pages/NotFound';
 
 // Wrapper component to handle AnimatePresence properly with useLocation
 const AnimatedRoutes = () => {
@@ -44,6 +48,10 @@ const AnimatedRoutes = () => {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/membership" element={<Membership />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
