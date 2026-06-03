@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import PageContainer from '../components/layout/PageContainer';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { mockProducts } from '../data/products';
 import { mockTutorials } from '../data/tutorials';
+import { useAuth } from '../context/AuthContext';
 
 const Account: React.FC = () => {
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"Profile" | "Orders" | "Wishlist" | "Learning">("Profile");
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login?redirect=/account" replace />;
+  }
 
   // Mock Data
   const savedTutorials = mockTutorials.slice(0, 2);
@@ -18,8 +25,10 @@ const Account: React.FC = () => {
         {/* Sidebar Navigation */}
         <aside className="w-full md:w-64 lg:w-80 border-b md:border-b-0 md:border-r border-outline-variant p-6 md:p-12">
           <div className="mb-10">
-            <h1 className="font-serif text-3xl text-primary-container mb-2">My Studio</h1>
-            <p className="font-sans text-xs uppercase tracking-widest text-on-surface-variant">Master Member</p>
+            <h1 className="font-serif text-3xl text-primary-container mb-2">{user?.name || "My Studio"}</h1>
+            <p className="font-sans text-xs uppercase tracking-widest text-on-surface-variant">
+              {user?.membershipTier === 'master' ? 'Master Member' : user?.membershipTier === 'artisan' ? 'Artisan Member' : 'Free Member'}
+            </p>
           </div>
           
           <nav className="flex flex-row md:flex-col gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0">
@@ -36,7 +45,13 @@ const Account: React.FC = () => {
                 {tab}
               </button>
             ))}
-            <button className="text-left font-sans text-sm tracking-widest uppercase text-on-surface-variant hover:text-[#8b0000] transition-colors whitespace-nowrap px-4 py-2 md:p-0 bg-transparent md:mt-12">
+            <button 
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              className="text-left font-sans text-sm tracking-widest uppercase text-on-surface-variant hover:text-[#8b0000] transition-colors whitespace-nowrap px-4 py-2 md:p-0 bg-transparent md:mt-12"
+            >
               Sign Out
             </button>
           </nav>

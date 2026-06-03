@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { mockProducts } from '../data/products';
+import { useAuth } from '../context/AuthContext';
 
 const Checkout: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login?redirect=/checkout" replace />;
+  }
 
   // Mock Data
   const cartItems = [

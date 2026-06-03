@@ -11,6 +11,7 @@ import AdminLayout from './components/dashboard/AdminLayout';
 import IntroAnimation from './components/IntroAnimation';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import NewsletterModal from './components/layout/NewsletterModal';
 
 // Storefront Pages
 import Home from './pages/Home';
@@ -99,6 +100,7 @@ const StorefrontShell: React.FC = () => {
         <StorefrontRoutes />
       </main>
       <Footer />
+      <NewsletterModal />
     </div>
   );
 };

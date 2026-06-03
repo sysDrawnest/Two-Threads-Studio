@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import AuthLayout from '../../components/auth/AuthLayout';
 import { useAuth } from '../../context/AuthContext';
 
 const Login: React.FC = () => {
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -19,8 +20,12 @@ const Login: React.FC = () => {
     const result = await login(email, password);
     if (result.success) {
       // Route to admin if admin user
-      if (email === 'admin@twothreads.com') navigate('/admin');
-      else navigate('/account');
+      if (email === 'admin@twothreads.com') {
+        navigate('/admin');
+      } else {
+        const redirectPath = searchParams.get('redirect') || '/account';
+        navigate(redirectPath);
+      }
     } else {
       setError(result.error || 'Login failed.');
     }
