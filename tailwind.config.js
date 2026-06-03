@@ -65,13 +65,15 @@ module.exports = {
         "section-gap": "120px"
       },
       fontFamily: {
-        "headline-lg": ["EB Garamond"],
-        "label-sm": ["DM Sans"],
-        "display-lg-mobile": ["EB Garamond"],
-        "display-lg": ["EB Garamond"],
-        "body-lg": ["DM Sans"],
-        "headline-md": ["EB Garamond"],
-        "body-md": ["DM Sans"]
+        "headline-lg": ["Cormorant Garamond", "serif"],
+        "label-sm": ["Lato", "sans-serif"],
+        "display-lg-mobile": ["Cormorant Garamond", "serif"],
+        "display-lg": ["Cormorant Garamond", "serif"],
+        "body-lg": ["Lato", "sans-serif"],
+        "headline-md": ["Cormorant Garamond", "serif"],
+        "body-md": ["Lato", "sans-serif"],
+        "sans": ["Lato", "sans-serif"],
+        "serif": ["Cormorant Garamond", "serif"]
       }
     }
   },
