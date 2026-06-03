@@ -120,9 +120,36 @@ Two-Threads-Studio/
 
 ---
 
-## 📈 What's Next / Potential Improvements
+I will view the `tailwind.config.js` file to extract the exact colors defined in your current theme.
 
-1. **Routing System**: Transition from a single-page hash navigation layout to dynamic routing using `react-router-dom` to support separate checkout and detailed product page routes.
-2. **Component Separation**: Refactor the monolithic `src/App.tsx` file by separating the inline functional subcomponents (`Hero`, `Navbar`, `Learning`, etc.) into their own files under a `src/components/` directory.
-3. **Cart & Checkout Logic**: Add state management (e.g., React Context API or Redux) to handle item additions, side-cart toggle, and pricing checkout flows.
-4. **Media Asset Integration**: Swap out colored abstract placeholders with actual product image files or generated assets to make the UI look fully populated.
+Viewed tailwind.config.js:1-80
+
+Here is the current color palette defined in your theme (from `tailwind.config.js`):
+
+### 🟫 Primary & Secondary (Brand Colors)
+| Token | Hex Value | Color Preview | Description |
+| :--- | :--- | :---: | :--- |
+| `primary` | `#17110c` | <div style="background-color: #17110c; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Deep charcoal-brown |
+| `primary-container` | `#2d2520` | <div style="background-color: #2d2520; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Dark accent brown |
+| `primary-fixed` | `#efe0d8` | <div style="background-color: #efe0d8; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Warm linen accent |
+| `secondary` | `#735947` | <div style="background-color: #735947; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Artisan gold-brown |
+| `secondary-fixed` | `#ffdcc5` | <div style="background-color: #ffdcc5; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Soft cream / highlight peach |
+
+### 📄 Surface & Backgrounds (Neutral Tones)
+| Token | Hex Value | Color Preview | Description |
+| :--- | :--- | :---: | :--- |
+| `background` / `surface` | `#fef8f3` | <div style="background-color: #fef8f3; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Off-white warm linen background |
+| `surface-container-lowest` | `#ffffff` | <div style="background-color: #ffffff; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Pure white (for cards/containers) |
+| `surface-container-low` | `#f8f3ee` | <div style="background-color: #f8f3ee; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Warm cream container background |
+| `surface-container` | `#f2ede8` | <div style="background-color: #f2ede8; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Light beige tone |
+| `surface-container-highest` | `#e6e2dd` | <div style="background-color: #e6e2dd; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Darker beige tone |
+| `on-surface` | `#1d1b19` | <div style="background-color: #1d1b19; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Dark body text color |
+| `on-surface-variant` | `#4e4540` | <div style="background-color: #4e4540; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Soft brown metadata text |
+
+### 🍒 Tertiary & Accent Tones
+| Token | Hex Value | Color Preview | Description |
+| :--- | :--- | :---: | :--- |
+| `tertiary` | `#2f0000` | <div style="background-color: #2f0000; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Deep burgundy red |
+| `on-tertiary-container` | `#eb6151` | <div style="background-color: #eb6151; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Bright vermilion / warning |
+| `outline` | `#7f756f` | <div style="background-color: #7f756f; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Medium gray-brown for borders |
+| `outline-variant` | `#d1c4bd` | <div style="background-color: #d1c4bd; width: 36px; height: 18px; border: 1px solid #d1c4bd; border-radius: 4px;"></div> | Soft gray-brown for dividers |
