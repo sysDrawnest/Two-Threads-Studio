@@ -8,11 +8,13 @@ import Footer from './components/layout/Footer';
 
 import Home from './pages/Home';
 import Shop from './pages/Shop';
+import ProductDetail from './pages/ProductDetail';
 import Collections from './pages/Collections';
 import Learning from './pages/Learning';
 import Journal from './pages/Journal';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Wishlist from './pages/Wishlist';
 
 // Wrapper component to handle AnimatePresence properly with useLocation
 const AnimatedRoutes = () => {
@@ -23,11 +25,13 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:id" element={<ProductDetail />} />
         <Route path="/collections" element={<Collections />} />
         <Route path="/learning" element={<Learning />} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </AnimatePresence>
   );
