@@ -15,6 +15,10 @@ import TutorialDetail from './pages/TutorialDetail';
 import InstructorProfile from './pages/InstructorProfile';
 import Journal from './pages/Journal';
 import About from './pages/About';
+import OurStory from './pages/OurStory';
+import Sustainability from './pages/Sustainability';
+import Artisans from './pages/Artisans';
+import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import Wishlist from './pages/Wishlist';
 
@@ -34,6 +38,10 @@ const AnimatedRoutes = () => {
         <Route path="/instructor/:id" element={<InstructorProfile />} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/about" element={<About />} />
+        <Route path="/our-story" element={<OurStory />} />
+        <Route path="/sustainability" element={<Sustainability />} />
+        <Route path="/artisans" element={<Artisans />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
