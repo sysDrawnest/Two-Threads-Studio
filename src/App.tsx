@@ -11,6 +11,8 @@ import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import Collections from './pages/Collections';
 import Learning from './pages/Learning';
+import TutorialDetail from './pages/TutorialDetail';
+import InstructorProfile from './pages/InstructorProfile';
 import Journal from './pages/Journal';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -28,6 +30,8 @@ const AnimatedRoutes = () => {
         <Route path="/shop/:id" element={<ProductDetail />} />
         <Route path="/collections" element={<Collections />} />
         <Route path="/learning" element={<Learning />} />
+        <Route path="/learning/:id" element={<TutorialDetail />} />
+        <Route path="/instructor/:id" element={<InstructorProfile />} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
