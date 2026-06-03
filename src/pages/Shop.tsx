@@ -32,15 +32,15 @@ const Shop: React.FC = () => {
           
           {/* Filters */}
           <div className="flex gap-4 mt-8 md:mt-0 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-            {['difficulty', 'category', 'collection'].map((filterType) => (
+            {(['difficulty', 'category', 'collection'] as const).map((filterType) => (
               <select 
                 key={filterType}
                 className="bg-transparent border border-outline-variant text-primary-container font-sans text-xs uppercase tracking-wider py-2 px-4 outline-none cursor-pointer"
-                value={filter[filterType as keyof typeof filter]}
+                value={filter[filterType]}
                 onChange={(e) => setFilter({...filter, [filterType]: e.target.value})}
               >
                 <option value="All">{filterType}</option>
-                {Array.from(new Set(mockProducts.map(p => p[filterType as keyof Product]))).map(val => (
+                {Array.from(new Set(mockProducts.map(p => p[filterType]))).map(val => (
                   <option key={val as string} value={val as string}>{val}</option>
                 ))}
               </select>
