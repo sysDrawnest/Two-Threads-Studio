@@ -58,9 +58,9 @@ const Navbar: React.FC = () => {
           <button className="bg-transparent border-none cursor-pointer p-1">
             <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
           </button>
-          <button className="bg-transparent border-none cursor-pointer p-1">
-            <svg width="20" height="20" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
-          </button>
+          <Link to="/wishlist" className="bg-transparent border-none cursor-pointer p-1 text-[#2d2520] hover:opacity-70 transition-opacity">
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+          </Link>
           {/* Hamburger */}
           <button 
             onClick={() => setMenuOpen(!menuOpen)} 
