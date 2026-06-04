@@ -43,13 +43,13 @@ const Login: React.FC = () => {
           </section>
 
           {/* Identity & Header */}
-          <header className="w-full pt-8 pb-4 px-[20px] text-center animate-[fadeInUp_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]" style={{ animationDelay: '0.1s' }}>
+          <header className="w-full pt-8 pb-4 px-[20px] text-center">
             <h1 className="font-sans text-[12px] font-medium tracking-[0.25em] uppercase text-[#17110c]">TWOTHREADS STUDIO</h1>
             <div className="mt-6 border-b border-dotted border-[#d2c4bc] w-1/4 mx-auto"></div>
           </header>
 
           {/* Form Container */}
-          <section className="w-full max-w-md px-[20px] mt-12 animate-[fadeInUp_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards]" style={{ animationDelay: '0.2s', opacity: 0 }}>
+          <section className="w-full max-w-md px-[20px] mt-12">
             <h2 className="font-serif text-[30px] font-normal leading-[1.2] text-[#2d2520] mb-10 text-center">Sign In</h2>
             
             <form onSubmit={handleSubmit} className="flex flex-col gap-10" noValidate>

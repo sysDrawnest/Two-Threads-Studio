@@ -60,19 +60,19 @@ const Signup: React.FC = () => {
       {/* ---------------- MOBILE VIEW ---------------- */}
       <div className="md:hidden bg-[#fef8f3] text-[#1d1b19] min-h-screen flex flex-col font-sans overflow-x-hidden">
         {/* Top Editorial Banner */}
-        <div className="relative w-full h-48 overflow-hidden mb-8 animate-[slideUpFadeIn_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] opacity-0" style={{ animationDelay: '0.1s' }}>
+        <div className="relative w-full h-48 overflow-hidden mb-8">
           <img alt="Warm beige linen fabric with dark grey geometric embroidery lines, showing macro texture and digital craftsmanship detail." className="w-full h-full object-cover grayscale-[20%] sepia-[10%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlg4PrBPPW6Yq1kmFVAZTbXfQOAuu1uPikYMXlSNzKUHMYq6UkqHbEeXSdBbquqxrAi54RtZZ7IVOvIPBtT6LpQXyg8Jc-iw7J-ewYkWuqpvk9FMdGmxg9KuYk9CveRpSiKq9Zm_-BG5Zo1n6SitUwb5qcuNLmiOs14X_noihfUCDz4cWbNQSWrbJU-VrI_KlbW0G9a59LzviutkjMA-d7BlMTonTFcKAK8qoMHN2u77Uit2Ea8wFGsx8qr9xW0RNOQVaNe3G9rVFh" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#fef8f3] via-transparent to-transparent"></div>
         </div>
 
         {/* Main Branding Header */}
-        <header className="w-full px-[20px] text-center mb-6 animate-[slideUpFadeIn_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] opacity-0" style={{ animationDelay: '0.2s' }}>
+        <header className="w-full px-[20px] text-center mb-6">
           <h1 className="font-sans text-[12px] font-medium tracking-[0.25em] text-[#17110c] uppercase">TWOTHREADS STUDIO</h1>
           <div className="mt-4 w-1/3 mx-auto border-b border-dotted border-[#d2c4bc]"></div>
         </header>
 
         {/* Sign-up Form Container */}
-        <main className="flex-grow px-[20px] max-w-md mx-auto w-full animate-[slideUpFadeIn_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] opacity-0" style={{ animationDelay: '0.3s' }}>
+        <main className="flex-grow px-[20px] max-w-md mx-auto w-full">
           <div className="mb-10 text-center">
             <h2 className="font-serif text-[30px] font-normal text-[#2d2520] leading-tight">Create Account</h2>
           </div>
@@ -172,7 +172,7 @@ const Signup: React.FC = () => {
           </form>
 
           {/* Collapsible Hint Section */}
-          <div className="mt-12 mb-20 animate-[slideUpFadeIn_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] opacity-0" style={{ animationDelay: '0.4s' }}>
+          <div className="mt-12 mb-20">
             <div className="border-t border-dotted border-[#d2c4bc] pt-4">
               <button 
                 className="w-full flex justify-between items-center text-[#4e4540] hover:text-[#17110c] transition-colors duration-200 cursor-pointer bg-transparent border-none" 
@@ -193,7 +193,7 @@ const Signup: React.FC = () => {
         </main>
 
         {/* Footer Identity */}
-        <footer className="mt-auto py-8 text-center animate-[slideUpFadeIn_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] opacity-0" style={{ animationDelay: '0.5s' }}>
+        <footer className="mt-auto py-8 text-center">
           <p className="font-sans text-[10px] font-medium text-[#675c56] tracking-widest uppercase">© TWOTHREADS STUDIO MMXXIV</p>
         </footer>
       </div>
