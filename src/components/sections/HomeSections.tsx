@@ -199,18 +199,24 @@ export function JustForYou() {
             Curated Picks
           </h2>
         </ScrollReveal>
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {items.map((item, i) => {
-            const spans = [8, 4, 4, 6, 6];
-            const heights = [340, 200, 200, 260, 260];
+            const classNames = [
+              "md:col-span-12 lg:col-span-8 h-[340px]",
+              "md:col-span-6 lg:col-span-4 h-[340px]",
+              "md:col-span-6 lg:col-span-4 h-[260px]",
+              "md:col-span-6 lg:col-span-4 h-[260px]",
+              "md:col-span-12 lg:col-span-4 h-[260px]"
+            ];
+            
             return (
-              <ScrollReveal key={i} direction="up" className={`md:col-span-${spans[i]}`} style={{ gridColumn: `span ${spans[i]} / span ${spans[i]}` }}>
-                <div className="relative group cursor-pointer overflow-hidden" style={{ height: heights[i], backgroundColor: `hsl(${28 + i * 15}, 22%, ${78 - i * 3}%)` }}>
+              <ScrollReveal key={i} direction="up" className={classNames[i]}>
+                <div className="relative group cursor-pointer overflow-hidden h-full w-full" style={{ backgroundColor: `hsl(${28 + i * 15}, 22%, ${78 - i * 3}%)` }}>
                   {/* Subtle hover zoom visual */}
                   <div className="absolute inset-0 w-full h-full bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                  <div className="absolute bottom-3 left-3 bg-inverse-on-surface/90 px-3 py-2 z-20 shadow-sm">
-                    <p className="font-sans text-sm text-primary-container">{item.name}</p>
-                    <p className="font-sans text-xs text-on-secondary-container">{item.price}</p>
+                  <div className="absolute bottom-4 left-4 bg-inverse-on-surface/90 px-4 py-2.5 z-20 shadow-sm transition-transform duration-300 group-hover:-translate-y-1">
+                    <p className="font-sans text-sm text-primary-container font-medium">{item.name}</p>
+                    <p className="font-sans text-xs text-on-secondary-container mt-0.5">{item.price}</p>
                   </div>
                 </div>
               </ScrollReveal>
