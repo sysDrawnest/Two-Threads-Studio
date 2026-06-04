@@ -1,5 +1,8 @@
 import React from 'react';
 import { ScrollReveal, StaggerContainer } from '../ui/ScrollReveal';
+import roomImg1 from '../../assets/stitch/a_high_end_editorial_photo_of_a_minimalist_living_room_featuring_framed_hand.png';
+import roomImg2 from '../../assets/stitch/a_high_end_editorial_photo_of_a_serene_bathroom_setting_featuring_delicate.png';
+import roomImg3 from '../../assets/stitch/a_high_end_editorial_photo_of_a_cozy_bedroom_featuring_an_embroidered.png';
 
 export function Hero() {
   const heroProducts = [
@@ -109,11 +112,6 @@ export function BestSellers() {
     </section>
   );
 }
-
-import roomImg1 from '../../assets/stitch/a_high_end_editorial_photo_of_a_minimalist_living_room_featuring_framed_hand.png';
-import roomImg2 from '../../assets/stitch/a_high_end_editorial_photo_of_a_serene_bathroom_setting_featuring_delicate.png';
-import roomImg3 from '../../assets/stitch/a_high_end_editorial_photo_of_a_cozy_bedroom_featuring_an_embroidered.png';
-
 export function ExploreByRoom() {
   const rooms = [
     { name: "Living Spaces", desc: "Framed hoops and wall hangings that bring warmth and texture to your walls and shelves.", img: roomImg1 },
@@ -144,7 +142,7 @@ export function ExploreByRoom() {
                 <p className="font-sans text-base text-[#4e4540] leading-relaxed">
                   {room.desc}
                 </p>
-                <a href="#" className="inline-flex items-center font-sans text-[14px] uppercase tracking-[0.15em] font-medium border-b border-primary-container pb-1 group-hover:text-secondary group-hover:border-secondary transition-colors no-underline text-primary-container">
+                <a href="#collections" className="inline-flex items-center font-sans text-[14px] uppercase tracking-[0.15em] font-medium border-b border-primary-container pb-1 group-hover:text-secondary group-hover:border-secondary transition-colors no-underline text-primary-container">
                   Shop {room.name}
                   <svg className="ml-2" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </a>
