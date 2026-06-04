@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#978b84",
+                    "on-primary-fixed-variant": "#4e453f",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e7e1dd",
+                    "tertiary-fixed-dim": "#d2c4bc",
+                    "secondary-fixed-dim": "#e2c0aa",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#211a15",
+                    "tertiary-fixed": "#efe0d7",
+                    "surface": "#fef8f3",
+                    "on-secondary-fixed": "#291709",
+                    "surface-tint": "#675c56",
+                    "secondary": "#735947",
+                    "on-secondary-fixed-variant": "#594231",
+                    "secondary-container": "#fcd9c2",
+                    "primary-fixed": "#efe0d8",
+                    "on-tertiary-fixed-variant": "#4e453f",
+                    "inverse-primary": "#d2c4bc",
+                    "on-surface": "#1d1b19",
+                    "primary-fixed-dim": "#d2c4bc",
+                    "on-secondary-container": "#785d4b",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-dim": "#ded9d4",
+                    "surface-bright": "#fef8f3",
+                    "background": "#fef8f3",
+                    "surface-container": "#f3ede8",
+                    "on-surface-variant": "#4e4540",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#ede7e2",
+                    "primary": "#17110c",
+                    "on-primary-container": "#988b84",
+                    "on-tertiary-fixed": "#211a15",
+                    "outline": "#7f756f",
+                    "tertiary-container": "#2d2520",
+                    "tertiary": "#17110c",
+                    "primary-container": "#2d2520",
+                    "outline-variant": "#d1c4bd",
+                    "on-error-container": "#93000a",
+                    "on-background": "#1d1b19",
+                    "surface-container-low": "#f8f3ee",
+                    "inverse-on-surface": "#f6f0eb",
+                    "inverse-surface": "#32302d",
+                    "surface-variant": "#e7e1dd",
+                    "secondary-fixed": "#ffdcc5",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-tablet": "40px",
+                    "margin-desktop": "80px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["EB Garamond", "serif"],
+                    "label-caps": ["DM Sans", "sans-serif"],
+                    "headline-md": ["EB Garamond", "serif"],
+                    "headline-lg": ["EB Garamond", "serif"],
+                    "body-lg": ["DM Sans", "sans-serif"],
+                    "headline-lg-mobile": ["EB Garamond", "serif"],
+                    "button-text": ["DM Sans", "sans-serif"],
+                    "body-md": ["DM Sans", "sans-serif"]
+            },
+            "fontSize": {
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                    "headline-md": ["28px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "button-text": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: auto;
+            align-items: start;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface border-b border-dotted border-outline-variant dark:border-outline fixed top-0 full-width z-50 flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="transition-opacity active:opacity-70 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<h1 class="font-display-lg text-headline-lg-mobile tracking-tighter text-primary dark:text-primary-fixed">TwoThreads Studio</h1>
+<div class="flex items-center gap-4">
+<button class="transition-opacity active:opacity-70 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile">
+<!-- Header Section -->
+<section class="mb-12">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant block mb-4">COMMUNITY GALLERY</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-6">Made by You.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8 max-w-[90%]">
+                A showcase of finished pieces, works-in-progress, and creative spaces from the TwoThreads community. Tag us on Instagram with #TwoThreadsStudio to be featured.
+            </p>
+<button class="w-full bg-primary py-4 px-6 transition-colors duration-300 active:bg-secondary flex justify-center items-center">
+<span class="font-button-text text-button-text text-on-primary uppercase">FOLLOW OUR INSTAGRAM</span>
+</button>
+</section>
+<!-- Divider -->
+<div class="w-full border-t border-dotted border-outline-variant mb-12"></div>
+<!-- Editorial Gallery Grid -->
+<section class="masonry-grid gap-gutter">
+<!-- Item 1 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzi3h5kRbTbXblMbOx65hzhxGpWWR2esWyQ6yFYel6j8HO6IKPe3Ru0j_V0oeayoUIbXk-tCIMc48meA1rjteKHQo-zKvuqlleYXdDKfpiiWMwj6sruoG-6QZJTHzwh98OjlJoP57a1sejYnk-1qo5YisMN8HtZ-OqmZAPTuIlS5zYyxqatT4sQQIM72BRjsGhaogQMRBlsBzU1oOvKvie5OvLwV08qh-GxWQVGD_tTrcPs3jdFi6l7PLa7vGe0mksPVl7DaTfVpui"/>
+</div>
+</div>
+<!-- Item 2 (Offset) -->
+<div class="flex flex-col gap-2 pt-12">
+<div class="aspect-[1/1] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtbAKhT9Apk1kq_79deEmUWi4yFp8apybD102AMTneT52SApdS8aNoMyJ2OMDh8ztL0vwWIc82Og5pwMRPvLnQ05YkPT0Q2hhamWM_HMjszCm-2j9v3_NwxLoIX00m2NobW_yBzws2YPRE7Vx2q4SNWS2SvacRNwk8duRWFD97pflmzazTCLyrqrxhT7wC_V3-mv25MDAzFJdKK-Z42nFxS6dUPS7p5rmtU7z3aIyjnl-M-CzXY4IpYT5cPj7X6MCb0eXRbDKHw5zI"/>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex flex-col gap-2 -mt-8">
+<div class="aspect-[1/1] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_2h_C5WPZoed0bhPwOB0I3wE5X4hez_8n5lMBtRjmvTb2koz-ahdaD4TJmlKqsxJaOjEyKHVyKWtzUceYJ_JBwFCS5ZFER38q_76Pxd468nyIrLZeP6D1hC0vk1XoBiMYNVHp6BafZYrKgR8c4UacUY077UCIWu5WJfY84EKJgjzRiMQt5LCTaBWA11MgGdEax1lgDCq6WztaYvFFFNhzpRDcq7CHYkXnnydxAENhnVqhV2GYrJjUpcIldjmT8OnmRXLmuTkA3cvG"/>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="flex flex-col gap-2">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlrVabTDzw6rSpuUIWrHXja8MVbyvVjhnOxHXZz3JR4K4Hx_rogkELvZK3mLVYM2aytJ0nlg7GYl_w9fKLN9RxZdivOxamT81gr0bRvOaCDY-X7j8svLuqfwaKsGN6owqz25HH85_xR3Bi-c1r58Sme3dLlAYP10R_JE03hjx1wJYM1AjBVwzTjqrR0eAn8ZGrnyFYyDPuhKP-LC3_l4tqBwktLWm2-q87fSaWcDWErqXTMBasWYCeVkYXpm6q3OBbbWEzMB9jPPp5"/>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="flex flex-col gap-2 -mt-4">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQhz0fz690gK2v9I5SmWD_hzwSfLGJGXkfFU_Qy-GgIydDD3aDsbhpaosd1zotp4ulgAlUPGWhQqe3mUhUuhuQuDyPiITQK1h3NM_M_NaWcghzo1N88yFc_Lw-tfLf-8c7Hh3VOLjDP45MMr6H314RBA99itiFUdTeU5pNVEDVhT6RBH6HNdJxURQfj88FZP9nyXMJ1jRlG_AqfB3n2KBEz5e7LKFK9Ziu4gYSluxMUkHzHMtO61u6DV9KkMmPknWvE6-gj_FZpIlk"/>
+</div>
+</div>
+<!-- Item 6 -->
+<div class="flex flex-col gap-2 pt-4">
+<div class="aspect-[1/1] overflow-hidden bg-surface-container">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBukPThQGPc0ED6nmaReG3tecQ9ClDw-wjaaTBxtFuLEY-YNmcqAOddW9oh9TWgpz8k579PRcEidc55lz5JpEWqsYtqJguoJV7PEOhbcmymw6Ck7SoX1QqfXxZ1C-00WXdLEe6kfhNFvnUOJ3-Fa1tQWznwSM5LbP-Cq6-qL1AfsVCKQ-IosSywy7yP8-hss_5RRvmT1DTUIniTjF6kqWzSyHBIDnUoT_sHn2_Us4VcDOxM53URwfxbvPtGqZwh-Oas1MTbWjCJ9qSk"/>
+</div>
+</div>
+</section>
+<!-- Aesthetic Footer Text -->
+<section class="py-24 text-center">
+<p class="font-headline-md text-headline-md text-primary italic opacity-50">Slowly crafted.</p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface dark:bg-surface border-t border-dotted border-outline-variant dark:border-outline">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 scale-95 active:scale-90 transition-transform hover:text-secondary" href="#">
+<span class="material-symbols-outlined">auto_awesome_motion</span>
+<span class="font-label-caps text-label-caps pt-1">Atelier</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 scale-95 active:scale-90 transition-transform hover:text-secondary" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-caps text-label-caps pt-1">Journal</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold border-t-2 border-primary pt-2 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-caps text-label-caps pt-1">Collections</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 scale-95 active:scale-90 transition-transform hover:text-secondary" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps pt-1">Archive</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for images
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('click', () => {
+                img.style.opacity = '0.8';
+                setTimeout(() => {
+                    img.style.opacity = '1';
+                }, 150);
+            });
+        });
+    </script>
+</body></html>

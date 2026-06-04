@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .dotted-stitch {
+            background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+            background-size: 8px 1px;
+            background-repeat: repeat-x;
+            height: 1px;
+            width: 100%;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f6f0eb",
+                        "secondary-container": "#fcd9c2",
+                        "primary-fixed-dim": "#d2c4bc",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#d1c4bd",
+                        "tertiary-container": "#2d2520",
+                        "on-secondary-fixed-variant": "#594231",
+                        "primary-container": "#2d2520",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#ede7e2",
+                        "surface-variant": "#e7e1dd",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#efe0d7",
+                        "surface-container": "#f3ede8",
+                        "inverse-primary": "#d2c4bc",
+                        "surface": "#fef8f3",
+                        "on-surface": "#1d1b19",
+                        "on-primary-fixed-variant": "#4e453f",
+                        "surface-container-highest": "#e7e1dd",
+                        "primary-fixed": "#efe0d8",
+                        "on-primary-container": "#988b84",
+                        "surface-bright": "#fef8f3",
+                        "primary": "#17110c",
+                        "tertiary-fixed-dim": "#d2c4bc",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#211a15",
+                        "surface-container-low": "#f8f3ee",
+                        "on-surface-variant": "#4e4540",
+                        "background": "#fef8f3",
+                        "outline": "#7f756f",
+                        "surface-dim": "#ded9d4",
+                        "on-secondary-container": "#785d4b",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#675c56",
+                        "secondary-fixed-dim": "#e2c0aa",
+                        "secondary-fixed": "#ffdcc5",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#17110c",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1d1b19",
+                        "on-tertiary-container": "#978b84",
+                        "on-tertiary-fixed": "#211a15",
+                        "secondary": "#735947",
+                        "on-tertiary-fixed-variant": "#4e453f",
+                        "on-secondary-fixed": "#291709",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#32302d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-tablet": "40px",
+                        "unit": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["EB Garamond"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["EB Garamond"],
+                        "body-md": ["DM Sans"],
+                        "button-text": ["DM Sans"],
+                        "display-lg": ["EB Garamond"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "body-lg": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                        "headline-md": ["28px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "button-text": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "500"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface flex justify-between items-center px-margin-mobile h-16 w-full docked full-width top-0 border-b border-dotted border-outline-variant dark:border-outline flat no shadows z-50">
+<div class="flex items-center transition-opacity active:opacity-70">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">menu</span>
+</div>
+<h1 class="font-display-lg text-headline-lg-mobile tracking-tighter text-primary dark:text-primary-fixed">TwoThreads Studio</h1>
+<div class="flex items-center transition-opacity active:opacity-70">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">shopping_bag</span>
+</div>
+</header>
+<main class="max-w-screen-md mx-auto px-margin-mobile pt-12">
+<!-- Section Header -->
+<section class="mb-16 text-center">
+<p class="font-label-caps text-label-caps uppercase tracking-[0.2em] mb-4 text-on-surface-variant" style="font-size: 11px;">Explore by Room</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-tertiary-container mb-6">Stitch Every Corner</h2>
+<div class="dotted-stitch text-outline-variant max-w-[80px] mx-auto"></div>
+</section>
+<!-- Room Categories Vertical Stack -->
+<div class="space-y-20">
+<!-- Item 1: Living Spaces -->
+<article class="group">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-low mb-6">
+<img alt="Living Spaces Illustration" class="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtcBc9QPQ4UKTD7qs7X5hDSn7YtZOa8-nWWFbNemCcKAo8HkSex0uTDdvsV4Z2kbUorZ-Up3KKwW_IiTpZrW0xXRSm7ASgICDCDC9Tq3CoE4v2EH-7F1Rm5Goh3UbnBVwv8_w1YSy2y3iCzcaBELGR8x5SeBTW0RKtKcUPe70QjCo8rXNWJaM_NsegeB7YGCbeRpYqOQJCMVi8DxXuNPhVHBIPiLngCwMx4Uyq3-Dm_lyfYaNcLcWa2tcCE5WGZac2x6Qxat_Ajs-H"/>
+</div>
+<div class="space-y-4">
+<h3 class="font-headline-md text-headline-md text-primary">Living Spaces</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Framed hoops and wall hangings that bring warmth and texture to your walls and shelves.
+                    </p>
+<a class="inline-flex items-center font-button-text text-button-text uppercase border-b border-primary pb-1 group-hover:text-secondary group-hover:border-secondary transition-colors" href="#">
+                        Shop Living Spaces
+                        <span class="material-symbols-outlined ml-2 text-[18px]">arrow_right_alt</span>
+</a>
+</div>
+</article>
+<!-- Item 2: Bathrooms -->
+<article class="group">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-low mb-6">
+<img alt="Bathrooms Illustration" class="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfD0_IWTlHGHnFSqspXtXdk7yWkfUk9qL8F75ZrPkwr9JTzzfCxRpJZRnACc4DTDMl-YtPG3XVmVXk-IMZiS8q8KIeWDneTlPbxVW0C_PwoiXKdVRwwTfnn737-g5N0SvldGnTozjnwV-mgfFHnJvRDz9PBNzCnFyjf1Np4kuGIpPTIGFB1YRU_WA33phX0lxDEm4UV7b-QRZF9iZRKY4PHjJLTgDJ_jHMt9Q3w3cHMWFvdt0FO81iNKbsJsVVNexbw0m7o8rDRoqp"/>
+</div>
+<div class="space-y-4">
+<h3 class="font-headline-md text-headline-md text-primary">Bathrooms</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Delicate embroidered towels, framed botanical prints, and linen accents for serene spaces.
+                    </p>
+<a class="inline-flex items-center font-button-text text-button-text uppercase border-b border-primary pb-1 group-hover:text-secondary group-hover:border-secondary transition-colors" href="#">
+                        Shop Bathrooms
+                        <span class="material-symbols-outlined ml-2 text-[18px]">arrow_right_alt</span>
+</a>
+</div>
+</article>
+<!-- Item 3: Bedrooms -->
+<article class="group">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-low mb-6">
+<img alt="Bedrooms Illustration" class="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAkpBdYKPpIJp-oZW5dbMc-dAPmxZumb7Sicn0r1WlgS4WoTVMxIGDKzb6XeQIR9MHAZs409dXSxbK3PkcQ7uUdUuc5DRjPWzKDgveiT9Is1hQIlGn6CyTxZTdeMkRCTdLiCHe9EIytHOfEuT_XlBuh7t0zeRcGMPkW1fYEigDElM2shAabNFYtTCR96o4BEK9LJeDWVGlmulvVTbvtHLOJj23j1X7m695k1QG3mAw03RMdIh-8YQpmgwyaRyvrm70wYl7-pDVg3nz"/>
+</div>
+<div class="space-y-4">
+<h3 class="font-headline-md text-headline-md text-primary">Bedrooms</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Pillowcase embroideries, dream-catcher wall art, and slow-stitch pieces for restful rooms.
+                    </p>
+<a class="inline-flex items-center font-button-text text-button-text uppercase border-b border-primary pb-1 group-hover:text-secondary group-hover:border-secondary transition-colors" href="#">
+                        Shop Bedrooms
+                        <span class="material-symbols-outlined ml-2 text-[18px]">arrow_right_alt</span>
+</a>
+</div>
+</article>
+</div>
+<!-- Footer Visual Anchor -->
+<div class="py-24 flex flex-col items-center">
+<div class="dotted-stitch text-outline-variant mb-12"></div>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-50">TwoThreads Studio © 2024</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface dark:bg-surface border-t border-dotted border-outline-variant dark:border-outline flat no shadows">
+<!-- Atelier (Active) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold border-t-2 border-primary pt-2 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">auto_awesome_motion</span>
+<span class="font-label-caps text-[10px] tracking-widest uppercase">Atelier</span>
+</a>
+<!-- Journal -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-secondary transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">menu_book</span>
+<span class="font-label-caps text-[10px] tracking-widest uppercase">Journal</span>
+</a>
+<!-- Collections -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-secondary transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">grid_view</span>
+<span class="font-label-caps text-[10px] tracking-widest uppercase">Collections</span>
+</a>
+<!-- Archive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant pt-2 hover:text-secondary transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">inventory_2</span>
+<span class="font-label-caps text-[10px] tracking-widest uppercase">Archive</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for smooth revealing of items
+        document.addEventListener('DOMContentLoaded', () => {
+            const articles = document.querySelectorAll('article');
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-8');
+                    }
+                });
+            }, observerOptions);
+
+            articles.forEach(article => {
+                article.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-1000');
+                observer.observe(article);
+            });
+        });
+    </script>
+</body></html>

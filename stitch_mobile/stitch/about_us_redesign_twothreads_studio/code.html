@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoThreads Studio | Our Story</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fef8f3",
+                        "surface-dim": "#ded9d4",
+                        "on-surface": "#1d1b19",
+                        "tertiary-fixed": "#efe0d7",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#291709",
+                        "on-primary-fixed-variant": "#4e453f",
+                        "on-tertiary-container": "#978b84",
+                        "inverse-on-surface": "#f6f0eb",
+                        "inverse-surface": "#32302d",
+                        "surface-container-highest": "#e7e1dd",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#594231",
+                        "secondary-container": "#fcd9c2",
+                        "primary-fixed-dim": "#d2c4bc",
+                        "on-surface-variant": "#4e4540",
+                        "secondary-fixed-dim": "#e2c0aa",
+                        "tertiary-container": "#2d2520",
+                        "on-primary-fixed": "#211a15",
+                        "on-error": "#ffffff",
+                        "background": "#fef8f3",
+                        "secondary": "#735947",
+                        "on-tertiary-fixed-variant": "#4e453f",
+                        "surface-variant": "#e7e1dd",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdcc5",
+                        "primary-fixed": "#efe0d8",
+                        "surface-tint": "#675c56",
+                        "primary-container": "#2d2520",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#211a15",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#d2c4bc",
+                        "surface-container": "#f3ede8",
+                        "primary": "#17110c",
+                        "error": "#ba1a1a",
+                        "tertiary": "#17110c",
+                        "surface": "#fef8f3",
+                        "outline": "#7f756f",
+                        "surface-container-low": "#f8f3ee",
+                        "inverse-primary": "#d2c4bc",
+                        "on-primary-container": "#988b84",
+                        "outline-variant": "#d1c4bd",
+                        "on-secondary-container": "#785d4b",
+                        "on-background": "#1d1b19",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#ede7e2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-tablet": "40px",
+                        "container-max": "1280px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "80px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["EB Garamond", "serif"],
+                        "display-lg": ["EB Garamond", "serif"],
+                        "body-md": ["DM Sans", "sans-serif"],
+                        "label-caps": ["DM Sans", "sans-serif"],
+                        "headline-md": ["EB Garamond", "serif"],
+                        "headline-lg": ["EB Garamond", "serif"],
+                        "button-text": ["DM Sans", "sans-serif"],
+                        "body-lg": ["DM Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.2em", "fontWeight": "500"}],
+                        "headline-md": ["28px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "button-text": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.15em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fef8f3;
+            color: #2d2520;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .dotted-divider {
+            border: 0;
+            border-top: 1px dotted #735947;
+            height: 0;
+            width: 100%;
+        }
+        .fade-mask {
+            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-[60] bg-surface flex justify-between items-center w-full px-margin-mobile py-4 border-b border-outline-variant">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+</div>
+<h1 class="font-label-caps text-label-caps tracking-[0.3em] text-primary">TWOTHREADS STUDIO</h1>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary cursor-pointer">shopping_bag</span>
+</div>
+</header>
+<main class="pt-16 pb-24 max-w-screen-md mx-auto">
+<!-- Section 1: Hero -->
+<section class="relative">
+<div class="w-full aspect-[4/5] overflow-hidden fade-mask">
+<img alt="Hand packing a premium embroidery kit" class="w-full h-full object-cover grayscale-[20%] contrast-[1.05]" src="https://lh3.googleusercontent.com/aida/AP1WRLu9N-OH0jUgPQzoWx9EWw5fpftSZngXSwgJENwfl8FTfpWBeAqzBeYDwakWBuMF8TBTGkw5_1x4ubODGSPntERHCAjQCQ7ueyZPgQEWNBSIf9bfv5EVatMla9e0f-LXqbardqrrMgeOlY5l30duvGJcAdEJYB61i7b5UKWvVKhP45KDG6nVQm2YamaTCumjtSMgeiitklVVGFCXVc1TXR9bGsNaJuVshWizQBKPiZE15VA1YFRxocukMT_H"/>
+</div>
+<div class="px-margin-mobile -mt-12 relative z-10">
+<p class="font-label-caps text-label-caps tracking-[0.3em] text-secondary mb-4 uppercase">OUR MISSION</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-6 italic">“We believe in the beauty of the handmade, and the peace found in the process.”</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-prose">
+                    At TwoThreads Studio, we source the finest natural materials and partner with master artisans to create embroidery kits that act as a bridge between traditional craft and modern mindfulness.
+                </p>
+</div>
+</section>
+<div class="px-margin-mobile py-16">
+<hr class="dotted-divider"/>
+</div>
+<!-- Section 2: Process -->
+<section class="px-margin-mobile">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">The Craftsmanship Process</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-12">How a TwoThreads kit comes to life.</p>
+<div class="space-y-20">
+<!-- Step 01 -->
+<div class="group">
+<div class="aspect-[1/1] mb-6 overflow-hidden bg-surface-container">
+<img alt="Macro shot of natural unbleached linen fabric" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBsvWyTI0KuaIPCPKThTjST56-dLQBzbmlprw7zXBujWGk6tlgaRYHpMv1BteTrZW00IcQmbOY5Fnt18Ei51L0wj8OeMiowc5FFaMLM57ge-MbF85Z66ziLcymCUKHe29WuFfcdccsgyzIcHkiqBxBBuZhyf1sMAASFBWQhAWODy9uzdet7QstyV90eLZYv6n2hLZxalkvGiARCvdcJvJCAbIjP5eJ_gyQRt0Y6PwCV2zaOjpPEgeVVrdL9ahFOlY-3Yf0ojbOXljY"/>
+</div>
+<div class="flex items-baseline gap-4">
+<span class="font-label-caps text-label-caps text-outline">01</span>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-3">Sourcing</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">We start with the fabric. Our unbleached linen is woven in a zero-waste facility in Belgium, ensuring perfect tension and a natural, earthy texture.</p>
+</div>
+</div>
+</div>
+<!-- Step 02 -->
+<div class="group">
+<div class="aspect-[1/1] mb-6 overflow-hidden bg-surface-container">
+<img alt="Artist hand-drawing botanical patterns in a sketchbook" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCplWiOJ97WOAIxZhsiR_LuTJRev7dnO7JyTqfpDnGEZ8DPwPhhZo_TtHFX--YbEaWnLUSRPj6sPh0SArZBl6ehJecNyK9qv2aleFxr_onRkHRawlZJrNa8w7Qd_dIBSboHDMjFYN8u2A16nJoQjnZlWF9EKkyQBeY1jpyVmPxpC-pNt20BVySUmLYkO_Vq_yZObQX7j2yVxSrql41V3EPzRBKMEN8P6IEXjdahhiG4TTf8a-LVCzT4c922Z9ALqUaxyX3Pqv-6iMZH"/>
+</div>
+<div class="flex items-baseline gap-4">
+<span class="font-label-caps text-label-caps text-outline">02</span>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-3">Design</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Every pattern is hand-drawn by our global network of textile artists. We digitize these drawings carefully to retain the organic feel of the original sketch.</p>
+</div>
+</div>
+</div>
+<!-- Step 03 -->
+<div class="group">
+<div class="aspect-[1/1] mb-6 overflow-hidden bg-surface-container">
+<img alt="Close-up of vibrant embroidery threads being packed into a box" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNAwhU3QyAmQy2FInr7nbvvLPdI6RjOl32R_plXSy6tOow3Reowa1GPPoY8tMfg0Vwf81PnXkRc2Zj09fwpKxcy2yGxiePwNZ0OEQV92P97DXXANyx99m6dLRnG0ojxFL69JeRhHHe0ThCh-cRRO8KF5uGj_EKHpTLdM2TmX8e0roBScW3IDHJpoTqova6sXd6eUA9mctlZZmdFrZ9EJK37fRZZZ7opGX_i6OiPv5ildSDmxv0WuuV29SDpFLegRLaw2maVQ_qNmGA"/>
+</div>
+<div class="flex items-baseline gap-4">
+<span class="font-label-caps text-label-caps text-outline">03</span>
+<div>
+<h4 class="font-headline-md text-headline-md text-primary mb-3">Curation</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Threads are color-matched by eye, not by computer. We pack every box by hand in our studio, wrapping components in recycled paper.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="px-margin-mobile py-20">
+<hr class="dotted-divider"/>
+</div>
+<!-- Section 3: Testimonials -->
+<section class="px-margin-mobile bg-surface-container-low py-16 -mx-margin-mobile">
+<div class="px-margin-mobile">
+<p class="font-label-caps text-label-caps tracking-[0.2em] text-secondary mb-12 text-center">WORDS FROM THE PRESS &amp; MAKERS</p>
+<div class="space-y-16">
+<figure class="text-center">
+<blockquote class="font-headline-md text-headline-md text-primary italic mb-6">
+                            "TwoThreads isn't just selling embroidery kits; they are selling an antidote to screen fatigue. The materials are stunningly premium."
+                        </blockquote>
+<figcaption class="font-label-caps text-label-caps text-outline-variant uppercase">
+                            — The Modern Crafter Magazine
+                        </figcaption>
+</figure>
+<figure class="text-center">
+<blockquote class="font-headline-md text-headline-md text-primary italic mb-6">
+                            "I bought a kit on a whim and it changed my evenings. It's so satisfying to watch an image appear thread by thread."
+                        </blockquote>
+<figcaption class="font-label-caps text-label-caps text-outline-variant uppercase">
+                            — Julia H., Customer
+                        </figcaption>
+</figure>
+</div>
+</div>
+</section>
+<!-- Section 4: CTA -->
+<section class="px-margin-mobile py-24 text-center">
+<a class="inline-block w-full py-6 bg-primary text-on-primary font-button-text text-button-text tracking-[0.2em] uppercase hover:bg-secondary transition-colors duration-300" href="#">
+                Read the Founder's Story →
+            </a>
+</section>
+<!-- Footer -->
+<footer class="px-margin-mobile pt-16 pb-32 bg-surface text-center border-t border-dotted border-outline-variant">
+<p class="font-label-caps text-label-caps tracking-widest text-primary mb-8">TWOTHREADS STUDIO</p>
+<div class="flex justify-center gap-8 mb-8 text-on-surface-variant">
+<span class="font-label-caps text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors">INSTAGRAM</span>
+<span class="font-label-caps text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors">PINTEREST</span>
+<span class="font-label-caps text-[10px] tracking-widest cursor-pointer hover:text-primary transition-colors">EMAIL</span>
+</div>
+<p class="font-label-caps text-[10px] text-outline">© 2024 ALL RIGHTS RESERVED.</p>
+</footer>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-dotted border-outline-variant flex justify-around items-center pb-safe pt-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-caps text-[10px] mt-1">COLLECTIONS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="font-label-caps text-[10px] mt-1">SHOP</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">texture</span>
+<span class="font-label-caps text-[10px] mt-1">STUDIO</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-caps text-[10px] mt-1">JOURNAL</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px] mt-1">ACCOUNT</span>
+</a>
+</nav>
+<script>
+        // Simple scroll reveal effect for images
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100');
+                    entry.target.classList.remove('translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('img').forEach(img => {
+            img.classList.add('transition-all', 'duration-1000', 'ease-out');
+            observer.observe(img);
+        });
+    </script>
+</body></html>
