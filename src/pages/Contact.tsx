@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PageContainer from '../components/layout/PageContainer';
+import { ScrollReveal, StaggerContainer } from '../components/ui/ScrollReveal';
 
 const Contact: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -16,7 +17,7 @@ const Contact: React.FC = () => {
       <div className="flex flex-col lg:flex-row min-h-screen bg-background">
         
         {/* Left Side: Contact Info & Form */}
-        <div className="w-full lg:w-1/2 p-8 md:p-16 lg:p-24 flex flex-col justify-center">
+        <ScrollReveal direction="left" className="w-full lg:w-1/2 p-8 md:p-16 lg:p-24 flex flex-col justify-center">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">
             Get in Touch
           </p>
@@ -31,11 +32,11 @@ const Contact: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
                 <label htmlFor="name" className="block font-sans text-xs uppercase tracking-widest text-primary-container mb-2">Name</label>
-                <input type="text" id="name" className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container" />
+                <input type="text" id="name" required className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container" />
               </div>
               <div className="flex-1">
                 <label htmlFor="email" className="block font-sans text-xs uppercase tracking-widest text-primary-container mb-2">Email</label>
-                <input type="email" id="email" className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container" />
+                <input type="email" id="email" required className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container" />
               </div>
             </div>
             
@@ -51,22 +52,22 @@ const Contact: React.FC = () => {
 
             <div>
               <label htmlFor="message" className="block font-sans text-xs uppercase tracking-widest text-primary-container mb-2">Message</label>
-              <textarea id="message" rows={4} className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container resize-none"></textarea>
+              <textarea id="message" rows={4} required className="w-full bg-transparent border-b border-outline-variant py-2 focus:outline-none focus:border-primary-container transition-colors font-sans text-sm text-primary-container resize-none"></textarea>
             </div>
 
-            <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-9 py-4 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-[#5a3d2b] transition-colors border-none">
+            <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-9 py-4 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-[#5a3d2b] transition-colors border-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container">
               Send Message
             </button>
           </form>
-        </div>
+        </ScrollReveal>
 
         {/* Right Side: FAQ & Imagery */}
-        <div className="w-full lg:w-1/2 bg-inverse-on-surface p-8 md:p-16 lg:p-24 flex flex-col relative overflow-hidden">
+        <ScrollReveal direction="right" className="w-full lg:w-1/2 bg-inverse-on-surface p-8 md:p-16 lg:p-24 flex flex-col relative overflow-hidden">
           {/* Aesthetic background image */}
           <img 
             src="https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop" 
-            alt="Studio Details" 
-            className="absolute inset-0 w-full h-full object-cover opacity-10"
+            alt="Studio Details decorative backdrop" 
+            className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none"
           />
           
           <div className="relative z-10 my-auto max-w-lg">
@@ -74,28 +75,35 @@ const Contact: React.FC = () => {
               Frequently Asked Questions
             </h2>
             
-            <div className="flex flex-col gap-4">
+            <StaggerContainer className="flex flex-col gap-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="border-b border-outline-variant pb-4">
+                <ScrollReveal key={i} direction="up" className="border-b border-outline-variant pb-4">
                   <button 
                     onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                    className="w-full flex justify-between items-center text-left bg-transparent border-none cursor-pointer py-2"
+                    className="w-full flex justify-between items-center text-left bg-transparent border-none cursor-pointer py-2 focus:outline-none focus-visible:ring-2"
+                    aria-expanded={activeFaq === i}
+                    aria-controls={`faq-panel-${i}`}
                   >
                     <span className="font-serif text-lg text-primary-container pr-8">{faq.q}</span>
-                    <span className="text-primary-container text-xl leading-none">
+                    <span className="text-primary-container text-xl leading-none" aria-hidden="true">
                       {activeFaq === i ? '−' : '+'}
                     </span>
                   </button>
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${activeFaq === i ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
+                  <div 
+                    id={`faq-panel-${i}`}
+                    role="region"
+                    aria-hidden={activeFaq !== i}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${activeFaq === i ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}
+                  >
                     <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed">
                       {faq.a}
                     </p>
                   </div>
-                </div>
+                </ScrollReveal>
               ))}
-            </div>
+            </StaggerContainer>
             
-            <div className="mt-16 p-6 border border-primary-container/20 bg-background/50 backdrop-blur-sm">
+            <ScrollReveal direction="up" delay={0.3} className="mt-16 p-6 border border-primary-container/20 bg-background/50 backdrop-blur-sm">
               <p className="font-sans text-sm text-primary-container font-medium mb-1">Direct Email</p>
               <p className="font-sans text-sm text-[#5a4a3f] mb-4">hello@twothreadsstudio.com</p>
               
@@ -104,9 +112,9 @@ const Contact: React.FC = () => {
                 124 Artisan Way, Suite 300<br/>
                 Portland, OR 97209
               </p>
-            </div>
+            </ScrollReveal>
           </div>
-        </div>
+        </ScrollReveal>
 
       </div>
     </PageContainer>

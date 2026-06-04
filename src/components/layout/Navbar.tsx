@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ease-in-out px-4 md:px-16 ${
-          scrolled ? "bg-background/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+          scrolled || menuOpen ? "bg-background shadow-sm" : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
@@ -101,8 +101,8 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         <div 
-          className={`md:hidden overflow-hidden transition-all duration-400 ease-in-out bg-background/98 ${
-            menuOpen ? "max-h-[400px] border-t border-surface-variant" : "max-h-0"
+          className={`md:hidden overflow-hidden transition-all duration-400 ease-in-out bg-background ${
+            menuOpen ? "max-h-[400px] border-t border-outline-variant/30" : "max-h-0"
           }`}
         >
           <div className="px-4 py-6 flex flex-col gap-6">

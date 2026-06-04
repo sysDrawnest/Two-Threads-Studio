@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
@@ -13,44 +13,57 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import NewsletterModal from './components/layout/NewsletterModal';
 
-// Storefront Pages
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetail from './pages/ProductDetail';
-import Collections from './pages/Collections';
-import Learning from './pages/Learning';
-import TutorialDetail from './pages/TutorialDetail';
-import InstructorProfile from './pages/InstructorProfile';
-import Journal from './pages/Journal';
-import About from './pages/About';
-import OurStory from './pages/OurStory';
-import Sustainability from './pages/Sustainability';
-import Artisans from './pages/Artisans';
-import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
-import Wishlist from './pages/Wishlist';
-import Account from './pages/Account';
-import Checkout from './pages/Checkout';
-import Membership from './pages/Membership';
-import NotFound from './pages/NotFound';
+// Reusable Elegant Loader
+const ElegantLoader: React.FC = () => (
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+    <div className="relative w-12 h-12 mb-4">
+      <div className="absolute inset-0 rounded-full border border-outline-variant/30" />
+      <div className="absolute inset-0 rounded-full border border-transparent border-t-on-secondary-container animate-spin" />
+    </div>
+    <p className="font-serif text-sm tracking-widest text-[#2d2520] uppercase animate-pulse">
+      TwoThreads Studio
+    </p>
+  </div>
+);
 
-// Auth Pages
-import Login from './pages/auth/Login';
-import SignUp from './pages/auth/SignUp';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
-import EmailVerified from './pages/auth/EmailVerified';
-import AccessDenied from './pages/auth/AccessDenied';
+// Lazy Storefront Pages
+const Home = lazy(() => import('./pages/Home'));
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Collections = lazy(() => import('./pages/Collections'));
+const Learning = lazy(() => import('./pages/Learning'));
+const TutorialDetail = lazy(() => import('./pages/TutorialDetail'));
+const InstructorProfile = lazy(() => import('./pages/InstructorProfile'));
+const Journal = lazy(() => import('./pages/Journal'));
+const About = lazy(() => import('./pages/About'));
+const OurStory = lazy(() => import('./pages/OurStory'));
+const Sustainability = lazy(() => import('./pages/Sustainability'));
+const Artisans = lazy(() => import('./pages/Artisans'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Account = lazy(() => import('./pages/Account'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Membership = lazy(() => import('./pages/Membership'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
-// Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
-import ProductsManagement from './pages/admin/ProductsManagement';
-import OrdersManagement from './pages/admin/OrdersManagement';
-import CustomersManagement from './pages/admin/CustomersManagement';
-import TutorialsManagement from './pages/admin/TutorialsManagement';
-import ReviewsManagement from './pages/admin/ReviewsManagement';
-import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
-import AdminSettings from './pages/admin/AdminSettings';
+// Lazy Auth Pages
+const Login = lazy(() => import('./pages/auth/Login'));
+const SignUp = lazy(() => import('./pages/auth/SignUp'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const EmailVerified = lazy(() => import('./pages/auth/EmailVerified'));
+const AccessDenied = lazy(() => import('./pages/auth/AccessDenied'));
+
+// Lazy Admin Pages
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const ProductsManagement = lazy(() => import('./pages/admin/ProductsManagement'));
+const OrdersManagement = lazy(() => import('./pages/admin/OrdersManagement'));
+const CustomersManagement = lazy(() => import('./pages/admin/CustomersManagement'));
+const TutorialsManagement = lazy(() => import('./pages/admin/TutorialsManagement'));
+const ReviewsManagement = lazy(() => import('./pages/admin/ReviewsManagement'));
+const AnalyticsDashboard = lazy(() => import('./pages/admin/AnalyticsDashboard'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storefront wrapper (with Navbar, Footer, page transitions)
@@ -154,7 +167,9 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <AppRoutes />
+        <Suspense fallback={<ElegantLoader />}>
+          <AppRoutes />
+        </Suspense>
       </Router>
     </AuthProvider>
   );
