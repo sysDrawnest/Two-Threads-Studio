@@ -2,6 +2,9 @@ import React from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import { Link } from 'react-router-dom';
 import { ScrollReveal, StaggerContainer } from '../components/ui/ScrollReveal';
+import aboutImg1 from '../assets/stitch/close_up_of_high_quality_unbleached_linen_fabric_texture_natural_beige_tones.png';
+import aboutImg2 from '../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.png';
+import aboutImg3 from '../assets/stitch/close_up_of_hands_carefully_packing_an_embroidery_kit_with_recycled_paper_and.png';
 
 const About: React.FC = () => {
   return (
@@ -39,9 +42,9 @@ const About: React.FC = () => {
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { num: "01", title: "Sourcing", img: "https://images.unsplash.com/photo-1579737151059-006f85d2eb3b?q=80&w=600&auto=format&fit=crop", text: "We start with the fabric. Our unbleached linen is woven in a zero-waste facility in Belgium, ensuring perfect tension and a natural, earthy texture." },
-              { num: "02", title: "Design", img: "https://images.unsplash.com/photo-1598444778129-c88c7ff4191c?q=80&w=600&auto=format&fit=crop", text: "Every pattern is hand-drawn by our global network of textile artists. We digitize these drawings carefully to retain the organic feel of the original sketch." },
-              { num: "03", title: "Curation", img: "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=600&auto=format&fit=crop", text: "Threads are color-matched by eye, not by computer. We pack every box by hand in our studio, wrapping components in recycled paper." }
+              { num: "01", title: "Sourcing", img: aboutImg1, text: "We start with the fabric. Our unbleached linen is woven in a zero-waste facility in Belgium, ensuring perfect tension and a natural, earthy texture." },
+              { num: "02", title: "Design", img: aboutImg2, text: "Every pattern is hand-drawn by our global network of textile artists. We digitize these drawings carefully to retain the organic feel of the original sketch." },
+              { num: "03", title: "Curation", img: aboutImg3, text: "Threads are color-matched by eye, not by computer. We pack every box by hand in our studio, wrapping components in recycled paper." }
             ].map((step, i) => (
               <ScrollReveal key={i} direction="up" className="flex flex-col group cursor-default">
                 <div className="relative aspect-[1/1] md:aspect-[4/5] overflow-hidden bg-surface-container mb-6">
