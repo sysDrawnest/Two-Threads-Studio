@@ -41,7 +41,22 @@ const Gallery: React.FC = () => {
       {/* Masonry-Style Gallery */}
       <section className="py-16 px-6 md:px-16 bg-inverse-on-surface">
         <div className="max-w-7xl mx-auto">
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+          {/* Mobile Grid */}
+          <div className="grid grid-cols-2 gap-4 md:hidden">
+            {images.map((src, i) => (
+              <div key={i} className={`flex flex-col gap-2 ${i % 2 !== 0 ? 'pt-8' : i > 1 ? '-mt-6' : ''}`}>
+                <div className={`group relative cursor-pointer overflow-hidden bg-surface-container ${i % 2 === 0 ? 'aspect-[4/5]' : 'aspect-[1/1]'}`}>
+                  <img src={src} alt={`Community creation ${i + 1}`} className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-primary-container/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center backdrop-blur-[2px]">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f5f0eb" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Masonry */}
+          <div className="hidden md:block columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
             {images.map((src, i) => (
               <div key={i} className="break-inside-avoid group relative cursor-pointer overflow-hidden bg-surface-container">
                 <img 
