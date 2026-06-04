@@ -73,26 +73,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = useCallback(async (email: string, password: string, name: string) => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-
-    if (MOCK_USERS.some(u => u.email === email)) {
-      setIsLoading(false);
-      return { success: false, error: 'User with this email already exists.' };
-    }
+    await new Promise(r => setTimeout(r, 1200)); // Simulate network delay
+    setIsLoading(false);
 
     const newUser: AuthUser = {
-      id: `u_${Date.now()}`,
+      id: `u-${Date.now()}`,
       name,
       email,
       role: 'customer',
       membershipTier: 'none',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'
     };
 
-    MOCK_USERS.push({ ...newUser, password });
+    MOCK_USERS.push({
+      ...newUser,
+      password
+    });
+
     setUser(newUser);
     try { sessionStorage.setItem('tt_auth_user', JSON.stringify(newUser)); } catch {}
-    setIsLoading(false);
     return { success: true };
   }, []);
 
