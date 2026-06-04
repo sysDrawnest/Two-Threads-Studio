@@ -15,6 +15,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -70,6 +71,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false, error: 'Invalid email or password. Try julia@example.com / password123 or admin@twothreads.com / admin123' };
   }, []);
 
+  const signup = useCallback(async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    await new Promise(r => setTimeout(r, 1200));
+
+    if (MOCK_USERS.some(u => u.email === email)) {
+      setIsLoading(false);
+      return { success: false, error: 'User with this email already exists.' };
+    }
+
+    const newUser: AuthUser = {
+      id: `u_${Date.now()}`,
+      name,
+      email,
+      role: 'customer',
+      membershipTier: 'none',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop'
+    };
+
+    MOCK_USERS.push({ ...newUser, password });
+    setUser(newUser);
+    try { sessionStorage.setItem('tt_auth_user', JSON.stringify(newUser)); } catch {}
+    setIsLoading(false);
+    return { success: true };
+  }, []);
+
   const logout = useCallback(() => {
     setUser(null);
     try { sessionStorage.removeItem('tt_auth_user'); } catch {}
@@ -80,6 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       isLoading,
       login,
+      signup,
       logout,
       isAuthenticated: !!user,
       isAdmin: user?.role === 'admin',
