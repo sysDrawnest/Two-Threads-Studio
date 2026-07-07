@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { mockProducts } from '../../data/products';
+import { useCartStore } from '../../store/cartStore';
+import CartItem from '../cart/CartItem';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -9,13 +10,8 @@ interface CartDrawerProps {
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
-  // Use mock data to simulate items in cart
-  const cartItems = [
-    { product: mockProducts[0], quantity: 1 },
-    { product: mockProducts[2], quantity: 1 }
-  ];
-
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+  const items = useCartStore((state) => state.items);
+  const getCartTotal = useCartStore((state) => state.getCartTotal);
 
   return (
     <AnimatePresence>
@@ -50,35 +46,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
             {/* Items */}
             <div className="flex-1 overflow-y-auto p-6">
-              {cartItems.length > 0 ? (
-                <div className="flex flex-col gap-6">
-                  {cartItems.map((item, i) => (
-                    <div key={i} className="flex gap-4 items-start">
-                      <div className="w-24 h-32 bg-surface-container flex-shrink-0">
-                        <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 flex flex-col justify-between h-32 py-1">
-                        <div>
-                          <div className="flex justify-between">
-                            <h3 className="font-serif text-lg text-primary-container line-clamp-1">{item.product.name}</h3>
-                            <span className="font-serif text-lg text-primary-container ml-2">${item.product.price}</span>
-                          </div>
-                          <p className="font-sans text-xs uppercase tracking-widest text-on-surface-variant mt-1">
-                            {item.product.category}
-                          </p>
-                        </div>
-                        <div className="flex justify-between items-center mt-auto">
-                          <div className="flex items-center border border-outline-variant">
-                            <button className="px-3 py-1 bg-transparent border-none cursor-pointer text-primary-container hover:bg-surface-variant transition-colors" aria-label="Decrease quantity">-</button>
-                            <span className="font-sans text-sm text-primary-container px-2">{item.quantity}</span>
-                            <button className="px-3 py-1 bg-transparent border-none cursor-pointer text-primary-container hover:bg-surface-variant transition-colors" aria-label="Increase quantity">+</button>
-                          </div>
-                          <button className="font-sans text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary-container bg-transparent border-none cursor-pointer underline transition-colors">
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+              {items.length > 0 ? (
+                <div>
+                  {items.map((item) => (
+                    <CartItem key={item.id} item={item} />
                   ))}
                 </div>
               ) : (
@@ -92,11 +63,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            {cartItems.length > 0 && (
+            {items.length > 0 && (
               <div className="p-6 border-t border-outline-variant bg-surface-container/30">
                 <div className="flex justify-between items-center mb-6">
                   <span className="font-sans text-sm uppercase tracking-widest text-primary-container">Subtotal</span>
-                  <span className="font-serif text-2xl text-primary-container">${subtotal}</span>
+                  <span className="font-serif text-2xl text-primary-container">${getCartTotal().toFixed(2)}</span>
                 </div>
                 <p className="font-sans text-xs text-[#5a4a3f] mb-6 text-center">
                   Shipping and taxes calculated at checkout.
