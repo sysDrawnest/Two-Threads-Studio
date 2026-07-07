@@ -5,19 +5,21 @@ interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export const AuthInput: React.FC<AuthInputProps> = ({ label, error, className = '', ...props }) => {
+export const AuthInput: React.FC<AuthInputProps> = ({ label, error, ...props }) => {
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className="w-full mb-4">
+      <label className="block text-xs font-medium tracking-wider uppercase text-stone-500 mb-1.5">
+        {label}
+      </label>
       <input
         {...props}
-        placeholder={label}
-        className={`w-full bg-transparent border-0 border-b pb-4 pt-2 text-stone-900 placeholder:text-stone-300 focus:ring-0 focus:outline-none transition-all duration-500 font-serif text-2xl lg:text-3xl font-light
+        className={`w-full px-4 py-3 bg-stone-50 border transition-all duration-200 text-stone-800 rounded-none focus:outline-none text-sm
           ${error 
-            ? 'border-red-300 focus:border-red-800 text-red-900' 
-            : 'border-stone-300 focus:border-stone-900'
+            ? 'border-red-400 focus:border-red-500 bg-red-50/10' 
+            : 'border-stone-200 focus:border-stone-800 focus:bg-white'
           }`}
       />
-      {error && <p className="absolute -bottom-6 left-0 text-xs tracking-widest text-red-500 font-sans uppercase">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-500 font-light">{error}</p>}
     </div>
   );
 };
