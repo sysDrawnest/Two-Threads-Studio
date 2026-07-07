@@ -21,7 +21,6 @@ const Login: React.FC = () => {
       return;
     }
 
-    // Dev/Demo Mock Logic: Divert based on email format
     if (email.includes('admin')) {
       navigate('/admin');
     } else {
@@ -30,90 +29,109 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-stone-50">
-      {/* Visual Editorial Side (Hidden on Mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-stone-900 items-center justify-center p-12 overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center mix-blend-luminosity scale-105 transition-transform duration-10000 hover:scale-100" />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent z-10" />
-        <div className="relative z-20 max-w-md text-white">
-          <span className="text-xs uppercase tracking-widest text-stone-400 font-medium block mb-4">TwoThreads Studio</span>
-          <h2 className="text-4xl font-serif font-light leading-snug mb-4">Pieces born of patience, crafted for lifetimes.</h2>
-          <p className="text-stone-300 font-light text-sm leading-relaxed">Log in to view your collection, manage custom heirloom commissions, and trace the path of your orders.</p>
-        </div>
-      </div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-stone-900 flex items-center justify-center lg:block">
+      {/* Immersive Background */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60 mix-blend-luminosity scale-105"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&q=80&w=2000')" }}
+      />
+      <div className="absolute inset-0 z-0 bg-stone-900/30 backdrop-blur-[2px]" />
 
-      {/* Interactive Form Side */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-20 bg-white">
-        <div className="max-w-md w-full mx-auto">
-          <div className="mb-10">
-            <h1 className="text-2xl sm:text-3xl font-serif text-stone-800 font-light mb-2">Welcome Back</h1>
-            <p className="text-sm text-stone-500 font-light">Enter your credentials to access your account.</p>
+      {/* Main Floating Container */}
+      <div className="relative z-10 w-full max-w-md px-6 lg:px-0 lg:absolute lg:bottom-16 lg:right-24 xl:right-32 animate-fade-in-up">
+        <div className="bg-white/80 backdrop-blur-md border-[0.5px] border-stone-200 p-8 sm:p-12 shadow-2xl relative">
+          
+          {/* Micro-Detail: Needle and Thread SVG */}
+          <div className="absolute -top-4 -right-4 w-12 h-12 pointer-events-none opacity-80">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 80L80 20" stroke="#d4af37" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M75 15L85 25" stroke="#a8a29e" strokeWidth="1.5" strokeLinecap="round"/>
+              <circle cx="82" cy="18" r="1.5" fill="#a8a29e"/>
+              <path d="M20 80C10 90 30 100 40 90C50 80 30 70 20 80Z" stroke="#d4af37" strokeWidth="0.5" fill="none"/>
+            </svg>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <div className="mb-12">
+            <h1 className="text-3xl font-serif text-stone-800 font-light mb-3">Welcome Back</h1>
+            <p className="text-sm text-stone-600 font-light leading-relaxed">
+              Log in to view your collection, manage custom heirloom commissions, and trace the path of your orders.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-8">
             <AuthInput 
               label="Email Address" 
               type="email" 
               value={email}
               onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({...prev, email: ''})); }}
               error={errors.email}
-              placeholder="name@example.com"
             />
             
-            <div>
+            <div className="relative pb-2">
               <AuthInput 
                 label="Password" 
                 type="password" 
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({...prev, password: ''})); }}
                 error={errors.password}
-                placeholder="••••••••"
               />
-              <div className="text-right -mt-2">
-                <a href="#forgot" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">Forgot password?</a>
+              <div className="absolute right-0 -bottom-4">
+                <a href="#forgot" className="text-[10px] uppercase tracking-widest text-stone-400 hover:text-stone-800 transition-colors">Forgot?</a>
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center space-x-2 cursor-pointer select-none">
-                <input 
-                  type="checkbox" 
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded-none accent-stone-800 border-stone-300 text-stone-800 focus:ring-0"
-                />
-                <span className="text-xs text-stone-500 font-light">Remember this device</span>
+            <div className="flex items-center pt-2">
+              <label className="flex items-center space-x-3 cursor-pointer group">
+                <div className="relative w-4 h-4 border-[0.5px] border-stone-300 flex items-center justify-center group-hover:border-stone-500 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="absolute opacity-0 w-full h-full cursor-pointer"
+                  />
+                  {rememberMe && <div className="w-2 h-2 bg-stone-800" />}
+                </div>
+                <span className="text-xs text-stone-500 font-light tracking-wide group-hover:text-stone-800 transition-colors">Remember this device</span>
               </label>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-stone-900 text-white py-3.5 tracking-widest text-xs uppercase font-medium hover:bg-stone-800 transition-colors duration-300 shadow-sm"
+              className="w-full bg-stone-900 text-white py-4 text-sm font-serif lowercase tracking-[0.25em] hover:bg-stone-800 transition-colors duration-500 mt-4"
             >
-              Sign In
+              sign in
             </button>
           </form>
 
-          {/* Context Switching Accordion for Quick Dev Evaluation */}
-          <div className="mt-8 border border-stone-100 bg-stone-50/50 p-4">
-            <details className="group">
-              <summary className="text-xs font-medium uppercase tracking-wider text-stone-400 cursor-pointer list-none flex justify-between items-center">
-                <span>Demo Sandbox Credentials</span>
-                <span className="transition-transform duration-200 group-open:rotate-180">▼</span>
-              </summary>
-              <div className="mt-3 text-xs text-stone-500 font-light space-y-1.5 border-t border-stone-100 pt-3">
-                <p><strong>Customer:</strong> customer@twothreads.com / <span className="font-mono">pass123</span></p>
-                <p><strong>Admin Portal:</strong> admin@twothreads.com / <span className="font-mono">admin123</span></p>
-              </div>
-            </details>
-          </div>
-
-          <p className="mt-8 text-center text-sm text-stone-500 font-light">
+          <p className="mt-10 text-center text-xs tracking-wider text-stone-500 font-light">
             Don't have an account?{' '}
-            <Link to="/auth/signup" className="text-stone-800 underline underline-offset-4 hover:text-stone-600 transition-colors">
-              Create one
+            <Link to="/auth/signup" className="text-stone-800 font-medium hover:text-stone-500 transition-colors ml-1">
+              create one
             </Link>
           </p>
+        </div>
+
+        {/* Swing-Tag Demo Credentials (Guest Access) */}
+        <div className="mt-8 lg:mt-0 lg:absolute lg:top-12 lg:-left-40 xl:-left-48 w-full max-w-xs lg:w-48 group perspective-1000">
+          <div className="bg-stone-100/90 backdrop-blur-sm border-[0.5px] border-stone-300 p-5 shadow-lg transform transition-transform duration-700 lg:group-hover:rotate-y-12 lg:group-hover:-translate-x-2 relative origin-top-right">
+            {/* Tag String / Hole */}
+            <div className="hidden lg:block absolute top-4 -right-2 w-4 h-4 bg-stone-200 rounded-full border border-stone-300 shadow-inner" />
+            <div className="hidden lg:block absolute top-6 -right-6 w-8 h-[1px] bg-stone-300 rotate-12" />
+
+            <h3 className="text-[10px] uppercase tracking-widest text-stone-500 mb-3 border-b border-stone-200 pb-2">Guest Access Pass</h3>
+            <div className="space-y-3 text-[11px] text-stone-600 font-light">
+              <div>
+                <span className="block font-medium text-stone-800 mb-0.5">Customer</span>
+                <span className="font-mono text-[10px]">customer@twothreads.com</span><br/>
+                <span className="font-mono text-[10px] text-stone-400">pass123</span>
+              </div>
+              <div>
+                <span className="block font-medium text-stone-800 mb-0.5">Admin</span>
+                <span className="font-mono text-[10px]">admin@twothreads.com</span><br/>
+                <span className="font-mono text-[10px] text-stone-400">admin123</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

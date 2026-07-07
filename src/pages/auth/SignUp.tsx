@@ -23,39 +23,47 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    // On registration victory, route smoothly back to marketplace root or onboarding
+    // On registration victory, route smoothly back to marketplace root
     navigate('/');
   };
 
   return (
-    <div className="min-h-screen flex bg-stone-50">
-      {/* Visual Editorial Side */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-stone-900 items-center justify-center p-12 overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1572451479139-6a308211d8be?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center mix-blend-luminosity scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent z-10" />
-        <div className="relative z-20 max-w-md text-white">
-          <span className="text-xs uppercase tracking-widest text-stone-400 font-medium block mb-4">TwoThreads Studio</span>
-          <h2 className="text-4xl font-serif font-light leading-snug mb-4">Begin Your Creative Journey</h2>
-          <p className="text-stone-300 font-light text-sm leading-relaxed">Join a community centered on slow-made craft. Save custom setups, track premium orders, and discover bespoke drops before anyone else.</p>
-        </div>
-      </div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-stone-900 flex items-center justify-center lg:block">
+      {/* Immersive Background */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60 mix-blend-luminosity scale-105"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1572451479139-6a308211d8be?auto=format&fit=crop&q=80&w=2000')" }}
+      />
+      <div className="absolute inset-0 z-0 bg-stone-900/40 backdrop-blur-[2px]" />
 
-      {/* Form Content Side */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-20 bg-white">
-        <div className="max-w-md w-full mx-auto">
-          <div className="mb-10">
-            <h1 className="text-2xl sm:text-3xl font-serif text-stone-800 font-light mb-2">Create an Account</h1>
-            <p className="text-sm text-stone-500 font-light">Join us to start personalizing your slow-made kits and art pieces.</p>
+      {/* Main Floating Container */}
+      <div className="relative z-10 w-full max-w-md px-6 lg:px-0 lg:absolute lg:bottom-12 lg:right-24 xl:right-32 animate-fade-in-up">
+        <div className="bg-white/80 backdrop-blur-md border-[0.5px] border-stone-200 p-8 sm:p-12 shadow-2xl relative">
+          
+          {/* Micro-Detail: Needle and Thread SVG */}
+          <div className="absolute -top-4 -right-4 w-12 h-12 pointer-events-none opacity-80">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 80L80 20" stroke="#d4af37" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M75 15L85 25" stroke="#a8a29e" strokeWidth="1.5" strokeLinecap="round"/>
+              <circle cx="82" cy="18" r="1.5" fill="#a8a29e"/>
+              <path d="M20 80C10 90 30 100 40 90C50 80 30 70 20 80Z" stroke="#d4af37" strokeWidth="0.5" fill="none"/>
+            </svg>
           </div>
 
-          <form onSubmit={handleSignUp} className="space-y-5">
+          <div className="mb-10">
+            <h1 className="text-3xl font-serif text-stone-800 font-light mb-3">Begin Your Journey</h1>
+            <p className="text-sm text-stone-600 font-light leading-relaxed">
+              Join a community centered on slow-made craft. Save custom setups and track premium orders.
+            </p>
+          </div>
+
+          <form onSubmit={handleSignUp} className="space-y-7">
             <AuthInput 
               label="Full Name" 
               type="text" 
               value={name}
               onChange={(e) => { setName(e.target.value); setErrors(prev => ({...prev, name: ''})); }}
               error={errors.name}
-              placeholder="Arjun Sharma"
             />
 
             <AuthInput 
@@ -64,46 +72,65 @@ const SignUp: React.FC = () => {
               value={email}
               onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({...prev, email: ''})); }}
               error={errors.email}
-              placeholder="arjun@example.com"
             />
 
-            <div className="relative">
+            <div className="relative pb-2">
               <AuthInput 
                 label="Password" 
                 type={showPassword ? "text" : "password"} 
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({...prev, password: ''})); }}
                 error={errors.password}
-                placeholder="Minimum 6 characters"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-9 text-xs font-medium tracking-wider text-stone-400 hover:text-stone-700 transition-colors uppercase"
+                className="absolute right-0 bottom-6 text-[10px] tracking-widest text-stone-400 hover:text-stone-700 transition-colors uppercase"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
 
-            <div className="text-xs text-stone-400 font-light leading-relaxed">
-              By continuing, you agree to our <a href="#terms" className="underline hover:text-stone-600">Terms of Service</a> and <a href="#privacy" className="underline hover:text-stone-600">Privacy Policy</a>.
+            <div className="pt-2 text-[10px] text-stone-400 font-light leading-relaxed tracking-wide">
+              By continuing, you agree to our <a href="#terms" className="text-stone-600 hover:text-stone-900 transition-colors border-b border-stone-200">Terms of Service</a> and <a href="#privacy" className="text-stone-600 hover:text-stone-900 transition-colors border-b border-stone-200">Privacy Policy</a>.
             </div>
 
             <button
               type="submit"
-              className="w-full bg-stone-900 text-white py-3.5 tracking-widest text-xs uppercase font-medium hover:bg-stone-800 transition-colors duration-300 shadow-sm"
+              className="w-full bg-stone-900 text-white py-4 text-sm font-serif lowercase tracking-[0.25em] hover:bg-stone-800 transition-colors duration-500 mt-2"
             >
-              Register Account
+              register account
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-stone-500 font-light">
+          <p className="mt-8 text-center text-xs tracking-wider text-stone-500 font-light">
             Already have an account?{' '}
-            <Link to="/auth/login" className="text-stone-800 underline underline-offset-4 hover:text-stone-600 transition-colors">
-              Log in instead
+            <Link to="/auth/login" className="text-stone-800 font-medium hover:text-stone-500 transition-colors ml-1">
+              log in
             </Link>
           </p>
         </div>
+
+        {/* Swing-Tag Demo Credentials (Guest Access) */}
+        <div className="mt-8 lg:mt-0 lg:absolute lg:top-12 lg:-left-40 xl:-left-48 w-full max-w-xs lg:w-48 group perspective-1000">
+          <div className="bg-stone-100/90 backdrop-blur-sm border-[0.5px] border-stone-300 p-5 shadow-lg transform transition-transform duration-700 lg:group-hover:rotate-y-12 lg:group-hover:-translate-x-2 relative origin-top-right">
+            <div className="hidden lg:block absolute top-4 -right-2 w-4 h-4 bg-stone-200 rounded-full border border-stone-300 shadow-inner" />
+            <div className="hidden lg:block absolute top-6 -right-6 w-8 h-[1px] bg-stone-300 rotate-12" />
+
+            <h3 className="text-[10px] uppercase tracking-widest text-stone-500 mb-3 border-b border-stone-200 pb-2">Guest Access Pass</h3>
+            <div className="space-y-3 text-[11px] text-stone-600 font-light">
+              <p className="leading-relaxed">
+                Use any valid email structure and a 6+ character password to review the dashboard.
+              </p>
+              <div className="pt-2">
+                <span className="block font-medium text-stone-800 mb-0.5">Sample</span>
+                <span className="font-mono text-[10px]">crafts@example.com</span><br/>
+                <span className="font-mono text-[10px] text-stone-400">craft123</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
