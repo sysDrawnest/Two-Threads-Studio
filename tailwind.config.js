@@ -65,15 +65,15 @@ module.exports = {
         "section-gap": "120px"
       },
       fontFamily: {
-        "headline-lg": ["Playfair Display", "serif"],
+        "headline-lg": ["Cormorant Garamond", "serif"],
         "label-sm": ["Lato", "sans-serif"],
-        "display-lg-mobile": ["Playfair Display", "serif"],
-        "display-lg": ["Playfair Display", "serif"],
+        "display-lg-mobile": ["Cormorant Garamond", "serif"],
+        "display-lg": ["Cormorant Garamond", "serif"],
         "body-lg": ["Lato", "sans-serif"],
-        "headline-md": ["Playfair Display", "serif"],
+        "headline-md": ["Cormorant Garamond", "serif"],
         "body-md": ["Lato", "sans-serif"],
         "sans": ["Lato", "sans-serif"],
-        "serif": ["Playfair Display", "serif"]
+        "serif": ["Cormorant Garamond", "serif"]
       }
     }
   },

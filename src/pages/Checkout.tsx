@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCartStore } from '../store/cartStore';
-import { useCheckoutStore, ShippingInfo } from '../store/checkoutStore';
+import { useCheckoutStore, CheckoutStep, ShippingInfo, PaymentMethod } from '../store/checkoutStore';
 
 const Checkout: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -14,7 +14,7 @@ const Checkout: React.FC = () => {
   const clearCart = useCartStore((state) => state.clearCart);
 
   // Checkout State
-  const { currentStep, setStep, shippingInfo, setShippingInfo, resetCheckout } = useCheckoutStore();
+  const { currentStep, setStep, shippingInfo, setShippingInfo, paymentMethod, setPaymentMethod, resetCheckout } = useCheckoutStore();
 
   const shippingCost = 8.00;
   const total = subtotal + shippingCost;
