@@ -5,68 +5,50 @@ import roomImg2 from '../../assets/stitch/a_high_end_editorial_photo_of_a_serene
 import roomImg3 from '../../assets/stitch/a_high_end_editorial_photo_of_a_cozy_bedroom_featuring_an_embroidered.png';
 
 export function Hero() {
-  const heroProducts = [
-    { name: "Floral Hoop Kit", price: "$38", bg: "#e8ddd3" },
-    { name: "Botanical Set", price: "$52", bg: "#dfd5c8" },
-    { name: "Beginner Bundle", price: "$29", bg: "#ede6de" },
-  ];
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.style.display = "none";
-  };
-
   return (
-    <section id="hero" className="relative min-h-[100vh] flex items-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f0e8de] via-[#e8ddd3] to-[#d4c4b5]" />
-      <img
-        src="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-        alt="Hero background showing embroidery supplies"
-        className="absolute inset-0 w-full h-full object-cover object-center opacity-60"
-        onError={handleImageError}
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/30 to-transparent" />
-
-      <div className="relative z-10 pt-32 px-6 md:px-16 pb-16 max-w-7xl mx-auto w-full">
-        <div className="max-w-xl">
-          <ScrollReveal direction="up" delay={0.15}>
-            <p className="font-sans text-xs tracking-[0.3em] text-on-secondary-container uppercase mb-5">
-              Handmade with Intention
-            </p>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.3}>
-            <h1 className="font-serif text-5xl md:text-7xl font-light leading-tight text-primary-container mb-6 tracking-tight">
-              Naturally Made<br />for Living
-            </h1>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.45}>
-            <p className="font-sans text-base md:text-lg leading-relaxed text-[#5a4a3f] mb-9 italic">
-              Thoughtfully made stitches that bring warmth, texture, and story into every room.
-            </p>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.6}>
-            <div className="flex gap-4 flex-wrap">
-              <button className="bg-primary-container text-inverse-on-surface border-none px-9 py-3.5 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-[#5a3d2b] transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container outline-none">
-                Shop Now
-              </button>
-              <button className="bg-transparent text-primary-container border border-primary-container px-9 py-3.5 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-primary-container hover:text-inverse-on-surface transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container outline-none">
-                Explore
-              </button>
-            </div>
-          </ScrollReveal>
-        </div>
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#a85a46]">
+      {/* Huge Background Text */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-0 mt-16 md:mt-0">
+        <h1 className="font-serif text-[#f6ebe0] font-normal leading-[0.85] text-center w-full">
+          <span className="hidden md:block text-[14vw] tracking-tight">TWO THREAD</span>
+          <span className="hidden md:block text-[14vw] tracking-tight">STUDIO</span>
+          
+          <span className="block md:hidden text-[16vw] tracking-tight mt-10">ARTISANAL</span>
+          <span className="block md:hidden text-[16vw] tracking-tight">CREATIONS</span>
+        </h1>
       </div>
 
-      {/* Floating product cards */}
-      <div className="hidden md:flex absolute right-[5vw] top-1/2 -translate-y-1/2 flex-col gap-3 z-20">
-        {heroProducts.map((p, i) => (
-          <ScrollReveal key={i} direction="left" delay={0.3 + i * 0.15}>
-            <div className="bg-white p-4 w-40 rounded-sm shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer" style={{ backgroundColor: p.bg }}>
-              <div className="w-full h-20 bg-[#c4b5a8] rounded-sm mb-2" />
-              <p className="font-sans text-xs text-primary-container">{p.name}</p>
-              <p className="font-sans text-xs text-on-secondary-container mt-1">{p.price}</p>
-            </div>
+      {/* Foreground Content */}
+      <div className="relative z-10 flex flex-col items-center w-full max-w-7xl px-6 pt-32 pb-12 flex-1 justify-end md:justify-center">
+        
+        {/* Central Product Image Container */}
+        {/* Placeholder for the transparent PNG asset the user will provide */}
+        <div className="w-full max-w-sm md:max-w-3xl mx-auto h-[45vh] md:h-[60vh] relative mb-12 flex items-end justify-center">
+           <div className="w-full h-[85%] border-2 border-dashed border-[#f6ebe0]/30 rounded-lg flex items-center justify-center bg-black/5 backdrop-blur-[2px]">
+             <div className="text-center p-6">
+               <p className="text-[#f6ebe0] font-sans text-sm tracking-widest uppercase mb-2">Pedestal Asset Placeholder</p>
+               <p className="text-[#f6ebe0]/70 font-sans text-xs">Place your transparent PNG here in the code</p>
+             </div>
+           </div>
+           
+           {/* Actual image tag to be used later: */}
+           {/* <img src="/path-to-your-asset.png" alt="Embroidery Kits" className="absolute inset-0 w-full h-full object-contain object-bottom drop-shadow-2xl" /> */}
+        </div>
+
+        {/* Bottom Text and CTA */}
+        <div className="text-center w-full mt-auto md:mt-4 z-20">
+          <ScrollReveal direction="up" delay={0.2}>
+            <p className="font-sans text-[9px] md:text-xs tracking-[0.25em] text-[#f6ebe0] uppercase mb-6 md:mb-8">
+              Indigo Embroidery Kits &bull; Limited Batches &bull; Mindful Craft
+            </p>
           </ScrollReveal>
-        ))}
+          
+          <ScrollReveal direction="up" delay={0.4}>
+            <button className="bg-[#f6ebe0] text-[#a85a46] border-none px-8 py-3.5 md:px-10 md:py-4 font-sans text-[10px] md:text-xs tracking-[0.15em] font-semibold uppercase cursor-pointer hover:bg-white hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+              Shop Collection
+            </button>
+          </ScrollReveal>
+        </div>
       </div>
     </section>
   );
