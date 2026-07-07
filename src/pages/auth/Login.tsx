@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import AuthLayout from '../../components/auth/AuthLayout';
 import { useAuth } from '../../context/AuthContext';
 
 const Login: React.FC = () => {
@@ -10,7 +9,6 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,7 +17,6 @@ const Login: React.FC = () => {
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     const result = await login(email, password);
     if (result.success) {
-      // Route to admin if admin user
       if (email === 'admin@twothreads.com') {
         navigate('/admin');
       } else {
@@ -31,219 +28,121 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleGuest = () => {
+    navigate('/'); 
+  };
+
   return (
-    <>
-      {/* ---------------- MOBILE VIEW ---------------- */}
-      <div className="md:hidden bg-[#fef8f3] text-[#1d1b19] font-sans overflow-x-hidden">
-        <main className="min-h-screen flex flex-col items-center">
-          {/* Banner Image */}
-          <section className="w-full h-48 relative overflow-hidden">
-            <img alt="Detailed textile embroidery macro shot showing artisanal gray threading on warm linen." className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlg4PrBPPW6Yq1kmFVAZTbXfQOAuu1uPikYMXlSNzKUHMYq6UkqHbEeXSdBbquqxrAi54RtZZ7IVOvIPBtT6LpQXyg8Jc-iw7J-ewYkWuqpvk9FMdGmxg9KuYk9CveRpSiKq9Zm_-BG5Zo1n6SitUwb5qcuNLmiOs14X_noihfUCDz4cWbNQSWrbJU-VrI_KlbW0G9a59LzviutkjMA-d7BlMTonTFcKAK8qoMHN2u77Uit2Ea8wFGsx8qr9xW0RNOQVaNe3G9rVFh" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#fef8f3] via-transparent to-transparent opacity-60"></div>
-          </section>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundColor: '#052345',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.25'/%3E%3C/svg%3E"), repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 6px)`
+      }}
+    >
+      <div className="relative w-full max-w-[380px] z-10 flex flex-col md:flex-row items-center justify-center">
+        
+        {/* Main Card */}
+        <div className="bg-[#fcfaf7] shadow-2xl p-8 md:p-10 relative z-10 w-full flex flex-col">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-8">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2c2c2c" strokeWidth="1.2" className="mb-2">
+              {/* Abstract loom/thread logo */}
+              <rect x="5" y="4" width="14" height="16" strokeLinecap="square" />
+              <path d="M5 8h14M5 12h14M5 16h14" />
+              <path d="M8 2v20M12 2v20M16 2v20" stroke="#903432" strokeWidth="0.8" strokeDasharray="2 2" />
+            </svg>
+            <h1 className="font-serif text-[18px] tracking-[0.1em] text-[#2c2c2c] uppercase text-center font-medium leading-tight">
+              TwoThreads<br/>Studio
+            </h1>
+            <p className="font-serif text-[22px] text-[#2c2c2c] mt-4 tracking-wide font-normal">Sign in to the Studio</p>
+          </div>
 
-          {/* Identity & Header */}
-          <header className="w-full pt-8 pb-4 px-[20px] text-center">
-            <h1 className="font-sans text-[12px] font-medium tracking-[0.25em] uppercase text-[#17110c]">TWOTHREADS STUDIO</h1>
-            <div className="mt-6 border-b border-dotted border-[#d2c4bc] w-1/4 mx-auto"></div>
-          </header>
-
-          {/* Form Container */}
-          <section className="w-full max-w-md px-[20px] mt-12">
-            <h2 className="font-serif text-[30px] font-normal leading-[1.2] text-[#2d2520] mb-10 text-center">Sign In</h2>
+          <form onSubmit={handleSubmit} className="flex flex-col flex-grow gap-8">
+            {error && <p className="text-[#903432] text-sm text-center bg-[#903432]/10 py-2">{error}</p>}
             
-            <form onSubmit={handleSubmit} className="flex flex-col gap-10" noValidate>
-              {error && (
-                <div className="bg-[#ffdad6] border border-[#ba1a1a]/30 text-[#ba1a1a] p-4 font-sans text-[14px]">
-                  {error}
-                </div>
-              )}
-
-              {/* Username Field */}
-              <div className="flex flex-col space-y-2 group">
-                <label className="font-sans text-[11px] font-medium tracking-[0.15em] text-[#4e4540] uppercase" htmlFor="mobile-username">
-                  Username
-                </label>
-                <div className="border-b border-[#d2c4bc] focus-within:border-[#735947] focus-within:border-b-2 transition-all duration-300">
-                  <input 
-                    className="w-full bg-transparent border-none p-0 pb-2 focus:ring-0 text-[#17110c] font-sans text-[16px] placeholder:text-[#d1c4bd]" 
-                    id="mobile-username" 
-                    name="username" 
-                    placeholder="Artisan ID or Email" 
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                  />
-                </div>
+            <div className="flex flex-col gap-6">
+              <div className="relative group">
+                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Email Address</label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg"
+                  placeholder="user@example.com"
+                />
               </div>
 
-              {/* Password Field */}
-              <div className="flex flex-col space-y-2 group">
-                <div className="flex justify-between items-baseline">
-                  <label className="font-sans text-[11px] font-medium tracking-[0.15em] text-[#4e4540] uppercase" htmlFor="mobile-password">
-                    Password
-                  </label>
-                </div>
-                <div className="border-b border-[#d2c4bc] focus-within:border-[#735947] focus-within:border-b-2 transition-all duration-300 relative flex items-center">
+              <div className="relative group">
+                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Password</label>
+                <div className="relative">
                   <input 
-                    className="w-full bg-transparent border-none p-0 pb-2 focus:ring-0 text-[#17110c] font-sans text-[16px] placeholder:text-[#d1c4bd]" 
-                    id="mobile-password" 
-                    name="password" 
-                    placeholder="••••••••" 
                     type={showPw ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
+                    className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg pr-8 tracking-widest"
+                    placeholder="••••••••"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-0 bottom-2 bg-transparent border-none cursor-pointer text-[#4e4540]"
-                  >
-                    {showPw ? (
-                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeLinecap="round" strokeLinejoin="round" /><line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" /></svg>
-                    ) : (
-                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" /></svg>
-                    )}
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-0 bottom-2 text-[#903432]">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" /></svg>
                   </button>
                 </div>
+                <div className="text-right mt-2">
+                  <Link to="/auth/forgot-password" className="text-[12px] text-[#903432] hover:underline font-serif italic tracking-wide">Forgot Password?</Link>
+                </div>
               </div>
+            </div>
 
-              {/* Controls */}
-              <div className="flex items-center justify-between font-sans text-[11px] font-medium tracking-wider">
-                <label className="flex items-center space-x-2 cursor-pointer group">
-                  <input 
-                    className="h-4 w-4 border-[#d1c4bd] text-[#735947] rounded-none focus:ring-offset-[#fef8f3] focus:ring-[#735947] transition-colors bg-transparent" 
-                    type="checkbox"
-                    checked={remember}
-                    onChange={e => setRemember(e.target.checked)}
-                  />
-                  <span className="text-[#4e4540] group-hover:text-[#17110c] transition-colors">REMEMBER ME</span>
-                </label>
-                <Link to="/auth/forgot-password" className="text-[#735947] hover:text-[#17110c] transition-colors border-b border-transparent hover:border-[#735947] no-underline">FORGOT PASSWORD?</Link>
-              </div>
-
-              {/* CTA */}
+            <div className="mt-2">
               <button 
-                type="submit"
+                type="submit" 
                 disabled={isLoading}
-                className="w-full bg-[#2d2520] text-[#fef8f3] py-5 font-sans text-[14px] font-medium tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#735947] active:scale-[0.98] disabled:opacity-60 flex justify-center items-center gap-3"
+                className="w-full bg-[#903432] text-white py-3.5 font-serif text-[18px] tracking-wide hover:bg-[#7a2b29] transition-colors border-none"
               >
-                {isLoading ? (
-                  <>
-                    <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    SIGNING IN...
-                  </>
-                ) : 'SIGN IN'}
+                {isLoading ? 'signing in...' : 'sign in to the studio'}
               </button>
-
-              <div className="mt-4 text-center">
-                <Link to="/auth/signup" className="font-sans text-[11px] font-medium tracking-[0.15em] uppercase text-[#735947] hover:text-[#17110c] border-b border-transparent hover:border-[#735947] no-underline transition-colors">
-                  CREATE AN ACCOUNT
-                </Link>
+              <div className="text-center mt-5">
+                <p className="font-sans text-[13px] text-[#2c2c2c]">
+                  Don't have an account? <Link to="/auth/signup" className="hover:underline text-[#2c2c2c] font-medium">Sign Up</Link>
+                </p>
               </div>
-            </form>
-          </section>
-        </main>
-      </div>
-
-      {/* ---------------- DESKTOP VIEW ---------------- */}
-      <div className="hidden md:block">
-        <AuthLayout
-          title="Welcome back."
-          subtitle="Sign in to your TwoThreads account."
-        >
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
-            {error && (
-              <div className="bg-error-container border border-error/30 text-error p-4 font-sans text-sm">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block font-sans text-xs uppercase tracking-widest text-primary-container mb-2">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full p-3 border border-outline-variant focus:border-primary-container focus:outline-none bg-transparent font-sans text-sm"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block font-sans text-xs uppercase tracking-widest text-primary-container mb-2">Password</label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPw ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full p-3 border border-outline-variant focus:border-primary-container focus:outline-none bg-transparent font-sans text-sm pr-12"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-on-surface-variant"
-                  aria-label={showPw ? 'Hide password' : 'Show password'}
-                >
-                  {showPw ? (
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" strokeLinecap="round" strokeLinejoin="round" /><line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" /></svg>
-                  ) : (
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" /></svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={e => setRemember(e.target.checked)}
-                  className="w-4 h-4 accent-primary-container"
-                />
-                <span className="font-sans text-xs text-on-surface-variant">Remember me</span>
-              </label>
-              <Link to="/auth/forgot-password" className="font-sans text-xs text-on-secondary-container hover:text-primary-container transition-colors no-underline">
-                Forgot password?
-              </Link>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-primary-container text-inverse-on-surface py-4 font-sans text-sm tracking-[0.15em] uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-2"
-            >
-              {isLoading ? (
-                <>
-                  <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Signing in...
-                </>
-              ) : 'Sign In'}
-            </button>
-
-            <p className="font-sans text-sm text-on-surface-variant text-center mt-4">
-              Don't have an account?{' '}
-              <Link to="/auth/signup" className="text-on-secondary-container hover:text-primary-container transition-colors no-underline underline">
-                Create one
-              </Link>
-            </p>
-
-            {/* Demo hint */}
-            <div className="mt-4 p-4 bg-surface-container border border-outline-variant font-sans text-xs text-on-surface-variant space-y-1">
-              <p className="font-semibold text-primary-container mb-1">Demo Credentials:</p>
-              <p>Customer: julia@example.com / password123</p>
-              <p>Admin: admin@twothreads.com / admin123</p>
             </div>
           </form>
-        </AuthLayout>
+        </div>
+        
+        {/* Guest Tag (Desktop) */}
+        <div 
+          onClick={handleGuest}
+          className="hidden md:flex absolute -right-32 top-[55%] -translate-y-1/2 w-32 flex-col items-center rotate-[8deg] drop-shadow-xl z-0 hover:rotate-[12deg] transition-all cursor-pointer group origin-top-left"
+        >
+          {/* String */}
+          <svg className="absolute -top-16 -left-10 w-24 h-24 pointer-events-none" viewBox="0 0 100 100">
+            <path d="M 0,10 Q 40,20 50,80" fill="none" stroke="#e0c7a5" strokeWidth="2.5" strokeDasharray="3 1" />
+            <path d="M 5,15 Q 45,25 55,80" fill="none" stroke="#c09a72" strokeWidth="1.5" />
+          </svg>
+          
+          <div 
+            className="w-full bg-[#c8a47e] shadow-lg p-4 flex flex-col items-center text-[#3b2513] group-hover:bg-[#d0b08d] transition-colors"
+            style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 15%, 100% 100%, 0% 100%, 0% 15%)' }}
+          >
+            <div className="w-4 h-4 rounded-full bg-[#052345] shadow-inner mt-1 mb-3 ring-2 ring-[#e6c19a]/40 border border-[#a67c52]"></div>
+            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-center border-b border-[#3b2513]/20 w-full pb-2 mb-2">Guest Access Pass</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b2513" strokeWidth="1" strokeLinecap="square" className="mb-2 opacity-60">
+              <rect x="5" y="4" width="14" height="16" />
+              <path d="M5 8h14M5 12h14M5 16h14" />
+            </svg>
+            <span className="text-[9px] font-sans font-medium text-center leading-tight mb-3 text-[#3b2513]/80 uppercase tracking-widest">Browse the collection<br/>as a guest.</span>
+            <button className="bg-[#903432] text-white text-[9px] font-sans uppercase tracking-widest py-1.5 px-3 w-full border-none">Enter as Guest</button>
+          </div>
+        </div>
+
+        {/* Mobile Guest Tag text */}
+        <div className="md:hidden mt-8 text-center text-white/80 font-serif text-lg tracking-wide z-10 w-full">
+           <Link to="/" className="underline decoration-white/50 underline-offset-4 hover:text-white transition-colors">Continue as Guest</Link>
+        </div>
+
       </div>
-    </>
+    </div>
   );
 };
 
