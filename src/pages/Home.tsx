@@ -1,31 +1,29 @@
 import React from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import { 
-  Hero, 
   BestSellers, 
-  ExploreByRoom, 
-  Banner, 
-  JustForYou, 
-  OurStory, 
-  Reviews, 
-  Learning, 
-  Newsletter 
+  ExploreByRoom 
 } from '../components/sections/HomeSections';
-import CricketKeychains from '../components/CricketKeychains';
+import { HeroVideo } from '../components/sections/HeroVideo';
+import { BrandManifesto } from '../components/sections/BrandManifesto';
+import { CollectionExclusives } from '../components/sections/CollectionExclusives';
+import { TheAtelierStory } from '../components/sections/TheAtelierStory';
+import { AtelierJournal } from '../components/sections/AtelierJournal';
+import { PrivateClubCapture } from '../components/sections/PrivateClubCapture';
+
+// Note: Old components are removed from the loop (Hero, Banner, JustForYou, CricketKeychains, OurStory, Reviews, Learning, Newsletter)
 
 const Home: React.FC = () => {
   return (
     <PageContainer>
-      <Hero />
+      <HeroVideo />
+      <BrandManifesto />
       <BestSellers />
+      <CollectionExclusives />
       <ExploreByRoom />
-      <Banner />
-      <JustForYou />
-      <CricketKeychains />
-      <OurStory />
-      <Reviews />
-      <Learning />
-      <Newsletter />
+      <TheAtelierStory />
+      <AtelierJournal />
+      <PrivateClubCapture />
     </PageContainer>
   );
 };
