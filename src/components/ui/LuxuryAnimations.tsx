@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 
 // Custom easing for a premium physical dampener feel
-const luxuryEase = [0.16, 1, 0.3, 1];
+const luxuryEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 // 1. Weightless Staggered Text Reveal
 interface StaggeredTextRevealProps {
