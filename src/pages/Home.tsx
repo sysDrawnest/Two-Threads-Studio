@@ -9,7 +9,8 @@ import {
   OurStory, 
   Reviews, 
   Learning, 
-  Newsletter 
+  Newsletter,
+  VideoBanner
 } from '../components/sections';
 
 const Home: React.FC = () => {
@@ -17,6 +18,7 @@ const Home: React.FC = () => {
     <PageContainer>
       <Hero />
       <BestSellers />
+      <VideoBanner />
       <ExploreByRoom />
       <Banner />
       <JustForYou />

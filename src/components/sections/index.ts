@@ -7,3 +7,4 @@ export { default as OurStory } from './OurStory';
 export { default as Reviews } from './Reviews';
 export { default as Learning } from './Learning';
 export { default as Newsletter } from './Newsletter';
+export { default as VideoBanner } from './VideoBanner';
