@@ -18,7 +18,7 @@
 | **Admin Dashboard** | In Progress | 60% |
 | **Mobile Responsiveness** | Completed | 100% |
 | **Product Management** | Planned | 0% |
-| **Cart & Checkout** | Planned | 0% |
+| **Cart & Checkout** | Completed | 100% |
 | **User Accounts (Profile)** | Planned | 0% |
 | **Backend / Database Integration**| Planned | 0% |
 
@@ -40,6 +40,11 @@
 ## Pages
 *   **Gallery**: Masonry layout image gallery showing craftsmanship.
 *   **About Us**: Editorial layout describing the brand's story.
+*   **Checkout**: Step-by-step state-managed checkout flow integrated with global cart.
+
+## State Management (Zustand)
+*   **Cart Store**: Global cart state with `localStorage` persistence and advanced customization features (gifting, engraving) natively embedded in `CartItem`.
+*   **Checkout Store**: Decoupled store to manage the user's progression through checkout steps independently, preventing unnecessary navigation re-renders.
 
 ---
 
@@ -53,9 +58,9 @@
 
 # Planned Features
 
-*   **E-Commerce Engine**: Shopping cart state management, checkout flow, and payment gateway integration.
 *   **Dynamic Data (CMS)**: Replacing hardcoded product arrays with fetched data from a backend.
 *   **User Profiles**: Allowing users to see past orders, saved items, and manage addresses.
+*   **Payment Gateway**: Connecting the state-managed checkout to a real payment processor (e.g. Stripe).
 
 ---
 
@@ -100,7 +105,8 @@ src/
 ├── assets/          # Static images, icons, and logos (local stitch assets)
 ├── components/      # Reusable UI components
 │   ├── auth/        # Authentication layout wrappers
-│   ├── layout/      # Navbar, Footer, PageContainer
+│   ├── cart/        # Atomic cart components (CartItem)
+│   ├── layout/      # Navbar, Footer, PageContainer, CartDrawer
 │   ├── sections/    # Homepage sections (Hero, BestSellers, etc.)
 │   └── ui/          # Generic UI pieces (ScrollReveal, etc.)
 ├── context/         # React Context providers (AuthContext)
@@ -108,8 +114,10 @@ src/
 │   ├── admin/       # Admin dashboard views
 │   ├── auth/        # Login, Signup pages
 │   ├── About.tsx
+│   ├── Checkout.tsx
 │   ├── Gallery.tsx
 │   └── Home.tsx
+├── store/           # Zustand global state (cartStore, checkoutStore)
 ├── App.tsx          # Main application router and shell
 └── index.css        # Global styles and Tailwind imports
 ```
@@ -126,5 +134,5 @@ src/
 # Next Recommended Priorities
 
 1.  **Component Refactoring**: Split `HomeSections.tsx` to improve maintainability before adding more features.
-2.  **Cart Implementation**: Build the global state (e.g., Zustand or Redux) for managing the shopping cart.
-3.  **Backend Architecture**: Plan and initialize the backend server (Node.js/Express or Firebase) to handle real user authentication and product data.
+2.  **Backend Architecture**: Plan and initialize the backend server (Node.js/Express or Firebase) to handle real user authentication and product data.
+3.  **Payment Integration**: Finalize the API endpoints for the secure checkout initialization and payment processing.
