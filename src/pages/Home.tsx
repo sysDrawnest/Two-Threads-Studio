@@ -10,8 +10,7 @@ import {
   Reviews, 
   Learning, 
   Newsletter 
-} from '../components/sections/HomeSections';
-import CricketKeychains from '../components/CricketKeychains';
+} from '../components/sections';
 
 const Home: React.FC = () => {
   return (
@@ -21,7 +20,6 @@ const Home: React.FC = () => {
       <ExploreByRoom />
       <Banner />
       <JustForYou />
-      <CricketKeychains />
       <OurStory />
       <Reviews />
       <Learning />

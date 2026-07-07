@@ -1,0 +1,9 @@
+export { default as Hero } from './Hero';
+export { default as BestSellers } from './BestSellers';
+export { default as ExploreByRoom } from './ExploreByRoom';
+export { default as Banner } from './Banner';
+export { default as JustForYou } from './JustForYou';
+export { default as OurStory } from './OurStory';
+export { default as Reviews } from './Reviews';
+export { default as Learning } from './Learning';
+export { default as Newsletter } from './Newsletter';
