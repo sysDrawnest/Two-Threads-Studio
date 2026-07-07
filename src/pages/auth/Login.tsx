@@ -6,7 +6,6 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleLogin = (e: React.FormEvent) => {
@@ -29,111 +28,75 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-stone-900 flex items-center justify-center lg:block">
-      {/* Immersive Background */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60 mix-blend-luminosity scale-105"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&q=80&w=2000')" }}
-      />
-      <div className="absolute inset-0 z-0 bg-stone-900/30 backdrop-blur-[2px]" />
+    <div className="min-h-screen bg-[#fef8f3] flex flex-col relative overflow-hidden">
+      
+      {/* Floating Embroidery Badge (The Visual Twist) */}
+      <div className="hidden lg:block absolute top-1/4 right-32 w-32 h-32 rounded-full overflow-hidden shadow-2xl animate-[bounce_4s_ease-in-out_infinite] opacity-90 hover:opacity-100 transition-opacity duration-500 z-10 border border-stone-200">
+        <img 
+          src="https://images.unsplash.com/photo-1572451479139-6a308211d8be?auto=format&fit=crop&q=80&w=400" 
+          alt="Embroidery Craft"
+          className="w-full h-full object-cover grayscale-[30%] sepia-[20%]"
+        />
+      </div>
 
-      {/* Main Floating Container */}
-      <div className="relative z-10 w-full max-w-md px-6 lg:px-0 lg:absolute lg:bottom-16 lg:right-24 xl:right-32 animate-fade-in-up">
-        <div className="bg-white/80 backdrop-blur-md border-[0.5px] border-stone-200 p-8 sm:p-12 shadow-2xl relative">
+      <div className="flex-1 w-full max-w-4xl mx-auto px-6 py-20 lg:py-32 flex flex-col justify-center relative z-20">
+        
+        {/* Editorial Heading */}
+        <div className="mb-16 lg:mb-24">
+          <span className="block text-[10px] font-sans uppercase tracking-[0.25em] text-stone-400 mb-6 border-b border-stone-200 inline-block pb-2">TwoThreads Studio</span>
+          <h1 className="text-5xl lg:text-7xl font-serif font-light text-stone-900 leading-[1.1] tracking-tight">
+            Welcome back <br className="hidden lg:block"/> to the studio.
+          </h1>
+        </div>
+
+        {/* Minimalist Form */}
+        <form onSubmit={handleLogin} className="space-y-12 lg:space-y-16 max-w-2xl">
+          <AuthInput 
+            label="Email Address" 
+            type="email" 
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({...prev, email: ''})); }}
+            error={errors.email}
+          />
           
-          {/* Micro-Detail: Needle and Thread SVG */}
-          <div className="absolute -top-4 -right-4 w-12 h-12 pointer-events-none opacity-80">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 80L80 20" stroke="#d4af37" strokeWidth="1" strokeLinecap="round"/>
-              <path d="M75 15L85 25" stroke="#a8a29e" strokeWidth="1.5" strokeLinecap="round"/>
-              <circle cx="82" cy="18" r="1.5" fill="#a8a29e"/>
-              <path d="M20 80C10 90 30 100 40 90C50 80 30 70 20 80Z" stroke="#d4af37" strokeWidth="0.5" fill="none"/>
-            </svg>
-          </div>
-
-          <div className="mb-12">
-            <h1 className="text-3xl font-serif text-stone-800 font-light mb-3">Welcome Back</h1>
-            <p className="text-sm text-stone-600 font-light leading-relaxed">
-              Log in to view your collection, manage custom heirloom commissions, and trace the path of your orders.
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-8">
+          <div className="relative">
             <AuthInput 
-              label="Email Address" 
-              type="email" 
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setErrors(prev => ({...prev, email: ''})); }}
-              error={errors.email}
+              label="Password" 
+              type="password" 
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({...prev, password: ''})); }}
+              error={errors.password}
             />
-            
-            <div className="relative pb-2">
-              <AuthInput 
-                label="Password" 
-                type="password" 
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({...prev, password: ''})); }}
-                error={errors.password}
-              />
-              <div className="absolute right-0 -bottom-4">
-                <a href="#forgot" className="text-[10px] uppercase tracking-widest text-stone-400 hover:text-stone-800 transition-colors">Forgot?</a>
-              </div>
+            <div className="absolute right-0 -bottom-8">
+              <a href="#forgot" className="font-sans text-[10px] uppercase tracking-widest text-stone-400 hover:text-stone-800 transition-colors">Recover Password</a>
             </div>
+          </div>
 
-            <div className="flex items-center pt-2">
-              <label className="flex items-center space-x-3 cursor-pointer group">
-                <div className="relative w-4 h-4 border-[0.5px] border-stone-300 flex items-center justify-center group-hover:border-stone-500 transition-colors">
-                  <input 
-                    type="checkbox" 
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="absolute opacity-0 w-full h-full cursor-pointer"
-                  />
-                  {rememberMe && <div className="w-2 h-2 bg-stone-800" />}
-                </div>
-                <span className="text-xs text-stone-500 font-light tracking-wide group-hover:text-stone-800 transition-colors">Remember this device</span>
-              </label>
-            </div>
-
+          <div className="pt-8 lg:pt-12">
             <button
               type="submit"
-              className="w-full bg-stone-900 text-white py-4 text-sm font-serif lowercase tracking-[0.25em] hover:bg-stone-800 transition-colors duration-500 mt-4"
+              className="w-full bg-stone-900 text-[#fef8f3] py-6 font-sans text-xs uppercase tracking-[0.3em] hover:bg-stone-800 transition-all duration-500 hover:tracking-[0.4em]"
             >
               sign in
             </button>
-          </form>
-
-          <p className="mt-10 text-center text-xs tracking-wider text-stone-500 font-light">
-            Don't have an account?{' '}
-            <Link to="/auth/signup" className="text-stone-800 font-medium hover:text-stone-500 transition-colors ml-1">
-              create one
-            </Link>
-          </p>
-        </div>
-
-        {/* Swing-Tag Demo Credentials (Guest Access) */}
-        <div className="mt-8 lg:mt-0 lg:absolute lg:top-12 lg:-left-40 xl:-left-48 w-full max-w-xs lg:w-48 group perspective-1000">
-          <div className="bg-stone-100/90 backdrop-blur-sm border-[0.5px] border-stone-300 p-5 shadow-lg transform transition-transform duration-700 lg:group-hover:rotate-y-12 lg:group-hover:-translate-x-2 relative origin-top-right">
-            {/* Tag String / Hole */}
-            <div className="hidden lg:block absolute top-4 -right-2 w-4 h-4 bg-stone-200 rounded-full border border-stone-300 shadow-inner" />
-            <div className="hidden lg:block absolute top-6 -right-6 w-8 h-[1px] bg-stone-300 rotate-12" />
-
-            <h3 className="text-[10px] uppercase tracking-widest text-stone-500 mb-3 border-b border-stone-200 pb-2">Guest Access Pass</h3>
-            <div className="space-y-3 text-[11px] text-stone-600 font-light">
-              <div>
-                <span className="block font-medium text-stone-800 mb-0.5">Customer</span>
-                <span className="font-mono text-[10px]">customer@twothreads.com</span><br/>
-                <span className="font-mono text-[10px] text-stone-400">pass123</span>
-              </div>
-              <div>
-                <span className="block font-medium text-stone-800 mb-0.5">Admin</span>
-                <span className="font-mono text-[10px]">admin@twothreads.com</span><br/>
-                <span className="font-mono text-[10px] text-stone-400">admin123</span>
-              </div>
-            </div>
           </div>
-        </div>
+        </form>
+
+        <p className="mt-16 font-sans text-xs tracking-widest uppercase text-stone-400 font-light">
+          New to the studio?{' '}
+          <Link to="/auth/signup" className="text-stone-800 font-medium hover:text-stone-500 transition-colors ml-2 border-b border-stone-800 pb-1">
+            begin your collection
+          </Link>
+        </p>
       </div>
+
+      {/* Minimalist Demo Credentials */}
+      <div className="mt-auto py-8 text-center text-[10px] font-sans text-stone-400 tracking-wider flex flex-col md:flex-row justify-center items-center gap-4 border-t border-stone-200/50">
+        <span>GUEST ACCESS (CUSTOMER): customer@twothreads.com / pass123</span>
+        <span className="hidden md:inline text-stone-300">|</span>
+        <span>GUEST ACCESS (ADMIN): admin@twothreads.com / admin123</span>
+      </div>
+
     </div>
   );
 };
