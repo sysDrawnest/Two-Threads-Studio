@@ -46,8 +46,8 @@ const Navbar: React.FC = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-5 md:px-12 lg:px-16 bg-transparent ${
-          scrolled ? "py-4" : "py-6"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-5 md:px-12 lg:px-16 ${
+          scrolled ? "bg-[#fcfaf8]/90 backdrop-blur-md border-b border-[#e5e0d8] py-4" : "bg-transparent py-6"
         }`}
       >
         {/* Desktop Layout */}
