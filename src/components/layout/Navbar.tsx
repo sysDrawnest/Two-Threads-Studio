@@ -46,8 +46,8 @@ const Navbar: React.FC = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-5 md:px-12 lg:px-16 ${
-          scrolled ? "bg-[#fcfaf8]/90 backdrop-blur-md border-b border-[#e5e0d8] py-4" : "bg-transparent py-6"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-5 md:px-12 lg:px-16 bg-transparent ${
+          scrolled ? "py-4" : "py-6"
         }`}
       >
         {/* Desktop Layout */}
@@ -57,9 +57,7 @@ const Navbar: React.FC = () => {
           <div className="w-1/3 flex justify-start">
             <Link 
               to="/" 
-              className={`font-serif text-[26px] tracking-wide hover:opacity-80 transition-colors duration-500 ${
-                scrolled ? "text-[#2c2826]" : "text-[#f4ebd9]"
-              }`}
+              className="font-serif text-[26px] tracking-wide text-[#2c2826] hover:opacity-80 transition-opacity"
             >
               TwoThreads Studio
             </Link>
@@ -71,13 +69,8 @@ const Navbar: React.FC = () => {
               <Link 
                 key={l.name} 
                 to={l.path} 
-                className={`relative font-sans text-[11px] lg:text-xs tracking-[0.2em] uppercase transition-colors duration-500 py-1
-                           after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[1px] hover:after:w-full after:transition-all after:duration-300
-                           ${
-                             scrolled 
-                               ? "text-[#4a4542] hover:text-[#1a1817] after:bg-[#4a4542]" 
-                               : "text-[#f4ebd9]/90 hover:text-white after:bg-white"
-                           }`}
+                className="relative font-sans text-[11px] lg:text-xs tracking-[0.2em] text-[#4a4542] uppercase hover:text-[#1a1817] transition-colors py-1
+                           after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[1px] after:bg-[#4a4542] hover:after:w-full after:transition-all after:duration-300"
               >
                 {l.name}
               </Link>
@@ -88,34 +81,26 @@ const Navbar: React.FC = () => {
           <div className="w-1/3 flex justify-end gap-6 items-center">
             <button 
               onClick={() => setIsSearchOpen(true)}
-              className={`transition-colors duration-500 ${
-                scrolled ? "text-[#4a4542] hover:text-[#1a1817]" : "text-[#f4ebd9]/90 hover:text-white"
-              }`}
+              className="text-[#4a4542] hover:text-[#1a1817] transition-colors"
               aria-label="Search"
             >
               <Search strokeWidth={1.25} size={20} />
             </button>
             <Link 
               to="/account" 
-              className={`transition-colors duration-500 ${
-                scrolled ? "text-[#4a4542] hover:text-[#1a1817]" : "text-[#f4ebd9]/90 hover:text-white"
-              }`}
+              className="text-[#4a4542] hover:text-[#1a1817] transition-colors"
               aria-label="Account"
             >
               <User strokeWidth={1.25} size={20} />
             </Link>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className={`relative transition-colors duration-500 ${
-                scrolled ? "text-[#4a4542] hover:text-[#1a1817]" : "text-[#f4ebd9]/90 hover:text-white"
-              }`}
+              className="text-[#4a4542] hover:text-[#1a1817] transition-colors relative"
               aria-label="Cart"
             >
               <ShoppingBag strokeWidth={1.25} size={20} />
               {cartItemCount > 0 && (
-                <span className={`absolute -top-1.5 -right-2 text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm transition-colors duration-500 ${
-                  scrolled ? "bg-[#ab5a46] text-[#f4ebd9]" : "bg-[#f4ebd9] text-[#ab5a46]"
-                }`}>
+                <span className="absolute -top-1.5 -right-2 bg-[#ab5a46] text-[#f4ebd9] text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
                   {cartItemCount}
                 </span>
               )}
@@ -129,9 +114,7 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-start">
             <button 
               onClick={() => setMenuOpen(true)}
-              className={`p-1 -ml-1 transition-colors duration-500 ${
-                scrolled ? "text-[#2c2826]" : "text-[#f4ebd9]"
-              }`}
+              className="text-[#2c2826] p-1 -ml-1"
               aria-label="Open Menu"
             >
               <Menu strokeWidth={1.25} size={24} />
@@ -142,9 +125,7 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-center">
             <Link 
               to="/" 
-              className={`font-serif text-[22px] tracking-wide transition-colors duration-500 ${
-                scrolled ? "text-[#2c2826]" : "text-[#f4ebd9]"
-              }`}
+              className="font-serif text-[22px] tracking-wide text-[#2c2826]"
             >
               TwoThreads
             </Link>
@@ -154,16 +135,12 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-end items-center">
             <button 
               onClick={() => setIsCartOpen(true)}
-              className={`relative p-1 -mr-1 transition-colors duration-500 ${
-                scrolled ? "text-[#2c2826]" : "text-[#f4ebd9]"
-              }`}
+              className="text-[#2c2826] relative p-1 -mr-1"
               aria-label="Cart"
             >
               <ShoppingBag strokeWidth={1.25} size={22} />
               {cartItemCount > 0 && (
-                <span className={`absolute -top-0.5 -right-1 text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm transition-colors duration-500 ${
-                  scrolled ? "bg-[#ab5a46] text-[#f4ebd9]" : "bg-[#f4ebd9] text-[#ab5a46]"
-                }`}>
+                <span className="absolute -top-0.5 -right-1 bg-[#ab5a46] text-[#f4ebd9] text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
                   {cartItemCount}
                 </span>
               )}
