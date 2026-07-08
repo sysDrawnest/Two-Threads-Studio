@@ -69,8 +69,7 @@ const Navbar: React.FC = () => {
               <Link 
                 key={l.name} 
                 to={l.path} 
-                className="relative font-sans text-[11px] lg:text-xs tracking-[0.2em] text-[#4a4542] uppercase hover:text-[#1a1817] transition-colors py-1
-                           after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[1px] after:bg-[#4a4542] hover:after:w-full after:transition-all after:duration-300"
+                className="font-sans text-[11px] lg:text-xs tracking-[0.2em] text-[#4a4542] uppercase hover:text-[#1a1817] transition-colors py-1"
               >
                 {l.name}
               </Link>
