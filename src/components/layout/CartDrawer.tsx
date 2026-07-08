@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '../../store/cartStore';
+import { useAuth } from '../../context/AuthContext';
 import CartItem from '../cart/CartItem';
 
 interface CartDrawerProps {
@@ -12,6 +13,7 @@ interface CartDrawerProps {
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const items = useCartStore((state) => state.items);
   const getCartTotal = useCartStore((state) => state.getCartTotal);
+  const { isAuthenticated } = useAuth();
 
   return (
     <AnimatePresence>
@@ -30,17 +32,17 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-background shadow-2xl z-[101] flex flex-col"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-[#FAF9F7] shadow-2xl z-[101] flex flex-col border-l border-neutral-200"
           >
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-outline-variant">
-              <h2 className="font-serif text-2xl text-primary-container">Your Cart</h2>
+            <div className="flex justify-between items-center p-6 border-b border-neutral-200">
+              <h2 className="font-serif text-2xl text-[#1C1C1B]">Your Cart</h2>
               <button 
                 onClick={onClose}
-                className="bg-transparent border-none cursor-pointer p-2 hover:bg-surface-variant transition-colors rounded-full"
+                className="bg-transparent border-none cursor-pointer p-2 hover:bg-neutral-100 transition-colors rounded-full"
                 aria-label="Close Cart"
               >
-                <svg width="24" height="24" fill="none" stroke="#2d2520" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="20" height="20" fill="none" stroke="#1C1C1B" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
             </div>
 
@@ -54,8 +56,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <p className="font-sans text-sm text-on-surface-variant mb-6">Your cart is currently empty.</p>
-                  <button onClick={onClose} className="bg-transparent text-primary-container border border-primary-container px-8 py-3 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-primary-container hover:text-inverse-on-surface transition-colors">
+                  <p className="font-sans text-sm text-neutral-500 mb-6">Your cart is currently empty.</p>
+                  <button onClick={onClose} className="bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] px-8 py-3 font-sans text-xs tracking-widest uppercase cursor-pointer hover:bg-neutral-800 transition-colors">
                     Continue Shopping
                   </button>
                 </div>
@@ -64,18 +66,18 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="p-6 border-t border-outline-variant bg-surface-container/30">
+              <div className="p-6 border-t border-neutral-200 bg-[#FAF9F7]">
                 <div className="flex justify-between items-center mb-6">
-                  <span className="font-sans text-sm uppercase tracking-widest text-primary-container">Subtotal</span>
-                  <span className="font-serif text-2xl text-primary-container">${getCartTotal().toFixed(2)}</span>
+                  <span className="font-sans text-xs uppercase tracking-widest text-neutral-500">Subtotal</span>
+                  <span className="font-sans text-xl font-bold text-[#1C1C1B]">₹{getCartTotal().toLocaleString()}</span>
                 </div>
-                <p className="font-sans text-xs text-[#5a4a3f] mb-6 text-center">
+                <p className="font-sans text-[11px] text-neutral-500 mb-6 text-center">
                   Shipping and taxes calculated at checkout.
                 </p>
                 <Link 
-                  to="/checkout"
+                  to={isAuthenticated ? "/checkout" : "/auth/signup?redirect=/checkout"}
                   onClick={onClose}
-                  className="block w-full text-center bg-primary-container text-inverse-on-surface border border-primary-container px-9 py-4 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-[#5a3d2b] transition-colors no-underline"
+                  className="block w-full text-center bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] px-9 py-4 font-sans text-xs tracking-[0.15em] uppercase cursor-pointer hover:bg-neutral-800 transition-colors no-underline rounded-sm shadow-sm"
                 >
                   Proceed to Checkout
                 </Link>

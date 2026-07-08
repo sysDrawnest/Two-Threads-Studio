@@ -26,7 +26,7 @@ export const mockProducts: Product[] = [
   {
     id: "p1",
     name: "Meadow Floral Hoop Kit",
-    price: 42,
+    price: 3500,
     category: "Kit",
     collection: "Botanical",
     difficulty: "Beginner",
@@ -53,7 +53,7 @@ export const mockProducts: Product[] = [
   {
     id: "p2",
     name: "Winter Pine Pattern",
-    price: 18,
+    price: 1500,
     category: "Pattern",
     collection: "Seasonal",
     difficulty: "Intermediate",
@@ -74,7 +74,7 @@ export const mockProducts: Product[] = [
   {
     id: "p3",
     name: "Cottage Garden Bundle",
-    price: 85,
+    price: 7000,
     category: "Bundle",
     collection: "Cottage",
     difficulty: "Advanced",
@@ -100,7 +100,7 @@ export const mockProducts: Product[] = [
   {
     id: "p4",
     name: "Pure Linen Starter Fabric",
-    price: 24,
+    price: 2000,
     category: "Material",
     collection: "Linen",
     difficulty: "Beginner",
@@ -120,7 +120,7 @@ export const mockProducts: Product[] = [
   {
     id: "p5",
     name: "Autumn Harvest Kit",
-    price: 45,
+    price: 3800,
     category: "Kit",
     collection: "Seasonal",
     difficulty: "Intermediate",
@@ -142,7 +142,7 @@ export const mockProducts: Product[] = [
   {
     id: "p6",
     name: "Minimalist Fern Pattern",
-    price: 15,
+    price: 1200,
     category: "Pattern",
     collection: "Botanical",
     difficulty: "Beginner",
@@ -163,7 +163,7 @@ export const mockProducts: Product[] = [
   {
     id: "p7",
     name: "Wildflower Sanctuary Finished Hoop",
-    price: 240,
+    price: 18000,
     category: "Finished Hoop",
     collection: "Botanical",
     difficulty: "Advanced",
@@ -185,7 +185,7 @@ export const mockProducts: Product[] = [
   {
     id: "p8",
     name: "Midnight Forest Finished Hoop",
-    price: 310,
+    price: 22000,
     category: "Finished Hoop",
     collection: "Linen",
     difficulty: "Advanced",

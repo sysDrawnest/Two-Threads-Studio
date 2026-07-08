@@ -9,10 +9,10 @@ import { useAuth } from '../../context/AuthContext';
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
-  const cartItemCount = useCartStore(state => state.items.length);
+  const { items, isCartOpen, setCartOpen } = useCartStore();
+  const cartItemCount = items.length;
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
               <User strokeWidth={1.25} size={20} />
             </Link>
             <button 
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => setCartOpen(true)}
               className="text-neutral-600 hover:text-neutral-900 relative"
               aria-label="Cart"
             >
@@ -135,7 +135,7 @@ const Navbar: React.FC = () => {
           {/* Right: Cart */}
           <div className="flex-1 flex justify-end items-center">
             <button 
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => setCartOpen(true)}
               className="text-neutral-800 relative p-1 -mr-1 hover:text-neutral-500"
               aria-label="Cart"
             >
@@ -205,7 +205,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );

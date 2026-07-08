@@ -20,6 +20,8 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
+  isCartOpen: boolean;
+  setCartOpen: (open: boolean) => void;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -32,15 +34,18 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      isCartOpen: false,
       
+      setCartOpen: (open) => set({ isCartOpen: open }),
+
       addItem: (item) => set((state) => {
         const existingItemIndex = state.items.findIndex(i => i.id === item.id);
         if (existingItemIndex >= 0) {
           const updatedItems = [...state.items];
           updatedItems[existingItemIndex].quantity += item.quantity;
-          return { items: updatedItems };
+          return { items: updatedItems, isCartOpen: true };
         }
-        return { items: [...state.items, item] };
+        return { items: [...state.items, item], isCartOpen: true };
       }),
 
       removeItem: (id) => set((state) => ({
@@ -68,6 +73,8 @@ export const useCartStore = create<CartState>()(
     {
       name: 'twothreads-cart-storage',
       storage: createJSONStorage(() => localStorage),
+      // We don't want to persist the open state of the cart
+      partialize: (state) => ({ items: state.items }),
     }
   )
 );

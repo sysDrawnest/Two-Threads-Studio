@@ -376,7 +376,7 @@ export default function Shop() {
                         </p>
                         
                         <p className="font-sans text-xs sm:text-sm font-semibold text-[#1C1C1B] mt-auto">
-                          ${product.price}
+                          ₹{product.price.toLocaleString()}
                         </p>
                       </div>
                     </Link>
