@@ -10,7 +10,6 @@ const Login: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
 
   if (isAuthenticated) {
@@ -42,108 +41,138 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#FBFBFA]"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E")`
-      }}
-    >
-      {/* Decorative background threads */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
-        <path d="M-100 200 C 300 100, 400 600, 1200 400" fill="none" stroke="#A34A38" strokeWidth="1" strokeDasharray="3 3" />
-        <path d="M-50 250 C 350 150, 450 650, 1250 450" fill="none" stroke="#1C1C1B" strokeWidth="0.5" />
-      </svg>
+    <div className="min-h-screen flex flex-col bg-[#F6F4F0] font-sans relative overflow-hidden text-[#111]">
+      {/* Subtle Noise Texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-50 z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E")`
+        }}
+      />
 
-      <div className="relative w-full max-w-[420px] z-10 flex flex-col items-center">
-        {/* Main Asymmetric Floating Frame Container */}
-        <div className="relative w-full bg-white p-8 md:p-10 border border-[#1C1C1B] shadow-sm before:absolute before:inset-0 before:border before:border-[#A34A38] before:translate-x-1.5 before:translate-y-1.5 before:-z-10 rounded-sm">
-          {/* Logo / Header */}
-          <div className="flex flex-col items-center mb-8 text-center">
-            <Link to="/" className="font-serif text-[24px] tracking-wide text-[#1C1C1B] hover:text-neutral-500 mb-1">
-              TwoThreads Studio
-            </Link>
-            <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-neutral-400">Honoring Slow Craft</span>
-            <h2 className="font-serif text-2xl font-light text-[#1C1C1B] mt-6">Sign In to the Studio</h2>
+      {/* Header */}
+      <header className="absolute top-0 left-0 w-full flex justify-between items-start md:items-center p-6 md:p-8 z-20">
+        <nav className="hidden md:flex gap-8 text-[10px] uppercase tracking-[0.2em] font-medium text-[#222]">
+          <Link to="/shop" className="hover:text-black">Shop</Link>
+          <Link to="/journal" className="hover:text-black">Journal</Link>
+          <Link to="/about" className="hover:text-black">About</Link>
+          <Link to="/auth/login" className="hover:text-black">Login</Link>
+        </nav>
+        <Link to="/" className="font-serif text-2xl md:text-3xl text-[#111] md:absolute md:left-1/2 md:-translate-x-1/2 whitespace-nowrap">
+          THE ARTISANAL STUDIO
+        </Link>
+        <nav className="hidden md:flex gap-8 text-[10px] uppercase tracking-[0.2em] font-medium text-[#222]">
+          <Link to="/account" className="hover:text-black">Account</Link>
+          <Link to="/cart" className="hover:text-black">Cart (0)</Link>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center relative z-10 px-6 pt-32 pb-24 w-full max-w-6xl mx-auto">
+        
+        <h1 className="font-serif text-6xl md:text-[5.5rem] lg:text-[6.5rem] leading-[0.95] tracking-tight text-center mb-16 md:mb-24 text-[#111]">
+          Welcome back<br />to the studio.
+        </h1>
+
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16 lg:gap-24 w-full relative">
+          
+          {/* Desktop Wax Seal (Left) */}
+          <div className="hidden lg:block relative w-32 h-32 flex-shrink-0 mt-2">
+            <div className="absolute inset-0 bg-[#b75b42] rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.4),0_10px_20px_rgba(0,0,0,0.15)] flex items-center justify-center transform -rotate-12 border-4 border-[#9c4630]">
+              <div className="absolute -top-6 left-1/2 w-1 h-12 bg-[#ded9cd] rotate-45 -z-10 shadow-sm" style={{backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px)'}}></div>
+              <div className="absolute -bottom-8 left-1/3 w-1 h-16 bg-[#ded9cd] -rotate-12 -z-10 shadow-sm" style={{backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px)'}}></div>
+              
+              <div className="w-24 h-24 rounded-full border border-[#d3775f] flex flex-col items-center justify-center text-[#fbd7cd] font-serif p-2">
+                <span className="text-[7px] uppercase tracking-[0.2em] mt-1">Artisanal</span>
+                <span className="text-3xl font-light leading-none my-0.5">AS</span>
+                <span className="text-[7px] uppercase tracking-[0.2em]">Studio</span>
+              </div>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="w-full max-w-[340px] flex flex-col relative z-20">
+            {/* Mobile Wax Seal */}
+            <div className="lg:hidden absolute -top-32 -right-8 w-24 h-24 transform rotate-12 scale-90">
+               <div className="absolute inset-0 bg-[#b75b42] rounded-full shadow-[inset_0_0_15px_rgba(0,0,0,0.4),0_8px_15px_rgba(0,0,0,0.15)] flex items-center justify-center border-4 border-[#9c4630]">
+                 <div className="w-16 h-16 rounded-full border border-[#d3775f] flex flex-col items-center justify-center text-[#fbd7cd] font-serif p-1">
+                   <span className="text-[5px] uppercase tracking-[0.2em]">Artisanal</span>
+                   <span className="text-xl font-light leading-none my-0.5">AS</span>
+                   <span className="text-[5px] uppercase tracking-[0.2em]">Studio</span>
+                 </div>
+               </div>
+            </div>
+
             {error && (
-              <p className="text-[#A34A38] text-xs text-center bg-rose-50 border border-rose-100 py-2.5 px-3 rounded-sm font-sans">
+              <p className="text-[#A34A38] text-xs text-center bg-rose-50 border border-rose-100 py-2 mb-6 font-sans">
                 {error}
               </p>
             )}
-            
-            <div className="flex flex-col gap-4">
-              {/* Email Address */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Email Address</label>
-                <input 
-                  type="email" 
-                  id="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm"
-                  placeholder="user@example.com"
-                />
-              </div>
 
-              {/* Password */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between items-center">
-                  <label htmlFor="password" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Password</label>
-                  <Link to="/auth/forgot-password" className="text-[11px] text-[#A34A38] hover:underline font-serif italic">Forgot Password?</Link>
-                </div>
-                <div className="relative">
-                  <input 
-                    type={showPw ? 'text' : 'password'}
-                    id="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm pr-10"
-                    placeholder="••••••••"
-                  />
-                  <button 
-                    type="button" 
-                    onClick={() => setShowPw(!showPw)} 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#A34A38] transition-colors"
-                  >
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+            <div className="mb-8 flex flex-col">
+              <label className="text-[9px] uppercase tracking-widest mb-3 text-[#333] font-medium">Email Address</label>
+              <input 
+                type="email" 
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="your@email.studio" 
+                className="bg-transparent border-0 border-b-2 border-[#111] p-0 pb-3 text-[17px] font-serif text-[#111] focus:ring-0 focus:border-black placeholder:text-[#999] rounded-none w-full outline-none"
+              />
             </div>
 
-            <div className="mt-4">
-              <button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full bg-[#1C1C1B] text-[#FAF9F7] py-3.5 font-sans text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors border-none rounded-sm shadow-sm font-semibold"
-              >
-                {isLoading ? 'Signing In...' : 'Sign In to the Studio'}
-              </button>
-              
-              <div className="text-center mt-5">
-                <p className="font-sans text-xs text-neutral-500">
-                  Don't have an account? <Link to={`/auth/signup?redirect=${encodeURIComponent(redirectPath)}`} className="hover:underline text-[#A34A38] font-medium">Sign Up</Link>
-                </p>
-              </div>
+            <div className="mb-10 flex flex-col relative">
+              <label className="text-[9px] uppercase tracking-widest mb-3 text-[#333] font-medium">Password</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••" 
+                className="bg-transparent border-0 border-b-2 border-[#111] p-0 pb-3 text-[17px] font-sans tracking-[0.2em] text-[#111] focus:ring-0 focus:border-black placeholder:text-[#999] rounded-none w-full outline-none"
+              />
+              <Link to="/auth/forgot-password" className="absolute right-0 bottom-4 text-[10px] text-[#333] hover:text-black underline underline-offset-4">Forgot?</Link>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              className="bg-[#111] text-[#F6F4F0] font-serif text-2xl py-4 px-8 w-full hover:bg-black transition-colors mb-6 cursor-pointer border-none"
+            >
+              {isLoading ? 'loading...' : 'log in'}
+            </button>
+
+            <div className="flex justify-center gap-6 text-[11px] underline underline-offset-4 text-[#333] mt-2 font-medium">
+              <Link to="/auth/forgot-password" className="hover:text-black">Forgot password?</Link>
+              <Link to="/auth/signup" className="hover:text-black">Request Invitation</Link>
             </div>
           </form>
-        </div>
 
-        {/* Back / Guest Access link */}
-        <div className="mt-8 text-center">
-          <Link 
-            to="/" 
-            className="font-sans text-xs tracking-wider uppercase text-neutral-500 hover:text-[#1C1C1B] transition-colors underline underline-offset-4 decoration-neutral-300"
-          >
-            Continue as Guest
-          </Link>
+          {/* Desktop Guest Access (Right) */}
+          <div className="hidden lg:flex flex-col p-8 w-[300px] relative bg-[#f9f8f4] shadow-[2px_4px_15px_rgba(0,0,0,0.05)] transform rotate-1 border-l-4 border-[#eae5dc] mt-4">
+            <div className="absolute -left-1 top-0 bottom-0 w-2 bg-gradient-to-r from-transparent to-[#f9f8f4] -z-10 mix-blend-overlay"></div>
+            <h3 className="font-serif text-xl mb-3 text-[#111]">GUEST ACCESS</h3>
+            <p className="font-sans text-sm text-[#555] leading-relaxed mb-6">Browse current collections and archives with a guest pass.</p>
+            <Link to="/" className="font-sans text-xs underline underline-offset-4 text-[#111] hover:text-[#555]">[Continue as Guest]</Link>
+          </div>
+
+          {/* Mobile Guest Access */}
+          <div className="lg:hidden flex flex-col p-6 w-full max-w-[340px] relative bg-[#f9f8f4] shadow-sm transform -rotate-1 border-l-4 border-[#eae5dc] mt-12">
+            <h3 className="font-serif text-lg mb-2 text-[#111]">GUEST ACCESS PASS</h3>
+            <p className="font-sans text-xs text-[#555] leading-relaxed mb-4">If you wish to browse our collections without an account, please continue as a guest.</p>
+            <Link to="/" className="font-sans text-[11px] underline underline-offset-4 text-[#111] hover:text-[#555]">Enter as Guest →</Link>
+          </div>
+
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="absolute bottom-6 w-full flex flex-col items-center gap-3 text-[9px] uppercase tracking-[0.2em] text-[#555] z-20 font-medium pb-safe">
+        <p>© 2026 THE ARTISANAL STUDIO</p>
+        <div className="flex gap-4 underline underline-offset-4">
+          <a href="#" className="hover:text-black">IG</a>
+          <a href="#" className="hover:text-black">LN</a>
+          <a href="#" className="hover:text-black">PIN</a>
+        </div>
+      </footer>
     </div>
   );
 };
