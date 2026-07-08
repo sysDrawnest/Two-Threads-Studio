@@ -294,9 +294,9 @@ export default function Shop() {
         </div>
 
         {/* Product Grid & Layout */}
-        <section className="px-6 md:px-12 lg:px-16 pt-12 max-w-[1400px] mx-auto w-full pb-20">
+        <section className="px-4 md:px-12 lg:px-16 pt-12 max-w-[1400px] mx-auto w-full pb-20">
           {sortedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 lg:pb-12">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-16 lg:pb-12">
               {sortedProducts.map((product, idx) => {
                 // Apply subtle vertical offset to alternate columns on large screens to create asymmetrical flow
                 const isShifted = idx % 2 === 1;
@@ -335,14 +335,14 @@ export default function Shop() {
 
                         {/* Tier-Responsive Badge */}
                         {product.category === 'Finished Hoop' ? (
-                          <div className="absolute bottom-4 left-4 z-10">
-                            <span className="bg-[#FAF9F7] text-[#A34A38] border border-[#A34A38]/30 font-serif text-[10px] tracking-wide px-3 py-1.5 rounded-full shadow-sm">
+                          <div className="absolute bottom-2.5 sm:bottom-4 left-2.5 sm:left-4 z-10">
+                            <span className="bg-[#FAF9F7] text-[#A34A38] border border-[#A34A38]/30 font-serif text-[8px] sm:text-[10px] tracking-wide px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm">
                               Artisan Edition
                             </span>
                           </div>
                         ) : product.badge ? (
-                          <div className="absolute bottom-4 left-4 z-10">
-                            <span className="bg-neutral-900/80 backdrop-blur-[2px] text-[#FAF9F7] font-sans text-[9px] tracking-widest uppercase px-2.5 py-1 rounded-[1px]">
+                          <div className="absolute bottom-2.5 sm:bottom-4 left-2.5 sm:left-4 z-10">
+                            <span className="bg-neutral-900/80 backdrop-blur-[2px] text-[#FAF9F7] font-sans text-[8px] sm:text-[9px] tracking-widest uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[1px]">
                               {product.badge}
                             </span>
                           </div>
@@ -351,31 +351,31 @@ export default function Shop() {
                         {/* Quick-Add Drawer Trigger */}
                         <button
                           onClick={(e) => handleQuickAdd(product, e)}
-                          className="absolute bottom-0 left-0 right-0 bg-[#1C1C1B] text-[#FAF9F7] py-3.5 text-center font-sans text-[10px] tracking-[0.2em] uppercase translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out flex items-center justify-center gap-2 hover:bg-neutral-900 shadow-md cursor-pointer pointer-events-auto"
+                          className="absolute bottom-0 left-0 right-0 bg-[#1C1C1B] text-[#FAF9F7] py-2 sm:py-3.5 text-center font-sans text-[8px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out flex items-center justify-center gap-2 hover:bg-neutral-900 shadow-md cursor-pointer pointer-events-auto"
                         >
                           {addedProductId === product.id ? (
                             <>
-                              <Check size={12} className="text-green-400" /> Added!
+                              <Check size={10} className="text-green-400" /> Added!
                             </>
                           ) : (
                             <>
-                              <ShoppingBag size={12} /> + Quick Add to Hoop
+                              <ShoppingBag size={10} /> + Quick Add to Hoop
                             </>
                           )}
                         </button>
                       </div>
 
                       {/* Typography Block */}
-                      <div className="flex flex-col mt-4">
-                        <h3 className="font-serif text-lg font-normal text-[#1C1C1B] leading-snug group-hover:text-[#A34A38] transition-colors duration-300">
+                      <div className="flex flex-col mt-2.5 sm:mt-4">
+                        <h3 className="font-serif text-sm sm:text-base md:text-lg font-normal text-[#1C1C1B] leading-tight sm:leading-snug group-hover:text-[#A34A38] transition-colors duration-300">
                           {product.name}
                         </h3>
                         
-                        <p className="font-sans text-[10px] text-neutral-400 tracking-[0.18em] uppercase mt-1 mb-2">
+                        <p className="font-sans text-[8px] sm:text-[10px] text-neutral-400 tracking-[0.12em] sm:tracking-[0.18em] uppercase mt-0.5 sm:mt-1 mb-1 sm:mb-2">
                           {product.category === 'Kit' ? 'DIY Kit' : product.category === 'Finished Hoop' ? 'Finished Hoop' : product.category === 'Pattern' ? 'Digital Pattern' : product.category} &bull; {product.difficulty}
                         </p>
                         
-                        <p className="font-sans text-sm font-semibold text-[#1C1C1B] mt-auto">
+                        <p className="font-sans text-xs sm:text-sm font-semibold text-[#1C1C1B] mt-auto">
                           ${product.price}
                         </p>
                       </div>
