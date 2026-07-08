@@ -6,6 +6,7 @@ export interface CustomizationOptions {
   giftMessage?: string;
   engravingText?: string;
   engravingFont?: string;
+  hoopFinish?: string;
 }
 
 export interface CartItem {

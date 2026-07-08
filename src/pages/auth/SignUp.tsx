@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Signup: React.FC = () => {
   const { signup, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get('redirect') || '/account';
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,7 +19,7 @@ const Signup: React.FC = () => {
   const [error, setError] = useState('');
 
   if (isAuthenticated) {
-    return <Navigate to="/account" replace />;
+    return <Navigate to={redirectPath} replace />;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +50,7 @@ const Signup: React.FC = () => {
 
     const result = await signup(formData.email, formData.password, formData.name);
     if (result.success) {
-      navigate('/account');
+      navigate(redirectPath);
     } else {
       setError(result.error || 'Signup failed. Please try again.');
     }
@@ -59,141 +62,141 @@ const Signup: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-[#FBFBFA]"
       style={{
-        backgroundColor: '#052345',
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.25'/%3E%3C/svg%3E"), repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 6px)`
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E")`
       }}
     >
-      <div className="relative w-full max-w-[380px] z-10 flex flex-col md:flex-row items-center justify-center">
-        
-        {/* Main Card */}
-        <div className="bg-[#fcfaf7] shadow-2xl p-8 md:p-10 relative z-10 w-full flex flex-col">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2c2c2c" strokeWidth="1.2" className="mb-2">
-              {/* Abstract loom/thread logo */}
-              <rect x="5" y="4" width="14" height="16" strokeLinecap="square" />
-              <path d="M5 8h14M5 12h14M5 16h14" />
-              <path d="M8 2v20M12 2v20M16 2v20" stroke="#903432" strokeWidth="0.8" strokeDasharray="2 2" />
-            </svg>
-            <h1 className="font-serif text-[18px] tracking-[0.1em] text-[#2c2c2c] uppercase text-center font-medium leading-tight">
-              TwoThreads<br/>Studio
-            </h1>
-            <p className="font-serif text-[22px] text-[#2c2c2c] mt-4 tracking-wide font-normal">Create an Account</p>
+      {/* Decorative background threads */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-100 200 C 300 100, 400 600, 1200 400" fill="none" stroke="#A34A38" strokeWidth="1" strokeDasharray="3 3" />
+        <path d="M-50 250 C 350 150, 450 650, 1250 450" fill="none" stroke="#1C1C1B" strokeWidth="0.5" />
+      </svg>
+
+      <div className="relative w-full max-w-[420px] z-10 flex flex-col items-center">
+        {/* Main Asymmetric Floating Frame Container */}
+        <div className="relative w-full bg-white p-8 md:p-10 border border-[#1C1C1B] shadow-sm before:absolute before:inset-0 before:border before:border-[#A34A38] before:translate-x-1.5 before:translate-y-1.5 before:-z-10 rounded-sm">
+          {/* Logo / Header */}
+          <div className="flex flex-col items-center mb-8 text-center">
+            <Link to="/" className="font-serif text-[24px] tracking-wide text-[#1C1C1B] hover:text-neutral-500 mb-1">
+              TwoThreads Studio
+            </Link>
+            <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-neutral-400">Honoring Slow Craft</span>
+            <h2 className="font-serif text-2xl font-light text-[#1C1C1B] mt-6">Create an Account</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col flex-grow gap-8">
-            {error && <p className="text-[#903432] text-sm text-center bg-[#903432]/10 py-2">{error}</p>}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {error && (
+              <p className="text-[#A34A38] text-xs text-center bg-rose-50 border border-rose-100 py-2.5 px-3 rounded-sm font-sans">
+                {error}
+              </p>
+            )}
             
-            <div className="flex flex-col gap-5">
-              <div className="relative group">
-                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Full Name</label>
+            <div className="flex flex-col gap-4">
+              {/* Full Name */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="name" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Full Name</label>
                 <input 
                   type="text" 
                   id="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg"
-                  placeholder="Your Name"
+                  className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm"
+                  placeholder="Julia Hampton"
                 />
               </div>
 
-              <div className="relative group">
-                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Email Address</label>
+              {/* Email Address */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Email Address</label>
                 <input 
                   type="email" 
                   id="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg"
-                  placeholder="user@example.com"
+                  className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm"
+                  placeholder="julia@example.com"
                 />
               </div>
 
-              <div className="relative group">
-                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Password</label>
+              {/* Password */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="password" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Password</label>
                 <div className="relative">
                   <input 
                     type={showPw ? 'text' : 'password'}
                     id="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg pr-8 tracking-widest"
+                    className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm pr-10"
                     placeholder="••••••••"
                   />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-0 bottom-2 text-[#903432]">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" /></svg>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPw(!showPw)} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#A34A38] transition-colors"
+                  >
+                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
-              <div className="relative group">
-                <label className="font-serif text-[14px] text-[#9a6345] mb-1 block">Confirm Password</label>
+              {/* Confirm Password */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="confirmPassword" className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Confirm Password</label>
                 <div className="relative">
                   <input 
                     type={showConfirmPw ? 'text' : 'password'}
                     id="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full bg-transparent border-0 border-b border-[#903432] py-1 text-[#2c2c2c] focus:ring-0 focus:border-b-2 outline-none font-sans text-lg pr-8 tracking-widest"
+                    className="w-full bg-[#FBFBFA] border border-neutral-200 focus:border-[#A34A38] focus:ring-0 outline-none px-3.5 py-2.5 font-sans text-sm text-[#1C1C1B] transition-colors rounded-sm pr-10"
                     placeholder="••••••••"
                   />
-                  <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="absolute right-0 bottom-2 text-[#903432]">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="3" /></svg>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowConfirmPw(!showConfirmPw)} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#A34A38] transition-colors"
+                  >
+                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-4">
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full bg-[#903432] text-white py-3.5 font-serif text-[18px] tracking-wide hover:bg-[#7a2b29] transition-colors border-none"
+                className="w-full bg-[#1C1C1B] text-[#FAF9F7] py-3.5 font-sans text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors border-none rounded-sm shadow-sm font-semibold"
               >
-                {isLoading ? 'signing up...' : 'sign up for the studio'}
+                {isLoading ? 'Creating Account...' : 'Sign Up for the Studio'}
               </button>
+              
               <div className="text-center mt-5">
-                <p className="font-sans text-[13px] text-[#2c2c2c]">
-                  Already have an account? <Link to="/auth/login" className="hover:underline text-[#2c2c2c] font-medium">Log In</Link>
+                <p className="font-sans text-xs text-neutral-500">
+                  Already have an account? <Link to={`/auth/login?redirect=${encodeURIComponent(redirectPath)}`} className="hover:underline text-[#A34A38] font-medium">Log In</Link>
                 </p>
               </div>
             </div>
           </form>
         </div>
-        
-        {/* Guest Tag (Desktop) */}
-        <div 
-          onClick={handleGuest}
-          className="hidden md:flex absolute -right-32 top-[55%] -translate-y-1/2 w-32 flex-col items-center rotate-[8deg] drop-shadow-xl z-0 hover:rotate-[12deg] transition-all cursor-pointer group origin-top-left"
-        >
-          {/* String */}
-          <svg className="absolute -top-16 -left-10 w-24 h-24 pointer-events-none" viewBox="0 0 100 100">
-            <path d="M 0,10 Q 40,20 50,80" fill="none" stroke="#e0c7a5" strokeWidth="2.5" strokeDasharray="3 1" />
-            <path d="M 5,15 Q 45,25 55,80" fill="none" stroke="#c09a72" strokeWidth="1.5" />
-          </svg>
-          
-          <div 
-            className="w-full bg-[#c8a47e] shadow-lg p-4 flex flex-col items-center text-[#3b2513] group-hover:bg-[#d0b08d] transition-colors"
-            style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 15%, 100% 100%, 0% 100%, 0% 15%)' }}
+
+        {/* Back / Guest Access link */}
+        <div className="mt-8 text-center">
+          <Link 
+            to="/" 
+            className="font-sans text-xs tracking-wider uppercase text-neutral-500 hover:text-[#1C1C1B] transition-colors underline underline-offset-4 decoration-neutral-300"
           >
-            <div className="w-4 h-4 rounded-full bg-[#052345] shadow-inner mt-1 mb-3 ring-2 ring-[#e6c19a]/40 border border-[#a67c52]"></div>
-            <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-center border-b border-[#3b2513]/20 w-full pb-2 mb-2">Guest Access Pass</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b2513" strokeWidth="1" strokeLinecap="square" className="mb-2 opacity-60">
-              <rect x="5" y="4" width="14" height="16" />
-              <path d="M5 8h14M5 12h14M5 16h14" />
-            </svg>
-            <span className="text-[9px] font-sans font-medium text-center leading-tight mb-3 text-[#3b2513]/80 uppercase tracking-widest">Browse the collection<br/>as a guest.</span>
-            <button className="bg-[#903432] text-white text-[9px] font-sans uppercase tracking-widest py-1.5 px-3 w-full border-none">Enter as Guest</button>
-          </div>
+            Continue as Guest
+          </Link>
         </div>
-
-        {/* Mobile Guest Tag text */}
-        <div className="md:hidden mt-8 text-center text-white/80 font-serif text-lg tracking-wide z-10 w-full">
-           <Link to="/" className="underline decoration-white/50 underline-offset-4 hover:text-white transition-colors">Continue as Guest</Link>
-        </div>
-
       </div>
     </div>
   );
