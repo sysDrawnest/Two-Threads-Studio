@@ -46,8 +46,8 @@ const Navbar: React.FC = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out px-5 md:px-12 lg:px-16 ${
-          scrolled ? "bg-[#fcfaf8]/90 backdrop-blur-md border-b border-[#e5e0d8] py-4" : "bg-transparent py-6"
+        className={`fixed top-0 left-0 right-0 z-50 px-5 md:px-12 lg:px-16 transition-all duration-500 ease-in-out ${
+          scrolled ? "bg-white/80 backdrop-blur-md border-b border-neutral-200/50 py-4 shadow-sm" : "bg-transparent py-6"
         }`}
       >
         {/* Desktop Layout */}
@@ -57,49 +57,50 @@ const Navbar: React.FC = () => {
           <div className="w-1/3 flex justify-start">
             <Link 
               to="/" 
-              className="font-serif text-[26px] tracking-wide text-[#2c2826] hover:opacity-80 transition-opacity"
+              className="font-serif text-[26px] tracking-wide text-neutral-800 hover:opacity-70 transition-opacity"
             >
               TwoThreads Studio
             </Link>
           </div>
 
           {/* Center: Links */}
-          <div className="w-1/3 flex justify-center gap-8 lg:gap-12">
+          <div className="w-1/3 flex justify-center gap-10">
             {links.map(l => (
               <Link 
                 key={l.name} 
                 to={l.path} 
-                className="font-sans text-[11px] lg:text-xs tracking-[0.2em] text-[#4a4542] uppercase hover:text-[#1a1817] transition-colors py-1"
+                className="relative font-sans text-xs tracking-[0.2em] text-neutral-600 uppercase hover:text-neutral-900 transition-colors py-1 group"
               >
                 {l.name}
+                <span className="absolute bottom-0 left-1/2 w-0 h-[1px] bg-neutral-800 -translate-x-1/2 transition-all duration-300 ease-out group-hover:w-full"></span>
               </Link>
             ))}
           </div>
 
           {/* Right: Icons */}
-          <div className="w-1/3 flex justify-end gap-6 items-center">
+          <div className="w-1/3 flex justify-end gap-7 items-center">
             <button 
               onClick={() => setIsSearchOpen(true)}
-              className="text-[#4a4542] hover:text-[#1a1817] transition-colors"
+              className="text-neutral-600 hover:text-neutral-900 transition-colors"
               aria-label="Search"
             >
               <Search strokeWidth={1.25} size={20} />
             </button>
             <Link 
               to="/account" 
-              className="text-[#4a4542] hover:text-[#1a1817] transition-colors"
+              className="text-neutral-600 hover:text-neutral-900 transition-colors"
               aria-label="Account"
             >
               <User strokeWidth={1.25} size={20} />
             </Link>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="text-[#4a4542] hover:text-[#1a1817] transition-colors relative"
+              className="text-neutral-600 hover:text-neutral-900 transition-colors relative"
               aria-label="Cart"
             >
               <ShoppingBag strokeWidth={1.25} size={20} />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#ab5a46] text-[#f4ebd9] text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
+                <span className="absolute -top-1.5 -right-2 bg-neutral-800 text-white text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm ring-2 ring-white">
                   {cartItemCount}
                 </span>
               )}
@@ -113,7 +114,7 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-start">
             <button 
               onClick={() => setMenuOpen(true)}
-              className="text-[#2c2826] p-1 -ml-1"
+              className="text-neutral-800 p-1 -ml-1 hover:opacity-70 transition-opacity"
               aria-label="Open Menu"
             >
               <Menu strokeWidth={1.25} size={24} />
@@ -124,7 +125,7 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-center">
             <Link 
               to="/" 
-              className="font-serif text-[22px] tracking-wide text-[#2c2826]"
+              className="font-serif text-[22px] tracking-wide text-neutral-800"
             >
               TwoThreads
             </Link>
@@ -134,12 +135,12 @@ const Navbar: React.FC = () => {
           <div className="flex-1 flex justify-end items-center">
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="text-[#2c2826] relative p-1 -mr-1"
+              className="text-neutral-800 relative p-1 -mr-1 hover:opacity-70 transition-opacity"
               aria-label="Cart"
             >
               <ShoppingBag strokeWidth={1.25} size={22} />
               {cartItemCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 bg-[#ab5a46] text-[#f4ebd9] text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
+                <span className="absolute -top-1 -right-1 bg-neutral-800 text-white text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full shadow-sm ring-2 ring-white">
                   {cartItemCount}
                 </span>
               )}
@@ -150,19 +151,19 @@ const Navbar: React.FC = () => {
 
       {/* Full Screen Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 z-[60] bg-[#fcfaf8] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        className={`fixed inset-0 z-[60] bg-[#faf9f7] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] flex flex-col ${
           menuOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-4"
         }`}
       >
-        <div className="flex flex-col h-full w-full px-5 py-6">
+        <div className="flex flex-col h-full w-full px-5 py-6 max-w-md mx-auto">
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between mb-16">
-            <Link to="/" className="font-serif text-[22px] tracking-wide text-[#2c2826]">
+            <Link to="/" className="font-serif text-[22px] tracking-wide text-neutral-800">
               TwoThreads Studio
             </Link>
             <button 
               onClick={() => setMenuOpen(false)}
-              className="text-[#2c2826] p-1 -mr-1 hover:rotate-90 transition-transform duration-500"
+              className="text-neutral-800 p-1 -mr-1 hover:rotate-90 transition-transform duration-500"
               aria-label="Close Menu"
             >
               <X strokeWidth={1.25} size={28} />
@@ -175,10 +176,10 @@ const Navbar: React.FC = () => {
               <Link 
                 key={l.name} 
                 to={l.path} 
-                className={`font-serif text-[32px] tracking-wide text-[#2c2826] transition-all duration-500 ${
+                className={`font-serif text-[36px] leading-tight tracking-wide text-neutral-800 transition-all duration-500 ${
                   menuOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
                 }`}
-                style={{ transitionDelay: `${i * 75 + 100}ms` }}
+                style={{ transitionDelay: `${i * 100 + 100}ms` }}
               >
                 {l.name}
               </Link>
@@ -186,7 +187,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Footer */}
-          <div className={`flex flex-col gap-6 border-t border-[#e5e0d8] pt-8 pb-4 transition-all duration-700 delay-500 ${
+          <div className={`flex flex-col gap-6 border-t border-neutral-200 pt-8 pb-8 transition-all duration-700 delay-500 ${
             menuOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}>
             <button 
@@ -194,13 +195,13 @@ const Navbar: React.FC = () => {
                 setMenuOpen(false);
                 setTimeout(() => setIsSearchOpen(true), 300);
               }}
-              className="font-sans text-[11px] tracking-[0.2em] text-[#4a4542] uppercase flex items-center gap-3 w-fit"
+              className="font-sans text-[11px] tracking-[0.2em] text-neutral-600 uppercase flex items-center gap-3 w-fit hover:text-neutral-900 transition-colors"
             >
               <Search size={18} strokeWidth={1.25} /> Search Collection
             </button>
             <Link 
               to="/account" 
-              className="font-sans text-[11px] tracking-[0.2em] text-[#4a4542] uppercase flex items-center gap-3 w-fit"
+              className="font-sans text-[11px] tracking-[0.2em] text-neutral-600 uppercase flex items-center gap-3 w-fit hover:text-neutral-900 transition-colors"
             >
               <User size={18} strokeWidth={1.25} /> My Account
             </Link>
