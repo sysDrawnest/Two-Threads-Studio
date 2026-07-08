@@ -1,19 +1,18 @@
 import React from 'react';
 import { ScrollReveal } from '../ui/ScrollReveal';
+import promoVideo from '../../assets/An_artisanal_campaign_of_this.mp4';
 
 export default function VideoBanner() {
   return (
-    <section className="w-full h-[35vh] md:h-[40vh] relative overflow-hidden bg-primary-container flex items-center justify-center">
+    <section className="w-full h-[55vh] md:h-[65vh] lg:h-[75vh] relative overflow-hidden bg-primary-container flex items-center justify-center">
       <video
         autoPlay
         loop
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-75"
-        poster="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
       >
-        {/* Placeholder for actual video source */}
-        {/* <source src="/path-to-your-video.mp4" type="video/mp4" /> */}
+        <source src={promoVideo} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-[#a85a46]/20 mix-blend-multiply" />
       <div className="absolute inset-0 bg-black/10" />
