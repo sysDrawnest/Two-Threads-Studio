@@ -4,6 +4,7 @@ import { Search, User, ShoppingBag, Menu, X } from 'lucide-react';
 import CartDrawer from './CartDrawer';
 import SearchOverlay from './SearchOverlay';
 import { useCartStore } from '../../store/cartStore';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const Navbar: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const cartItemCount = useCartStore(state => state.items.length);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -86,7 +88,7 @@ const Navbar: React.FC = () => {
               <Search strokeWidth={1.25} size={20} />
             </button>
             <Link 
-              to="/account" 
+              to={isAuthenticated ? "/account" : "/auth/login?redirect=/account"} 
               className="text-neutral-600 hover:text-neutral-900"
               aria-label="Account"
             >
@@ -194,7 +196,7 @@ const Navbar: React.FC = () => {
               <Search size={18} strokeWidth={1.25} /> Search Collection
             </button>
             <Link 
-              to="/account" 
+              to={isAuthenticated ? "/account" : "/auth/login?redirect=/account"} 
               className="font-sans text-[11px] tracking-[0.2em] text-neutral-600 uppercase flex items-center gap-3 w-fit hover:text-neutral-900"
             >
               <User size={18} strokeWidth={1.25} /> My Account
