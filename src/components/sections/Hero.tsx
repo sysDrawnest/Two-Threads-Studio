@@ -1,19 +1,88 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import heroMobile from '../../assets/hero section mobile.png';
 import heroPc from '../../assets/hero section pc.png';
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Entrance animation for text
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  // Scroll zoom effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current || !imageRef.current) return;
+      
+      const rect = sectionRef.current.getBoundingClientRect();
+      const scrollProgress = 1 - (rect.top / window.innerHeight);
+      
+      // Clamp the progress between 0 and 1
+      const progress = Math.min(Math.max(scrollProgress, 0), 1);
+      
+      // Zoom effect: scale from 1 to 1.15
+      const scale = 1 + (progress * 0.15);
+      imageRef.current.style.transform = `scale(${scale})`;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#ab5a46]">
-      {/* Huge Background Text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-start md:justify-center pt-[18vh] md:pt-0 pointer-events-none select-none z-0">
+    <section 
+      ref={sectionRef}
+      id="hero" 
+      className="relative h-screen w-full overflow-hidden bg-[#ab5a46]"
+    >
+      {/* Huge Background Text with Entrance Animation */}
+      <div className="absolute inset-0 flex flex-col items-center justify-start md:justify-center pt-[18vh] md:pt-0 pointer-events-none select-none z-0 overflow-hidden">
         <h1 className="font-serif text-[#f4ebd9] font-normal text-center w-full" style={{ lineHeight: '0.85' }}>
-          <span className="hidden md:block text-[17vw] tracking-tighter">TWO THREAD</span>
-          <span className="hidden md:block text-[17vw] tracking-tighter">STUDIO</span>
+          <span 
+            className="hidden md:block text-[17vw] tracking-tighter"
+            style={{
+              transform: isVisible ? 'translateX(0)' : 'translateX(-100%)',
+              opacity: isVisible ? 1 : 0,
+              transition: 'transform 1.2s cubic-bezier(0.76, 0, 0.24, 1), opacity 1s ease'
+            }}
+          >
+            TWO THREAD
+          </span>
+          <span 
+            className="hidden md:block text-[17vw] tracking-tighter"
+            style={{
+              transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
+              opacity: isVisible ? 1 : 0,
+              transition: 'transform 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s, opacity 1s ease 0.15s'
+            }}
+          >
+            STUDIO
+          </span>
           
-          <span className="block md:hidden text-[22vw] tracking-tighter">TWO THREAD</span>
-          <span className="block md:hidden text-[22vw] tracking-tighter">STUDIO</span>
+          <span 
+            className="block md:hidden text-[22vw] tracking-tighter"
+            style={{
+              transform: isVisible ? 'translateX(0)' : 'translateX(-100%)',
+              opacity: isVisible ? 1 : 0,
+              transition: 'transform 1.2s cubic-bezier(0.76, 0, 0.24, 1), opacity 1s ease'
+            }}
+          >
+            TWO THREAD
+          </span>
+          <span 
+            className="block md:hidden text-[22vw] tracking-tighter"
+            style={{
+              transform: isVisible ? 'translateX(0)' : 'translateX(100%)',
+              opacity: isVisible ? 1 : 0,
+              transition: 'transform 1.2s cubic-bezier(0.76, 0, 0.24, 1) 0.15s, opacity 1s ease 0.15s'
+            }}
+          >
+            STUDIO
+          </span>
         </h1>
       </div>
 
@@ -22,14 +91,18 @@ export default function Hero() {
         <div className="relative w-full max-w-[1200px] flex justify-center pointer-events-auto">
            
            <img 
+             ref={imageRef}
              src={heroMobile} 
              alt="Artisanal Creations" 
-             className="w-full max-w-[500px] h-[70vh] md:h-auto object-contain object-bottom block md:hidden drop-shadow-2xl" 
+             className="w-full max-w-[500px] h-[70vh] md:h-auto object-contain object-bottom block md:hidden drop-shadow-2xl transition-transform duration-100 will-change-transform" 
+             style={{ transform: 'scale(1)' }}
            />
            <img 
+             ref={imageRef}
              src={heroPc} 
              alt="Two Thread Studio Kits" 
-             className="w-full max-w-[1000px] h-[80vh] object-contain object-bottom hidden md:block drop-shadow-2xl" 
+             className="w-full max-w-[1000px] h-[80vh] object-contain object-bottom hidden md:block drop-shadow-2xl transition-transform duration-100 will-change-transform" 
+             style={{ transform: 'scale(1)' }}
            />
 
            {/* Text and Button Overlaying the Rock */}

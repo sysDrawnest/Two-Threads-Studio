@@ -10,7 +10,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material";
+  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop";
   collection: "Botanical" | "Cottage" | "Linen" | "Seasonal";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited";
@@ -159,6 +159,50 @@ export const mockProducts: Product[] = [
     reviews: [
       { id: "r5", author: "Liam J.", rating: 5, text: "Finished this in one evening. Looks amazing in a black frame.", date: "June 01, 2026" }
     ]
+  },
+  {
+    id: "p7",
+    name: "Wildflower Sanctuary Finished Hoop",
+    price: 240,
+    category: "Finished Hoop",
+    collection: "Botanical",
+    difficulty: "Advanced",
+    badge: "Limited",
+    images: [
+      "https://images.unsplash.com/photo-1595166415582-895180f2d5e2?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop"
+    ],
+    description: "A meticulously hand-embroidered 8-inch hoop featuring a dense wildflower meadow. Over 40 hours of hand stitching.",
+    story: "Each Wildflower Sanctuary hoop is individually crafted by our master embroiderer. Due to the handmade nature, no two pieces are identical, making this a true heirloom.",
+    materialsIncluded: [
+      "Finished 8\" Walnut-stained hoop",
+      "Hand-embroidered linen art piece",
+      "Signed certificate of authenticity"
+    ],
+    estimatedTime: "40 hours",
+    reviews: []
+  },
+  {
+    id: "p8",
+    name: "Midnight Forest Finished Hoop",
+    price: 310,
+    category: "Finished Hoop",
+    collection: "Linen",
+    difficulty: "Advanced",
+    badge: "Limited",
+    images: [
+      "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=800&auto=format&fit=crop"
+    ],
+    description: "A stunning night sky forest silhouette stitched in pure silk and metallic threads on charcoal Belgian linen.",
+    story: "Capturing the quiet mystery of a winter forest at night. This piece features delicate French knots and satin stitches using silk-blend threads that catch the light from different angles.",
+    materialsIncluded: [
+      "Finished 10\" Oak-stained hoop",
+      "Hand-stitched silk and linen artwork",
+      "Wall-mounting hardware"
+    ],
+    estimatedTime: "55 hours",
+    reviews: []
   }
 ];
 
