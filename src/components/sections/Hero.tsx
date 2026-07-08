@@ -12,8 +12,8 @@ export default function Hero() {
           <span className="hidden md:block text-[17vw] tracking-tighter">TWO THREAD</span>
           <span className="hidden md:block text-[17vw] tracking-tighter">STUDIO</span>
           
-          <span className="block md:hidden text-[22vw] tracking-tighter">ARTISANAL</span>
-          <span className="block md:hidden text-[22vw] tracking-tighter">CREATIONS</span>
+          <span className="block md:hidden text-[22vw] tracking-tighter">TWO THREAD</span>
+          <span className="block md:hidden text-[22vw] tracking-tighter">STUDIO</span>
         </h1>
       </div>
 
