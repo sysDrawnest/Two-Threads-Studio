@@ -15,7 +15,7 @@ import {
 
 const Home: React.FC = () => {
   return (
-    <PageContainer>
+    <PageContainer disablePadding={true}>
       <Hero />
       <BestSellers />
       <VideoBanner />

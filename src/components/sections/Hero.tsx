@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#ab5a46]">
       {/* Huge Background Text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-start pt-[12vh] md:pt-[12vh] pointer-events-none select-none z-0">
+      <div className="absolute inset-0 flex flex-col items-center justify-start md:justify-center pt-[18vh] md:pt-0 pointer-events-none select-none z-0">
         <h1 className="font-serif text-[#f4ebd9] font-normal text-center w-full" style={{ lineHeight: '0.85' }}>
           <span className="hidden md:block text-[17vw] tracking-tighter">TWO THREAD</span>
           <span className="hidden md:block text-[17vw] tracking-tighter">STUDIO</span>
