@@ -43,7 +43,7 @@ const AdminLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/" target="_blank" rel="noreferrer" className="font-sans text-xs text-on-secondary-container no-underline hover:text-primary-container transition-colors">
+            <Link to="/" className="font-sans text-xs text-on-secondary-container no-underline hover:text-primary-container transition-colors">
               ← View Storefront
             </Link>
             {user?.avatar && (

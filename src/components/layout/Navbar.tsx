@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, User, ShoppingBag, Menu, X } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X, Shield } from 'lucide-react';
 import CartDrawer from './CartDrawer';
 import SearchOverlay from './SearchOverlay';
 import { useCartStore } from '../../store/cartStore';
@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const { items, isCartOpen, setCartOpen } = useCartStore();
   const cartItemCount = items.length;
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Center: Links */}
-          <div className="w-1/3 flex justify-center gap-10">
+          <div className="w-1/3 flex justify-center gap-10 items-center">
             {links.map(l => (
               <Link 
                 key={l.name} 
@@ -80,6 +80,15 @@ const Navbar: React.FC = () => {
 
           {/* Right: Icons */}
           <div className="w-1/3 flex justify-end gap-7 items-center">
+            {isAuthenticated && user?.role === 'admin' && (
+              <Link 
+                to="/admin" 
+                className="text-neutral-600 hover:text-[#A34A38]"
+                aria-label="Admin Dashboard"
+              >
+                <Shield strokeWidth={1.5} size={20} />
+              </Link>
+            )}
             <button 
               onClick={() => setIsSearchOpen(true)}
               className="text-neutral-600 hover:text-neutral-900"
@@ -87,13 +96,23 @@ const Navbar: React.FC = () => {
             >
               <Search strokeWidth={1.25} size={20} />
             </button>
-            <Link 
-              to={isAuthenticated ? "/account" : "/auth/login?redirect=/account"} 
-              className="text-neutral-600 hover:text-neutral-900"
-              aria-label="Account"
-            >
-              <User strokeWidth={1.25} size={20} />
-            </Link>
+            {isAuthenticated ? (
+              <Link 
+                to="/account" 
+                className="text-neutral-600 hover:text-[#A34A38]"
+                aria-label="Account Profile"
+              >
+                <User strokeWidth={1.5} size={20} />
+              </Link>
+            ) : (
+              <Link 
+                to="/auth/login?redirect=/account" 
+                className="text-neutral-600 hover:text-neutral-900"
+                aria-label="Login"
+              >
+                <User strokeWidth={1.25} size={20} />
+              </Link>
+            )}
             <button 
               onClick={() => setCartOpen(true)}
               className="text-neutral-600 hover:text-neutral-900 relative"
@@ -195,12 +214,29 @@ const Navbar: React.FC = () => {
             >
               <Search size={18} strokeWidth={1.25} /> Search Collection
             </button>
-            <Link 
-              to={isAuthenticated ? "/account" : "/auth/login?redirect=/account"} 
-              className="font-sans text-[11px] tracking-[0.2em] text-neutral-600 uppercase flex items-center gap-3 w-fit hover:text-neutral-900"
-            >
-              <User size={18} strokeWidth={1.25} /> My Account
-            </Link>
+            {isAuthenticated && user?.role === 'admin' && (
+              <Link 
+                to="/admin" 
+                className="font-sans text-[11px] tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 w-fit hover:text-[#1C1C1B]"
+              >
+                <Shield size={18} strokeWidth={1.5} /> Admin Dashboard
+              </Link>
+            )}
+            {isAuthenticated ? (
+              <Link 
+                to="/account" 
+                className="font-sans text-[11px] tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 w-fit hover:text-[#1C1C1B]"
+              >
+                <User size={18} strokeWidth={1.5} /> My Profile
+              </Link>
+            ) : (
+              <Link 
+                to="/auth/login?redirect=/account" 
+                className="font-sans text-[11px] tracking-[0.2em] text-neutral-600 uppercase flex items-center gap-3 w-fit hover:text-neutral-900"
+              >
+                <User size={18} strokeWidth={1.25} /> Log In
+              </Link>
+            )}
           </div>
         </div>
       </div>

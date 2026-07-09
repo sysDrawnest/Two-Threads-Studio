@@ -47,7 +47,8 @@ const MOCK_USERS: (AuthUser & { password: string })[] = [
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
-      const stored = sessionStorage.getItem('tt_auth_user');
+      // localStorage persists across tabs and page refreshes (unlike sessionStorage)
+      const stored = localStorage.getItem('tt_auth_user');
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -65,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (found) {
       const { password: _pw, ...safeUser } = found;
       setUser(safeUser);
-      try { sessionStorage.setItem('tt_auth_user', JSON.stringify(safeUser)); } catch {}
+      try { localStorage.setItem('tt_auth_user', JSON.stringify(safeUser)); } catch {}
       return { success: true };
     }
     return { success: false, error: 'Invalid email or password. Try julia@example.com / password123 or admin@twothreads.com / admin123' };
@@ -90,13 +91,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     setUser(newUser);
-    try { sessionStorage.setItem('tt_auth_user', JSON.stringify(newUser)); } catch {}
+    try { localStorage.setItem('tt_auth_user', JSON.stringify(newUser)); } catch {}
     return { success: true };
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
-    try { sessionStorage.removeItem('tt_auth_user'); } catch {}
+    try { localStorage.removeItem('tt_auth_user'); } catch {}
   }, []);
 
   return (
