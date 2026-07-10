@@ -3,26 +3,19 @@ import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
-import swaggerUi from 'swagger-ui-express';
-import pino from 'pino';
+import { randomUUID } from 'crypto';
 
-import { env } from './config/env';
+import { corsConfig } from './config/cors';
+import { limiter } from './config/rateLimit';
+import { swaggerConfig } from './config/swagger';
+import logger from './lib/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 import routes from './routes';
-
-export const logger = pino({
-  level: env.NODE_ENV === 'production' ? 'info' : 'debug',
-  transport:
-    env.NODE_ENV !== 'production'
-      ? {
-          target: 'pino-pretty',
-          options: { colorize: true },
-        }
-      : undefined,
-});
+import { BASE_API_PATH } from './constants/api';
+import { HTTP_STATUS } from './constants/httpStatus';
+import { successResponse } from './utils/response';
 
 const app: Application = express();
 
@@ -34,22 +27,10 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS
-app.use(
-  cors({
-    origin: env.FRONTEND_URL,
-    credentials: true,
-  })
-);
+app.use(cors(corsConfig));
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window`
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, message: 'Too many requests from this IP, please try again later.' },
-});
-app.use('/api', limiter);
+app.use(BASE_API_PATH, limiter);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
@@ -61,61 +42,39 @@ app.use(cookieParser());
 // Data compression
 app.use(compression());
 
-// Structured logging
+// Request ID & Structured logging
 app.use(
   pinoHttp({
     logger,
+    genReqId: (req, res) => {
+      const id = req.headers['x-request-id'] || randomUUID();
+      res.setHeader('X-Request-Id', id);
+      return id;
+    },
     autoLogging: {
-      ignore: (req) => req.url === '/api/health' || req.url === '/',
+      ignore: (req) => req.url === `${BASE_API_PATH}/health` || req.url === '/',
     },
   })
 );
 
 // 2. ROUTES
 // Basic root endpoint
-app.get('/', (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
+app.get('/', (_req: Request, res: Response) => {
+  return successResponse(res, {
     service: 'Two Threads Studio Backend',
-    version: '1.0.0',
+    version: process.env.npm_package_version || '1.0.0',
   });
 });
 
 // API Routes (versioned)
-app.use('/api/v1', routes);
+app.use(BASE_API_PATH, routes);
 
 // Swagger Documentation
-const swaggerDocument = {
-  openapi: '3.0.0',
-  info: {
-    title: 'Two Threads Studio API',
-    version: '1.0.0',
-    description: 'API Documentation for Two Threads Studio Backend',
-  },
-  servers: [
-    {
-      url: `http://localhost:${env.PORT}/api/v1`,
-      description: 'Development server',
-    },
-  ],
-  paths: {
-    '/health': {
-      get: {
-        summary: 'Check API Health',
-        responses: {
-          '200': {
-            description: 'Successful response',
-          },
-        },
-      },
-    },
-  },
-};
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerConfig.serve, swaggerConfig.setup);
 
 // 3. UNHANDLED ROUTES
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+app.all('*', (req: Request, _res: Response, next: NextFunction) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, HTTP_STATUS.NOT_FOUND));
 });
 
 // 4. GLOBAL ERROR HANDLER

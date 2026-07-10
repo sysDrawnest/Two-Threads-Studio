@@ -1,6 +1,13 @@
-import app, { logger } from './app';
+import app from './app';
 import { env } from './config/env';
 import prisma from './prisma';
+import logger from './lib/logger';
+
+// Handle uncaught exceptions gracefully
+process.on('uncaughtException', (err) => {
+  logger.fatal({ err }, 'UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  process.exit(1);
+});
 
 const startServer = async () => {
   try {
@@ -11,6 +18,14 @@ const startServer = async () => {
     // Start Express server
     const server = app.listen(env.PORT, () => {
       logger.info(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
+    });
+
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (err: Error) => {
+      logger.fatal({ err }, 'UNHANDLED REJECTION! 💥 Shutting down...');
+      server.close(() => {
+        process.exit(1);
+      });
     });
 
     // Graceful Shutdown
