@@ -10,16 +10,16 @@ import {
 const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
 const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
 const ExploreByRoom = lazy(() => import('../components/sections/ExploreByRoom'));
-const VideoBanner = lazy(() => import('../components/sections/VideoBanner'));
-const Banner = lazy(() => import('../components/sections/Banner'));
-const JustForYou = lazy(() => import('../components/sections/JustForYou'));
+const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
+const Banner = lazy(() => import('../components/sections/ArtisanGuildCollection'));
+const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
 const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
 const Reviews = lazy(() => import('../components/sections/Reviews'));
 const CommunityGallery = lazy(() => import('../components/sections/CommunityGallery'));
 const Learning = lazy(() => import('../components/sections/Learning'));
-const CorporateBulkOrders = lazy(() => import('../components/sections/CorporateBulkOrders'));
+const CorporateBulkOrders = lazy(() => import('../components/sections/CorporateOrders'));
 const Newsletter = lazy(() => import('../components/sections/Newsletter'));
 
 // Lightweight fallback skeleton for lazy-loaded sections
