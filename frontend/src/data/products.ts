@@ -15,9 +15,9 @@ export interface Product {
   name: string;
   price: number;
   mrp?: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set";
-  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor";
-  collection: "Botanical" | "Cottage" | "Linen" | "Seasonal";
+  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Candles";
+  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Candles";
+  collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
   images: string[];
@@ -85,9 +85,9 @@ export const mockCategories: Category[] = [
   },
   {
     id: "cat5",
-    name: "Wall Decor",
-    slug: "wall-decor",
-    image: "https://images.unsplash.com/photo-1595166415582-895180f2d5e2?q=80&w=800&auto=format&fit=crop",
+    name: "Botanical Candles",
+    slug: "botanical-candles",
+    image: "https://images.unsplash.com/photo-1608405021200-e14fc75338cd?q=80&w=800&auto=format&fit=crop",
     count: 21,
   },
   {

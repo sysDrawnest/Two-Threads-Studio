@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollReveal, StaggerContainer } from '../ui/ScrollReveal';
 import { mockProducts } from '../../data/products';
 
-export default function JustForYou() {
+export default function CuratedPicks() {
   const items = mockProducts.slice(0, 5);
 
   return (

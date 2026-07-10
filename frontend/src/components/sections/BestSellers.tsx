@@ -5,9 +5,9 @@ import { ProductCard } from '../ui/ProductCard';
 import { mockProducts } from '../../data/products';
 import { ArrowRight } from 'lucide-react';
 
-type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Gift Sets';
+type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Candles' | 'Gift Sets';
 
-const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Gift Sets'];
+const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Candles', 'Gift Sets'];
 
 export default function BestSellers() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('All');
