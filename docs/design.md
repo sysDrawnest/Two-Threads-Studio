@@ -142,3 +142,14 @@ This section lists all static images used across the homepage and core sections,
 | `/saree quality.png`                              | Image          | Texture/detail image for product pages.                    |
 | `/Weave Traditions.png`                           | Image          | Title card graphic for the "Weave Traditions" section.     |
 | `/weaves.png`                                     | Image          | Placeholder for a weaves collage or grid.                  |
+| `/stamp.png` / `/stamp mobile.png`                | Image/Graphic  | Decorative postal-style stamp used for authentic branding. |
+| `/paper cutoff.png` / `/paper cutoff mobile.png`  | Image/Graphic  | Ripped edge paper texture used for layering.               |
+| `/Embroidery_hoop,_pencil,_thread_2K...jpeg`      | Image          | High-res 2K macro backdrop used for immersive views.       |
+
+---
+
+## 5. UI Guidelines (Authentication)
+
+* **Glassmorphism Aesthetic**: Auth modals use a glass-like frosted effect (`bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl`) layered over high-resolution texture backgrounds.
+* **Immersive Backgrounds**: Use 2K macro shots of embroidery materials (hoops, threads) with subtle contrasting overlays (`contrast(1.1) brightness(0.9) saturate(1.2)` + `mix-blend-overlay`).
+* **Interactive Elements**: Floating interactive objects like the "Guest Access Pass" tag, utilizing absolute positioning, SVG connecting strings, and CSS ripple/tilt effects (`hover:-translate-y-1 hover:shadow-xl`).

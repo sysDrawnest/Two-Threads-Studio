@@ -129,7 +129,7 @@ Various components inside `HomeSections.tsx` and `CricketKeychains.tsx`.
 
 # Homepage Loading Strategy
 
-*   **Critical Rendering Path**: The `Hero` section and the primary navigation are prioritized.
+*   **Critical Rendering Path**: The `Hero` section and the primary navigation are prioritized. Navigation flows have been optimized and validated to resolve previous routing/anchor issues.
 *   **Lazy Loading**: Images below the fold (e.g., in `OurStory`, `Reviews`, `ExploreByRoom`) should utilize native `loading="lazy"`.
 *   **Deferred Components**: Non-critical sections could potentially be code-split, though currently bundled together in `HomeSections.tsx`.
 
@@ -139,5 +139,5 @@ Various components inside `HomeSections.tsx` and `CricketKeychains.tsx`.
 
 *   **Performance**: Implement Next/Image or a similar optimized image component to automatically serve WebP/AVIF formats instead of large PNGs/JPEGs.
 *   **SEO**: Ensure all images have descriptive `alt` tags (some currently do, but need auditing). Add semantic schema markup for products.
-*   **UX**: Add a "Quick Add" to cart button directly on the `BestSellers` and `JustForYou` cards to reduce friction.
+*   **UX / E-Commerce**: Seamlessly connect "Shop Now" and "Add to Cart" buttons to the newly implemented Zustand `CartStore`, ensuring the `isCartOpen` state toggles smoothly.
 *   **Dynamic Data**: Replace hardcoded product arrays with API calls to a CMS or backend.
