@@ -13,6 +13,13 @@ export default function VideoBanner() {
       >
         <source src={promoVideo} type="video/mp4" />
       </video>
+      {/* Bottom gradient transition to Dark Cocoa (#1e1812) */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-[120px] md:h-[180px] pointer-events-none z-10"
+        style={{
+          background: 'linear-gradient(to top, #1e1812 0%, rgba(30, 24, 18, 0) 100%)'
+        }}
+      />
     </section>
   );
 }

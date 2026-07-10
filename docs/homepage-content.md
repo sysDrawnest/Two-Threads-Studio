@@ -161,14 +161,14 @@ Drives navigation and discovery by categorizing catalog offerings into beautiful
 
 ### Layout
 
-- **Desktop**: Fixed-height grid (`640px`) utilizing 12 columns.
+- **Desktop**: Fixed-height grid (`640px`) utilizing 12 columns, nested inside a floating card container that overlaps the preceding `VideoBanner` section by `80px` to `112px` (`-mt-20 md:-mt-28`).
   - The first/featured category (e.g., Embroidery Kits) occupies a large left-hand tile (`col-span-5` spanning both rows).
   - The remaining 6 categories are partitioned into a top row (3 columns) and a bottom row (4 columns, including the last category filling the remaining space).
-- **Mobile**: Fallback 2-column grid. The first card expands to full width (`col-span-2`), while others occupy single columns.
+- **Mobile**: Fallback 2-column grid inside a floating card container that overlaps the banner by `80px` (`-mt-20`). The first card expands to full width (`col-span-2`), while others occupy single columns.
 
 ### Styling
 
-- **Colors**: Light background (`#FBFBFA`). Cards use a gray-brown base background (`#e8e1d9`) with a bottom-heavy dark gradient overlay (`bg-gradient-to-t from-[#1C1C1B]/75 via-[#1C1C1B]/10 to-transparent`) for text readability.
+- **Colors**: The section background is `#ede6de`, featuring a top dark cocoa (`#1e1812`) gradient overlay (`h-[140px]`) to blend with the `VideoBanner`'s bottom gradient. The category content sits inside a card panel with a warm off-white background (`#FBFBFA`), generous border radius (`rounded-[24px] md:rounded-[36px]`), and a soft double shadow (`shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.15),_0_20px_40px_-15px_rgba(0,0,0,0.1)]`).
 - **Typography**: Muted cream sans-serif for product count (`#d2c4bc`), light serif for category names, and red-brown for overlines (`#A34A38`).
 
 ### Animations
