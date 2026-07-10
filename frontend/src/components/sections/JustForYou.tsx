@@ -1,14 +1,9 @@
 import React from 'react';
 import { ScrollReveal, StaggerContainer } from '../ui/ScrollReveal';
+import { mockProducts } from '../../data/products';
 
 export default function JustForYou() {
-  const items = [
-    { name: "Botanical Wreath Kit", price: "$44", size: "tall" },
-    { name: "Modern Grid Set", price: "$38", size: "small" },
-    { name: "Forest Walk Pattern", price: "$29", size: "small" },
-    { name: "Sage Linen Bundle", price: "$55", size: "medium" },
-    { name: "Thread Palette Box", price: "$22", size: "medium" },
-  ];
+  const items = mockProducts.slice(0, 5);
 
   return (
     <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 md:px-16 bg-inverse-on-surface">
@@ -45,26 +40,29 @@ export default function JustForYou() {
             }
             
             return (
-              <ScrollReveal key={i} direction="up" className={classNames}>
+              <ScrollReveal key={item.id || i} direction="up" className={classNames}>
                 <div 
-                  className="relative group cursor-pointer overflow-hidden h-full w-full transition-transform duration-300 hover:scale-[1.02]" 
-                  style={{ backgroundColor: `hsl(${28 + i * 15}, 22%, ${78 - i * 3}%)` }}
+                  className="relative group cursor-pointer overflow-hidden h-full w-full transition-transform duration-300 hover:scale-[1.02] bg-[#f4ebd9]" 
                 >
-                  {/* Decorative pattern/placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-2 border-primary-container/30" />
-                  </div>
+                  {item.images && item.images.length > 0 && (
+                    <img
+                      src={item.images[0]}
+                      alt={item.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  )}
                   
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 w-full h-full bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                  <div className="absolute inset-0 w-full h-full bg-[#1C1C1B]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
                   
                   {/* Content label */}
-                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-inverse-on-surface/90 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-2.5 z-20 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
-                    <p className="font-sans text-xs sm:text-sm text-primary-container font-medium truncate max-w-[140px] sm:max-w-[180px] md:max-w-none">
+                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 bg-[#FAF9F7]/95 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-2.5 z-20 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md border border-neutral-200/40">
+                    <p className="font-sans text-xs sm:text-sm text-[#1C1C1B] font-medium truncate max-w-[140px] sm:max-w-[180px] md:max-w-none">
                       {item.name}
                     </p>
-                    <p className="font-sans text-[10px] sm:text-xs text-on-secondary-container mt-0.5">
-                      {item.price}
+                    <p className="font-sans text-[10px] sm:text-xs text-[#735947] mt-0.5">
+                      ₹{item.price}
                     </p>
                   </div>
                 </div>
