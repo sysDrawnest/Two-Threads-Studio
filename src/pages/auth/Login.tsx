@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import bgImage from '../../assets/Embroidery_hoop,_pencil,_thread_2K_202607100702.jpeg';
 
 const Login: React.FC = () => {
   const { login, isLoading, isAuthenticated, user } = useAuth();
@@ -53,7 +54,7 @@ const Login: React.FC = () => {
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat animate-bg-drift"
         style={{ 
           // High-resolution placeholder for macro embroidery/fabric texture
-          backgroundImage: 'url("https://images.unsplash.com/photo-1581428982868-e410dd047a90?q=80&w=2574&auto=format&fit=crop")',
+          backgroundImage: `url(${bgImage})`,
           filter: 'contrast(1.1) brightness(0.9) saturate(1.2)'
         }}
       >
