@@ -44,6 +44,7 @@ The project adopts a classic and high-contrast typographic hierarchy to emphasiz
 * **Font Delivery**: Google Fonts API integrations (loaded directly in `public/index.html` and `src/App.tsx`).
 * **Icons**: Inline SVGs for lightweight, crisp rendering without third-party icon dependencies.
 * **Build System**: Create React App / `react-scripts` configuration.
+* **State Management**: Zustand (used for global state like the Shopping Cart).
 
 ---
 
@@ -95,6 +96,19 @@ The project is currently structured as a monolithic single-page experience in `s
 ### 11. Newsletter & Footer (`Newsletter`, `Footer`)
 * Dark warm newsletter sign-up with styled borderless inputs.
 * Extensive 4-column footer map outlining Shop, Learn, Studio, and Support categories alongside social link listings.
+
+### 12. Authentication (Login & Sign Up)
+* **Mobile-First Design**: Completely distinct mobile vs. desktop HTML structures using Tailwind `md:hidden` and `md:block` for pixel-perfect implementations on all devices.
+* **Glassmorphism Aesthetic**: Auth modals use a frosted glass effect (`backdrop-blur-md`) layered over high-resolution texture backgrounds (2K macro shots of embroidery materials).
+* **Interactive Elements**: Floating interactive objects like the "Guest Access Pass" tag, utilizing absolute positioning, SVG connecting strings, and CSS ripple/tilt effects.
+
+### 13. Shopping Cart & State (`cartStore.ts`)
+* **Zustand Implementation**: Uses a lightweight global store (`useCartStore`) to manage cart items.
+* **Persistence**: Persists cart contents across sessions using `localStorage`.
+* **Customization**: Supports deep item customization options (e.g., gift message, engraving text, hoop finish).
+
+### 14. Checkout Flow (`Checkout.tsx`)
+* A step-by-step state-managed checkout flow integrated directly with the global cart.
 
 ---
 
