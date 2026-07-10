@@ -73,8 +73,8 @@ app.use(BASE_API_PATH, routes);
 app.use('/docs', swaggerConfig.serve, swaggerConfig.setup);
 
 // 3. UNHANDLED ROUTES
-app.all('*', (req: Request, _res: Response, next: NextFunction) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, HTTP_STATUS.NOT_FOUND));
+app.use((_req: Request, _res: Response, next: NextFunction) => {
+  next(new AppError(`Route not found`, HTTP_STATUS.NOT_FOUND));
 });
 
 // 4. GLOBAL ERROR HANDLER

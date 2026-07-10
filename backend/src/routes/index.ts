@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { checkHealth } from '../controllers/health.controller';
+import authRoutes from './auth.routes';
 
 const router = Router();
 
-// Define API v1 routes here
+// Health
 router.get('/health', checkHealth);
+
+// Authentication
+router.use('/auth', authRoutes);
 
 export default router;
