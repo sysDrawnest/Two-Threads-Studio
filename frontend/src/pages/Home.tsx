@@ -42,11 +42,11 @@ const Home: React.FC = () => {
         ════════════════════════════════════════
         1.  Hero                   (KEEP)
         2.  TrustBar               (NEW)
-        3.  ShopByCategory         (NEW)
-        4.  BestSellers            (ENHANCED)
-        5.  ShopByOccasion         (NEW)
-        6.  ExploreByRoom          (EXPANDED)
-        7.  VideoBanner            (KEEP)
+        3.  BestSellers            (ENHANCED)
+        4.  VideoBanner            (KEEP)
+        5.  ShopByCategory         (NEW)
+        6.  ShopByOccasion         (NEW)
+        7.  ExploreByRoom          (EXPANDED)
         8.  Banner/ArtisanGuild    (RENAMED)
         9.  JustForYou             (KEEP)
         10. CustomCreations        (NEW)
@@ -64,6 +64,10 @@ const Home: React.FC = () => {
       <TrustBar />
       <BestSellers />
 
+      <Suspense fallback={<SectionFallback />}>
+        <VideoBanner />
+      </Suspense>
+
       {/* ─── Below fold — lazily loaded ─── */}
       <Suspense fallback={<SectionFallback />}>
         <ShopByCategory />
@@ -75,10 +79,6 @@ const Home: React.FC = () => {
 
       <Suspense fallback={<SectionFallback />}>
         <ExploreByRoom />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <VideoBanner />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>

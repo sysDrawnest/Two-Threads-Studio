@@ -5,10 +5,10 @@ The homepage renders in the following top-to-bottom sequence of components:
 1. `Hero` (Eagerly Loaded)
 2. `TrustBar` (Eagerly Loaded)
 3. `BestSellers` (Eagerly Loaded)
-4. `ShopByCategory` (Lazy Loaded)
-5. `ShopByOccasion` (Lazy Loaded)
-6. `ExploreByRoom` (Lazy Loaded)
-7. `VideoBanner` (Lazy Loaded)
+4. `VideoBanner` (Lazy Loaded)
+5. `ShopByCategory` (Lazy Loaded)
+6. `ShopByOccasion` (Lazy Loaded)
+7. `ExploreByRoom` (Lazy Loaded)
 8. `Banner` (Lazy Loaded)
 9. `JustForYou` (Lazy Loaded)
 10. `CustomCreations` (Lazy Loaded)
@@ -961,11 +961,11 @@ Home (Page)
 └── PageContainer (Layout Wrapper)
     ├── Hero
     ├── TrustBar
-    ├── ShopByCategory
     ├── BestSellers
+    ├── VideoBanner (ExclusiveCollection)
+    ├── ShopByCategory
     ├── ShopByOccasion
     ├── ExploreByRoom
-    ├── VideoBanner (ExclusiveCollection)
     ├── Banner (ArtisanGuildCollection)
     ├── JustForYou (CuratedPicks)
     ├── CustomCreations
