@@ -1,422 +1,473 @@
-# 🧵 Two Threads Studio — Backend Architecture & Tech Stack
+# 🧵 Two Threads Studio — Backend Tech Stack Recommendation (Final)
 
-> **Status:** Finalized  
-> **Version:** 2.0  
-> **Last Updated:** July 2026  
-> **Overall Rating: 9.7 / 10**
+## Project Profile (TL;DR)
 
----
+Two Threads Studio is a **premium artisan e-commerce + learning platform** built on React 19 + TypeScript with TailwindCSS and Zustand. The frontend is **85% complete** with zero backend. It needs:
 
-## Project Context
-
-Two Threads Studio is a **premium artisan e-commerce + learning platform** built on React 19 + TypeScript. The frontend is 85% complete with zero backend. Core backend requirements:
-
-- Real authentication with custom roles (customer, admin, artisan, corporate)
-- PostgreSQL database for relational product/order/user data
-- Razorpay payment processing (UPI, cards, EMI — INR-native)
-- Admin CRUD for inventory, orders, customers
-- Transactional emails for orders and shipping
-- Cloudinary-powered image delivery (WebP, CDN, transformations)
-- Tutorial video delivery via Cloudflare Stream / Bunny.net
+- Real authentication (currently mocked)
+- A product/order/user database
+- Stripe payment processing
+- Admin CRUD operations
+- Email notifications
+- Image & asset storage
+- Tutorial video delivery
 
 ---
 
-## ✅ Final Recommended Stack
+## Overall Rating
 
-| Layer | Technology | Rationale |
-|:---|:---|:---|
-| **Runtime** | Node.js 20 LTS | TypeScript consistency with frontend |
-| **Framework** | Express.js | Lightweight, full control, no migration overhead |
-| **Language** | TypeScript | Unified language across the entire stack |
-| **Database** | PostgreSQL (via Supabase) | Relational model required for products/orders/users |
-| **ORM** | Prisma | Industry-standard TypeScript ORM, typed migrations |
-| **Authentication** | Custom JWT + Refresh Tokens + bcrypt | Full ownership, role flexibility, mobile-ready |
-| **Validation** | Zod | Request validation + environment variable enforcement |
-| **Images** | Cloudinary | Auto WebP/AVIF, CDN, resizing, watermarking |
-| **Videos** | Cloudflare Stream or Bunny.net | Learning Studio tutorial delivery |
-| **Payments** | Razorpay | UPI, NetBanking, Cards, EMI — India-first |
-| **Email** | Resend + React Email | Transactional email with JSX templates |
-| **Logging** | Pino | Structured JSON logging for production |
-| **Security** | Helmet, CORS, Rate Limiting, Compression | Standard Express hardening |
-| **API Docs** | Swagger / OpenAPI | Self-documenting API for long-term maintainability |
-| **Deployment** | Railway | Fast CI/CD, clean env management, native Node.js support |
-| **Frontend Host** | Vercel | Best-in-class for React SPAs |
-| **Monitoring** | Sentry | Error tracking when approaching production |
-| **Jobs (future)** | BullMQ + Redis | Async email, image processing, inventory updates |
+| Area                 | Rating                            |
+| -------------------- | --------------------------------- |
+| Scalability          | ⭐⭐⭐⭐⭐                        |
+| Cost                 | ⭐⭐⭐⭐⭐                        |
+| Developer Experience | ⭐⭐⭐⭐⭐                        |
+| Maintainability      | ⭐⭐⭐⭐⭐                        |
+| Deployment           | ⭐⭐⭐⭐⭐                        |
+| Production Readiness | ⭐⭐⭐⭐☆ (needs a few additions) |
+
+**Overall: 9.7/10**
 
 ---
 
-## Architecture Diagram
+## ✅ Final Recommended Stack at a Glance
+
+| Layer             | Technology                               | Why                                                       |
+| :---------------- | :--------------------------------------- | :-------------------------------------------------------- |
+| **Runtime**       | Node.js (v20 LTS)                        | Same language as your frontend (TypeScript)               |
+| **Framework**     | **Express.js**                           | Lightweight, flexible, ideal for indie/small teams        |
+| **Language**      | **TypeScript**                           | Consistent with your existing frontend codebase           |
+| **Database**      | **PostgreSQL** (via Supabase)            | Relational, reliable, free-tier available                 |
+| **ORM**           | **Prisma**                               | Best-in-class TypeScript ORM, great DX                    |
+| **Auth**          | **Custom JWT + Refresh Tokens + bcrypt** | Full control, vendor independence, easier role management |
+| **Payments**      | **Razorpay**                             | India-first, INR payments, UPI/Cards/Netbanking           |
+| **Images**        | **Cloudinary**                           | Auto-optimization, CDN, transformations, WebP/AVIF        |
+| **Videos**        | **Cloudflare Stream** or **Bunny.net**   | Affordable video CDN for tutorial delivery                |
+| **Email**         | **Resend + React Email**                 | Modern, developer-friendly transactional email            |
+| **Validation**    | **Zod**                                  | Type-safe runtime validation                              |
+| **Logging**       | **Pino**                                 | Structured, fast JSON logging                             |
+| **Security**      | **Helmet, CORS, Rate Limiting**          | Production-ready security middleware                      |
+| **API Docs**      | **Swagger/OpenAPI**                      | Self-documenting API for frontend/team                    |
+| **Deployment**    | **Railway**                              | Simple Node.js deployment, great DX                       |
+| **Frontend Host** | **Vercel**                               | Best for React SPAs (your existing setup)                 |
+| **Monitoring**    | **Sentry** (pre-production)              | Error tracking and performance monitoring                 |
+
+---
+
+## 🔍 Detailed Justification
+
+### What I Agree With ✅
+
+#### 1. 🟢 Runtime & Framework: Node.js + Express + TypeScript
+
+**Keep it.** You already have React + TypeScript. A full TypeScript stack makes debugging much easier. No reason to rewrite everything into Next.js.
+
+---
+
+#### 2. 🗄️ Database: PostgreSQL via Supabase
+
+**100% yes.** Your application is not just a product catalog. You have:
+
+- Products, Categories, Collections
+- Orders, OrderItems
+- Tutorials, Learning Studio
+- Users, Wishlists, Reviews
+- Workshops, Product Variants
+- Artisans, Corporate customers
+
+These are **highly relational**. MongoDB would become messy.
+
+---
+
+#### 3. 🔌 ORM: Prisma
+
+**Absolutely.** Prisma is almost becoming the standard for TypeScript. Auto-generated types, schema-first migrations, and readable query syntax.
+
+---
+
+#### 4. 💳 Payments: Razorpay
+
+**Correct.** Your customers are Indian. UPI alone makes this the correct choice. Razorpay handles Indian payment methods natively.
+
+---
+
+#### 5. 📧 Email: Resend
+
+**Excellent choice.** Modern API, free tier (3,000 emails/month), and works with React Email for beautiful JSX templates.
+
+---
+
+### What I Would Change 🔄
+
+#### 1. 🔐 Authentication: Custom JWT Instead of Supabase Auth
+
+This is the **biggest architectural decision**.
+
+**Why I'm recommending a change:**
+
+Your frontend is **already built around your own authentication flow**, with separate customer and admin experiences. You're also planning:
+
+- Admin dashboard with custom roles
+- Corporate customers
+- Artisans and instructors
+- Learning platform users
+- Workshop management
+- Future mobile app
+
+These benefit from **owning the authentication layer**.
+
+**Recommended approach:**
 
 ```
-┌──────────────────────┐       ┌────────────────────────────┐
-│    Vercel (Frontend) │       │  Railway (Express + TS API) │
-│    React 19 SPA      │◄─────►│  JWT Auth · Prisma · Zod   │
-│    TailwindCSS       │       │  Pino · Helmet · Swagger    │
-└──────────────────────┘       └──────────┬─────────────────┘
-                                          │
-              ┌───────────────────────────┼──────────────────────┐
-              │                           │                      │
-  ┌───────────▼────────┐    ┌─────────────▼──────┐   ┌──────────▼────────┐
-  │  Supabase          │    │   Cloudinary        │   │  Razorpay         │
-  │  PostgreSQL        │    │   Image Storage     │   │  Payment Gateway  │
-  │  (via Prisma ORM)  │    │   CDN + Transform   │   │  UPI / Cards / EMI│
-  └────────────────────┘    └────────────────────┘   └───────────────────┘
-              │
-  ┌───────────▼────────┐    ┌────────────────────┐
-  │  Resend            │    │  Cloudflare Stream  │
-  │  Transactional     │    │  Tutorial Videos    │
-  │  Email             │    │  Learning Studio    │
-  └────────────────────┘    └────────────────────┘
+PostgreSQL (Supabase) → Express API → JWT → Refresh Tokens → bcrypt → Role Middleware
 ```
+
+**Use Supabase primarily for:**
+
+- PostgreSQL (database)
+- Storage (for some assets)
+
+**Build authentication yourself in Express:**
+
+- Complete control over user schema
+- Easier role management (ADMIN, CUSTOMER, ARTISAN, INSTRUCTOR)
+- No vendor-specific auth dependency
+- Easier migration to other providers later
+- Better for long-term customization
 
 ---
 
-## Key Architecture Decisions Explained
+#### 2. 🖼️ Images: Cloudinary Instead of Supabase Storage
 
-### 1. Custom JWT Auth (NOT Supabase Auth)
+For your business, **images are critical**. You're selling handcrafted artisan products — image quality directly impacts conversions.
 
-The original recommendation of Supabase Auth was the convenient but wrong path for this project.
+**Cloudinary advantages:**
 
-**Why custom JWT is correct here:**
+- Automatic WebP/AVIF conversion
+- Smart compression
+- Responsive image sizes (srcset)
+- Cropping and transformations
+- CDN delivery
+- Watermarking
+- Lazy loading optimizations
 
-Your frontend already has a custom `AuthContext` with distinct admin vs. customer flows. Your planned user roles include:
+Supabase Storage is reliable, but Cloudinary's media capabilities are **significantly stronger** for an image-heavy premium storefront.
 
-- Customer
-- Admin
-- Artisan
-- Corporate Client
-
-Supabase Auth restricts how deeply you can customize token payloads, middleware logic, and role enforcement. Custom JWT gives you:
-
-- Complete control over access and refresh token lifecycles
-- Flexible role-based middleware (`isAdmin`, `isArtisan`, `isVerified`)
-- Clean migration path to a mobile app with no SDK dependency
-- No vendor lock-in on authentication
-
-**Implementation:**
-
-```
-PostgreSQL (Supabase)  →  Express  →  bcrypt hash  →  JWT Sign  →  Refresh Token Store
-```
-
-Use Supabase only for: **PostgreSQL** and **nothing else from Supabase's auth system.**
+**For videos:** Keep your idea of using Cloudflare Stream or Bunny.net.
 
 ---
 
-### 2. Cloudinary (NOT Supabase Storage)
+#### 3. 🚀 Deployment: Railway Over Render
 
-Supabase Storage is a reliable object store, but it has no media intelligence.
+**Railway** advantages:
 
-For a handcrafted product brand, **the image is the product.** Poor image delivery directly harms conversion.
-
-Cloudinary provides:
-
-- Automatic WebP / AVIF conversion on delivery
-- On-the-fly responsive resizing (`w_400,h_400,c_fill`)
-- CDN delivery worldwide
-- Lazy image delivery
-- Watermarking for artisan content protection
-- Compression without quality loss
-
-This is not optional for a premium artisan storefront.
+- Faster deployments
+- Better developer experience
+- Better PostgreSQL support
+- Cleaner environment management
+- Native GitHub integration
 
 ---
 
-### 3. Zod for Validation + Environment Enforcement
+### Missing Technologies I Would Add 📦
 
-Never trust frontend input.
+#### 1. Validation: Zod
 
-Every request body, query param, and route param must be validated before reaching business logic.
+Never trust frontend input. Every request should be validated before reaching business logic.
 
 ```typescript
-// Example: Create Order validator
-const CreateOrderSchema = z.object({
-  items: z.array(z.object({
-    productId: z.string().uuid(),
-    variantId: z.string().uuid(),
-    quantity: z.number().int().min(1),
-  })).min(1),
-  shippingAddress: z.object({
-    line1: z.string().min(5),
-    city: z.string(),
-    pincode: z.string().regex(/^\d{6}$/),
-    state: z.string(),
-  }),
-  couponCode: z.string().optional(),
+import { z } from "zod";
+
+const createProductSchema = z.object({
+  name: z.string().min(3).max(100),
+  price: z.number().positive(),
+  categoryId: z.string().uuid(),
+  description: z.string().optional(),
 });
 ```
 
-Also use Zod for **environment validation at startup** — the server should refuse to start if `JWT_SECRET`, `DATABASE_URL`, or `RAZORPAY_KEY_SECRET` are missing:
+---
+
+#### 2. Logging: Pino
+
+Production applications need structured logs for debugging and monitoring.
 
 ```typescript
-const EnvSchema = z.object({
+import pino from "pino";
+
+const logger = pino({
+  level: process.env.LOG_LEVEL || "info",
+  transport: {
+    target: "pino-pretty",
+    options: { colorize: true },
+  },
+});
+```
+
+---
+
+#### 3. Security Middleware
+
+Install and configure:
+
+- **Helmet** - Security headers
+- **CORS** - Cross-origin resource sharing
+- **Compression** - Response compression
+- **Express Rate Limit** - Brute force protection
+- **XSS sanitization** - Input sanitization
+
+---
+
+#### 4. Environment Validation
+
+Instead of `process.env.JWT_SECRET`, use Zod to validate and fail fast:
+
+```typescript
+import { z } from "zod";
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]),
+  PORT: z.string().default("5000"),
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string().min(32),
   RAZORPAY_KEY_ID: z.string(),
   RAZORPAY_KEY_SECRET: z.string(),
-  CLOUDINARY_URL: z.string(),
+  CLOUDINARY_URL: z.string().url(),
   RESEND_API_KEY: z.string(),
 });
 
-export const env = EnvSchema.parse(process.env); // Fails fast if invalid
+const env = envSchema.parse(process.env);
 ```
+
+If a required environment variable is missing, the application should refuse to start.
 
 ---
 
-### 4. Security Middleware Stack
+#### 5. API Documentation: Swagger/OpenAPI
 
-Every Express production app requires this baseline:
+Self-documenting APIs help:
 
-```typescript
-import helmet from 'helmet';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import compression from 'compression';
-import morgan from 'morgan'; // or pino-http
-
-app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
-app.use(compression());
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
-app.use(express.json({ limit: '10kb' })); // Prevent large payload attacks
-```
+- Frontend developers understand endpoints
+- Onboard new team members
+- Test APIs easily
+- Generate client SDKs
 
 ---
 
-## Folder Structure
+#### 6. Background Jobs (Plan for Future)
 
-```text
+Eventually you'll need asynchronous work:
+
+- Order confirmation emails
+- Inventory updates
+- Image processing
+- Order status notifications
+- Analytics aggregation
+
+**Plan for a job queue** (BullMQ with Redis) when those needs arise. Not necessary for initial launch.
+
+---
+
+## 📁 Suggested Backend Folder Structure
+
+```
 backend/
+│
 ├── src/
-│   ├── config/          # Database connection, Cloudinary, Razorpay, env
-│   ├── middleware/      # Auth guard, role check, error handler, rate limiter
-│   ├── routes/          # Express routers by domain
-│   ├── controllers/     # Request handlers (thin layer)
-│   ├── services/        # Business logic (orders, payments, auth)
-│   ├── repositories/    # Prisma query layer (database abstraction)
-│   ├── prisma/          # schema.prisma + migrations
-│   ├── validators/      # Zod schemas per route
-│   ├── utils/           # Helpers (token utils, slug gen, pagination)
-│   ├── lib/             # Third-party wrappers (cloudinary.ts, resend.ts)
-│   ├── types/           # Shared TypeScript interfaces and enums
-│   ├── constants/       # App-wide constants (roles, status enums)
-│   ├── emails/          # React Email templates
-│   ├── storage/         # Cloudinary upload helpers
-│   ├── jobs/            # BullMQ job definitions (future)
-│   ├── cron/            # Scheduled tasks (future)
-│   └── tests/           # Jest unit + integration tests
-├── app.ts               # Express app setup, middleware registration
-└── server.ts            # Entry point, env validation, DB connect, listen
+│   ├── config/           # Configuration files
+│   │   ├── database.ts
+│   │   ├── redis.ts
+│   │   └── cloudinary.ts
+│   ├── middleware/       # Express middleware
+│   │   ├── auth.ts
+│   │   ├── errorHandler.ts
+│   │   ├── rateLimiter.ts
+│   │   └── validation.ts
+│   ├── routes/           # Route definitions
+│   │   ├── auth.routes.ts
+│   │   ├── products.routes.ts
+│   │   ├── orders.routes.ts
+│   │   ├── admin.routes.ts
+│   │   └── index.ts
+│   ├── controllers/      # Request handlers
+│   │   ├── auth.controller.ts
+│   │   ├── products.controller.ts
+│   │   └── orders.controller.ts
+│   ├── services/         # Business logic
+│   │   ├── auth.service.ts
+│   │   ├── payment.service.ts
+│   │   └── email.service.ts
+│   ├── repositories/     # Database operations
+│   │   ├── product.repository.ts
+│   │   └── order.repository.ts
+│   ├── prisma/           # Prisma schema & migrations
+│   │   └── schema.prisma
+│   ├── validators/       # Zod schemas
+│   │   ├── product.validator.ts
+│   │   └── order.validator.ts
+│   ├── utils/            # Utility functions
+│   │   ├── logger.ts
+│   │   └── helpers.ts
+│   ├── lib/              # Third-party integrations
+│   │   ├── razorpay.ts
+│   │   ├── cloudinary.ts
+│   │   └── resend.ts
+│   ├── types/            # TypeScript types
+│   │   └── index.ts
+│   ├── constants/        # Constants
+│   │   └── index.ts
+│   ├── emails/           # Email templates
+│   │   └── templates/
+│   ├── storage/          # File storage logic
+│   ├── jobs/             # Background jobs (future)
+│   ├── cron/             # Scheduled tasks (future)
+│   ├── tests/            # Test files
+│   │   ├── unit/
+│   │   └── integration/
+│   ├── app.ts            # Express app setup
+│   └── server.ts         # Server entry point
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── docker-compose.yml
+└── README.md
 ```
 
----
-
-## API Routes Reference
-
-### Authentication
-| Method | Route | Description |
-|:---|:---|:---|
-| `POST` | `/api/auth/register` | Create new customer account |
-| `POST` | `/api/auth/login` | Login → access + refresh token |
-| `POST` | `/api/auth/refresh` | Rotate refresh token |
-| `POST` | `/api/auth/logout` | Invalidate refresh token |
-| `GET` | `/api/auth/me` | Get current user profile |
-| `POST` | `/api/auth/forgot-password` | Send reset email |
-| `POST` | `/api/auth/reset-password` | Reset with token |
-
-### Catalog
-| Method | Route | Description |
-|:---|:---|:---|
-| `GET` | `/api/products` | List with filters, pagination, search |
-| `GET` | `/api/products/:slug` | Single product with variants + images |
-| `GET` | `/api/categories` | Category tree |
-| `GET` | `/api/collections` | Curated collections |
-
-### Commerce
-| Method | Route | Description |
-|:---|:---|:---|
-| `POST` | `/api/orders` | Create order |
-| `GET` | `/api/orders/my-orders` | Customer order history |
-| `GET` | `/api/orders/:id` | Single order detail |
-| `POST` | `/api/payments/razorpay/create-order` | Initiate Razorpay order |
-| `POST` | `/api/payments/razorpay/verify` | Verify payment signature |
-| `POST` | `/api/coupons/validate` | Validate coupon code |
-
-### User Account
-| Method | Route | Description |
-|:---|:---|:---|
-| `GET` | `/api/wishlist` | Get wishlist |
-| `POST` | `/api/wishlist/:productId` | Add to wishlist |
-| `DELETE` | `/api/wishlist/:productId` | Remove from wishlist |
-| `GET` | `/api/reviews` | Get reviews for product |
-| `POST` | `/api/reviews` | Submit review |
-
-### Admin (Role-Protected)
-| Method | Route | Description |
-|:---|:---|:---|
-| `GET/POST` | `/api/admin/products` | List / Create product |
-| `PUT/DELETE` | `/api/admin/products/:id` | Update / Delete product |
-| `GET/PUT` | `/api/admin/orders` | List / Update order status |
-| `GET` | `/api/admin/customers` | Customer management |
-| `GET` | `/api/admin/analytics` | Dashboard metrics |
-| `GET/POST` | `/api/admin/tutorials` | Manage learning content |
+This structure keeps responsibilities well separated and scales cleanly.
 
 ---
 
-## Database Schema (Key Models — Prisma)
+## 🔮 Future Features to Design For Now
 
-Design now for features you'll need later. This avoids painful migrations.
+Your current product catalog already suggests future capabilities. Model the backend with these in mind to reduce future migrations:
 
-```prisma
-model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  role          Role     @default(CUSTOMER)
-  firstName     String?
-  lastName      String?
-  phone         String?
-  isVerified    Boolean  @default(false)
-  orders        Order[]
-  wishlist      WishlistItem[]
-  reviews       Review[]
-  addresses     Address[]
-  refreshTokens RefreshToken[]
-  createdAt     DateTime @default(now())
-}
-
-enum Role {
-  CUSTOMER
-  ARTISAN
-  CORPORATE
-  ADMIN
-  SUPER_ADMIN
-}
-
-model Product {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String
-  basePrice   Decimal
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  variants    ProductVariant[]
-  images      ProductImage[]
-  reviews     Review[]
-  isFeatured  Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-}
-
-model Order {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  items           OrderItem[]
-  status          OrderStatus @default(PENDING)
-  totalAmount     Decimal
-  shippingAddress Json
-  paymentId       String?
-  razorpayOrderId String?
-  couponId        String?
-  giftMessage     String?
-  createdAt       DateTime @default(now())
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  REFUNDED
-}
-```
+- **Product personalization** - Custom engraving, monogramming
+- **Made-to-order products** - Production lead times
+- **Handmade production tracking** - Artisan assignment
+- **Crafting time estimates** - Delivery date calculation
+- **Workshop bookings** - Calendar integration
+- **DIY kit downloads** - Digital pattern delivery
+- **Digital patterns** - PDF generation
+- **Gift messages** - Order notes
+- **Bulk corporate orders** - B2B pricing
+- **Artisan profiles** - Storytelling and bio
+- **Inventory by variant** - Size/color tracking
+- **Coupon engine** - Discount codes
+- **Gift cards** - Store credit
+- **Loyalty program** - Points/rewards
 
 ---
 
-## Implementation Milestones
+## 🗺️ Phased Implementation Roadmap
 
-### Milestone 1 — Foundation
-- [ ] Express + TypeScript project setup
-- [ ] Prisma + Supabase PostgreSQL connection
-- [ ] Zod environment validation at startup
-- [ ] Global error handler
-- [ ] Pino structured logging
-- [ ] Security middleware (Helmet, CORS, Rate Limit)
-- [ ] Swagger/OpenAPI setup
+### Milestone 1 — Backend Foundation (Week 1)
 
-### Milestone 2 — Authentication
-- [ ] bcrypt password hashing
-- [ ] JWT access tokens (15 min expiry)
-- [ ] Refresh token rotation (7 day expiry, stored in DB)
-- [ ] Role-based middleware (`requireAuth`, `requireAdmin`)
-- [ ] Email verification flow (Resend)
-- [ ] Password reset flow (Resend)
-- [ ] Replace frontend `AuthContext` mock with real API
+- [ ] Initialize Express + TypeScript project
+- [ ] Configure Prisma + PostgreSQL
+- [ ] Set up environment validation with Zod
+- [ ] Implement logging with Pino
+- [ ] Add security middleware (Helmet, CORS, Rate Limiting)
+- [ ] Create global error handler
+- [ ] Set up Swagger/OpenAPI documentation
+- [ ] Configure environment variables
 
-### Milestone 3 — Catalog
-- [ ] Product schema + Prisma migrations
-- [ ] Category, Variant, Image models
-- [ ] `/api/products` with filtering, pagination, search
-- [ ] Cloudinary upload endpoint for product images
-- [ ] Seed script to migrate hardcoded frontend data to DB
-- [ ] Wire `Shop.tsx` and `ProductDetail.tsx` to real API
+### Milestone 2 — Authentication (Week 2)
 
-### Milestone 4 — Commerce
-- [ ] Order creation endpoint
-- [ ] Razorpay order initiation + signature verification
-- [ ] Inventory decrement on order confirm
-- [ ] Order confirmation email (Resend + React Email template)
-- [ ] Coupon validation engine
-- [ ] Wire `Checkout.tsx` to real backend
+- [ ] Design User schema in Prisma
+- [ ] Implement JWT generation and verification
+- [ ] Build refresh token system
+- [ ] Create bcrypt password hashing
+- [ ] Implement role-based middleware (ADMIN, CUSTOMER, ARTISAN)
+- [ ] Build auth endpoints: register, login, logout, refresh
+- [ ] Add password reset flow
+- [ ] Replace frontend `AuthContext` with real API calls
 
-### Milestone 5 — Admin Panel
-- [ ] Product CRUD API
-- [ ] Order status management API
-- [ ] Customer management API
-- [ ] Tutorial/video management API
-- [ ] Analytics endpoints (revenue, top products, recent orders)
-- [ ] Wire all `pages/admin/` screens to real data
+### Milestone 3 — Catalog (Week 3)
 
-### Milestone 6 — Production Hardening
-- [ ] Sentry error tracking integration
-- [ ] Image optimization audit (Cloudinary transformations)
-- [ ] React.lazy code splitting on Admin + heavy routes
-- [ ] Performance testing
-- [ ] Security review (JWT, SQL injection via Prisma, XSS)
-- [ ] Railway deployment pipeline with GitHub Actions
-- [ ] Environment variable audit
+- [ ] Design Product, Category, Collection schemas
+- [ ] Seed database with existing hardcoded product data
+- [ ] Build `/api/products` endpoints (list, detail, filtering)
+- [ ] Add search and pagination
+- [ ] Build `/api/categories` endpoints
+- [ ] Wire up `Shop.tsx` and `ProductDetail.tsx`
+- [ ] Integrate Cloudinary for product images
+- [ ] Upload existing product images to Cloudinary
+
+### Milestone 4 — Commerce (Week 4)
+
+- [ ] Design Cart, Order, OrderItem schemas
+- [ ] Build `/api/cart` endpoints
+- [ ] Integrate Razorpay payment gateway
+- [ ] Create order creation flow
+- [ ] Build payment verification endpoint
+- [ ] Wire up multi-step `Checkout.tsx`
+- [ ] Add inventory management
+- [ ] Implement order status tracking
+
+### Milestone 5 — Admin (Week 5)
+
+- [ ] Build admin authentication and role middleware
+- [ ] Create product CRUD endpoints
+- [ ] Build order management endpoints (list, update status)
+- [ ] Add customer management endpoints
+- [ ] Implement analytics endpoints (dashboard data)
+- [ ] Wire up all `/pages/admin/` screens
+- [ ] Add image upload for admin product creation
+
+### Milestone 6 — Email & Production Hardening (Week 6)
+
+- [ ] Integrate Resend for transactional emails
+- [ ] Create React Email templates (order confirmation, shipping)
+- [ ] Implement email queue system
+- [ ] Add shipping status notifications
+- [ ] Performance optimization
+- [ ] Security audit and penetration testing
+- [ ] Accessibility review
+- [ ] SEO optimization
+- [ ] Monitoring with Sentry
+- [ ] Deployment pipeline setup on Railway
 
 ---
 
-## Monthly Cost Estimate (Early Stage)
+## 💰 Estimated Monthly Cost (Early Stage)
 
-| Service | Plan | Cost |
-|:---|:---|:---|
-| Supabase | Free tier (500MB DB) | ₹0 |
-| Railway | Starter | ~₹400/month |
-| Cloudinary | Free (25 credits/month) | ₹0 |
-| Razorpay | 2% per transaction | Pay-per-use |
-| Resend | Free (3,000 emails/month) | ₹0 |
-| Vercel | Hobby (free) | ₹0 |
-| Sentry | Free (5k errors/month) | ₹0 |
-| **Total** | | **~₹400/month** |
+| Service    | Plan               | Cost            |
+| :--------- | :----------------- | :-------------- |
+| Supabase   | Free tier          | ₹0              |
+| Cloudinary | Free tier          | ₹0              |
+| Railway    | Starter            | ~₹400/month     |
+| Razorpay   | 2% per transaction | Pay-per-use     |
+| Resend     | Free (3k emails)   | ₹0              |
+| Vercel     | Free (Hobby)       | ₹0              |
+| **Total**  |                    | **~₹400/month** |
 
 ---
 
-## What NOT to Use
+## ❌ What to Avoid
 
-| Technology | Why Avoided |
-|:---|:---|
-| Supabase Auth | Limits role customization; not suited for multi-role, mobile-ready auth |
-| Supabase Storage (for images) | No media transformations; Cloudinary is strictly superior for artisan products |
-| MongoDB | Data is highly relational; MongoDB adds join complexity with no benefit |
-| Firebase | Vendor lock-in, weak relational querying, expensive at scale |
-| Stripe | Doesn't natively support UPI — wrong for an India-focused business |
-| Next.js (backend) | Frontend is 85% complete in CRA; rewriting to Next.js is unnecessary risk |
-| GraphQL | Overkill for this API surface; adds complexity with no material gain |
-| Heroku | Discontinued free tier; Railway is the superior modern replacement |
+| Technology    | Reason to Avoid                                                       |
+| :------------ | :-------------------------------------------------------------------- |
+| MongoDB       | Your data is relational; MongoDB adds unnecessary complexity          |
+| Firebase      | Vendor lock-in, limited relational query power, costly at scale       |
+| Stripe        | Doesn't support UPI/Indian payment methods natively                   |
+| Heroku        | Discontinued free tier; Railway/Render are better modern alternatives |
+| GraphQL       | Overkill for your API surface; REST is sufficient and faster to build |
+| Next.js       | Would require rewriting your mature CRA frontend                      |
+| Supabase Auth | Limits customization for roles and future features; vendor lock-in    |
+
+---
+
+## 🎯 Final Recommendations Summary
+
+This architecture balances low operational cost, strong developer experience, and enough flexibility to support the evolution of Two Threads Studio from an accessible premium artisan brand into a larger lifestyle platform without requiring a major backend rewrite.
+
+**Key differentiators from the initial stack:**
+
+1. ✅ **Custom authentication** instead of Supabase Auth — more control, easier role management
+2. ✅ **Cloudinary** instead of Supabase Storage — better image optimization for premium products
+3. ✅ **Additional production essentials** — Zod validation, Pino logging, Swagger docs
+4. ✅ **Structured folder organization** — Scalable and maintainable from day one
+5. ✅ **Future-proof design** — Modeled to support upcoming features without migrations
+
+**The stack is production-ready** with minimal changes and will serve Two Threads Studio well through its first 10,000 customers.
