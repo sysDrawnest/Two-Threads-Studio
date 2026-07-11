@@ -46,7 +46,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Membership = lazy(() => import('./pages/Membership'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Legal = lazy(() => import('./pages/Legal'));
-const OurBrands = lazy(() => import('./pages/OurBrands'));
+// const OurBrands = lazy(() => import('./pages/OurBrands'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Lazy Auth Pages
@@ -95,7 +95,7 @@ const StorefrontRoutes = () => {
         <Route path="/membership" element={<Membership />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/legal" element={<Legal />} />
-        <Route path="/our-brands" element={<OurBrands />} />
+        {/* <Route path="/our-brands" element={<OurBrands />} /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
