@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
               © 2026 TwoThreads Studio. A brand by SYS Pvt. Ltd. All rights reserved.
             </p>
             <p className="font-sans text-[10px] text-inverse-on-surface/20 tracking-wider">
-              Crafted by TwoThreads Studio • A <Link to="/our-brands" className="underline hover:text-inverse-on-surface/40 transition-colors text-inherit">SYS Pvt. Ltd.</Link> Company
+              Crafted by TwoThreads Studio • A SYS Pvt. Ltd. Company
             </p>
           </div>
           <div className="flex gap-4">
