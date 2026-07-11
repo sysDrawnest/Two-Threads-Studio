@@ -187,6 +187,24 @@ const OurStory: React.FC = () => {
         </div>
       </section>
 
+      {/* Parent Company Section */}
+      <section className="py-20 px-6 md:px-16 bg-inverse-on-surface border-t border-outline-variant/20">
+        <div className="max-w-3xl mx-auto text-center">
+          <ScrollReveal direction="up">
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-on-surface-variant/60 block mb-4">
+              Corporate Parent
+            </span>
+            <h2 className="font-serif text-2xl font-light text-primary-container mb-6">
+              About SYS Pvt. Ltd.
+            </h2>
+            <p className="font-sans text-xs text-[#5a4a3f]/80 leading-relaxed max-w-2xl mx-auto mb-8">
+              Two Threads Studio operates as a proud member of the SYS Pvt. Ltd. family. SYS Pvt. Ltd. is a creator of digital-first consumer brands focused on craftsmanship, technology, design, and building meaningful products. Under this umbrella, we leverage advanced operational platforms while ensuring our master artisans retain full creative independence and traditional design heritage.
+            </p>
+            <div className="w-12 h-px bg-outline-variant/40 mx-auto" />
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Outro CTA (from OurStory.tsx) */}
       <section className="py-24 px-6 md:px-16 text-center bg-background border-t border-outline-variant/20">
         <ScrollReveal direction="up">

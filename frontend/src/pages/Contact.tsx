@@ -108,10 +108,21 @@ const Contact: React.FC = () => {
               <p className="font-sans text-sm text-[#5a4a3f] mb-4">hello@twothreadsstudio.com</p>
               
               <p className="font-sans text-sm text-primary-container font-medium mb-1">Studio Address (By Appointment)</p>
-              <p className="font-sans text-sm text-[#5a4a3f]">
+              <p className="font-sans text-sm text-[#5a4a3f] mb-6">
                 124 Artisan Way, Suite 300<br/>
                 Portland, OR 97209
               </p>
+
+              <div className="border-t border-primary-container/10 pt-4 flex justify-between text-[10px] font-sans text-neutral-500 uppercase tracking-widest">
+                <div>
+                  <span className="block text-primary-container/60 font-semibold mb-0.5">Business Entity</span>
+                  <span className="text-[#5a4a3f]">SYS Pvt. Ltd.</span>
+                </div>
+                <div className="text-right">
+                  <span className="block text-primary-container/60 font-semibold mb-0.5">Brand Identity</span>
+                  <span className="text-[#5a4a3f]">Two Threads Studio</span>
+                </div>
+              </div>
             </ScrollReveal>
           </div>
         </ScrollReveal>

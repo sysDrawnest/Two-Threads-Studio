@@ -18,6 +18,8 @@ const Account: React.FC = () => {
     if (tabParam === 'addresses') return 'AddressBook';
     return 'Profile';
   });
+
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<any | null>(null);
   
   // Form states
   const [firstName, setFirstName] = useState("Julia");
@@ -153,6 +155,24 @@ const Account: React.FC = () => {
         .linen-texture {
           background-color: #FBFBFA;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
+        }
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #print-invoice-area, #print-invoice-area * {
+            visibility: visible;
+          }
+          #print-invoice-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+          }
         }
       `}</style>
       
@@ -414,8 +434,16 @@ const Account: React.FC = () => {
 
                         {/* Order Footer */}
                         <div className="border-t border-neutral-100 px-6 py-4 flex justify-between items-center">
-                          <span className="font-sans text-xs uppercase tracking-wider text-neutral-400">Grand Total</span>
-                          <span className="font-sans text-sm font-bold text-[#1C1C1B]">₹{order.total.toLocaleString()}</span>
+                          <div>
+                            <span className="font-sans text-xs uppercase tracking-wider text-neutral-400 mr-2">Grand Total</span>
+                            <span className="font-sans text-sm font-bold text-[#1C1C1B]">₹{order.total.toLocaleString()}</span>
+                          </div>
+                          <button 
+                            onClick={() => setSelectedInvoiceOrder(order)}
+                            className="bg-transparent text-neutral-500 border border-neutral-300 hover:border-[#1C1C1B] hover:text-[#1C1C1B] py-2 px-4 text-[10px] uppercase tracking-widest cursor-pointer transition-colors rounded-sm font-semibold"
+                          >
+                            View Invoice
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -713,6 +741,161 @@ const Account: React.FC = () => {
         </nav>
 
       </div>
+
+      {/* Invoice Modal Overlay */}
+      {selectedInvoiceOrder && (
+        <div className="fixed inset-0 bg-[#1C1C1B]/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-300 print:bg-white print:p-0">
+          <div id="print-invoice-area" className="bg-white w-full max-w-3xl p-8 md:p-12 border border-neutral-300 shadow-xl rounded-sm max-h-[90vh] overflow-y-auto relative print:border-none print:shadow-none print:max-h-none print:overflow-visible animate-in zoom-in-95 duration-200">
+            
+            {/* Close Button (hidden on print) */}
+            <button
+              onClick={() => setSelectedInvoiceOrder(null)}
+              className="absolute right-6 top-6 bg-transparent border-none cursor-pointer text-neutral-400 hover:text-[#1C1C1B] text-xl print:hidden"
+              aria-label="Close invoice"
+            >
+              ✕
+            </button>
+
+            {/* Print Button (hidden on print) */}
+            <button
+              onClick={() => window.print()}
+              className="absolute left-6 top-6 bg-[#A34A38] text-white px-4 py-2 font-sans text-[10px] tracking-widest uppercase hover:bg-[#83382a] transition-colors border-none cursor-pointer rounded-sm shadow-sm font-semibold print:hidden"
+            >
+              Print Invoice
+            </button>
+
+            <div className="pt-8 print:pt-0">
+              {/* Invoice Header */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-neutral-200 pb-8 mb-8">
+                <div>
+                  <h2 className="font-serif text-2xl text-primary-container font-light leading-none">
+                    Two Threads Studio
+                  </h2>
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-neutral-400 mt-1.5 font-medium">
+                    A Brand of SYS Pvt. Ltd.
+                  </p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <h1 className="font-serif text-3xl font-light text-primary-container uppercase tracking-wider mb-1">
+                    Invoice
+                  </h1>
+                  <p className="font-sans text-xs text-neutral-400">
+                    Ref: <span className="font-mono font-bold text-[#1C1C1B]">{selectedInvoiceOrder.id}</span>
+                  </p>
+                  <p className="font-sans text-[11px] text-neutral-400 mt-0.5">
+                    Date: <span className="text-[#1C1C1B]">{selectedInvoiceOrder.date}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Bill To & Company Addresses */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8 text-sm">
+                <div>
+                  <span className="block font-sans text-[10px] uppercase tracking-wider text-neutral-400 mb-2">Billed To:</span>
+                  <h4 className="font-serif text-base text-[#1C1C1B] mb-1">
+                    {selectedInvoiceOrder.shippingAddress?.fullName || 'Julia Hampton'}
+                  </h4>
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                    {selectedInvoiceOrder.shippingAddress?.addressLine1}
+                  </p>
+                  {selectedInvoiceOrder.shippingAddress?.addressLine2 && (
+                    <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                      {selectedInvoiceOrder.shippingAddress?.addressLine2}
+                    </p>
+                  )}
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                    {selectedInvoiceOrder.shippingAddress?.city}, {selectedInvoiceOrder.shippingAddress?.state} {selectedInvoiceOrder.shippingAddress?.zipCode}
+                  </p>
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed capitalize">
+                    {selectedInvoiceOrder.shippingAddress?.country === 'IN' ? 'India' : selectedInvoiceOrder.shippingAddress?.country}
+                  </p>
+                </div>
+                <div className="sm:text-right">
+                  <span className="block font-sans text-[10px] uppercase tracking-wider text-neutral-400 mb-2">Issued By:</span>
+                  <h4 className="font-serif text-base text-[#1C1C1B] mb-1">
+                    SYS Pvt. Ltd.
+                  </h4>
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                    Corporate Office: 124 Artisan Way
+                  </p>
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                    Suite 300, Portland, OR 97209
+                  </p>
+                  <p className="font-sans text-xs text-neutral-500 leading-relaxed mt-2 italic">
+                    hello@twothreadsstudio.com
+                  </p>
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <div className="border border-neutral-200 rounded-sm overflow-hidden mb-8">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#FAF9F7] border-b border-neutral-200 font-sans text-[10px] tracking-wider uppercase text-neutral-500">
+                      <th className="p-4 font-semibold">Item Details</th>
+                      <th className="p-4 font-semibold text-center w-16">Qty</th>
+                      <th className="p-4 font-semibold text-right w-28">Rate</th>
+                      <th className="p-4 font-semibold text-right w-28">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedInvoiceOrder.items.map((item: any, idx: number) => (
+                      <tr key={idx} className="border-b border-neutral-100 last:border-b-0">
+                        <td className="p-4">
+                          <p className="font-serif text-sm text-[#1C1C1B] font-normal leading-tight">{item.name}</p>
+                          {(item.customization?.hoopFinish || item.customization?.engravingText || item.customization?.isGift) && (
+                            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-neutral-400 font-sans">
+                              {item.customization.hoopFinish && (
+                                <span>Hoop: <span className="capitalize text-neutral-500">{item.customization.hoopFinish}</span></span>
+                              )}
+                              {item.customization.engravingText && (
+                                <span>Plate: <span className="text-neutral-500">"{item.customization.engravingText}"</span></span>
+                              )}
+                              {item.customization.isGift && (
+                                <span className="text-[#A34A38] font-medium">Bespoke Gift Wrap</span>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 text-center text-neutral-500 font-sans">{item.quantity}</td>
+                        <td className="p-4 text-right text-neutral-500 font-sans">₹{item.price.toLocaleString()}</td>
+                        <td className="p-4 text-right text-[#1C1C1B] font-sans font-semibold">₹{(item.price * item.quantity).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Totals Box */}
+              <div className="flex flex-col items-end gap-2 text-xs font-sans text-neutral-500 mb-12">
+                <div className="flex justify-between w-64 border-b border-neutral-100 pb-2">
+                  <span>Subtotal</span>
+                  <span className="text-[#1C1C1B] font-semibold">
+                    ₹{(selectedInvoiceOrder.total - 250).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between w-64 border-b border-neutral-100 pb-2">
+                  <span>Standard Shipping</span>
+                  <span className="text-[#1C1C1B] font-semibold">₹250</span>
+                </div>
+                <div className="flex justify-between w-64 text-sm font-bold text-[#1C1C1B] pt-2">
+                  <span className="uppercase tracking-widest text-[10px] text-neutral-400 font-semibold self-center">Grand Total</span>
+                  <span className="text-lg">₹{selectedInvoiceOrder.total.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Invoice Footer */}
+              <div className="border-t border-neutral-200/60 pt-8 text-center text-[10px] font-sans text-neutral-400 leading-relaxed">
+                <p className="font-semibold text-neutral-500 uppercase tracking-widest mb-1.5">Legal Disclaimer</p>
+                <p className="max-w-xl mx-auto">
+                  This transaction is legally processed and billed by <strong>SYS Pvt. Ltd.</strong>, the parent company and registered owner of the <strong>Two Threads Studio</strong> brand. If you have any inquiries regarding this document, please contact hello@twothreadsstudio.com.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 };

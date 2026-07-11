@@ -3,10 +3,46 @@ import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   const cols = [
-    { title: "Shop", links: ["New Arrivals", "Kits & Bundles", "Patterns", "Threads & Fabric", "Gift Cards"] },
-    { title: "Learn", links: ["Video Tutorials", "Beginner Guide", "Stitch Library", "Pattern Downloads", "Community"] },
-    { title: "Studio", links: ["Our Story", "Sustainability", "Collaborations", "Press", "Careers"] },
-    { title: "Support", links: ["FAQ", "Shipping Info", "Returns", "Track Order", "Contact Us"] },
+    { 
+      title: "Shop", 
+      links: [
+        { name: "New Arrivals", path: "/shop" },
+        { name: "Kits & Bundles", path: "/shop" },
+        { name: "Patterns", path: "/shop" },
+        { name: "Threads & Fabric", path: "/shop" },
+        { name: "Gift Cards", path: "/shop" }
+      ] 
+    },
+    { 
+      title: "Learn", 
+      links: [
+        { name: "Video Tutorials", path: "/learning" },
+        { name: "Beginner Guide", path: "/learning" },
+        { name: "Stitch Library", path: "/learning" },
+        { name: "Pattern Downloads", path: "/shop" },
+        { name: "Community", path: "/gallery" }
+      ] 
+    },
+    { 
+      title: "Studio", 
+      links: [
+        { name: "Our Story", path: "/about" },
+        { name: "Sustainability", path: "/sustainability" },
+        { name: "Collaborations", path: "#" },
+        { name: "Press", path: "#" },
+        { name: "Careers", path: "/careers" }
+      ] 
+    },
+    { 
+      title: "Support", 
+      links: [
+        { name: "FAQ", path: "/contact" },
+        { name: "Shipping Info", path: "/legal?tab=shipping" },
+        { name: "Returns", path: "/legal?tab=returns" },
+        { name: "Track Order", path: "/account?tab=orders" },
+        { name: "Contact Us", path: "/contact" }
+      ] 
+    },
   ];
 
   return (
@@ -36,24 +72,35 @@ const Footer: React.FC = () => {
               </h4>
               {col.links.map(l => (
                 <Link 
-                  key={l} 
-                  to="#" 
+                  key={l.name} 
+                  to={l.path} 
                   className="block font-sans text-sm text-inverse-on-surface/45 no-underline mb-3 leading-relaxed hover:text-inverse-on-surface/70 transition-colors"
                 >
-                  {l}
+                  {l.name}
                 </Link>
               ))}
             </div>
           ))}
         </div>
         
-        <div className="border-t border-inverse-on-surface/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-sans text-xs text-inverse-on-surface/30">
-            © 2026 TwoThreads Studio. All rights reserved.
-          </p>
-          <p className="font-sans text-xs text-inverse-on-surface/30">
-            Privacy Policy · Terms of Service
-          </p>
+        <div className="border-t border-inverse-on-surface/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col gap-1.5 text-center md:text-left">
+            <p className="font-sans text-xs text-inverse-on-surface/30">
+              © 2026 TwoThreads Studio. A brand by SYS Pvt. Ltd. All rights reserved.
+            </p>
+            <p className="font-sans text-[10px] text-inverse-on-surface/20 tracking-wider">
+              Crafted by TwoThreads Studio • A <Link to="/our-brands" className="underline hover:text-inverse-on-surface/40 transition-colors text-inherit">SYS Pvt. Ltd.</Link> Company
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <Link to="/legal?tab=privacy" className="font-sans text-xs text-inverse-on-surface/30 hover:text-inverse-on-surface/50 no-underline transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="text-inverse-on-surface/20 text-xs">·</span>
+            <Link to="/legal?tab=terms" className="font-sans text-xs text-inverse-on-surface/30 hover:text-inverse-on-surface/50 no-underline transition-colors">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
