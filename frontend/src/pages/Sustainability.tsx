@@ -116,8 +116,8 @@ const Sustainability: React.FC = () => {
       
       <section className="py-16 px-6 bg-[#ede6de] text-center">
         <ScrollReveal direction="up">
-          <Link to="/about" className="font-sans text-sm uppercase tracking-[0.15em] text-primary-container hover:text-on-secondary-container transition-colors no-underline outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container p-2">
-            ← Back to About Us
+          <Link to="/our-story" className="font-sans text-sm uppercase tracking-[0.15em] text-primary-container hover:text-on-secondary-container transition-colors no-underline outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container p-2">
+            ← Back to Our Story
           </Link>
         </ScrollReveal>
       </section>
