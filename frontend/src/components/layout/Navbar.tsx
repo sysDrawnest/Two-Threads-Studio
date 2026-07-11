@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
   const links = [
     { name: "Shop", path: "/shop" },
     { name: "Gallery", path: "/gallery" },
-    { name: "Our Story", path: "/about" },
+    { name: "Our Story", path: "/our-story" },
     { name: "Journal", path: "/journal" },
   ];
 
