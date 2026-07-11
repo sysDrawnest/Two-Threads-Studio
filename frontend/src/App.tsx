@@ -35,7 +35,6 @@ const Learning = lazy(() => import('./pages/Learning'));
 const TutorialDetail = lazy(() => import('./pages/TutorialDetail'));
 const InstructorProfile = lazy(() => import('./pages/InstructorProfile'));
 const Journal = lazy(() => import('./pages/Journal'));
-const About = lazy(() => import('./pages/About'));
 const OurStory = lazy(() => import('./pages/OurStory'));
 const Sustainability = lazy(() => import('./pages/Sustainability'));
 const Artisans = lazy(() => import('./pages/Artisans'));
@@ -81,7 +80,7 @@ const StorefrontRoutes = () => {
         <Route path="/learning/:id" element={<TutorialDetail />} />
         <Route path="/instructor/:id" element={<InstructorProfile />} />
         <Route path="/journal" element={<Journal />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/about" element={<OurStory />} />
         <Route path="/our-story" element={<OurStory />} />
         <Route path="/sustainability" element={<Sustainability />} />
         <Route path="/artisans" element={<Artisans />} />
