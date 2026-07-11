@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { motion } from 'framer-motion';
 import { ArrowRight, Paintbrush2, Sparkles } from 'lucide-react';
-import hoopImg from '../../assets/stitch/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an.png';
+import hoopImg from '../../assets/Image for cutum section Jul 11, 2026, 05_05_41 PM.png';
 
 const customTypes = [
   { label: 'Portrait Embroidery', icon: '🎨' },
