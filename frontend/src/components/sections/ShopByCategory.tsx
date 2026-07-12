@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ScrollReveal } from '../ui/ScrollReveal';
-import { mockCategories } from '../../data/products';
+import { mockCategories, Category } from '../../data/products';
+import { productService } from '../../services/productService';
 import { ArrowRight } from 'lucide-react';
 
 export default function ShopByCategory() {
-  const [featured, ...rest] = mockCategories;
-  const topRow = rest.slice(0, 3);
-  const bottomRow = rest.slice(3, 6);
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    productService.getCategories()
+      .then(data => {
+        if (data && data.length > 0) {
+          setCategories(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching categories:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const featured = categories[0] || mockCategories[0];
+  const topRow = categories.slice(1, 4);
+  const bottomRow = categories.slice(4, 7);
+  const lastCategory = categories[7] || mockCategories[7];
 
   return (
     <section className="relative bg-[#ede6de] pt-4 pb-24 px-4 sm:px-6 md:px-16">
@@ -55,7 +74,7 @@ export default function ShopByCategory() {
             </ScrollReveal>
           ))}
 
-          {/* Bottom row — 4 cards */}
+          {/* Bottom row — 3 cards */}
           {bottomRow.map((cat, i) => (
             <ScrollReveal
               key={cat.id}
@@ -67,14 +86,16 @@ export default function ShopByCategory() {
             </ScrollReveal>
           ))}
           {/* Last category fills remaining space */}
-          <ScrollReveal direction="up" delay={0.4} className="col-span-3">
-            <CategoryCard category={mockCategories[7]} className="h-full" />
-          </ScrollReveal>
+          {lastCategory && (
+            <ScrollReveal direction="up" delay={0.4} className="col-span-3">
+              <CategoryCard category={lastCategory} className="h-full" />
+            </ScrollReveal>
+          )}
         </div>
 
         {/* Mobile — 2-column grid */}
         <div className="grid md:hidden grid-cols-2 gap-3">
-          {mockCategories.map((cat, i) => (
+          {categories.map((cat, i) => (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, y: 20 }}
@@ -104,7 +125,7 @@ export default function ShopByCategory() {
 }
 
 interface CategoryCardProps {
-  category: (typeof mockCategories)[0];
+  category: Category;
   large?: boolean;
   className?: string;
 }

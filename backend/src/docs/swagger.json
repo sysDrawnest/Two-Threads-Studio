@@ -3,24 +3,504 @@
   "info": {
     "title": "Two Threads Studio API",
     "version": "1.0.0",
-    "description": "API documentation for the Two Threads Studio backend"
+    "description": "API documentation for Two Threads Studio backend, including Authentication, Category, Collection, and Product Catalog systems."
   },
   "servers": [
     {
       "url": "http://localhost:5000/api/v1",
-      "description": "Local server"
+      "description": "Development Server"
     }
   ],
   "paths": {
     "/health": {
       "get": {
-        "summary": "Health check endpoint",
-        "description": "Returns the status of the API and database",
+        "summary": "Health Check",
+        "description": "Returns the status of the API service and Supabase PostgreSQL connection.",
         "responses": {
           "200": {
-            "description": "Successful operation"
+            "description": "Service is healthy"
           }
         }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register customer account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "firstName", "lastName"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Account created successfully" },
+          "400": { "description": "Invalid input or email already exists" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "Authenticate user, returns access token and sets secure refresh token cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "User Logout",
+        "responses": {
+          "200": { "description": "Logged out successfully" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Refresh Access Token",
+        "responses": {
+          "200": { "description": "Access token refreshed" },
+          "401": { "description": "Invalid or expired refresh token" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get Current User Profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Current user profile retrieved" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/profile": {
+      "put": {
+        "summary": "Update User Profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "avatarUrl": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "List all active categories",
+        "responses": {
+          "200": { "description": "List of categories" }
+        }
+      },
+      "post": {
+        "summary": "Create a category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "slug"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "slug": { "type": "string" },
+                  "description": { "type": "string" },
+                  "image": { "type": "string" },
+                  "sortOrder": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Category created" }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "summary": "Get category details",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category details" }
+        }
+      },
+      "put": {
+        "summary": "Update category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "image": { "type": "string" },
+                  "sortOrder": { "type": "integer" },
+                  "isActive": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Category updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete category (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Category deleted" }
+        }
+      }
+    },
+    "/collections": {
+      "get": {
+        "summary": "List all active collections",
+        "responses": {
+          "200": { "description": "List of collections" }
+        }
+      },
+      "post": {
+        "summary": "Create a collection (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "slug"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "slug": { "type": "string" },
+                  "description": { "type": "string" },
+                  "bannerImage": { "type": "string" },
+                  "sortOrder": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Collection created" }
+        }
+      }
+    },
+    "/collections/{id}": {
+      "get": {
+        "summary": "Get collection details",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Collection details" }
+        }
+      },
+      "put": {
+        "summary": "Update collection (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "bannerImage": { "type": "string" },
+                  "sortOrder": { "type": "integer" },
+                  "isActive": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Collection updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete collection (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Collection deleted" }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "List/Filter/Search products",
+        "description": "Paginated discovery endpoint with sorting, searching, and filtering parameters.",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "string", "default": "1" } },
+          { "name": "limit", "in": "query", "schema": { "type": "string", "default": "12" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "collection", "in": "query", "schema": { "type": "string" } },
+          { "name": "tag", "in": "query", "schema": { "type": "string" } },
+          { "name": "featured", "in": "query", "schema": { "type": "string", "enum": ["true", "false"] } },
+          { "name": "available", "in": "query", "schema": { "type": "string", "enum": ["true", "false"] } },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["PHYSICAL", "DIGITAL", "WORKSHOP", "SERVICE"] } },
+          { "name": "badge", "in": "query", "schema": { "type": "string" } },
+          { "name": "difficulty", "in": "query", "schema": { "type": "string" } },
+          { "name": "handmade", "in": "query", "schema": { "type": "string", "enum": ["true", "false"] } },
+          { "name": "customizable", "in": "query", "schema": { "type": "string", "enum": ["true", "false"] } },
+          { "name": "minPrice", "in": "query", "schema": { "type": "string" } },
+          { "name": "maxPrice", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["newest", "oldest", "price_asc", "price_desc", "rating", "popular"], "default": "newest" } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated list of active products" }
+        }
+      },
+      "post": {
+        "summary": "Create a product (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "description", "categoryId", "price"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "shortDescription": { "type": "string" },
+                  "description": { "type": "string" },
+                  "sku": { "type": "string" },
+                  "categoryId": { "type": "string" },
+                  "collectionId": { "type": "string" },
+                  "price": { "type": "number" },
+                  "comparePrice": { "type": "number" },
+                  "costPrice": { "type": "number" },
+                  "stockQuantity": { "type": "integer" },
+                  "lowStockThreshold": { "type": "integer" },
+                  "trackInventory": { "type": "boolean" },
+                  "status": { "type": "string", "enum": ["DRAFT", "ACTIVE", "ARCHIVED", "OUT_OF_STOCK"] },
+                  "type": { "type": "string", "enum": ["PHYSICAL", "DIGITAL", "WORKSHOP", "SERVICE"] },
+                  "badge": { "type": "string", "enum": ["NEW", "BEST_SELLER", "LIMITED", "EDITORS_CHOICE", "TRENDING"] },
+                  "difficulty": { "type": "string", "enum": ["BEGINNER", "INTERMEDIATE", "ADVANCED"] },
+                  "featured": { "type": "boolean" },
+                  "isHandmade": { "type": "boolean" },
+                  "isSustainable": { "type": "boolean" },
+                  "isCustomizable": { "type": "boolean" },
+                  "isPersonalizable": { "type": "boolean" },
+                  "madeToOrder": { "type": "boolean" },
+                  "materials": { "type": "array", "items": { "type": "string" } },
+                  "materialsIncluded": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Product created successfully" }
+        }
+      }
+    },
+    "/products/featured": {
+      "get": {
+        "summary": "Get featured products",
+        "responses": {
+          "200": { "description": "Featured products list" }
+        }
+      }
+    },
+    "/products/new-arrivals": {
+      "get": {
+        "summary": "Get new arrivals",
+        "responses": {
+          "200": { "description": "New arrivals list" }
+        }
+      }
+    },
+    "/products/best-sellers": {
+      "get": {
+        "summary": "Get best sellers",
+        "responses": {
+          "200": { "description": "Best sellers list" }
+        }
+      }
+    },
+    "/products/{slug}": {
+      "get": {
+        "summary": "Get product by slug",
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product detailed view" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    },
+    "/products/admin/{id}": {
+      "get": {
+        "summary": "Get product by ID (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product detailed view" }
+        }
+      }
+    },
+    "/products/{id}": {
+      "put": {
+        "summary": "Update product details (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Product updated" }
+        }
+      },
+      "delete": {
+        "summary": "Archive (soft delete) product (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product status set to ARCHIVED" }
+        }
+      }
+    },
+    "/products/{id}/status": {
+      "patch": {
+        "summary": "Update product status (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["DRAFT", "ACTIVE", "ARCHIVED", "OUT_OF_STOCK"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Status updated successfully" }
+        }
+      }
+    },
+    "/products/{id}/inventory": {
+      "patch": {
+        "summary": "Update product inventory (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["stockQuantity"],
+                "properties": {
+                  "stockQuantity": { "type": "integer" },
+                  "lowStockThreshold": { "type": "integer" },
+                  "trackInventory": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Inventory updated successfully" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

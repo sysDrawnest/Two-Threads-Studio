@@ -1,6 +1,5 @@
-import { PrismaClient, ProductStatus, ProductType, BadgeType, DifficultyLevel } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { ProductStatus, ProductType, BadgeType, DifficultyLevel } from '@prisma/client';
+import prisma from '../src/prisma/index';
 
 async function main() {
   console.log('🌱 Seeding Phase 3 catalog data...');

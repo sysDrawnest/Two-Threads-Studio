@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
-import { mockProducts } from '../data/products';
+import { Product } from '../data/products';
+import { productService } from '../services/productService';
 import { useCartStore } from '../store/cartStore';
 
 const ProductDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const product = mockProducts.find(p => p.id === id);
+  const { id } = useParams<{ id: string }>(); // This represents the product slug
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const addItem = useCartStore(state => state.addItem);
 
@@ -17,6 +20,47 @@ const ProductDetail: React.FC = () => {
   const [engravingFont, setEngravingFont] = useState<'serif' | 'sans' | 'script'>('serif');
   const [hasGiftWrap, setHasGiftWrap] = useState(false);
   const [giftMessage, setGiftMessage] = useState('');
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    productService.getProductBySlug(id)
+      .then(data => {
+        setProduct(data);
+        setActiveImage(0);
+        
+        // Fetch related products (e.g. from the same category)
+        productService.getProducts({ limit: 20 })
+          .then(res => {
+            // Filter by matching category or collection, excluding current product
+            const matches = res.products.filter(p => p.id !== data.id && (p.category === data.category || p.collection === data.collection));
+            setRelatedProducts(matches.slice(0, 3));
+          })
+          .catch(err => console.error('Error fetching related products:', err));
+
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error loading product details:', err);
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="min-h-screen bg-[#FAF9F7] flex flex-col items-center justify-center p-6">
+          <div className="relative w-12 h-12 mb-4">
+            <div className="absolute inset-0 rounded-full border border-neutral-200" />
+            <div className="absolute inset-0 rounded-full border border-transparent border-t-[#A34A38] animate-spin" />
+          </div>
+          <p className="font-serif text-sm tracking-widest text-[#2d2520] uppercase animate-pulse">
+            Loading Artistry...
+          </p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   if (!product) {
     return (
@@ -57,8 +101,6 @@ const ProductDetail: React.FC = () => {
     });
   };
 
-  const relatedProducts = mockProducts.filter(p => p.category === product.category && p.id !== product.id).slice(0, 3);
-
   return (
     <PageContainer>
       {/* Product Hero Section */}
@@ -98,7 +140,7 @@ const ProductDetail: React.FC = () => {
               {product.name}
             </h1>
             <p className="font-sans text-2xl font-semibold text-[#1C1C1B] mb-6">
-              ₹{product.price.toLocaleString()}
+              ₹{product.price.toLocaleString('en-IN')}
             </p>
 
             <div className="flex flex-col gap-4 border-y border-neutral-200 py-6 mb-6">
@@ -222,7 +264,7 @@ const ProductDetail: React.FC = () => {
               <div className="border-t border-neutral-200 pt-3 flex flex-col gap-1.5 text-xs text-neutral-600">
                 <div className="flex justify-between">
                   <span>Base Price</span>
-                  <span>₹{product.price.toLocaleString()}</span>
+                  <span>₹{product.price.toLocaleString('en-IN')}</span>
                 </div>
                 {hoopFinish === 'walnut' && (
                   <div className="flex justify-between">
@@ -244,7 +286,7 @@ const ProductDetail: React.FC = () => {
                 )}
                 <div className="flex justify-between border-t border-neutral-200 pt-2 font-semibold text-sm text-[#1C1C1B]">
                   <span>Total Dynamic Price</span>
-                  <span>₹{totalPrice.toLocaleString()}</span>
+                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>
@@ -302,7 +344,7 @@ const ProductDetail: React.FC = () => {
       </section>
 
       {/* Reviews Section */}
-      {product.reviews.length > 0 && (
+      {product.reviews && product.reviews.length > 0 && (
         <section className="py-24 px-6 md:px-16 bg-[#f8f3ee]">
           <div className="max-w-5xl mx-auto">
             <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-12 text-center">
@@ -354,7 +396,7 @@ const ProductDetail: React.FC = () => {
                   <div className="p-6">
                     <div className="flex justify-between items-start">
                       <h4 className="font-serif text-lg font-normal text-[#1C1C1B] group-hover:text-[#A34A38] transition-colors">{p.name}</h4>
-                      <span className="font-sans text-sm font-semibold text-[#1C1C1B]">₹{p.price.toLocaleString()}</span>
+                      <span className="font-sans text-sm font-semibold text-[#1C1C1B]">₹{p.price.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </Link>

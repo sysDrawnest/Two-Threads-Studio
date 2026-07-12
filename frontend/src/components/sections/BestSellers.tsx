@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { ProductCard } from '../ui/ProductCard';
-import { mockProducts } from '../../data/products';
+import { productService } from '../../services/productService';
+import type { Product } from '../../data/products';
 import { ArrowRight } from 'lucide-react';
 
 type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Candles' | 'Gift Sets';
@@ -11,10 +12,24 @@ const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippa
 
 export default function BestSellers() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('All');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = mockProducts.filter((p) => {
+  useEffect(() => {
+    productService.getBestSellers()
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching best sellers:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredProducts = products.filter((p) => {
     if (activeFilter === 'All') {
-      return p.badge === 'Best Seller' || p.badge === 'Editor\'s Choice' || p.badge === 'Trending';
+      return true;
     }
     return p.productCategory === activeFilter;
   }).slice(0, 8);
@@ -54,11 +69,25 @@ export default function BestSellers() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-          {filteredProducts.map((product, i) => (
-            <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
-              <ProductCard product={product} />
-            </ScrollReveal>
-          ))}
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse bg-white border border-neutral-100 p-4">
+                <div className="aspect-[4/5] bg-neutral-200 mb-4" />
+                <div className="h-4 bg-neutral-200 w-3/4 mb-2" />
+                <div className="h-4 bg-neutral-200 w-1/2" />
+              </div>
+            ))
+          ) : filteredProducts.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-neutral-400">
+              No best sellers found in this category.
+            </div>
+          ) : (
+            filteredProducts.map((product, i) => (
+              <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
+                <ProductCard product={product} />
+              </ScrollReveal>
+            ))
+          )}
         </div>
 
         {/* View All */}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
-import { mockProducts, Product } from '../data/products';
+import { Product } from '../data/products';
+import { productService } from '../services/productService';
 import { useCartStore } from '../store/cartStore';
 import { ScrollReveal } from '../components/ui/ScrollReveal';
 import { ChevronDown, SlidersHorizontal, X, RotateCcw, ShoppingBag, Check } from 'lucide-react';
@@ -14,6 +15,8 @@ export default function Shop() {
   const [activeDropdown, setActiveDropdown] = useState<'difficulty' | 'collection' | 'sort' | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -24,6 +27,19 @@ export default function Shop() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Fetch live products from backend
+  useEffect(() => {
+    productService.getProducts({ limit: 100 })
+      .then(res => {
+        setProducts(res.products);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error loading products:', err);
+        setLoading(false);
+      });
   }, []);
 
   const handleQuickAdd = (product: Product, e: React.MouseEvent) => {
@@ -53,11 +69,18 @@ export default function Shop() {
   };
 
   // Filter products based on active filters
-  const filteredProducts = mockProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     // Category mapping
-    if (activeCategory === 'DIY Kits' && product.category !== 'Kit' && product.category !== 'Bundle') return false;
-    if (activeCategory === 'Finished Hoops' && product.category !== 'Finished Hoop') return false;
-    if (activeCategory === 'Digital Patterns' && product.category !== 'Pattern') return false;
+    if (activeCategory === 'DIY Kits') {
+      const cat = product.category.toLowerCase();
+      // Match any category containing kit, bundle, or embroidery
+      if (!cat.includes('kit') && !cat.includes('bundle') && !cat.includes('embroidery')) return false;
+    }
+    if (activeCategory === 'Finished Hoops') {
+      const cat = product.category.toLowerCase();
+      if (!cat.includes('hoop') && !cat.includes('crochet') && !cat.includes('lippan') && !cat.includes('macramé')) return false;
+    }
+    if (activeCategory === 'Digital Patterns' && !product.category.toLowerCase().includes('pattern')) return false;
 
     // Difficulty filter
     if (difficultyFilter !== 'All' && product.difficulty !== difficultyFilter) return false;
@@ -72,7 +95,6 @@ export default function Shop() {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'price-asc') return a.price - b.price;
     if (sortBy === 'price-desc') return b.price - a.price;
-    // newest uses ID order descending
     return b.id.localeCompare(a.id);
   });
 
@@ -108,7 +130,7 @@ export default function Shop() {
                 Crafted to Endure.
               </h1>
               <p className="font-sans text-sm md:text-base text-neutral-600 leading-relaxed max-w-lg">
-                Every kit, pattern, and canvas represents hours of meticulous, quiet hand-stitch work, honoring the age-old heritage of slow craft. Designed to build mindfulness and elevate your living space.
+                Every kit, pattern, and canvas represents hours of quiet hand-stitch work, honoring the age-old heritage of slow craft. Designed to build mindfulness and elevate your living space.
               </p>
             </div>
 
@@ -178,7 +200,7 @@ export default function Shop() {
                   <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === 'difficulty' ? 'rotate-180' : ''}`} />
                 </button>
                 {activeDropdown === 'difficulty' && (
-                  <div className="absolute right-0 mt-3 bg-white border border-neutral-200/70 p-2 w-48 shadow-lg z-50 flex flex-col gap-1 rounded-sm animate-fade-in">
+                  <div className="absolute right-0 mt-3 bg-white border border-neutral-200/70 p-2 w-48 shadow-lg z-50 flex flex-col gap-1 rounded-sm">
                     {difficulties.map((difficulty) => (
                       <button
                         key={difficulty}
@@ -295,7 +317,17 @@ export default function Shop() {
 
         {/* Product Grid & Layout */}
         <section className="px-4 md:px-12 lg:px-16 pt-12 max-w-[1400px] mx-auto w-full pb-20">
-          {sortedProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-16 lg:pb-12">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="animate-pulse bg-white border border-neutral-100 p-4">
+                  <div className="aspect-[4/5] bg-neutral-200 mb-4" />
+                  <div className="h-4 bg-neutral-200 w-3/4 mb-2" />
+                  <div className="h-4 bg-neutral-200 w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : sortedProducts.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-16 lg:pb-12">
               {sortedProducts.map((product, idx) => {
                 // Apply subtle vertical offset to alternate columns on large screens to create asymmetrical flow
@@ -372,11 +404,11 @@ export default function Shop() {
                         </h3>
                         
                         <p className="font-sans text-[8px] sm:text-[10px] text-neutral-400 tracking-[0.12em] sm:tracking-[0.18em] uppercase mt-0.5 sm:mt-1 mb-1 sm:mb-2">
-                          {product.category === 'Kit' ? 'DIY Kit' : product.category === 'Finished Hoop' ? 'Finished Hoop' : product.category === 'Pattern' ? 'Digital Pattern' : product.category} &bull; {product.difficulty}
+                          {product.category} &bull; {product.difficulty}
                         </p>
                         
                         <p className="font-sans text-xs sm:text-sm font-semibold text-[#1C1C1B] mt-auto">
-                          ₹{product.price.toLocaleString()}
+                          ₹{product.price.toLocaleString('en-IN')}
                         </p>
                       </div>
                     </Link>
@@ -453,7 +485,7 @@ export default function Shop() {
                           : 'border-neutral-200 text-neutral-600 bg-transparent'
                       }`}
                     >
-                      {category === 'DIY Kits' ? 'DIY Kits' : category === 'Finished Hoops' ? 'Finished Hoops' : category === 'Digital Patterns' ? 'Patterns' : category}
+                      {category}
                     </button>
                   ))}
                 </div>
