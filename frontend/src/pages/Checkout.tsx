@@ -5,7 +5,7 @@ import { useCartStore } from '../store/cartStore';
 import { useCheckoutStore, ShippingInfo } from '../store/checkoutStore';
 
 const Checkout: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   
   // Cart State
@@ -27,8 +27,8 @@ const Checkout: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
-          fullName: parsed.fullName || '',
-          email: '',
+          fullName: parsed.fullName || user?.name || '',
+          email: user?.email || '',
           addressLine1: parsed.addressLine1 || '',
           addressLine2: parsed.addressLine2 || '',
           city: parsed.city || '',
@@ -39,7 +39,7 @@ const Checkout: React.FC = () => {
       }
     } catch {}
     return {
-      fullName: '', email: '', addressLine1: '', addressLine2: '', city: '', state: '', zipCode: '', country: 'IN'
+      fullName: user?.name || '', email: user?.email || '', addressLine1: '', addressLine2: '', city: '', state: '', zipCode: '', country: 'IN'
     };
   });
 
