@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { User, History, Bookmark, BookOpen, Settings as SettingsIcon, LogOut, Award, Heart, ShoppingBag, Eye, Shield, Edit, MapPin } from 'lucide-react';
 
 const Account: React.FC = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, updateProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
@@ -21,11 +21,27 @@ const Account: React.FC = () => {
 
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<any | null>(null);
   
-  // Form states
-  const [firstName, setFirstName] = useState("Julia");
-  const [lastName, setLastName] = useState("Hampton");
+  // Form states initialized dynamically
+  const [firstName, setFirstName] = useState(() => {
+    const nameParts = user?.name ? user.name.split(' ') : [];
+    return nameParts[0] || 'Julia';
+  });
+  const [lastName, setLastName] = useState(() => {
+    const nameParts = user?.name ? user.name.split(' ') : [];
+    return nameParts.slice(1).join(' ') || 'Hampton';
+  });
   const [email, setEmail] = useState(user?.email || "julia@example.com");
   const [isSaved, setIsSaved] = useState(false);
+
+  // Keep form fields synced if user info updates or loads later
+  React.useEffect(() => {
+    if (user) {
+      const nameParts = user.name ? user.name.split(' ') : [];
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
 
   // Address book state
   const [addressBook, setAddressBook] = useState(() => {
@@ -34,7 +50,7 @@ const Account: React.FC = () => {
       if (stored) return JSON.parse(stored);
       
       const defaultAddress = {
-        fullName: 'Julia Hampton',
+        fullName: user?.name || 'Julia Hampton',
         addressLine1: '45 Artisan Boulevard',
         addressLine2: 'Apt 302',
         city: 'Bengaluru',
@@ -111,8 +127,13 @@ const Account: React.FC = () => {
   const savedTutorials = mockTutorials.slice(0, 2);
   const wishlistItems = mockProducts.slice(1, 4);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    await updateProfile({
+      name: fullName,
+      email: email.trim()
+    });
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
