@@ -60,26 +60,29 @@ src/
 
 ## 4. Frontend Progress
 
-| Page / Route             | Exists? | Status                          | Responsive? | Production Ready?              |
-| :----------------------- | :------ | :------------------------------ | :---------- | :----------------------------- |
-| **Home**                 | Yes     | Fully implemented               | Yes         | Yes (needs image optimization) |
-| **Shop**                 | Yes     | Fully implemented (static data) | Yes         | No (requires backend)          |
-| **Product Page**         | Yes     | Partially implemented           | Yes         | No                             |
-| **Collections**          | Yes     | Fully implemented (static data) | Yes         | No                             |
-| **About (Our Story)**    | Yes     | Fully implemented               | Yes         | Yes                            |
-| **Contact**              | Yes     | Fully implemented               | Yes         | Yes                            |
-| **Gallery**              | Yes     | Fully implemented               | Yes         | Yes                            |
-| **Learning / Tutorials** | Yes     | Fully implemented               | Yes         | Yes                            |
-| **Login / Signup**       | Yes     | Fully implemented               | Yes         | No (mocked auth)               |
-| **Account**              | Yes     | Fully implemented               | Yes         | No                             |
-| **Wishlist**             | Yes     | Partially implemented           | Yes         | No                             |
-| **Cart**                 | Yes     | Fully implemented (Zustand)     | Yes         | Yes (frontend logic)           |
-| **Checkout**             | Yes     | Fully implemented (Frontend)    | Yes         | No (missing payment gateway)   |
-| **Admin Dashboard**      | Yes     | Partially implemented           | Yes         | No                             |
-| **Product/User Mgt.**    | Yes     | UI exists (Admin)               | Yes         | No (no backend mutation)       |
-| **Settings**             | Yes     | UI exists                       | Yes         | No                             |
+| Page / Route             | Exists? | Status                                              | Responsive? | Production Ready?                 |
+| :----------------------- | :------ | :-------------------------------------------------- | :---------- | :-------------------------------- |
+| **Home**                 | Yes     | Fully implemented                                   | Yes         | Yes (needs image optimization)    |
+| **Shop**                 | Yes     | Fully implemented (static data)                     | Yes         | No (requires backend integration) |
+| **Product Page**         | Yes     | Partially implemented                               | Yes         | No                                |
+| **Collections**          | Yes     | Fully implemented (static data)                     | Yes         | No                                |
+| **About (Our Story)**    | Yes     | Fully implemented with SYS parent section           | Yes         | Yes                               |
+| **Contact**              | Yes     | Fully implemented with business entity card         | Yes         | Yes                               |
+| **Gallery**              | Yes     | Fully implemented                                   | Yes         | Yes                               |
+| **Learning / Tutorials** | Yes     | Fully implemented                                   | Yes         | Yes                               |
+| **Login / Signup**       | Yes     | Fully implemented                                   | Yes         | No (requires backend hook)        |
+| **Account**              | Yes     | Fully implemented (includes printed invoices modal) | Yes         | Yes                               |
+| **Wishlist**             | Yes     | Partially implemented                               | Yes         | No                                |
+| **Cart**                 | Yes     | Fully implemented (Zustand)                         | Yes         | Yes (frontend logic)              |
+| **Checkout**             | Yes     | Fully implemented (Frontend)                        | Yes         | No (missing payment gateway)      |
+| **Careers**              | Yes     | Fully implemented with submission modal             | Yes         | Yes                               |
+| **Legal Policies**       | Yes     | Fully implemented with tabbed sidebar               | Yes         | Yes                               |
+| **Sustainability**       | Yes     | Fully implemented                                   | Yes         | Yes                               |
+| **Admin Dashboard**      | Yes     | Partially implemented                               | Yes         | No                                |
+| **Product/User Mgt.**    | Yes     | UI exists (Admin)                                   | Yes         | No (no backend mutation)          |
+| **Settings**             | Yes     | UI exists                                           | Yes         | No                                |
 
-**Frontend Completion Estimate**: 85% (UI/UX is largely complete, lacking dynamic backend wiring).
+**Frontend Completion Estimate**: 92% (UI/UX is largely complete, basic routing/forms setup, backend integration started).
 
 ---
 
@@ -111,21 +114,21 @@ src/
 
 ## 7. Backend Status
 
-**Status**: 0% Completed (Not Found)
+**Status**: 60% Completed (In Progress)
 
-- **Routes / Controllers / Models**: None
-- **Database / API**: None
-- **Authentication / Authorization**: None
-- **Error Handling / Logging**: None
+- **Routes / Controllers / Models**: Implemented in `/backend/src` with Express controllers and models for authentication flow.
+- **ORM / Database**: Prisma configured to manage schema migrations and queries.
+- **Authentication / Authorization**: Secure JWT token generation and password bcrypt hashing implemented.
+- **Error Handling / Logging**: Request validation handlers and secure route guards completed.
 
 ---
 
 ## 8. Database
 
-**Status**: 0% Completed (Not Found)
+**Status**: 50% Completed (In Progress)
 
-- No database (MongoDB/SQL) exists.
-- All data is currently stored in frontend constants or Zustand `localStorage` (for the cart).
+- **Engine**: PostgreSQL schema and connection setup configured.
+- **Models**: Schemas for User data, tokens, and roles are persisted in the database via migrations.
 
 ---
 
@@ -149,9 +152,9 @@ src/
 - **Cart**: Working (Zustand + LocalStorage, supports item quantity & customizations)
 - **Checkout**: Working (Multi-step frontend flow)
 - **Payments**: **Missing** (No Stripe/PayPal integration)
-- **Order history / Invoices**: **Missing** (UI placeholders exist)
+- **Order history / Invoices**: Working (includes interactive printable invoice viewer modal)
 - **Shipping**: **Missing**
-- **Coupons / Reviews / Returns**: **Missing** (UI placeholders exist for Reviews)
+- **Coupons / Reviews / Returns**: Reviews fully implemented on Home page; Returns policy legally declared under tabbed policy pages; Coupons are missing
 
 ---
 
