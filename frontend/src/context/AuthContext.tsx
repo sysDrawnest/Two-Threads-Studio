@@ -17,6 +17,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  updateProfile: (updates: Partial<AuthUser>) => Promise<{ success: boolean; error?: string }>;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -100,6 +101,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try { localStorage.removeItem('tt_auth_user'); } catch {}
   }, []);
 
+  const updateProfile = useCallback(async (updates: Partial<AuthUser>) => {
+    setUser(prev => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updates };
+      try { localStorage.setItem('tt_auth_user', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    return { success: true };
+  }, []);
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -107,6 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login,
       signup,
       logout,
+      updateProfile,
       isAuthenticated: !!user,
       isAdmin: user?.role === 'admin',
     }}>
