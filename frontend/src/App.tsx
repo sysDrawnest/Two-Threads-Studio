@@ -1,6 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Auth
 import { AuthProvider } from './context/AuthContext';
@@ -12,6 +13,15 @@ import IntroAnimation from './components/IntroAnimation';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import NewsletterModal from './components/layout/NewsletterModal';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Reusable Elegant Loader
 const ElegantLoader: React.FC = () => (
@@ -170,12 +180,14 @@ const AppRoutes: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Suspense fallback={<ElegantLoader />}>
-          <AppRoutes />
-        </Suspense>
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Suspense fallback={<ElegantLoader />}>
+            <AppRoutes />
+          </Suspense>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

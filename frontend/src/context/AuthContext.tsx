@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
 
 export type UserRole = 'customer' | 'admin';
 
@@ -24,89 +26,135 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Mock user accounts for demo
-const MOCK_USERS: (AuthUser & { password: string })[] = [
-  {
-    id: 'u1',
-    name: 'Julia Hampton',
-    email: 'julia@example.com',
-    password: 'password123',
-    role: 'customer',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop',
-    membershipTier: 'master',
-  },
-  {
-    id: 'admin1',
-    name: 'Elara Vance',
-    email: 'admin@twothreads.com',
-    password: 'admin123',
-    role: 'admin',
-    avatar: 'https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=200&auto=format&fit=crop',
-  },
-];
+const mapBackendUserToAuthUser = (backendUser: any): AuthUser => {
+  return {
+    id: backendUser.id,
+    name: `${backendUser.firstName} ${backendUser.lastName}`.trim(),
+    email: backendUser.email,
+    role: backendUser.role.toLowerCase() as UserRole,
+    avatar: backendUser.avatarUrl || undefined,
+    membershipTier: 'none',
+  };
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    try {
-      // localStorage persists across tabs and page refreshes (unlike sessionStorage)
-      const stored = localStorage.getItem('tt_auth_user');
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load user profile on mount if token exists
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('tt_access_token');
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data?.user) {
+            setUser(mapBackendUserToAuthUser(result.data.user));
+          } else {
+            // Invalid token
+            localStorage.removeItem('tt_access_token');
+            localStorage.removeItem('tt_refresh_token');
+          }
+        } else {
+          // Token expired or invalid
+          localStorage.removeItem('tt_access_token');
+          localStorage.removeItem('tt_refresh_token');
+        }
+      } catch (err) {
+        console.error('Failed to restore auth session:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 1200)); // Simulate network delay
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const found = MOCK_USERS.find(u => u.email === email && u.password === password);
-    setIsLoading(false);
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        return { success: false, error: result.message || 'Login failed' };
+      }
 
-    if (found) {
-      const { password: _pw, ...safeUser } = found;
-      setUser(safeUser);
-      try { localStorage.setItem('tt_auth_user', JSON.stringify(safeUser)); } catch {}
+      const { user: backendUser, accessToken, refreshToken } = result.data;
+      localStorage.setItem('tt_access_token', accessToken);
+      localStorage.setItem('tt_refresh_token', refreshToken);
+
+      const authUser = mapBackendUserToAuthUser(backendUser);
+      setUser(authUser);
       return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error occurred' };
+    } finally {
+      setIsLoading(false);
     }
-    return { success: false, error: 'Invalid email or password. Try julia@example.com / password123 or admin@twothreads.com / admin123' };
   }, []);
 
   const signup = useCallback(async (email: string, password: string, name: string) => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 1200)); // Simulate network delay
-    setIsLoading(false);
+    try {
+      // Split full name
+      const [firstName, ...lastNameParts] = name.trim().split(' ');
+      const lastName = lastNameParts.join(' ') || ' ';
 
-    const newUser: AuthUser = {
-      id: `u-${Date.now()}`,
-      name,
-      email,
-      role: 'customer',
-      membershipTier: 'none',
-    };
+      const registerResponse = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, password }),
+      });
 
-    MOCK_USERS.push({
-      ...newUser,
-      password
-    });
+      const registerResult = await registerResponse.json();
+      if (!registerResponse.ok || !registerResult.success) {
+        return { success: false, error: registerResult.message || 'Signup failed' };
+      }
 
-    setUser(newUser);
-    try { localStorage.setItem('tt_auth_user', JSON.stringify(newUser)); } catch {}
-    return { success: true };
-  }, []);
+      // Auto login after successful signup
+      return await login(email, password);
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error occurred' };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [login]);
 
   const logout = useCallback(() => {
+    const refreshToken = localStorage.getItem('tt_refresh_token');
+    if (refreshToken) {
+      fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      }).catch(err => console.error('Silent logout error:', err));
+    }
+
+    localStorage.removeItem('tt_access_token');
+    localStorage.removeItem('tt_refresh_token');
     setUser(null);
-    try { localStorage.removeItem('tt_auth_user'); } catch {}
   }, []);
 
   const updateProfile = useCallback(async (updates: Partial<AuthUser>) => {
     setUser(prev => {
       if (!prev) return null;
-      const updated = { ...prev, ...updates };
-      try { localStorage.setItem('tt_auth_user', JSON.stringify(updated)); } catch {}
-      return updated;
+      return { ...prev, ...updates };
     });
     return { success: true };
   }, []);

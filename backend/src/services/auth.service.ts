@@ -188,4 +188,11 @@ export const authService = {
       tokenRepository.revokeAllByUserId(userId),
     ]);
   },
+
+  /**
+   * Revoke all refresh tokens for the user (Logout all devices).
+   */
+  logoutAll: async (userId: string): Promise<void> => {
+    await tokenRepository.revokeAllByUserId(userId);
+  },
 };

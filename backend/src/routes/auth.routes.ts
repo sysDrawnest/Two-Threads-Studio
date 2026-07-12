@@ -10,6 +10,7 @@ import {
   refresh,
   getMe,
   changePassword,
+  logoutAll,
 } from '../controllers/auth.controller';
 import {
   registerSchema,
@@ -41,5 +42,6 @@ router.post('/refresh', validate(refreshSchema), refresh);
 // ─── Protected Routes ──────────────────────────────────────────────────────────
 router.get('/me', requireAuth, getMe);
 router.post('/change-password', requireAuth, validate(changePasswordSchema), changePassword);
+router.post('/logout-all', requireAuth, logoutAll);
 
 export default router;

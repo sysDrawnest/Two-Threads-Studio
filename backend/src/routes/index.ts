@@ -4,6 +4,7 @@ import authRoutes       from './auth.routes';
 import productRoutes    from './product.routes';
 import categoryRoutes   from './category.routes';
 import collectionRoutes from './collection.routes';
+import profileRoutes    from './profile.routes';
 
 const router = Router();
 
@@ -17,5 +18,8 @@ router.use('/auth', authRoutes);
 router.use('/products',    productRoutes);
 router.use('/categories',  categoryRoutes);
 router.use('/collections', collectionRoutes);
+
+// Profile (Phase 4A)
+router.use('/profile',     profileRoutes);
 
 export default router;

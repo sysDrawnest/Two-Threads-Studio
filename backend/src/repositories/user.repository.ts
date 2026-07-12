@@ -12,6 +12,13 @@ export type SafeUser = {
   isVerified: boolean;
   isActive: boolean;
   lastLogin: Date | null;
+  dateOfBirth: Date | null;
+  gender: string | null;
+  profileImage: string | null;
+  preferredLanguage: string;
+  marketingConsent: boolean;
+  newsletterSubscribed: boolean;
+  memberSince: Date;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -28,6 +35,13 @@ const safeUserSelect = {
   isVerified: true,
   isActive: true,
   lastLogin: true,
+  dateOfBirth: true,
+  gender: true,
+  profileImage: true,
+  preferredLanguage: true,
+  marketingConsent: true,
+  newsletterSubscribed: true,
+  memberSince: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.UserSelect;
@@ -77,6 +91,14 @@ export const userRepository = {
     await prisma.user.update({
       where: { id },
       data: { passwordHash, updatedAt: new Date() },
+    });
+  },
+
+  updateProfile: async (id: string, data: Partial<Prisma.UserUpdateInput>): Promise<SafeUser> => {
+    return prisma.user.update({
+      where: { id },
+      data,
+      select: safeUserSelect,
     });
   },
 };

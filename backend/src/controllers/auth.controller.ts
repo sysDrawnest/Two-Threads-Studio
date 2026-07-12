@@ -62,3 +62,10 @@ export const changePassword = catchAsync(async (req: Request, res: Response) => 
 
   return successResponse(res, null, 'Password changed successfully. Please login again.');
 });
+
+// ─── Logout All Devices ────────────────────────────────────────────────────────
+export const logoutAll = catchAsync(async (req: Request, res: Response) => {
+  await authService.logoutAll(req.user!.id);
+
+  return successResponse(res, null, 'Logged out from all devices successfully.');
+});
