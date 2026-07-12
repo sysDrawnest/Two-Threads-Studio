@@ -51,23 +51,35 @@ enum DifficultyLevel {
 // ─────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String    @unique
-  passwordHash  String
-  phone         String?
-  avatarUrl     String?
-  role          Role      @default(CUSTOMER)
-  isVerified    Boolean   @default(false)
-  isActive      Boolean   @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  firstName            String
+  lastName             String
+  email                String    @unique
+  passwordHash         String
+  phone                String?
+  avatarUrl            String?
+  role                 Role      @default(CUSTOMER)
+  isVerified           Boolean   @default(false)
+  isActive             Boolean   @default(true)
+  lastLogin            DateTime?
+  
+  // Profile enhancements
+  dateOfBirth          DateTime?
+  gender               String?
+  profileImage         String?
+  preferredLanguage    String    @default("en")
+  marketingConsent     Boolean   @default(false)
+  newsletterSubscribed Boolean   @default(false)
+  memberSince          DateTime  @default(now())
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   refreshTokens RefreshToken[]
   reviews       Review[]
   wishlist      Wishlist[]
+  addresses     Address[]
+  cart          Cart?
 
   @@map("users")
 }
@@ -199,6 +211,7 @@ model Product {
   tags       ProductTag[]
   reviews    Review[]
   wishlist   Wishlist[]
+  cartItems  CartItem[]
 
   // Indexes for common query patterns
   @@index([status])
@@ -241,6 +254,7 @@ model ProductVariant {
   isActive        Boolean @default(true)
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
 
   @@index([productId])
   @@map("product_variants")
@@ -292,4 +306,80 @@ model Wishlist {
   @@unique([userId, productId])
   @@index([userId])
   @@map("wishlists")
+}
+
+enum AddressType {
+  HOME
+  WORK
+  OTHER
+}
+
+model Address {
+  id                String      @id @default(cuid())
+  userId            String
+  fullName          String
+  phone             String
+  company           String?
+  line1             String
+  line2             String?
+  city              String
+  district          String?
+  state             String
+  country           String
+  postalCode        String
+  landmark          String?
+  type              AddressType @default(HOME)
+  isDefaultBilling  Boolean     @default(false)
+  isDefaultShipping Boolean     @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?    @unique
+  guestId   String?    @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user  User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id            String   @id @default(cuid())
+  cartId        String
+  productId     String
+  variantId     String?
+  quantity      Int
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  
+  // Snapshots for order history compatibility and changing prices
+  productName   String
+  primaryImage  String
+  sku           String?
+  variantName   String?
+
+  customization Json?
+  giftWrap      Boolean  @default(false)
+  engravingText String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cart    Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@unique([cartId, productId, variantId])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
 }
