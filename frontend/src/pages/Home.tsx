@@ -16,6 +16,7 @@ const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
 const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
+const SustainabilitySection = lazy(() => import('../components/sections/SustainabilitySection'));
 const Reviews = lazy(() => import('../components/sections/Reviews'));
 const CommunityGallery = lazy(() => import('../components/sections/CommunityGallery'));
 const Learning = lazy(() => import('../components/sections/Learning'));
@@ -87,6 +88,10 @@ const Home: React.FC = () => {
 
       <Suspense fallback={<SectionFallback />}>
         <JustForYou />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <SustainabilitySection />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
