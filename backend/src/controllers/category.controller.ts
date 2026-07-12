@@ -13,7 +13,7 @@ export const listCategories = catchAsync(async (_req: Request, res: Response) =>
 });
 
 export const getCategoryBySlug = catchAsync(async (req: Request, res: Response) => {
-  const category = await categoryService.getBySlug(req.params.slug);
+  const category = await categoryService.getBySlug(String(req.params.slug));
   return successResponse(res, { category }, MESSAGES.SUCCESS);
 });
 
@@ -25,11 +25,11 @@ export const createCategory = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const updateCategory = catchAsync(async (req: Request, res: Response) => {
-  const category = await categoryService.update(req.params.id, req.body);
+  const category = await categoryService.update(String(req.params.id), req.body);
   return successResponse(res, { category }, MESSAGES.UPDATED);
 });
 
 export const deleteCategory = catchAsync(async (req: Request, res: Response) => {
-  await categoryService.delete(req.params.id);
+  await categoryService.delete(String(req.params.id));
   return successResponse(res, null, MESSAGES.DELETED);
 });
