@@ -3,7 +3,8 @@ import { orderService } from '../services/order.service';
 import { invoiceService } from '../services/invoice.service';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import { AppError } from '../utils/AppError';
-import { OrderStatus, PaymentStatus } from '@prisma/client';
+import { OrderStatus, PaymentStatus, AuditActorType } from '@prisma/client';
+import { eventDispatcher, OrderEvents } from '../events';
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -84,6 +85,19 @@ export const downloadInvoice = async (req: Request, res: Response, next: NextFun
     }
     const order = await orderService.getCustomerOrderById(id, userId);
     const pdfBytes = await invoiceService.generateInvoicePdf(order);
+
+    // Emit INVOICE_VIEWED event post-render
+    eventDispatcher
+      .emit(OrderEvents.INVOICE_VIEWED, {
+        orderId: order.id,
+        userId,
+        actorType: req.user?.role === 'ADMIN' ? AuditActorType.ADMIN : AuditActorType.CUSTOMER,
+        details: {
+          ip: req.ip,
+          userAgent: req.headers['user-agent'],
+        },
+      })
+      .catch(() => {});
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="invoice_${order.orderNumber}.pdf"`);

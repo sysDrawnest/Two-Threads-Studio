@@ -5,15 +5,11 @@ import {
   Calendar,
   ChevronRight,
   ChevronLeft,
-  FileText,
   XCircle,
   Clock,
   Truck,
   CheckCircle2,
-  MapPin,
-  CreditCard,
   AlertTriangle,
-  ArrowRight,
   Download,
   AlertCircle
 } from 'lucide-react';
@@ -256,7 +252,6 @@ export const OrdersTab: React.FC = () => {
                   const currentIdx = getStatusIndex(selectedOrder.orderStatus);
                   const isCompleted = idx < currentIdx;
                   const isActive = idx === currentIdx;
-                  const isFuture = idx > currentIdx;
 
                   return (
                     <div key={step.status} className="relative flex sm:flex-col items-start sm:items-center sm:text-center flex-1 pb-6 sm:pb-0 gap-4 sm:gap-2">

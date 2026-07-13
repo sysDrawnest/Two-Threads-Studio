@@ -69,6 +69,32 @@ enum PaymentStatus {
   PARTIALLY_REFUNDED
 }
 
+enum PaymentMethod {
+  ONLINE
+  COD
+  BANK_TRANSFER
+}
+
+enum AuditAction {
+  ORDER_CREATED
+  ORDER_UPDATED
+  ORDER_CANCELLED
+  STATUS_CHANGED
+  INVOICE_VIEWED
+}
+
+enum AuditActorType {
+  CUSTOMER
+  ADMIN
+  SYSTEM
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+}
+
 // ─────────────────────────────────────────────
 // Authentication Models (Phase 2 — unchanged)
 // ─────────────────────────────────────────────
@@ -436,8 +462,14 @@ model Order {
   paymentStatus PaymentStatus @default(PENDING)
 
   // Metadata
-  paymentMethod String?  // future: "razorpay", "cod", etc.
+  paymentMethod PaymentMethod @default(ONLINE)
   notes         String?  // customer notes at checkout
+
+  // Coupon snapshot
+  couponCode     String?
+  couponDiscount Decimal     @default(0) @db.Decimal(10, 2)
+  promotionId    String?
+  couponType     CouponType?
 
   // Artisan-specific
   estimatedCompletionDate DateTime?
@@ -452,6 +484,7 @@ model Order {
 
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
+  auditLogs     OrderAuditLog[]
 
   @@index([userId])
   @@index([orderStatus])
@@ -507,4 +540,32 @@ model OrderStatusHistory {
 
   @@index([orderId])
   @@map("order_status_history")
+}
+
+model OrderAuditLog {
+  id         String         @id @default(cuid())
+  orderId    String
+  action     AuditAction
+  actorType  AuditActorType
+  actorId    String
+  details    Json?
+  createdAt  DateTime       @default(now())
+
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_audit_logs")
+}
+
+model IdempotencyKey {
+  id             String   @id @default(cuid())
+  userId         String
+  key            String   @unique
+  requestHash    String
+  responseStatus Int
+  responseBody   Json
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+
+  @@map("idempotency_keys")
 }

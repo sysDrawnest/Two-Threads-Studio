@@ -13,6 +13,7 @@ import logger from './lib/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 import routes from './routes';
+import './events';
 import { BASE_API_PATH } from './constants/api';
 import { HTTP_STATUS } from './constants/httpStatus';
 import { successResponse } from './utils/response';

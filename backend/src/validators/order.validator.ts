@@ -1,12 +1,16 @@
 import { z } from 'zod';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentMethod, CouponType } from '@prisma/client';
 
 export const createOrderSchema = z.object({
   body: z.object({
     shippingAddressId: z.string().min(1, 'Shipping address ID is required'),
     billingAddressId: z.string().min(1, 'Billing address ID is required'),
     notes: z.string().max(500, 'Notes cannot exceed 500 characters').nullable().optional(),
-    paymentMethod: z.string().min(1, 'Payment method is required').optional().default('razorpay'),
+    paymentMethod: z.nativeEnum(PaymentMethod).optional().default(PaymentMethod.ONLINE),
+    couponCode: z.string().nullable().optional(),
+    couponDiscount: z.number().min(0).optional().default(0),
+    promotionId: z.string().nullable().optional(),
+    couponType: z.nativeEnum(CouponType).nullable().optional(),
   }),
 });
 

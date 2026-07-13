@@ -1,10 +1,19 @@
 import prisma from '../prisma';
 import { orderRepository } from '../repositories/order.repository';
 import { cartService } from './cart.service';
-import { orderNotifications } from '../notifications/order.notifications';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
-import { OrderStatus, PaymentStatus, Prisma } from '@prisma/client';
+import {
+  OrderStatus,
+  PaymentStatus,
+  Prisma,
+  PaymentMethod,
+  CouponType,
+  AuditAction,
+  AuditActorType,
+} from '@prisma/client';
+import { eventDispatcher, OrderEvents } from '../events';
+import logger from '../lib/logger';
 
 export const orderService = {
   /**
@@ -12,13 +21,11 @@ export const orderService = {
    */
   generateOrderNumber: async (tx: Prisma.TransactionClient): Promise<string> => {
     const now = new Date();
-    // Get YYMMDD
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     const datePrefix = `TTS${yy}${mm}${dd}`;
 
-    // Count existing orders for today to get next serial number
     const count = await tx.order.count({
       where: {
         orderNumber: {
@@ -40,7 +47,11 @@ export const orderService = {
       shippingAddressId: string;
       billingAddressId: string;
       notes?: string | null;
-      paymentMethod?: string;
+      paymentMethod?: PaymentMethod;
+      couponCode?: string | null;
+      couponDiscount?: number;
+      promotionId?: string | null;
+      couponType?: CouponType | null;
     }
   ) => {
     // 1. Verify address ownership
@@ -68,12 +79,10 @@ export const orderService = {
 
     // 3. Complete Transaction
     const resultOrder = await prisma.$transaction(async (tx) => {
-      // Re-fetch products/variants to ensure stock and status are fresh/valid
       const itemsToCreate = [];
       let calculatedSubtotal = 0;
 
       for (const item of cart.items) {
-        // Fetch product with status and trackInventory
         const product = await tx.product.findUnique({
           where: { id: item.productId },
           include: { variants: true },
@@ -96,24 +105,20 @@ export const orderService = {
           variantName = `${variant.name}: ${variant.value}`;
           finalUnitPrice += Number(variant.priceAdjustment);
 
-          // Inventory validation
           if (product.trackInventory) {
             if (variant.stockQuantity < item.quantity) {
               throw new AppError(`Insufficient stock for "${item.productName} (${variantName})"`, HTTP_STATUS.BAD_REQUEST);
             }
-            // Deduct stock from variant
             await tx.productVariant.update({
               where: { id: variant.id },
               data: { stockQuantity: { decrement: item.quantity } },
             });
           }
         } else {
-          // Inventory validation for non-variant product
           if (product.trackInventory) {
             if (product.stockQuantity < item.quantity) {
               throw new AppError(`Insufficient stock for "${item.productName}"`, HTTP_STATUS.BAD_REQUEST);
             }
-            // Deduct stock from product
             await tx.product.update({
               where: { id: product.id },
               data: { stockQuantity: { decrement: item.quantity } },
@@ -141,15 +146,13 @@ export const orderService = {
         });
       }
 
-      // Generate order number
       const orderNumber = await orderService.generateOrderNumber(tx);
 
-      // Default totals for Phase 5A
       const subtotal = calculatedSubtotal;
-      const discount = 0;
+      const discount = params.couponDiscount || 0;
       const shipping = 0;
       const tax = 0;
-      const grandTotal = subtotal;
+      const grandTotal = Math.max(0, subtotal - discount);
 
       // Create Order
       const order = await tx.order.create({
@@ -167,7 +170,11 @@ export const orderService = {
           orderStatus: OrderStatus.PENDING,
           paymentStatus: PaymentStatus.PENDING,
           notes: params.notes,
-          paymentMethod: params.paymentMethod || 'razorpay',
+          paymentMethod: params.paymentMethod || PaymentMethod.ONLINE,
+          couponCode: params.couponCode || null,
+          couponDiscount: discount,
+          promotionId: params.promotionId || null,
+          couponType: params.couponType || null,
         },
       });
 
@@ -190,6 +197,22 @@ export const orderService = {
         },
       });
 
+      // Create Audit Log
+      await tx.orderAuditLog.create({
+        data: {
+          orderId: order.id,
+          action: AuditAction.ORDER_CREATED,
+          actorType: AuditActorType.CUSTOMER,
+          actorId: userId,
+          details: {
+            couponCode: params.couponCode || null,
+            discount,
+            grandTotal,
+            paymentMethod: params.paymentMethod || PaymentMethod.ONLINE,
+          },
+        },
+      });
+
       // Clear Cart Items
       const userCart = await tx.cart.findUnique({
         where: { userId },
@@ -200,7 +223,6 @@ export const orderService = {
         });
       }
 
-      // Fetch the created order with relations
       return tx.order.findUnique({
         where: { id: order.id },
         include: {
@@ -215,8 +237,10 @@ export const orderService = {
     });
 
     if (resultOrder) {
-      // Trigger background notification hook
-      orderNotifications.onOrderCreated(resultOrder).catch(() => {});
+      // Emit event post-commit
+      eventDispatcher.emit(OrderEvents.CREATED, resultOrder).catch((err) => {
+        logger.error({ err, orderId: resultOrder.id }, 'Failed to emit Order Created event');
+      });
     }
 
     return resultOrder;
@@ -263,7 +287,6 @@ export const orderService = {
       throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
     }
 
-    // Allowed customer cancellation statuses
     const allowedStatuses: OrderStatus[] = [OrderStatus.PENDING, OrderStatus.AWAITING_PAYMENT, OrderStatus.CONFIRMED];
     if (!allowedStatuses.includes(order.orderStatus)) {
       throw new AppError(
@@ -274,13 +297,11 @@ export const orderService = {
 
     const previousStatus = order.orderStatus;
 
-    // Transactional status change + stock restoration
     const updatedOrder = await prisma.$transaction(async (tx) => {
       // Restore stocks
       for (const item of order.items) {
         if (!item.productId) continue;
 
-        // Fetch product to see if we track inventory
         const product = await tx.product.findUnique({
           where: { id: item.productId },
         });
@@ -328,8 +349,26 @@ export const orderService = {
         },
       });
 
+      // Add Audit Log
+      await tx.orderAuditLog.create({
+        data: {
+          orderId,
+          action: AuditAction.ORDER_CANCELLED,
+          actorType: AuditActorType.CUSTOMER,
+          actorId: userId,
+          details: { reason: reason || 'Cancelled by customer' },
+        },
+      });
+
       return updated;
     });
+
+    if (updatedOrder) {
+      // Emit event post-commit
+      eventDispatcher.emit(OrderEvents.CANCELLED, updatedOrder).catch((err) => {
+        logger.error({ err, orderId: updatedOrder.id }, 'Failed to emit Order Cancelled event');
+      });
+    }
 
     return updatedOrder;
   },
@@ -380,14 +419,12 @@ export const orderService = {
       return order;
     }
 
-    // Determine corresponding payment status if order gets delivered or cancelled/refunded
     let finalPaymentStatus: PaymentStatus | undefined = undefined;
     if (status === OrderStatus.CANCELLED || status === OrderStatus.REFUNDED) {
       finalPaymentStatus = PaymentStatus.REFUNDED;
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      // If we are transition to CANCELLED from a non-cancelled status, restore stock
       if (status === OrderStatus.CANCELLED && previousStatus !== OrderStatus.CANCELLED) {
         for (const item of order.items) {
           if (!item.productId) continue;
@@ -436,16 +473,37 @@ export const orderService = {
         },
       });
 
+      // Add Audit Log
+      await tx.orderAuditLog.create({
+        data: {
+          orderId,
+          action: status === OrderStatus.CANCELLED ? AuditAction.ORDER_CANCELLED : AuditAction.STATUS_CHANGED,
+          actorType: AuditActorType.ADMIN,
+          actorId: adminId,
+          details: {
+            previousStatus,
+            newStatus: status,
+            note: note || `Status updated by Admin`,
+          },
+        },
+      });
+
       return updatedOrder;
     });
 
-    // Trigger hooks
-    if (status === OrderStatus.CONFIRMED) {
-      orderNotifications.onOrderConfirmed(updated).catch(() => {});
-    } else if (status === OrderStatus.SHIPPED) {
-      orderNotifications.onOrderShipped(updated).catch(() => {});
-    } else if (status === OrderStatus.DELIVERED) {
-      orderNotifications.onOrderDelivered(updated).catch(() => {});
+    if (updated) {
+      // Emit status changed event post-commit
+      eventDispatcher
+        .emit(OrderEvents.STATUS_CHANGED, {
+          order: updated,
+          previousStatus,
+          newStatus: status,
+          changedBy: adminId,
+          note,
+        })
+        .catch((err) => {
+          logger.error({ err, orderId: updated.id }, 'Failed to emit Order Status Changed event');
+        });
     }
 
     return updated;
