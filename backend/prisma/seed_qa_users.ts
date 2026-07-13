@@ -47,7 +47,7 @@ async function main() {
   }
 
   // 2. QA Admin
-  const adminEmail = 'admin@test.twothreadsstudio.com';
+  const adminEmail = 'admin@twothreads.com';
   const adminPassword = 'Admin@12345';
   const adminPasswordHash = await bcrypt.hash(adminPassword, SALT_ROUNDS);
 
