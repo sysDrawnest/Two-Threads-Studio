@@ -31,4 +31,11 @@ router.use('/addresses', addressRoutes);
 router.use('/wishlist',  wishlistRoutes);
 router.use('/cart',      cartRoutes);
 
+// Order Management (Phase 5A)
+import orderRoutes from './order.routes';
+import adminOrderRoutes from './admin-order.routes';
+
+router.use('/orders',       orderRoutes);
+router.use('/admin/orders', adminOrderRoutes);
+
 export default router;

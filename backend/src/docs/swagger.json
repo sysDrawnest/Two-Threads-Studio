@@ -493,6 +493,182 @@
           "200": { "description": "Inventory updated successfully" }
         }
       }
+    },
+    "/orders": {
+      "post": {
+        "summary": "Create Order from Cart (Customer)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["shippingAddressId", "billingAddressId"],
+                "properties": {
+                  "shippingAddressId": { "type": "string" },
+                  "billingAddressId": { "type": "string" },
+                  "notes": { "type": "string" },
+                  "paymentMethod": { "type": "string", "default": "razorpay" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Order created successfully" },
+          "400": { "description": "Bad Request - empty cart or invalid stock" }
+        }
+      },
+      "get": {
+        "summary": "Get Order History (Customer)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "List of user orders retrieved successfully" }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Get Order Detail (Customer)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Detailed order retrieved successfully" },
+          "404": { "description": "Order not found" }
+        }
+      }
+    },
+    "/orders/{id}/cancel": {
+      "post": {
+        "summary": "Cancel Order (Customer)",
+        "description": "Cancel an order before it goes into production (only allowed in PENDING, AWAITING_PAYMENT, or CONFIRMED).",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order cancelled successfully" },
+          "400": { "description": "Cancellation blocked" }
+        }
+      }
+    },
+    "/orders/{id}/invoice": {
+      "get": {
+        "summary": "Download PDF Invoice (Customer)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns PDF invoice inline",
+            "content": {
+              "application/pdf": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/orders": {
+      "get": {
+        "summary": "List all Orders (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "paymentStatus", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Admin orders list retrieved successfully" }
+        }
+      }
+    },
+    "/admin/orders/{id}": {
+      "get": {
+        "summary": "Get Order Detail (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Order retrieved successfully" }
+        }
+      }
+    },
+    "/admin/orders/{id}/status": {
+      "patch": {
+        "summary": "Update Order Status (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string" },
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order status updated successfully" }
+        }
+      }
+    },
+    "/admin/orders/{id}/note": {
+      "patch": {
+        "summary": "Update Order Notes/Internal Notes (Admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["note"],
+                "properties": {
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Notes updated successfully" }
+        }
+      }
     }
   },
   "components": {

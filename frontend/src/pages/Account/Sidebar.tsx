@@ -27,11 +27,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'security', label: 'Security & Access', icon: ShieldCheck },
   ];
 
-  const placeholderItems = [
-    { id: 'orders', label: 'Orders', icon: ShoppingBag },
-    { id: 'wishlist', label: 'Wishlist', icon: Heart },
-    { id: 'addresses', label: 'Saved Addresses', icon: MapPin },
-    { id: 'learning', label: 'Learning Guild', icon: GraduationCap },
+  const commerceItems = [
+    { id: 'orders', label: 'Orders', icon: ShoppingBag, soon: false },
+    { id: 'wishlist', label: 'Wishlist', icon: Heart, soon: false },
+    { id: 'addresses', label: 'Saved Addresses', icon: MapPin, soon: false },
+    { id: 'learning', label: 'Learning Guild', icon: GraduationCap, soon: true },
   ];
 
   return (
@@ -59,13 +59,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Future Commerce Placeholders */}
+        {/* Commerce Guild Section */}
         <div className="hidden md:block space-y-4">
           <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-400 px-3">
             Commerce Guild
           </h4>
           <div className="space-y-1">
-            {placeholderItems.map((item) => {
+            {commerceItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -75,14 +75,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-mono uppercase tracking-widest transition-all duration-300 border-l-2 text-left ${
                     isActive
                       ? 'border-zinc-900 text-zinc-900 bg-zinc-50'
-                      : 'border-transparent text-zinc-405 text-zinc-400 hover:text-zinc-700'
+                      : 'border-transparent text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50/50'
                   }`}
                 >
                   <Icon className="w-4 h-4 opacity-70" />
                   <span>{item.label}</span>
-                  <span className="text-[8px] text-zinc-300 ml-auto border border-zinc-200 px-1 py-0.5 scale-90 font-mono">
-                    Soon
-                  </span>
+                  {item.soon && (
+                    <span className="text-[8px] text-zinc-300 ml-auto border border-zinc-200 px-1 py-0.5 scale-90 font-mono">
+                      Soon
+                    </span>
+                  )}
                 </button>
               );
             })}

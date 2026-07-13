@@ -7,6 +7,7 @@ import EmptyState from './EmptyState';
 import ErrorBoundary from './ErrorBoundary';
 import AddressBook from './AddressBook';
 import WishlistTab from './WishlistTab';
+import OrdersTab from './OrdersTab';
 import { useAuth } from '../../context/AuthContext';
 
 export const AccountLayout: React.FC = () => {
@@ -22,12 +23,7 @@ export const AccountLayout: React.FC = () => {
       case 'security':
         return <Security />;
       case 'orders':
-        return (
-          <EmptyState
-            title="My Orders"
-            message="This feature will be available in an upcoming update."
-          />
-        );
+        return <OrdersTab />;
       case 'wishlist':
         return <WishlistTab />;
       case 'addresses':
