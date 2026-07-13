@@ -13,9 +13,13 @@ export const validate =
         query: req.query,
         params: req.params,
       });
-      req.body = parsed.body;
-      Object.defineProperty(req, 'query', { value: parsed.query, writable: true, configurable: true });
-      Object.defineProperty(req, 'params', { value: parsed.params, writable: true, configurable: true });
+      if (parsed.body !== undefined) req.body = parsed.body;
+      if (parsed.query !== undefined) {
+        Object.defineProperty(req, 'query', { value: parsed.query, writable: true, configurable: true });
+      }
+      if (parsed.params !== undefined) {
+        Object.defineProperty(req, 'params', { value: parsed.params, writable: true, configurable: true });
+      }
       return next();
     } catch (error) {
       if (error instanceof ZodError) {
