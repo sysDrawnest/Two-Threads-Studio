@@ -5,6 +5,8 @@ import Profile from './Profile';
 import Security from './Security';
 import EmptyState from './EmptyState';
 import ErrorBoundary from './ErrorBoundary';
+import AddressBook from './AddressBook';
+import WishlistTab from './WishlistTab';
 import { useAuth } from '../../context/AuthContext';
 
 export const AccountLayout: React.FC = () => {
@@ -27,19 +29,9 @@ export const AccountLayout: React.FC = () => {
           />
         );
       case 'wishlist':
-        return (
-          <EmptyState
-            title="My Wishlist"
-            message="This feature will be available in an upcoming update."
-          />
-        );
+        return <WishlistTab />;
       case 'addresses':
-        return (
-          <EmptyState
-            title="Saved Addresses"
-            message="This feature will be available in an upcoming update."
-          />
-        );
+        return <AddressBook />;
       case 'learning':
         return (
           <EmptyState

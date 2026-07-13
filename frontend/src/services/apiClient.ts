@@ -32,6 +32,12 @@ async function request(path: string, options: RequestOptions = {}) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
+  // Inject Guest ID
+  const guestId = localStorage.getItem('tts_guest_id');
+  if (guestId) {
+    headers.set('x-guest-id', guestId);
+  }
+
   const finalOptions: RequestInit = {
     ...options,
     headers,
@@ -63,6 +69,9 @@ export const apiClient = {
   
   put: (path: string, body?: any, options?: RequestOptions) =>
     request(path, { ...options, method: 'PUT', body }),
+  
+  patch: (path: string, body?: any, options?: RequestOptions) =>
+    request(path, { ...options, method: 'PATCH', body }),
   
   delete: (path: string, options?: RequestOptions) =>
     request(path, { ...options, method: 'DELETE' }),

@@ -5,14 +5,16 @@ import CartDrawer from './CartDrawer';
 import SearchOverlay from './SearchOverlay';
 import { useCartStore } from '../../store/cartStore';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../hooks/useCommerce';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
-  const { items, isCartOpen, setCartOpen } = useCartStore();
-  const cartItemCount = items.length;
+  const { isCartOpen, setCartOpen } = useCartStore();
+  const { data: cartData } = useCart();
+  const cartItemCount = cartData?.totals?.totalItems ?? 0;
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
 import { useCartStore } from '../store/cartStore';
+import { useAddToCart } from '../hooks/useCommerce';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // This represents the product slug
@@ -11,7 +12,8 @@ const ProductDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState(0);
-  const addItem = useCartStore(state => state.addItem);
+  const addToCartMutation = useAddToCart();
+  const setCartOpen = useCartStore(state => state.setCartOpen);
 
   // Customization States
   const [hoopFinish, setHoopFinish] = useState<'bamboo' | 'walnut'>('bamboo');
@@ -79,26 +81,23 @@ const ProductDetail: React.FC = () => {
   const giftPrice = hasGiftWrap ? 300 : 0;
   const totalPrice = product.price + finishPrice + engravingPrice + giftPrice;
 
-  const handleAddToBag = () => {
-    // Generate unique ID based on customizations
-    const customizationHash = `${hoopFinish}-${hasEngraving ? engravingText + '-' + engravingFont : ''}-${hasGiftWrap ? giftMessage || 'gift' : ''}`;
-    const cartItemId = `${product.id}-${customizationHash}`;
-
-    addItem({
-      id: cartItemId,
-      productId: product.id,
-      name: product.name,
-      price: totalPrice,
-      quantity: 1,
-      imageUrl: product.images[0],
-      customization: {
-        isGift: hasGiftWrap,
-        giftMessage: hasGiftWrap ? giftMessage : undefined,
-        engravingText: hasEngraving ? engravingText : undefined,
-        engravingFont: hasEngraving ? engravingFont : undefined,
-        hoopFinish: hoopFinish
-      }
-    });
+  const handleAddToBag = async () => {
+    try {
+      await addToCartMutation.mutateAsync({
+        productId: product.id,
+        quantity: 1,
+        giftWrap: hasGiftWrap,
+        engravingText: hasEngraving ? engravingText : null,
+        customization: {
+          hoopFinish,
+          engravingFont: hasEngraving ? engravingFont : undefined,
+          giftMessage: hasGiftWrap ? giftMessage : undefined,
+        },
+      });
+      setCartOpen(true);
+    } catch (err: any) {
+      alert(err.message || 'Failed to add item to bag.');
+    }
   };
 
   return (

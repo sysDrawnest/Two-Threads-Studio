@@ -22,4 +22,13 @@ router.use('/collections', collectionRoutes);
 // Profile (Phase 4A)
 router.use('/profile',     profileRoutes);
 
+// Commerce (Phase 4B)
+import addressRoutes from './address.routes';
+import wishlistRoutes from './wishlist.routes';
+import cartRoutes from './cart.routes';
+
+router.use('/addresses', addressRoutes);
+router.use('/wishlist',  wishlistRoutes);
+router.use('/cart',      cartRoutes);
+
 export default router;

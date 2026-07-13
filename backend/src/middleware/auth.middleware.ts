@@ -52,3 +52,29 @@ export const requireRole = (...roles: Role[]) => {
     return next();
   };
 };
+
+/**
+ * optionalAuth — Decodes JWT if provided, but does not block request if unauthenticated.
+ */
+export const optionalAuth = (req: Request, _res: Response, next: NextFunction): void => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = verifyAccessToken(token);
+    req.user = {
+      id: decoded.sub,
+      email: decoded.email,
+      role: decoded.role as Role,
+    };
+  } catch {
+    // Fallback to guest gracefully
+  }
+
+  return next();
+};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useCartStore } from '../../store/cartStore';
+import { useCart, CartItem as CartItemType } from '../../hooks/useCommerce';
 import { useAuth } from '../../context/AuthContext';
 import CartItem from '../cart/CartItem';
 
@@ -11,9 +11,11 @@ interface CartDrawerProps {
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
-  const items = useCartStore((state) => state.items);
-  const getCartTotal = useCartStore((state) => state.getCartTotal);
+  const { data: cartData, isLoading } = useCart();
   const { isAuthenticated } = useAuth();
+
+  const items = cartData?.items || [];
+  const grandTotal = cartData?.totals?.grandTotal || 0;
 
   return (
     <AnimatePresence>
@@ -48,9 +50,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
             {/* Items */}
             <div className="flex-1 overflow-y-auto p-6">
-              {items.length > 0 ? (
+              {isLoading ? (
+                <div className="space-y-4 animate-pulse">
+                  <div className="h-20 bg-zinc-200" />
+                  <div className="h-20 bg-zinc-200" />
+                </div>
+              ) : items.length > 0 ? (
                 <div>
-                  {items.map((item) => (
+                  {items.map((item: CartItemType) => (
                     <CartItem key={item.id} item={item} />
                   ))}
                 </div>
@@ -65,11 +72,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Footer */}
-            {items.length > 0 && (
+            {!isLoading && items.length > 0 && (
               <div className="p-6 border-t border-neutral-200 bg-[#FAF9F7]">
                 <div className="flex justify-between items-center mb-6">
-                  <span className="font-sans text-xs uppercase tracking-widest text-neutral-500">Subtotal</span>
-                  <span className="font-sans text-xl font-bold text-[#1C1C1B]">₹{getCartTotal().toLocaleString()}</span>
+                  <span className="font-sans text-xs uppercase tracking-widest text-neutral-500 font-mono">Subtotal</span>
+                  <span className="font-sans text-xl font-bold text-[#1C1C1B]">₹{grandTotal.toLocaleString()}</span>
                 </div>
                 <p className="font-sans text-[11px] text-neutral-500 mb-6 text-center">
                   Shipping and taxes calculated at checkout.

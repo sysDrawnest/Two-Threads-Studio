@@ -4,6 +4,7 @@ import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
 import { useCartStore } from '../store/cartStore';
+import { useAddToCart } from '../hooks/useCommerce';
 import { ScrollReveal } from '../components/ui/ScrollReveal';
 import { ChevronDown, SlidersHorizontal, X, RotateCcw, ShoppingBag, Check } from 'lucide-react';
 
@@ -18,7 +19,7 @@ export default function Shop() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const addItem = useCartStore((state) => state.addItem);
+  const addToCartMutation = useAddToCart();
 
   // Close dropdowns on escape key
   useEffect(() => {
@@ -42,23 +43,23 @@ export default function Shop() {
       });
   }, []);
 
-  const handleQuickAdd = (product: Product, e: React.MouseEvent) => {
+  const handleQuickAdd = async (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    addItem({
-      id: product.id,
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      imageUrl: product.images[0]
-    });
+    try {
+      await addToCartMutation.mutateAsync({
+        productId: product.id,
+        quantity: 1,
+      });
 
-    setAddedProductId(product.id);
-    setTimeout(() => {
-      setAddedProductId(null);
-    }, 2000);
+      setAddedProductId(product.id);
+      setTimeout(() => {
+        setAddedProductId(null);
+      }, 2000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to add item to bag.');
+    }
   };
 
   const resetFilters = () => {

@@ -99,6 +99,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('tt_access_token', accessToken);
       localStorage.setItem('tt_refresh_token', refreshToken);
 
+      // Merge guest cart if guestId exists
+      const guestId = localStorage.getItem('tts_guest_id');
+      if (guestId) {
+        try {
+          await fetch(`${API_BASE_URL}/cart/merge`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ guestId }),
+          });
+          localStorage.removeItem('tts_guest_id');
+        } catch (mergeErr) {
+          console.error('Failed to merge guest cart on login:', mergeErr);
+        }
+      }
+
       const authUser = mapBackendUserToAuthUser(backendUser);
       setUser(authUser);
       return { success: true };
