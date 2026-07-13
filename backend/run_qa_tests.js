@@ -29,7 +29,7 @@ async function runTests() {
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@test.twothreadsstudio.com', password: 'Admin@12345' })
+      body: JSON.stringify({ email: 'admin@twothreads.com', password: 'Admin@12345' })
     });
     const data = await res.json();
     if (res.ok && data.success) {
