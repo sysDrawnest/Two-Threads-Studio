@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import bgImage from '../../assets/Embroidery_hoop,_pencil,_thread_2K_202607100702.jpeg';
+import bgImage from '../../assets/login,signup.png';
 
 const Signup: React.FC = () => {
   const { signup, isLoading, isAuthenticated } = useAuth();
@@ -103,7 +103,7 @@ const Signup: React.FC = () => {
         </div>
 
         {/* Glassmorphism Signup Modal */}
-        <div className="relative w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-2xl p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
+        <div className="relative w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
           
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
 
@@ -150,7 +150,7 @@ const Signup: React.FC = () => {
                   id="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
+                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
                   placeholder="Full Name"
                 />
               </div>
@@ -163,7 +163,7 @@ const Signup: React.FC = () => {
                   id="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
+                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
                   placeholder="Email Address"
                 />
               </div>
@@ -178,7 +178,7 @@ const Signup: React.FC = () => {
                       id="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-10"
+                      className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-10"
                       placeholder="Password"
                     />
                     <button 
@@ -203,7 +203,7 @@ const Signup: React.FC = () => {
                       id="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-10"
+                      className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-10"
                       placeholder="Confirm"
                     />
                     <button 
@@ -225,7 +225,7 @@ const Signup: React.FC = () => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className={`w-full text-[#fef8f3] py-4 rounded-lg font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
+                className={`w-full text-[#fef8f3] py-4 rounded-none font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
                   isLoading 
                     ? 'animate-shimmer cursor-wait' 
                     : 'bg-[#3b3a38] hover:bg-[#2a2927] hover:shadow-lg hover:-translate-y-[1px]'
