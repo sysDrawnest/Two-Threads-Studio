@@ -9,7 +9,7 @@ The homepage renders in the following top-to-bottom sequence of components:
 5. `ShopByCategory` (Lazy Loaded)
 6. `ShopByOccasion` (Lazy Loaded)
 7. `FeaturedCollections` (Lazy Loaded)
-8. `Banner` (Lazy Loaded - Artisan Guild Collection)
+8. `SacredTraditionsCollection` (Lazy Loaded - Sacred Traditions)
 9. `JustForYou` (Lazy Loaded - Curated Picks)
 10. `SustainabilitySection` (Lazy Loaded - Conscious Crafting) -- **NEW**
 11. `CustomCreations` (Lazy Loaded)
@@ -430,25 +430,25 @@ Delivers immersive visual branding, providing high-end editorial and cinematic m
 
 ---
 
-## Banner (Artisan Guild Collection)
+## Sacred Traditions Collection
 
 ### Component
 
-`Banner`
+`SacredTraditionsCollection`
 
 ### File
 
-`src/components/sections/ArtisanGuildCollection.tsx`
+`src/components/sections/SacredTraditionsCollection.tsx`
 
 ### Purpose
 
-An editorial campaign section highlighting the brand's heritage, curated materials, and core collection story.
+An editorial campaign section highlighting Indian heritage, temple carvings, sacred symbols, and ancient embroidery traditions.
 
 ### Content
 
-- **Overline Text**: "An Exclusive Collection"
-- **Title**: "Artisan Guild Collection"
-- **Copy**: "Premium embroidery patterns and handcrafted pieces, curated for the modern artisan..."
+- **Overline Text**: "Inspired by Timeless India"
+- **Title**: "Sacred Traditions Collection"
+- **Copy**: "Inspired by India's living heritage—from temple carvings and sacred symbols to ancient embroidery traditions—this collection celebrates craftsmanship, culture, and stories passed through generations."
 - **CTA Button**: "Explore Collection"
 
 ### Layout
@@ -1031,8 +1031,8 @@ Home (Page)
     ├── VideoBanner (ExclusiveCollection)
     ├── ShopByCategory
     ├── ShopByOccasion
-    ├── ExploreByRoom
-    ├── Banner (ArtisanGuildCollection)
+    ├── FeaturedCollections
+    ├── SacredTraditionsCollection
     ├── JustForYou (CuratedPicks)
     ├── SustainabilitySection
     ├── CustomCreations

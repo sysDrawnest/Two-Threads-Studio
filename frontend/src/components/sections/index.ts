@@ -5,7 +5,7 @@ export { default as BestSellers } from './BestSellers';
 export { default as ShopByOccasion } from './ShopByOccasion';
 export { default as FeaturedCollections } from './FeaturedCollections';
 export { default as VideoBanner } from './ExclusiveCollection';
-export { default as Banner } from './ArtisanGuildCollection';
+export { default as SacredTraditionsCollection } from './SacredTraditionsCollection';
 export { default as JustForYou } from './CuratedPicks';
 export { default as CustomCreations } from './CustomCreations';
 export { default as OurStory } from './OurStory';

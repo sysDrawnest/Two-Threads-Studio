@@ -11,7 +11,7 @@ const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'
 const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
 const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
-const Banner = lazy(() => import('../components/sections/ArtisanGuildCollection'));
+const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
 const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
@@ -83,7 +83,7 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <Banner />
+        <SacredTraditionsCollection />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>

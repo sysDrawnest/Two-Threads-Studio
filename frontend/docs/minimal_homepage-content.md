@@ -71,14 +71,14 @@ This document provides a sequential, minimal reference of the homepage component
   * **Collections**: Botanical Collection, Heritage Collection, Modern Minimal, Cultural Collection, Wedding Keepsakes, Seasonal Editions.
   * **CTA**: "View Collection"
 
-## 8. Banner (Artisan Guild Collection)
-* **Component**: `Banner`
-* **File**: `src/components/sections/ArtisanGuildCollection.tsx`
-* **Purpose**: Heritage campaign storytelling block highlighting raw materials.
+## 8. Sacred Traditions Collection
+* **Component**: `SacredTraditionsCollection`
+* **File**: `src/components/sections/SacredTraditionsCollection.tsx`
+* **Purpose**: Heritage campaign storytelling block highlighting Indian heritage and sacred traditions.
 * **Key Content**:
-  * **Overline**: "An Exclusive Collection"
-  * **Title**: "Artisan Guild Collection"
-  * **Description**: "Premium embroidery patterns and handcrafted pieces, curated for the modern artisan..."
+  * **Overline**: "Inspired by Timeless India"
+  * **Title**: "Sacred Traditions Collection"
+  * **Description**: "Inspired by India's living heritage—from temple carvings and sacred symbols to ancient embroidery traditions—this collection celebrates craftsmanship, culture, and stories passed through generations."
   * **CTA**: "Explore Collection"
 
 ## 9. JustForYou
