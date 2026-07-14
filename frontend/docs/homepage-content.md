@@ -335,7 +335,7 @@ Organizes the storefront around carefully curated editorial collections using an
 - **Overline Text**: "Signature Collections"
 - **Title**: "Featured Collections"
 - **Description**: "Discover our signature collections, each thoughtfully curated around a unique story, crafted for modern makers and collectors."
-- **Collection Cards**: Six data-driven collections (Botanical Collection, Heritage Collection, Modern Minimal, Personalized Portraits, Wedding Keepsakes, Seasonal Editions) featuring:
+- **Collection Cards**: Six data-driven collections (Botanical Collection, Heritage Collection, Modern Minimal, Handcrafted Women's Handbags, Wedding Keepsakes, Seasonal Editions) featuring:
   - Large editorial image.
   - Optional badge (e.g. `NEW`, `LIMITED`, `BESTSELLER`, `EDITOR'S PICK`).
   - Collection title.
