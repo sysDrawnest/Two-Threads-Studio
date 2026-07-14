@@ -1,4 +1,4 @@
-import botanicalImg from '../assets/portrait_of_a_botanical_collection_for_a_luxur.png';
+import botanicalImg from '../assets/botanical e…_202607141252.jpeg';
 import heritageImg from '../assets/portrait_of_a_heritage_collection_for_a_luxury.png';
 import minimalImg from '../assets/portrait_of_a_modern_minimal_collection_for_a_luxury.png';
 import culturalImg from '../assets/portrait_of_personalized_portraits_for_a_luxur.png';
