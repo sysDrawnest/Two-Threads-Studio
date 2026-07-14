@@ -15,8 +15,8 @@ export interface Product {
   name: string;
   price: number;
   mrp?: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Candles";
-  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Candles";
+  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Candles" | "Handbag";
+  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Candles" | "Handbags";
   collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
@@ -585,6 +585,54 @@ export const mockProducts: Product[] = [
       "Handcrafted gift box",
     ],
     estimatedTime: "Ready to gift",
+    reviews: [],
+  },
+  {
+    id: "p13",
+    name: "Aranya Jute Tote Bag",
+    price: 4500,
+    mrp: 5500,
+    category: "Handbag",
+    productCategory: "Handbags",
+    collection: "Cottage",
+    difficulty: "Intermediate",
+    badge: "Best Seller",
+    rating: 4.8,
+    reviewCount: 38,
+    stock: "In Stock",
+    isHandmade: true,
+    isSustainable: true,
+    images: [
+      "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop",
+    ],
+    description: "A premium handcrafted jute tote bag featuring beautiful floral embroidery details.",
+    story: "Woven from golden jute fibers and detailed with delicate chain stitching by our women artisans.",
+    materialsIncluded: ["Handwoven Jute Tote", "Dust bag"],
+    estimatedTime: "N/A",
+    reviews: [],
+  },
+  {
+    id: "p14",
+    name: "Madhubani Silk Clutch",
+    price: 3200,
+    mrp: 3800,
+    category: "Handbag",
+    productCategory: "Handbags",
+    collection: "Cottage",
+    difficulty: "Advanced",
+    badge: "Editor's Choice",
+    rating: 4.9,
+    reviewCount: 14,
+    stock: "Low Stock",
+    isHandmade: true,
+    isSustainable: true,
+    images: [
+      "https://images.unsplash.com/photo-1598532187856-34941336ee02?q=80&w=800&auto=format&fit=crop",
+    ],
+    description: "An elegant silk clutch featuring handcrafted traditional Madhubani motifs.",
+    story: "Hand-painted and embroidered on pure raw silk, perfect for festive occasions and weddings.",
+    materialsIncluded: ["Handcrafted Silk Clutch", "Detachable metal chain", "Gift box"],
+    estimatedTime: "N/A",
     reviews: [],
   },
 ];
