@@ -68,7 +68,7 @@ This document provides a sequential, minimal reference of the homepage component
   * **Overline**: "Signature Collections"
   * **Title**: "Featured Collections"
   * **Description**: "Discover our signature collections, each thoughtfully curated around a unique story, crafted for modern makers and collectors."
-  * **Collections**: Botanical Collection, Heritage Collection, Modern Minimal, Cultural Collection, Wedding Keepsakes, Seasonal Editions.
+  * **Collections**: Botanical Collection, Heritage Collection, Modern Minimal, Handcrafted Women's Handbags, Wedding Keepsakes, Seasonal Editions.
   * **CTA**: "View Collection"
 
 ## 8. Sacred Traditions Collection
