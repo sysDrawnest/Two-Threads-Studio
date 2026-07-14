@@ -3,7 +3,7 @@ export { default as TrustBar } from './TrustBar';
 export { default as ShopByCategory } from './ShopByCategory';
 export { default as BestSellers } from './BestSellers';
 export { default as ShopByOccasion } from './ShopByOccasion';
-export { default as ExploreByRoom } from './ExploreByRoom';
+export { default as FeaturedCollections } from './FeaturedCollections';
 export { default as VideoBanner } from './ExclusiveCollection';
 export { default as Banner } from './ArtisanGuildCollection';
 export { default as JustForYou } from './CuratedPicks';

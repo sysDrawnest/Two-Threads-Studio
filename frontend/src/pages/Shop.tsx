@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
@@ -9,6 +9,7 @@ import { ScrollReveal } from '../components/ui/ScrollReveal';
 import { ChevronDown, SlidersHorizontal, X, RotateCcw, ShoppingBag, Check } from 'lucide-react';
 
 export default function Shop() {
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState<'All' | 'DIY Kits' | 'Finished Hoops' | 'Digital Patterns'>('All');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('All');
   const [collectionFilter, setCollectionFilter] = useState<string>('All');
@@ -29,6 +30,21 @@ export default function Shop() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Parse initial query params on mount/location change
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const colParam = params.get('collection');
+    if (colParam) {
+      const slug = colParam.toLowerCase();
+      if (slug === 'botanical') setCollectionFilter('Botanical Collection');
+      else if (slug === 'heritage') setCollectionFilter('Heritage Collection');
+      else if (slug === 'modern-minimal') setCollectionFilter('Modern Minimal');
+      else if (slug === 'personalized-portraits') setCollectionFilter('Personalized Portraits');
+      else if (slug === 'wedding-keepsakes') setCollectionFilter('Wedding Keepsakes');
+      else if (slug === 'seasonal-editions') setCollectionFilter('Seasonal Editions');
+    }
+  }, [location.search]);
 
   // Fetch live products from backend
   useEffect(() => {
@@ -86,8 +102,15 @@ export default function Shop() {
     // Difficulty filter
     if (difficultyFilter !== 'All' && product.difficulty !== difficultyFilter) return false;
 
-    // Collection filter
-    if (collectionFilter !== 'All' && product.collection !== collectionFilter) return false;
+    // Collection filter mapping
+    if (collectionFilter !== 'All') {
+      if (collectionFilter === 'Botanical Collection' && product.collection !== 'Botanical') return false;
+      if (collectionFilter === 'Heritage Collection' && product.collection !== 'Cottage') return false;
+      if (collectionFilter === 'Modern Minimal' && product.collection !== 'Linen') return false;
+      if (collectionFilter === 'Personalized Portraits' && !product.isPersonalizable) return false;
+      if (collectionFilter === 'Wedding Keepsakes' && !product.occasion?.includes('Wedding') && !product.occasion?.includes('Anniversary')) return false;
+      if (collectionFilter === 'Seasonal Editions' && product.collection !== 'Seasonal' && !product.occasion?.includes('Festive')) return false;
+    }
 
     return true;
   });
@@ -107,7 +130,15 @@ export default function Shop() {
   ];
 
   const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced'];
-  const collections = ['All', 'Botanical', 'Cottage', 'Linen', 'Seasonal'];
+  const collections = [
+    'All',
+    'Botanical Collection',
+    'Heritage Collection',
+    'Modern Minimal',
+    'Personalized Portraits',
+    'Wedding Keepsakes',
+    'Seasonal Editions',
+  ];
 
   const getSortLabel = () => {
     if (sortBy === 'price-asc') return 'Price: Low to High';

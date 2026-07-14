@@ -9,7 +9,7 @@ import {
 // Lazy load all below-fold sections for performance
 const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
 const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
-const ExploreByRoom = lazy(() => import('../components/sections/ExploreByRoom'));
+const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
 const Banner = lazy(() => import('../components/sections/ArtisanGuildCollection'));
 const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
         4.  VideoBanner            (KEEP)
         5.  ShopByCategory         (NEW)
         6.  ShopByOccasion         (NEW)
-        7.  ExploreByRoom          (EXPANDED)
+        7.  FeaturedCollections    (NEW)
         8.  Banner/ArtisanGuild    (RENAMED)
         9.  JustForYou             (KEEP)
         10. CustomCreations        (NEW)
@@ -79,7 +79,7 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <ExploreByRoom />
+        <FeaturedCollections />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>

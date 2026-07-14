@@ -8,7 +8,7 @@ The homepage renders in the following top-to-bottom sequence of components:
 4. `VideoBanner` (Lazy Loaded - Exclusive Collection)
 5. `ShopByCategory` (Lazy Loaded)
 6. `ShopByOccasion` (Lazy Loaded)
-7. `ExploreByRoom` (Lazy Loaded)
+7. `FeaturedCollections` (Lazy Loaded)
 8. `Banner` (Lazy Loaded - Artisan Guild Collection)
 9. `JustForYou` (Lazy Loaded - Curated Picks)
 10. `SustainabilitySection` (Lazy Loaded - Conscious Crafting) -- **NEW**
@@ -316,60 +316,70 @@ Capitalizes on high-AOV gifting vectors by guiding customers to targeted collect
 
 ---
 
-## Explore By Room
+## Featured Collections
 
 ### Component
 
-`ExploreByRoom`
+`FeaturedCollections`
 
 ### File
 
-`src/components/sections/ExploreByRoom.tsx`
+`src/components/sections/FeaturedCollections.tsx`
 
 ### Purpose
 
-Encourages lifestyle contextual purchasing by organizing collections around interior styling rooms.
+Organizes the storefront around carefully curated editorial collections using an asymmetrical catalog layout.
 
 ### Content
 
-- **Overline Text**: "Explore by Room"
-- **Title**: "Stitch Every Corner"
-- **Alternating Layout Cards**: Six rooms (Living Room, Bedroom, Dining, Workspace, Entryway, Kids' Room), featuring:
-  - Sub-index label (e.g. "01 / 06").
-  - Description copy explaining the room's design focus.
-  - High-end editorial photo.
-  - "Shop [Room]" CTA.
+- **Overline Text**: "Signature Collections"
+- **Title**: "Featured Collections"
+- **Description**: "Discover our signature collections, each thoughtfully curated around a unique story, crafted for modern makers and collectors."
+- **Collection Cards**: Six data-driven collections (Botanical Collection, Heritage Collection, Modern Minimal, Personalized Portraits, Wedding Keepsakes, Seasonal Editions) featuring:
+  - Large editorial image.
+  - Optional badge (e.g. `NEW`, `LIMITED`, `BESTSELLER`, `EDITOR'S PICK`).
+  - Collection title.
+  - Dynamic product count computed from catalog.
+  - Description copy.
+  - Highlights summary ("Featuring: ...").
+  - "View Collection" CTA with grow-underline transition.
 
 ### Layout
 
-- **Desktop**: Alternating 2-column layout. Odd steps place copy on the left and image on the right. Even steps place image on the left and copy on the right.
-- **Mobile**: Vertical stacking. Images are constrained to a `4/5` aspect ratio with copy stacked beneath them.
+- **Desktop (`lg`)**: 3-column asymmetric grid. Spans are mixed: Card 1 (col-span-2), Card 2 (col-span-1), Card 3 (col-span-1), Card 4 (col-span-2), Card 5 (col-span-2), Card 6 (col-span-1). Aspect ratios are also mixed (wide aspect vs. tall aspect).
+- **Tablet (`md`)**: 2-column asymmetric grid.
+- **Mobile**: Vertical stacking. Single-column list.
 
 ### Styling
 
-- **Colors**: Warm background (`#ede6de`).
-- **Buttons**: Outlined transparent buttons with border and text in primary container color, transitioning to a solid container on hover.
-- **Images**: Muted saturation (e.g., `grayscale-[10%]` on desktop, `grayscale-[20%]` on mobile) to maintain editorial harmony.
+- **Colors**: Warm background (`#ede6de`). Card backgrounds are semi-translucent white (`bg-white/50`), transitioning to solid/elevated cream on hover.
+- **Shape**: Sharp corners (`rounded-none`).
+- **Borders**: Thin borders (`border border-[#c0b4a4]/40`).
+- **Typography**: Display serif for headings, tracked sans-serif for numbers/CTAs.
 
 ### Animations
 
-- **Alternating Reveal**: Uses ScrollReveal to trigger directional slides depending on layout orientation (left vs. right).
-- **Hover Zoom**: Images scale up slightly on hover.
+- **Staggered Entrance**: ScrollReveal slides up cards with layout delays.
+- **Hover Zoom**: Images scale to `1.03` inside the container.
+- **CTA Underline**: Thin underline grows from 0 to 100% width on hover.
+- **Card Offset**: Subtle translation (`hover:-translate-y-1`) on hover.
 
 ### User Interaction
 
-- **CTA Buttons**: Navigate to custom routes (`/shop?room=[slug]`).
+- **Navigation**: Clicking cards routes to `/shop?collection=[slug]`.
 
 ### Backend Integration Readiness
 
-- **Static**: Room list is configured as a static constant array in the file.
+- **Dynamic Catalog**: Collection metadata is imported from `src/data/featuredCollections.ts`, and counts are computed dynamically from `src/data/products.ts`'s live data.
 
 ### Dependencies
 
-- Local room assets (`roomImg1`, `roomImg2`, `roomImg3`).
+- `featuredCollections` metadata array.
+- `mockProducts` data array.
 - `ScrollReveal` component.
 
 ---
+
 
 ## VideoBanner
 
