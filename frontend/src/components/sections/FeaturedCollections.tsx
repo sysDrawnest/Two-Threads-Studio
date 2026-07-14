@@ -14,8 +14,8 @@ const getProductCount = (slug: string): number => {
     case 'modern-minimal':
       // Modern Minimal maps to "Linen" collection in our product database
       return mockProducts.filter(p => p.collection === 'Linen').length;
-    case 'cultural':
-      return mockProducts.filter(p => p.category === 'Lippan Art' || p.isPersonalizable).length;
+    case 'handbags':
+      return mockProducts.filter(p => p.category === 'Handbag' || p.productCategory === 'Handbags').length;
     case 'wedding-keepsakes':
       return mockProducts.filter(p => p.occasion?.includes('Wedding') || p.occasion?.includes('Anniversary')).length;
     case 'seasonal-editions':
