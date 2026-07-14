@@ -1,3 +1,10 @@
+import botanicalImg from '../assets/portrait_of_a_botanical_collection_for_a_luxur.png';
+import heritageImg from '../assets/portrait_of_a_heritage_collection_for_a_luxury.png';
+import minimalImg from '../assets/portrait_of_a_modern_minimal_collection_for_a_luxury.png';
+import culturalImg from '../assets/portrait_of_personalized_portraits_for_a_luxur.png';
+import weddingImg from '../assets/portrait_of_wedding_keepsakes_for_a_luxury_em.png';
+import seasonalImg from '../assets/portrait_of_seasonal_editions_for_a_luxury_em.png';
+
 export interface FeaturedCollection {
   id: string;
   slug: string;
@@ -16,7 +23,7 @@ export const featuredCollections: FeaturedCollection[] = [
     title: "Botanical Collection",
     description: "Inspired by wildflowers, leaves, forests and slow botanical illustrations.",
     productsSummary: "Floral embroidery kits, Botanical hoops, Nature inspired décor",
-    image: "https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop",
+    image: botanicalImg,
     badge: "BESTSELLER",
     featured: true
   },
@@ -26,7 +33,7 @@ export const featuredCollections: FeaturedCollection[] = [
     title: "Heritage Collection",
     description: "Traditional Indian craftsmanship blended with contemporary interiors.",
     productsSummary: "Heritage embroidery, Folk-inspired designs, Artisan décor",
-    image: "https://images.unsplash.com/photo-1590736704728-f4730bb30770?q=80&w=800&auto=format&fit=crop",
+    image: heritageImg,
     badge: "NEW"
   },
   {
@@ -35,15 +42,15 @@ export const featuredCollections: FeaturedCollection[] = [
     title: "Modern Minimal",
     description: "Simple geometric forms, neutral palettes and timeless aesthetics.",
     productsSummary: "Minimal hoops, Contemporary wall art, Clean interior accents",
-    image: "https://images.unsplash.com/photo-1579737151059-006f85d2eb3b?q=80&w=800&auto=format&fit=crop"
+    image: minimalImg
   },
   {
-    id: "fc_portraits",
-    slug: "personalized-portraits",
-    title: "Personalized Portraits",
-    description: "Custom embroidered artwork made from customer memories.",
-    productsSummary: "Couple portraits, Family portraits, Pet portraits",
-    image: "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop",
+    id: "fc_cultural",
+    slug: "cultural",
+    title: "Cultural Collection",
+    description: "Traditional Indian folk art, Lippan art hoops, and hand-embroidered regional motifs.",
+    productsSummary: "Lippan art, Kutch work kits, Folk art hoops",
+    image: culturalImg,
     badge: "EDITOR'S PICK"
   },
   {
@@ -52,7 +59,7 @@ export const featuredCollections: FeaturedCollection[] = [
     title: "Wedding Keepsakes",
     description: "Luxury handcrafted gifts celebrating weddings and anniversaries.",
     productsSummary: "Ring hoops, Wedding portraits, Personalized keepsakes",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop",
+    image: weddingImg,
     badge: "LIMITED",
     featured: true
   },
@@ -62,7 +69,7 @@ export const featuredCollections: FeaturedCollection[] = [
     title: "Seasonal Editions",
     description: "Limited seasonal releases available only during specific collections.",
     productsSummary: "Christmas, Autumn, Spring, Festival editions",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop",
+    image: seasonalImg,
     badge: "NEW"
   }
 ];
