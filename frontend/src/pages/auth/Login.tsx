@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import bgImage from '../../assets/Embroidery_hoop,_pencil,_thread_2K_202607100702.jpeg';
+import bgImage from '../../assets/login,signup.png';
 
 const Login: React.FC = () => {
   const { login, isLoading, isAuthenticated, user } = useAuth();
@@ -94,7 +94,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Glassmorphism Login Modal */}
-        <div className="relative w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-2xl p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
+        <div className="relative w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
           
           {/* Subtle inner noise texture for realism */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
@@ -144,7 +144,7 @@ const Login: React.FC = () => {
                   id="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
+                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
                   placeholder="Email Address"
                 />
               </div>
@@ -158,7 +158,7 @@ const Login: React.FC = () => {
                     id="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-lg px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-12"
+                    className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-12"
                     placeholder="Password"
                   />
                   <button 
@@ -185,7 +185,7 @@ const Login: React.FC = () => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className={`w-full text-[#fef8f3] py-4 rounded-lg font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
+                className={`w-full text-[#fef8f3] py-4 rounded-none font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
                   isLoading 
                     ? 'animate-shimmer cursor-wait' 
                     : 'bg-[#3b3a38] hover:bg-[#2a2927] hover:shadow-lg hover:-translate-y-[1px]'
