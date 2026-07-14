@@ -40,7 +40,7 @@ export default function Shop() {
       if (slug === 'botanical') setCollectionFilter('Botanical Collection');
       else if (slug === 'heritage') setCollectionFilter('Heritage Collection');
       else if (slug === 'modern-minimal') setCollectionFilter('Modern Minimal');
-      else if (slug === 'cultural') setCollectionFilter('Cultural Collection');
+      else if (slug === 'handbags') setCollectionFilter("Handcrafted Women's Handbags");
       else if (slug === 'wedding-keepsakes') setCollectionFilter('Wedding Keepsakes');
       else if (slug === 'seasonal-editions') setCollectionFilter('Seasonal Editions');
     }
@@ -107,7 +107,7 @@ export default function Shop() {
       if (collectionFilter === 'Botanical Collection' && product.collection !== 'Botanical') return false;
       if (collectionFilter === 'Heritage Collection' && product.collection !== 'Cottage') return false;
       if (collectionFilter === 'Modern Minimal' && product.collection !== 'Linen') return false;
-      if (collectionFilter === 'Cultural Collection' && product.category !== 'Lippan Art' && !product.isPersonalizable) return false;
+      if (collectionFilter === "Handcrafted Women's Handbags" && product.category !== 'Handbag' && product.productCategory !== 'Handbags') return false;
       if (collectionFilter === 'Wedding Keepsakes' && !product.occasion?.includes('Wedding') && !product.occasion?.includes('Anniversary')) return false;
       if (collectionFilter === 'Seasonal Editions' && product.collection !== 'Seasonal' && !product.occasion?.includes('Festive')) return false;
     }
@@ -135,7 +135,7 @@ export default function Shop() {
     'Botanical Collection',
     'Heritage Collection',
     'Modern Minimal',
-    'Cultural Collection',
+    "Handcrafted Women's Handbags",
     'Wedding Keepsakes',
     'Seasonal Editions',
   ];
