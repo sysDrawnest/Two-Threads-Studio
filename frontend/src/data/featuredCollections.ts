@@ -1,7 +1,7 @@
-import botanicalImg from '../assets/botanical e…_202607141252.jpeg';
+import botanicalImg from '../assets/botanical e…_202607141252.png';
 import heritageImg from '../assets/portrait_of_a_heritage_collection_for_a_luxury.png';
 import minimalImg from '../assets/portrait_of_a_modern_minimal_collection_for_a_luxury.png';
-import culturalImg from '../assets/portrait_of_personalized_portraits_for_a_luxur.png';
+import handbagsImg from '../assets/Woman_holding_wool_handbag_2K_202607141448.jpeg';
 import weddingImg from '../assets/portrait_of_wedding_keepsakes_for_a_luxury_em.png';
 import seasonalImg from '../assets/portrait_of_seasonal_editions_for_a_luxury_em.png';
 
@@ -45,12 +45,12 @@ export const featuredCollections: FeaturedCollection[] = [
     image: minimalImg
   },
   {
-    id: "fc_cultural",
-    slug: "cultural",
-    title: "Cultural Collection",
-    description: "Traditional Indian folk art, Lippan art hoops, and hand-embroidered regional motifs.",
-    productsSummary: "Lippan art, Kutch work kits, Folk art hoops",
-    image: culturalImg,
+    id: "fc_handbags",
+    slug: "handbags",
+    title: "Handcrafted Women's Handbags",
+    description: "Luxury hand-embroidered handbags, tote bags, and clutches showcasing traditional Indian stitches.",
+    productsSummary: "Embroidered totes, Silk clutches, Artisan sling bags",
+    image: handbagsImg,
     badge: "EDITOR'S PICK"
   },
   {
