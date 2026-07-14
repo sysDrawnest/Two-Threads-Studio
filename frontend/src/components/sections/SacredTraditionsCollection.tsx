@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollReveal } from '../ui/ScrollReveal';
+import sacredTraditionsImg from '../../assets/Temple_relief_with_floral_mandalas_202607141319.jpeg';
 
 export default function SacredTraditionsCollection() {
   return (
@@ -7,7 +8,7 @@ export default function SacredTraditionsCollection() {
       {/* Background Image of spools of natural yarns and threads */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1558271881-3e527a036d0b?q=80&w=1600&auto=format&fit=crop"
+          src={sacredTraditionsImg}
           alt="Artisanal thread spools"
           className="w-full h-full object-cover object-center grayscale-[10%] brightness-[92%]"
           loading="lazy"
