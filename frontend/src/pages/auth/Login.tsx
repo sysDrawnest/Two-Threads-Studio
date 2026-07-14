@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center p-4 md:p-8 overflow-hidden font-sans">
+    <div className="min-h-screen w-full relative flex items-center justify-center p-6 md:p-8 overflow-hidden font-sans">
       
       {/* Immersive Background */}
       <div 
@@ -94,13 +94,13 @@ const Login: React.FC = () => {
         </div>
 
         {/* Glassmorphism Login Modal */}
-        <div className="relative w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
+        <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none py-6 px-5 sm:p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
           
           {/* Subtle inner noise texture for realism */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
 
           {/* Graphic: Needle and Thread */}
-          <div className="relative h-24 w-full mb-2 pointer-events-none flex items-center justify-center">
+          <div className="relative h-12 sm:h-24 w-full mb-1 sm:mb-2 pointer-events-none flex items-center justify-center">
              <svg width="100%" height="100%" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
                {/* Thread Path */}
                <path 
@@ -121,44 +121,44 @@ const Login: React.FC = () => {
           </div>
 
           {/* Header */}
-          <div className="text-center mb-8 relative z-10">
-            <h2 className="font-serif text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm">
+          <div className="text-center mb-4 sm:mb-8 relative z-10">
+            <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm">
               Log In to<br/>Artisanal Creations
             </h2>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6 relative z-10">
             {error && (
               <p className="text-[#a83232] text-xs text-center bg-[#fdf0f0] border border-[#f5c6c6] py-2 px-3 rounded-md font-sans shadow-sm">
                 {error}
               </p>
             )}
             
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3.5 sm:gap-5">
               {/* Email Address */}
-              <div className="flex flex-col gap-1.5 relative group">
-                <label htmlFor="email" className="font-serif text-[14px] text-[#5c544d] ml-1">Email Address</label>
+              <div className="flex flex-col gap-1 sm:gap-1.5 relative group">
+                <label htmlFor="email" className="font-serif text-[13px] sm:text-[14px] text-[#5c544d] ml-1">Email Address</label>
                 <input 
                   type="email" 
                   id="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
+                  className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-3.5 py-2.5 sm:px-4 sm:py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner"
                   placeholder="Email Address"
                 />
               </div>
 
               {/* Password */}
-              <div className="flex flex-col gap-1.5 relative group">
-                <label htmlFor="password" className="font-serif text-[14px] text-[#5c544d] ml-1">Password</label>
+              <div className="flex flex-col gap-1 sm:gap-1.5 relative group">
+                <label htmlFor="password" className="font-serif text-[13px] sm:text-[14px] text-[#5c544d] ml-1">Password</label>
                 <div className="relative">
                   <input 
                     type={showPw ? 'text' : 'password'}
                     id="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-4 py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-12"
+                    className="animate-glow-pulse w-full bg-[#FAF8F5] border border-[#d2c4bc] rounded-none px-3.5 py-2.5 sm:px-4 sm:py-3 font-sans text-sm text-[#1d1b19] placeholder:text-[#a3968e] transition-all shadow-inner pr-12"
                     placeholder="Password"
                   />
                   <button 
@@ -181,11 +181,11 @@ const Login: React.FC = () => {
               </Link>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-1 sm:mt-2">
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className={`w-full text-[#fef8f3] py-4 rounded-none font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
+                className={`w-full text-[#fef8f3] py-3 sm:py-4 rounded-none font-sans text-[13px] tracking-widest uppercase shadow-md transition-all border-none ${
                   isLoading 
                     ? 'animate-shimmer cursor-wait' 
                     : 'bg-[#3b3a38] hover:bg-[#2a2927] hover:shadow-lg hover:-translate-y-[1px]'
@@ -198,7 +198,7 @@ const Login: React.FC = () => {
                 access your account
               </button>
               
-              <div className="text-center mt-6">
+              <div className="text-center mt-4 sm:mt-6">
                 <p className="font-sans text-[13px] text-[#5c544d]">
                   Don't have an account? <Link to={`/auth/signup?redirect=${encodeURIComponent(redirectPath)}`} className="hover:underline text-[#8b6f5c] font-semibold transition-colors">Sign Up</Link>
                 </p>
