@@ -234,7 +234,7 @@ export const orderService = {
           billingAddress: true,
         },
       });
-    });
+    }, { timeout: 20000 });
 
     if (resultOrder) {
       // Emit event post-commit
@@ -361,7 +361,7 @@ export const orderService = {
       });
 
       return updated;
-    });
+    }, { timeout: 20000 });
 
     if (updatedOrder) {
       // Emit event post-commit
@@ -489,7 +489,7 @@ export const orderService = {
       });
 
       return updatedOrder;
-    });
+    }, { timeout: 20000 });
 
     if (updated) {
       // Emit status changed event post-commit
