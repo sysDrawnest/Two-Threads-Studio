@@ -13,6 +13,7 @@ import logger from './lib/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 import routes from './routes';
+import webhookRoutes from './routes/webhook.routes';
 import './events';
 import { BASE_API_PATH } from './constants/api';
 import { HTTP_STATUS } from './constants/httpStatus';
@@ -32,6 +33,11 @@ app.use(cors(corsConfig));
 
 // Rate limiting
 app.use(BASE_API_PATH, limiter);
+
+// ── Webhook route: MUST use raw body BEFORE JSON parser ──────────────────
+// Razorpay HMAC verification requires the raw Buffer body.
+// If express.json() runs first, the Buffer is destroyed.
+app.use('/webhooks', express.raw({ type: 'application/json' }), webhookRoutes);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));

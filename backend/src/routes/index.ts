@@ -38,4 +38,11 @@ import adminOrderRoutes from './admin-order.routes';
 router.use('/orders',       orderRoutes);
 router.use('/admin/orders', adminOrderRoutes);
 
+// Payment & Fulfillment (Phase 5B)
+import paymentRoutes from './payment.routes';
+import adminPaymentRoutes from './admin-payment.routes';
+
+router.use('/payments',       paymentRoutes);
+router.use('/admin/payments', adminPaymentRoutes);
+
 export default router;

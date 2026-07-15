@@ -1,5 +1,5 @@
 // Two Threads Studio — Prisma Schema
-// Phase 5A: Order Management Engine (updated)
+// Phase 5B: Payment, Fulfillment, Notifications & Shipment
 
 generator client {
   provider = "prisma-client-js"
@@ -63,10 +63,22 @@ enum OrderStatus {
 
 enum PaymentStatus {
   PENDING
-  PAID
+  AUTHORIZED
+  CAPTURED
   FAILED
   REFUNDED
   PARTIALLY_REFUNDED
+  CANCELLED
+}
+
+enum ShipmentStatus {
+  PENDING
+  PACKING
+  READY
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  RETURNED
 }
 
 enum PaymentMethod {
@@ -81,6 +93,10 @@ enum AuditAction {
   ORDER_CANCELLED
   STATUS_CHANGED
   INVOICE_VIEWED
+  PAYMENT_CAPTURED
+  PAYMENT_FAILED
+  REFUND_INITIATED
+  SHIPMENT_CREATED
 }
 
 enum AuditActorType {
@@ -96,7 +112,7 @@ enum CouponType {
 }
 
 // ─────────────────────────────────────────────
-// Authentication Models (Phase 2 — unchanged)
+// Authentication Models (Phase 2)
 // ─────────────────────────────────────────────
 
 model User {
@@ -111,8 +127,7 @@ model User {
   isVerified           Boolean   @default(false)
   isActive             Boolean   @default(true)
   lastLogin            DateTime?
-  
-  // Profile enhancements
+
   dateOfBirth          DateTime?
   gender               String?
   profileImage         String?
@@ -199,61 +214,53 @@ model Tag {
 }
 
 model Product {
-  id          String        @id @default(cuid())
-  name        String
-  slug        String        @unique
+  id               String          @id @default(cuid())
+  name             String
+  slug             String          @unique
   shortDescription String?
-  description String
-  sku         String?       @unique
-  categoryId  String
-  collectionId String?
+  description      String
+  sku              String?         @unique
+  categoryId       String
+  collectionId     String?
 
-  // Pricing (Decimal for precision — never Float for money)
   price        Decimal  @db.Decimal(10, 2)
   comparePrice Decimal? @db.Decimal(10, 2)
   costPrice    Decimal? @db.Decimal(10, 2)
 
-  // Inventory
-  stockQuantity      Int     @default(0)
-  lowStockThreshold  Int     @default(5)
-  trackInventory     Boolean @default(true)
+  stockQuantity     Int     @default(0)
+  lowStockThreshold Int     @default(5)
+  trackInventory    Boolean @default(true)
 
-  // Status & Classification
-  status     ProductStatus  @default(DRAFT)
-  type       ProductType    @default(PHYSICAL)
+  status     ProductStatus   @default(DRAFT)
+  type       ProductType     @default(PHYSICAL)
   badge      BadgeType?
   difficulty DifficultyLevel?
-  featured   Boolean        @default(false)
+  featured   Boolean         @default(false)
 
-  // Artisan-specific fields
-  isHandmade                Boolean  @default(true)
-  isSustainable             Boolean  @default(false)
-  isCustomizable            Boolean  @default(false)
-  isPersonalizable          Boolean  @default(false)
-  madeToOrder               Boolean  @default(false)
-  estimatedProductionDays   Int?
-  estimatedShippingDays     Int?
-  estimatedTime             String?  // human-readable e.g. "4 - 6 hours"
+  isHandmade              Boolean @default(true)
+  isSustainable           Boolean @default(false)
+  isCustomizable          Boolean @default(false)
+  isPersonalizable        Boolean @default(false)
+  madeToOrder             Boolean @default(false)
+  estimatedProductionDays Int?
+  estimatedShippingDays   Int?
+  estimatedTime           String?
 
-  // Craft attributes
-  materials         String[] // ["DMC Cotton floss", "6\" Bamboo hoop"]
-  materialsIncluded String[] // what's in the box
-  technique         String?  // "French knot", "Satin stitch"
+  materials         String[]
+  materialsIncluded String[]
+  technique         String?
   careInstructions  String?
-  origin            String?  // "Handmade in Bengaluru, India"
+  origin            String?
 
-  // Physical product dimensions
   weight     Float?
-  dimensions Json?  // { length, width, height, unit }
+  dimensions Json?
 
-  // SEO
   seoTitle       String?
   seoDescription String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   category   Category    @relation(fields: [categoryId], references: [id])
   collection Collection? @relation(fields: [collectionId], references: [id])
   images     ProductImage[]
@@ -263,7 +270,6 @@ model Product {
   wishlist   Wishlist[]
   cartItems  CartItem[]
 
-  // Indexes for common query patterns
   @@index([status])
   @@index([featured])
   @@index([categoryId])
@@ -296,14 +302,14 @@ model ProductImage {
 model ProductVariant {
   id              String  @id @default(cuid())
   productId       String
-  name            String  // e.g. "Hoop Size"
-  value           String  // e.g. "6 inch"
+  name            String
+  value           String
   sku             String? @unique
   priceAdjustment Decimal @default(0) @db.Decimal(10, 2)
   stockQuantity   Int     @default(0)
   isActive        Boolean @default(true)
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems CartItem[]
 
   @@index([productId])
@@ -322,20 +328,19 @@ model ProductTag {
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int      // 1–5
-  title     String?
-  comment   String
-  productId String
-  userId    String
-  isVerified Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  rating     Int
+  title      String?
+  comment    String
+  productId  String
+  userId     String
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // One review per product per user
   @@unique([productId, userId])
   @@index([productId])
   @@index([userId])
@@ -352,7 +357,6 @@ model Wishlist {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  // Each user can wishlist each product only once
   @@unique([userId, productId])
   @@index([userId])
   @@map("wishlists")
@@ -395,11 +399,11 @@ model Address {
 }
 
 model Cart {
-  id        String     @id @default(cuid())
-  userId    String?    @unique
-  guestId   String?    @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id @default(cuid())
+  userId    String?  @unique
+  guestId   String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user  User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items CartItem[]
@@ -414,13 +418,10 @@ model CartItem {
   variantId     String?
   quantity      Int
   unitPrice     Decimal  @db.Decimal(10, 2)
-  
-  // Snapshots for order history compatibility and changing prices
   productName   String
   primaryImage  String
   sku           String?
   variantName   String?
-
   customization Json?
   giftWrap      Boolean  @default(false)
   engravingText String?
@@ -438,18 +439,17 @@ model CartItem {
 }
 
 // ─────────────────────────────────────────────
-// Order Models (Phase 5A)
+// Order Models (Phase 5A — extended in 5B)
 // ─────────────────────────────────────────────
 
 model Order {
   id          String @id @default(cuid())
-  orderNumber String @unique // e.g. TTS260713-000001
+  orderNumber String @unique
 
-  userId             String
-  shippingAddressId  String
-  billingAddressId   String
+  userId            String
+  shippingAddressId String
+  billingAddressId  String
 
-  // Financial snapshot (all Decimal for precision)
   subtotal   Decimal @db.Decimal(10, 2)
   discount   Decimal @default(0) @db.Decimal(10, 2)
   shipping   Decimal @default(0) @db.Decimal(10, 2)
@@ -457,27 +457,25 @@ model Order {
   grandTotal Decimal @db.Decimal(10, 2)
   currency   String  @default("INR")
 
-  // Status
   orderStatus   OrderStatus   @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
-
-  // Metadata
   paymentMethod PaymentMethod @default(ONLINE)
-  notes         String?  // customer notes at checkout
 
-  // Coupon snapshot
+  notes          String?
   couponCode     String?
-  couponDiscount Decimal     @default(0) @db.Decimal(10, 2)
+  couponDiscount Decimal    @default(0) @db.Decimal(10, 2)
   promotionId    String?
   couponType     CouponType?
 
-  // Artisan-specific
   estimatedCompletionDate DateTime?
+
+  // Phase 5B: payment reference for quick lookup without joining payment table
+  paymentReference String?
+  paidAt           DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   user            User    @relation(fields: [userId], references: [id])
   shippingAddress Address @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   billingAddress  Address @relation("BillingAddress", fields: [billingAddressId], references: [id])
@@ -485,6 +483,8 @@ model Order {
   items         OrderItem[]
   statusHistory OrderStatusHistory[]
   auditLogs     OrderAuditLog[]
+  payment       Payment?
+  shipment      Shipment?
 
   @@index([userId])
   @@index([orderStatus])
@@ -494,25 +494,21 @@ model Order {
 }
 
 model OrderItem {
-  id      String @id @default(cuid())
-  orderId String
-
-  // Product reference (nullable — product could be deleted later)
+  id        String  @id @default(cuid())
+  orderId   String
   productId String?
   variantId String?
 
-  // Immutable snapshot — never changes after order creation
   productName  String
   productSlug  String
   productImage String
   sku          String?
   variantName  String?
 
-  unitPrice     Decimal @db.Decimal(10, 2)
-  quantity      Int
-  lineTotal     Decimal @db.Decimal(10, 2) // unitPrice * quantity
+  unitPrice Decimal @db.Decimal(10, 2)
+  quantity  Int
+  lineTotal Decimal @db.Decimal(10, 2)
 
-  // Customizations snapshot
   customization Json?
   engravingText String?
   giftWrap      Boolean @default(false)
@@ -526,15 +522,13 @@ model OrderItem {
 }
 
 model OrderStatusHistory {
-  id      String @id @default(cuid())
-  orderId String
-
+  id             String       @id @default(cuid())
+  orderId        String
   previousStatus OrderStatus?
   newStatus      OrderStatus
-  changedBy      String   // userId (admin) or "SYSTEM" or "CUSTOMER"
+  changedBy      String
   note           String?
-
-  createdAt DateTime @default(now())
+  createdAt      DateTime     @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -543,15 +537,15 @@ model OrderStatusHistory {
 }
 
 model OrderAuditLog {
-  id         String         @id @default(cuid())
-  orderId    String
-  action     AuditAction
-  actorType  AuditActorType
-  actorId    String
-  details    Json?
-  createdAt  DateTime       @default(now())
+  id        String         @id @default(cuid())
+  orderId   String
+  action    AuditAction
+  actorType AuditActorType
+  actorId   String
+  details   Json?
+  createdAt DateTime       @default(now())
 
-  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@map("order_audit_logs")
@@ -568,4 +562,78 @@ model IdempotencyKey {
   expiresAt      DateTime
 
   @@map("idempotency_keys")
+}
+
+// ─────────────────────────────────────────────
+// Payment Models (Phase 5B)
+// ─────────────────────────────────────────────
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  provider          String        @default("RAZORPAY")
+
+  // Provider-specific identifiers
+  providerOrderId   String?       // Razorpay order_id (created on backend)
+  providerPaymentId String?       @unique // Razorpay payment_id — @unique prevents duplicate capture
+  providerSignature String?
+
+  // Financial
+  amount         Decimal @db.Decimal(10, 2)
+  currency       String  @default("INR")
+
+  // Status & method
+  status         PaymentStatus @default(PENDING)
+  method         String?       // card, upi, netbanking, wallet, cod
+  transactionFee Decimal?      @db.Decimal(10, 2)
+
+  // Failure tracking
+  failureReason String?
+  failureCode   String?
+
+  // Timing
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Raw provider response
+  metadata Json?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+  @@index([providerOrderId])
+  @@map("payments")
+}
+
+// ─────────────────────────────────────────────
+// Shipment Models (Phase 5B)
+// ─────────────────────────────────────────────
+
+model Shipment {
+  id             String         @id @default(cuid())
+  orderId        String         @unique
+  provider       String         @default("MOCK")
+
+  trackingNumber String?
+  carrier        String?
+  shippingMethod String?        @default("STANDARD")
+
+  status            ShipmentStatus @default(PENDING)
+
+  labelUrl          String?
+  estimatedDelivery DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+  @@map("shipments")
 }

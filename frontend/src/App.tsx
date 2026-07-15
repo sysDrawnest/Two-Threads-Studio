@@ -56,6 +56,8 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Membership = lazy(() => import('./pages/Membership'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Legal = lazy(() => import('./pages/Legal'));
+const CheckoutSuccess = lazy(() => import('./pages/checkout/CheckoutSuccess'));
+const CheckoutFailed = lazy(() => import('./pages/checkout/CheckoutFailed'));
 // const OurBrands = lazy(() => import('./pages/OurBrands'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -102,6 +104,8 @@ const StorefrontRoutes = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/success" element={<CheckoutSuccess />} />
+        <Route path="/checkout/failed" element={<CheckoutFailed />} />
         <Route path="/membership" element={<Membership />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/legal" element={<Legal />} />

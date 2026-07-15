@@ -4,6 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { useCart, useClearCart, Address, CartItem as CartItemType } from '../hooks/useCommerce';
 import { useCheckoutStore } from '../store/checkoutStore';
 import AddressSelector from '../components/commerce/AddressSelector';
+import { orderService } from '../services/orderService';
+import {
+  paymentService,
+  loadRazorpayScript,
+  openRazorpayPopup,
+} from '../services/paymentService';
+
 
 const Checkout: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -30,14 +37,11 @@ const Checkout: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [contactEmail, setContactEmail] = useState(user?.email || '');
 
-  // Payment Form States
-  const [paymentOption, setPaymentOption] = useState<'card' | 'upi'>('card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [upiId, setUpiId] = useState('');
+  const [paymentOption, setPaymentOption] = useState<'online' | 'cod'>('online');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState('');
   const [placedOrderId, setPlacedOrderId] = useState('');
+
 
   useEffect(() => {
     // If cart is empty, redirect to shop
@@ -80,54 +84,86 @@ const Checkout: React.FC = () => {
   };
 
   const handlePlaceOrder = async () => {
-    const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-    setPlacedOrderId(orderId);
-
-    // Save to localStorage (as a simulated place order flow for client verification)
-    const newOrder = {
-      id: orderId,
-      date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
-      status: 'Processing',
-      items: cartItems.map((item: CartItemType) => ({
-        id: item.id,
-        productId: item.productId,
-        productName: item.productName,
-        price: item.unitPrice,
-        quantity: item.quantity,
-        primaryImage: item.primaryImage,
-        customization: item.customization,
-        giftWrap: item.giftWrap,
-        engravingText: item.engravingText,
-      })),
-      shippingAddress: shippingInfo || {
-        fullName: selectedAddress?.fullName || '',
-        email: contactEmail,
-        addressLine1: selectedAddress?.line1 || '',
-        addressLine2: selectedAddress?.line2 || '',
-        city: selectedAddress?.city || '',
-        state: selectedAddress?.state || '',
-        zipCode: selectedAddress?.postalCode || '',
-        country: selectedAddress?.country || 'IN',
-      },
-      total: totals.grandTotal
-    };
-
-    try {
-      const storedOrders = localStorage.getItem('tt_orders');
-      const orders = storedOrders ? JSON.parse(storedOrders) : [];
-      orders.unshift(newOrder);
-      localStorage.setItem('tt_orders', JSON.stringify(orders));
-    } catch (err) {
-      console.error("Failed to save order", err);
+    if (!selectedAddress) {
+      alert('Please select a shipping address.');
+      return;
     }
-
+    setIsProcessing(true);
     try {
-      await clearCartMutation.mutateAsync();
-      setStep('confirmation');
+      // Step 1: Create order on the backend
+      setProcessingMessage('Creating your order…');
+      const order = await orderService.createOrder({
+        shippingAddressId: selectedAddress.id,
+        billingAddressId: selectedAddress.id,
+        paymentMethod: paymentOption === 'cod' ? 'COD' : 'ONLINE',
+        notes: undefined,
+      });
+
+      setPlacedOrderId(order.orderNumber);
+
+      if (paymentOption === 'cod') {
+        // COD: confirm directly
+        setProcessingMessage('Confirming COD order…');
+        await paymentService.confirmCodOrder(order.id);
+        await clearCartMutation.mutateAsync();
+        navigate(`/checkout/success?order=${order.orderNumber}`);
+        return;
+      }
+
+      // ONLINE: Razorpay flow
+      setProcessingMessage('Loading secure payment…');
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Failed to load Razorpay. Please check your internet connection.');
+      }
+
+      setProcessingMessage('Initiating payment…');
+      const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
+
+      // Step 2: Open Razorpay popup — result comes in handler callbacks
+      openRazorpayPopup({
+        key: razorpayOrder.keyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Two Threads Studio',
+        description: `Order ${order.orderNumber}`,
+        order_id: razorpayOrder.razorpayOrderId,
+        prefill: {
+          name: user?.firstName + ' ' + (user?.lastName || ''),
+          email: user?.email || contactEmail,
+        },
+        theme: { color: '#1C1C1B' },
+        handler: async (response) => {
+          try {
+            // Step 3: Verify signature server-side
+            setProcessingMessage('Verifying payment…');
+            await paymentService.verifyPayment(order.id, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            await clearCartMutation.mutateAsync();
+            navigate(`/checkout/success?order=${order.orderNumber}`);
+          } catch (err: any) {
+            navigate(`/checkout/failed?order=${order.orderNumber}`);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessing(false);
+            setProcessingMessage('');
+          },
+        },
+      });
     } catch (err: any) {
-      alert(err.message || 'Failed to complete order submission.');
+      const orderNum = placedOrderId;
+      navigate(`/checkout/failed${orderNum ? '?order=' + orderNum : ''}`);
+    } finally {
+      setIsProcessing(false);
+      setProcessingMessage('');
     }
   };
+
 
   if (currentStep === 'confirmation') {
     return (
