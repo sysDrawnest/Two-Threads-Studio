@@ -13,6 +13,8 @@ import {
   AuditActorType,
 } from '@prisma/client';
 import { eventDispatcher, OrderEvents } from '../events';
+import { riskService } from './risk.service';
+import { reviewQueueRepository } from '../repositories/review-queue.repository';
 import logger from '../lib/logger';
 
 export const orderService = {
@@ -75,6 +77,36 @@ export const orderService = {
     const cart = await cartService.getCart({ userId });
     if (!cart || cart.items.length === 0) {
       throw new AppError('Your cart is empty', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    // 2.5 Phase 5C: Risk Evaluation
+    const finalPaymentMethod = params.paymentMethod || PaymentMethod.ONLINE;
+    // Calculate estimated total for risk engine (discounts will be applied later, but subtotal is fine for risk thresholds)
+    let estimatedTotal = 0;
+    for (const item of cart.items) {
+      estimatedTotal += Number(item.unitPrice) * item.quantity;
+    }
+    const grandTotalEstimate = Math.max(0, estimatedTotal - (params.couponDiscount || 0));
+
+    const riskEval = await riskService.evaluateCheckout(userId, {
+      orderTotal: grandTotalEstimate,
+      paymentMethod: finalPaymentMethod,
+      cartItems: cart.items.map((i) => ({
+        productId: i.productId,
+        engravingText: i.engravingText,
+        customization: i.customization,
+      })),
+      shippingAddressId: params.shippingAddressId,
+    });
+
+    if (riskEval.decision === 'BLOCKED') {
+      throw new AppError(riskEval.userMessage || 'Blocked', HTTP_STATUS.FORBIDDEN);
+    }
+    if (riskEval.decision === 'PREPAID_ONLY' && finalPaymentMethod === 'COD') {
+      throw new AppError(riskEval.userMessage || 'Prepaid only', HTTP_STATUS.BAD_REQUEST);
+    }
+    if (riskEval.decision === 'REQUIRES_OTP') {
+      throw new AppError('OTP_REQUIRED: ' + (riskEval.userMessage || 'OTP needed'), HTTP_STATUS.PRECONDITION_REQUIRED);
     }
 
     // 3. Complete Transaction
@@ -170,13 +202,24 @@ export const orderService = {
           orderStatus: OrderStatus.PENDING,
           paymentStatus: PaymentStatus.PENDING,
           notes: params.notes,
-          paymentMethod: params.paymentMethod || PaymentMethod.ONLINE,
+          paymentMethod: finalPaymentMethod,
           couponCode: params.couponCode || null,
           couponDiscount: discount,
           promotionId: params.promotionId || null,
           couponType: params.couponType || null,
+          riskDecision: riskEval.decision,
+          requiresReview: riskEval.decision === 'MANUAL_REVIEW',
         },
       });
+
+      // If manual review is required, enqueue it
+      if (riskEval.decision === 'MANUAL_REVIEW') {
+        await reviewQueueRepository.enqueue({
+          orderId: order.id,
+          reason: riskEval.auditDetail || 'Manual review required',
+          riskScore: riskEval.trustScore,
+        });
+      }
 
       // Create Order Items
       await tx.orderItem.createMany({

@@ -1,5 +1,5 @@
 // Two Threads Studio — Prisma Schema
-// Phase 5B: Payment, Fulfillment, Notifications & Shipment
+// Phase 5C: Trust & Risk Management Engine
 
 generator client {
   provider = "prisma-client-js"
@@ -97,6 +97,14 @@ enum AuditAction {
   PAYMENT_FAILED
   REFUND_INITIATED
   SHIPMENT_CREATED
+  // Phase 5C
+  RISK_EVALUATED
+  TRUST_SCORE_UPDATED
+  ORDER_FLAGGED
+  ORDER_REVIEWED
+  OTP_SENT
+  OTP_VERIFIED
+  COD_BLOCKED
 }
 
 enum AuditActorType {
@@ -111,6 +119,48 @@ enum CouponType {
   FREE_SHIPPING
 }
 
+// Phase 5C enums
+
+enum RiskDecision {
+  APPROVED
+  REQUIRES_OTP
+  MANUAL_REVIEW
+  PREPAID_ONLY
+  BLOCKED
+}
+
+enum FraudFlagType {
+  MULTIPLE_FAILED_PAYMENTS
+  MULTIPLE_ACCOUNTS_SAME_PHONE
+  MULTIPLE_ACCOUNTS_SAME_ADDRESS
+  DISPOSABLE_EMAIL
+  TOO_MANY_ORDERS_TODAY
+  ADDRESS_MISMATCH
+  CHARGEBACK_HISTORY
+  REPEATED_CANCELLATIONS
+  SUSPICIOUS_PATTERN
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OtpPurpose {
+  FIRST_ORDER_VERIFICATION
+  COD_VERIFICATION
+  HIGH_VALUE_ORDER
+  PHONE_CHANGE
+  PHONE_REGISTRATION
+}
+
+enum ReturnEligibility {
+  FULL_RETURN
+  EXCHANGE_ONLY
+  NO_RETURN
+}
+
 // ─────────────────────────────────────────────
 // Authentication Models (Phase 2)
 // ─────────────────────────────────────────────
@@ -121,7 +171,10 @@ model User {
   lastName             String
   email                String    @unique
   passwordHash         String
+  /// Primary commerce identity — required for order fulfillment
   phone                String?
+  /// True after OTP or manual verification by admin
+  phoneVerified        Boolean   @default(false)
   avatarUrl            String?
   role                 Role      @default(CUSTOMER)
   isVerified           Boolean   @default(false)
@@ -139,12 +192,14 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  refreshTokens RefreshToken[]
-  reviews       Review[]
-  wishlist      Wishlist[]
-  addresses     Address[]
-  cart          Cart?
-  orders        Order[]
+  refreshTokens  RefreshToken[]
+  reviews        Review[]
+  wishlist       Wishlist[]
+  addresses      Address[]
+  cart           Cart?
+  orders         Order[]
+  customerRisk   CustomerRisk?
+  otpVerifications OtpVerification[]
 
   @@map("users")
 }
@@ -258,6 +313,9 @@ model Product {
   seoTitle       String?
   seoDescription String?
 
+  /// Phase 5C: false for personalized/custom products — enforced by CodEligibilityEngine
+  allowCod  Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -269,6 +327,7 @@ model Product {
   reviews    Review[]
   wishlist   Wishlist[]
   cartItems  CartItem[]
+  returnPolicy ReturnPolicy?
 
   @@index([status])
   @@index([featured])
@@ -439,7 +498,7 @@ model CartItem {
 }
 
 // ─────────────────────────────────────────────
-// Order Models (Phase 5A — extended in 5B)
+// Order Models (Phase 5A — extended in 5B/5C)
 // ─────────────────────────────────────────────
 
 model Order {
@@ -469,9 +528,18 @@ model Order {
 
   estimatedCompletionDate DateTime?
 
-  // Phase 5B: payment reference for quick lookup without joining payment table
+  // Phase 5B: payment reference
   paymentReference String?
   paidAt           DateTime?
+
+  // Phase 5C: risk & trust
+  riskDecision     RiskDecision?
+  riskScore        Int?
+  requiresReview   Boolean       @default(false)
+  otpVerified      Boolean       @default(false)
+  /// Prepaid discount applied as percentage (from PREPAID_DISCOUNT_PERCENT env)
+  prepaidDiscountPct Decimal?    @db.Decimal(5, 2)
+  prepaidDiscount    Decimal     @default(0) @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -485,10 +553,14 @@ model Order {
   auditLogs     OrderAuditLog[]
   payment       Payment?
   shipment      Shipment?
+  reviewQueue   ManualReviewQueue?
+  fraudFlags    FraudFlag[]
 
   @@index([userId])
   @@index([orderStatus])
   @@index([paymentStatus])
+  @@index([riskDecision])
+  @@index([requiresReview])
   @@index([createdAt(sort: Desc)])
   @@map("orders")
 }
@@ -573,30 +645,24 @@ model Payment {
   orderId           String        @unique
   provider          String        @default("RAZORPAY")
 
-  // Provider-specific identifiers
-  providerOrderId   String?       // Razorpay order_id (created on backend)
-  providerPaymentId String?       @unique // Razorpay payment_id — @unique prevents duplicate capture
+  providerOrderId   String?
+  providerPaymentId String?       @unique
   providerSignature String?
 
-  // Financial
   amount         Decimal @db.Decimal(10, 2)
   currency       String  @default("INR")
 
-  // Status & method
   status         PaymentStatus @default(PENDING)
-  method         String?       // card, upi, netbanking, wallet, cod
+  method         String?
   transactionFee Decimal?      @db.Decimal(10, 2)
 
-  // Failure tracking
   failureReason String?
   failureCode   String?
 
-  // Timing
   paidAt    DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  // Raw provider response
   metadata Json?
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -636,4 +702,124 @@ model Shipment {
   @@index([orderId])
   @@index([status])
   @@map("shipments")
+}
+
+// ─────────────────────────────────────────────
+// Risk & Trust Models (Phase 5C)
+// ─────────────────────────────────────────────
+
+/// One record per customer. Upserted on every order event.
+/// Trust score is CALCULATED from counters — never set manually (except admin override).
+model CustomerRisk {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Order outcome counters (source of trust score)
+  ordersPlaced      Int @default(0)
+  ordersDelivered   Int @default(0)
+  rtoCount          Int @default(0)
+  cancelledOrders   Int @default(0)
+  prepaidOrders     Int @default(0)
+  codOrders         Int @default(0)
+  chargebackCount   Int @default(0)
+  failedPayments    Int @default(0)
+
+  /// Computed from counters by TrustScoreEngine (0–100). Default 50 for new users.
+  trustScore Int @default(50)
+
+  // Restrictions
+  isBlocked     Boolean  @default(false)
+  blockReason   String?
+  /// If set, orders above this value require MANUAL_REVIEW
+  maxOrderValue Decimal? @db.Decimal(10, 2)
+
+  // Timestamps
+  lastRiskEvaluation DateTime?
+  lastOrderAt        DateTime?
+  /// Admin notes visible only in admin dashboard
+  adminNotes         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([trustScore])
+  @@index([isBlocked])
+  @@map("customer_risk")
+}
+
+/// OTP record — hashed OTP stored, max 3 attempts, 10-minute TTL
+model OtpVerification {
+  id        String     @id @default(cuid())
+  userId    String
+  /// Phone or email the OTP was sent to
+  recipient String
+  purpose   OtpPurpose
+  /// bcrypt-hashed OTP
+  otpHash   String
+  expiresAt DateTime
+  verified  Boolean    @default(false)
+  attempts  Int        @default(0)
+  createdAt DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([recipient, purpose])
+  @@map("otp_verifications")
+}
+
+/// Fraud signals detected by FraudDetector engine
+model FraudFlag {
+  id      String        @id @default(cuid())
+  userId  String?
+  orderId String?
+  type    FraudFlagType
+  details Json?
+  resolved  Boolean  @default(false)
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt DateTime @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([type])
+  @@index([resolved])
+  @@map("fraud_flags")
+}
+
+/// Orders that need admin review before fulfillment begins
+model ManualReviewQueue {
+  id         String       @id @default(cuid())
+  orderId    String       @unique
+  /// Comma-separated human-readable reasons
+  reason     String
+  riskScore  Int
+  status     ReviewStatus @default(PENDING)
+  reviewedBy String?
+  reviewedAt DateTime?
+  reviewNote String?
+  createdAt  DateTime     @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("manual_review_queue")
+}
+
+/// Per-product return/refund rules enforced by backend
+model ReturnPolicy {
+  id          String            @id @default(cuid())
+  productId   String            @unique
+  eligibility ReturnEligibility
+  windowDays  Int               @default(0)
+  /// Displayed to customer if they attempt a return
+  reason      String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("return_policies")
 }

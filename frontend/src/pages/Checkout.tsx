@@ -10,6 +10,8 @@ import {
   loadRazorpayScript,
   openRazorpayPopup,
 } from '../services/paymentService';
+import { riskService, CodEligibilityResponse } from '../services/riskService';
+
 
 
 const Checkout: React.FC = () => {
@@ -41,6 +43,15 @@ const Checkout: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState('');
   const [placedOrderId, setPlacedOrderId] = useState('');
+
+  // Phase 5C: Risk & Trust
+  const [codData, setCodData] = useState<CodEligibilityResponse | null>(null);
+  const [isCheckingCod, setIsCheckingCod] = useState(false);
+  
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState('');
 
 
   useEffect(() => {
@@ -77,10 +88,30 @@ const Checkout: React.FC = () => {
 
   const stepNumber = currentStep === 'cart' ? 1 : currentStep === 'shipping' ? 2 : currentStep === 'payment' ? 3 : 4;
   
-  const goToStep = (num: number) => {
+  const goToStep = async (num: number) => {
     if (num === 1) setStep('cart');
     if (num === 2) setStep('shipping');
-    if (num === 3) setStep('payment');
+    if (num === 3) {
+      setStep('payment');
+      setIsCheckingCod(true);
+      try {
+        const res = await riskService.checkCodEligibility(
+          totals.grandTotal, 
+          cartItems.map((item: any) => item.productId)
+        );
+        // Depending on apiClient, response data might be unwrapped
+        const data = (res as any).data || res;
+        setCodData(data as CodEligibilityResponse);
+        
+        if (data && !data.codEligible && paymentOption === 'cod') {
+          setPaymentOption('online');
+        }
+      } catch (e) {
+        console.error('Failed to check COD eligibility', e);
+      } finally {
+        setIsCheckingCod(false);
+      }
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -92,12 +123,13 @@ const Checkout: React.FC = () => {
     try {
       // Step 1: Create order on the backend
       setProcessingMessage('Creating your order…');
-      const order = await orderService.createOrder({
+      const orderRes: any = await orderService.createOrder({
         shippingAddressId: selectedAddress.id,
         billingAddressId: selectedAddress.id,
         paymentMethod: paymentOption === 'cod' ? 'COD' : 'ONLINE',
         notes: undefined,
       });
+      const order = orderRes.data || orderRes.order || orderRes;
 
       setPlacedOrderId(order.orderNumber);
 
@@ -129,7 +161,7 @@ const Checkout: React.FC = () => {
         description: `Order ${order.orderNumber}`,
         order_id: razorpayOrder.razorpayOrderId,
         prefill: {
-          name: user?.firstName + ' ' + (user?.lastName || ''),
+          name: (user as any)?.firstName ? (user as any).firstName + ' ' + ((user as any).lastName || '') : user?.name || '',
           email: user?.email || contactEmail,
         },
         theme: { color: '#1C1C1B' },
@@ -156,11 +188,87 @@ const Checkout: React.FC = () => {
         },
       });
     } catch (err: any) {
+      const errorMsg = err.response?.data?.message || err.message || '';
+      
+      // Phase 5C: Handle OTP required response
+      if (errorMsg.includes('OTP_REQUIRED')) {
+        setShowOtpModal(true);
+        // Send OTP automatically when modal opens
+        riskService.sendOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION').catch(console.error);
+        return; // Pause checkout process
+      }
+
       const orderNum = placedOrderId;
       navigate(`/checkout/failed${orderNum ? '?order=' + orderNum : ''}`);
     } finally {
-      setIsProcessing(false);
-      setProcessingMessage('');
+      if (!showOtpModal) {
+        setIsProcessing(false);
+        setProcessingMessage('');
+      }
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsVerifyingOtp(true);
+    setOtpError('');
+    try {
+      await riskService.verifyOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION', otpValue);
+      setShowOtpModal(false);
+      
+      // Resume place order directly without showing the modal again
+      setProcessingMessage('Resuming order...');
+      const orderRes: any = await orderService.createOrder({
+        shippingAddressId: selectedAddress!.id,
+        billingAddressId: selectedAddress!.id,
+        paymentMethod: paymentOption === 'cod' ? 'COD' : 'ONLINE',
+        notes: undefined,
+      });
+      const order = orderRes.data || orderRes.order || orderRes;
+
+      setPlacedOrderId(order.orderNumber);
+
+      if (paymentOption === 'cod') {
+        setProcessingMessage('Confirming COD order…');
+        await paymentService.confirmCodOrder(order.id);
+        await clearCartMutation.mutateAsync();
+        navigate(`/checkout/success?order=${order.orderNumber}`);
+        return;
+      }
+
+      setProcessingMessage('Initiating payment…');
+      const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
+      openRazorpayPopup({
+        key: razorpayOrder.keyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Two Threads Studio',
+        description: `Order ${order.orderNumber}`,
+        order_id: razorpayOrder.razorpayOrderId,
+        prefill: {
+          name: (user as any)?.firstName ? (user as any).firstName + ' ' + ((user as any).lastName || '') : user?.name || '',
+          email: user?.email || contactEmail,
+        },
+        theme: { color: '#1C1C1B' },
+        handler: async (response) => {
+          try {
+            setProcessingMessage('Verifying payment…');
+            await paymentService.verifyPayment(order.id, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            await clearCartMutation.mutateAsync();
+            navigate(`/checkout/success?order=${order.orderNumber}`);
+          } catch (err: any) {
+            navigate(`/checkout/failed?order=${order.orderNumber}`);
+          }
+        },
+      });
+
+    } catch (e: any) {
+      setOtpError(e.response?.data?.message || 'Invalid OTP');
+    } finally {
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -336,86 +444,63 @@ const Checkout: React.FC = () => {
                 <div className="grid grid-cols-2 border border-neutral-200 rounded-t-sm bg-[#FAF9F7]">
                   <button
                     type="button"
-                    onClick={() => setPaymentOption('card')}
+                    onClick={() => setPaymentOption('online')}
                     className={`py-3 font-sans text-xs uppercase tracking-wider border-none transition-all ${
-                      paymentOption === 'card' 
+                      paymentOption === 'online' 
                         ? 'bg-white font-semibold text-[#1C1C1B] border-r border-neutral-200' 
                         : 'bg-transparent text-neutral-400 hover:text-[#1C1C1B]'
                     }`}
                   >
-                    Credit / Debit Card
+                    Pay Online
+                    {codData && codData.prepaidDiscountPct > 0 && (
+                      <span className="ml-2 bg-[#1C1C1B] text-white text-[9px] px-1.5 py-0.5 rounded-sm">-{codData.prepaidDiscountPct}% OFF</span>
+                    )}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentOption('upi')}
-                    className={`py-3 font-sans text-xs uppercase tracking-wider border-none transition-all ${
-                      paymentOption === 'upi' 
+                    disabled={codData?.codEligible === false}
+                    onClick={() => codData?.codEligible !== false && setPaymentOption('cod')}
+                    className={`py-3 flex flex-col items-center justify-center font-sans text-xs uppercase tracking-wider border-none transition-all ${
+                      paymentOption === 'cod' 
                         ? 'bg-white font-semibold text-[#1C1C1B] border-l border-neutral-200' 
+                        : codData?.codEligible === false
+                        ? 'bg-neutral-100 text-neutral-300 cursor-not-allowed border-l border-neutral-200'
                         : 'bg-transparent text-neutral-400 hover:text-[#1C1C1B]'
                     }`}
                   >
-                    UPI Transfer
+                    <span>Cash on Delivery</span>
                   </button>
                 </div>
+                
+                {/* Reason for COD disabled */}
+                {codData && codData.codEligible === false && (
+                  <div className="bg-red-50 text-red-700 text-xs p-3 mt-4 border border-red-100 rounded-sm font-sans flex gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span>{codData.reason || 'COD is not available for this order.'}</span>
+                  </div>
+                )}
 
                 {/* Method fields */}
                 <div className="border border-t-0 border-neutral-200 p-6 bg-white rounded-b-sm mb-8 flex flex-col gap-4">
-                  {paymentOption === 'card' ? (
-                    <>
-                      <div className="flex flex-col gap-1">
-                        <label className="font-sans text-[9px] uppercase tracking-wider text-neutral-400">Card Number</label>
-                        <input 
-                          type="text" 
-                          value={cardNumber}
-                          onChange={e => setCardNumber(e.target.value)}
-                          placeholder="4242 •••• •••• 4242" 
-                          className="w-full p-2.5 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-white text-sm font-mono" 
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="font-sans text-[9px] uppercase tracking-wider text-neutral-400">Cardholder Name</label>
-                        <input 
-                          type="text" 
-                          value={cardName}
-                          onChange={e => setCardName(e.target.value)}
-                          placeholder="Julia Hampton" 
-                          className="w-full p-2.5 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-white text-sm" 
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 font-mono">
-                        <div className="flex flex-col gap-1">
-                          <label className="font-sans text-[9px] uppercase tracking-wider text-neutral-400">Expiration (MM/YY)</label>
-                          <input 
-                            type="text" 
-                            value={expiry}
-                            onChange={e => setExpiry(e.target.value)}
-                            placeholder="12/28" 
-                            className="w-full p-2.5 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-white text-sm" 
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <label className="font-sans text-[9px] uppercase tracking-wider text-neutral-400">CVV</label>
-                          <input 
-                            type="password" 
-                            maxLength={3}
-                            value={cvv}
-                            onChange={e => setCvv(e.target.value)}
-                            placeholder="•••" 
-                            className="w-full p-2.5 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-white text-sm" 
-                          />
-                        </div>
-                      </div>
-                    </>
+                  {paymentOption === 'online' ? (
+                    <div className="flex flex-col gap-4 items-center justify-center p-6 text-center text-neutral-500 font-sans text-xs">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mb-2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      </svg>
+                      <p>You will be redirected to Razorpay securely to complete your online payment using UPI, Credit/Debit Card, Netbanking, or Wallets.</p>
+                      {codData && codData.prepaidDiscountAmount > 0 && (
+                        <p className="text-[#A34A38] font-semibold text-sm">
+                          Save ₹{codData.prepaidDiscountAmount} by paying online today!
+                        </p>
+                      )}
+                    </div>
                   ) : (
-                    <div className="flex flex-col gap-1 font-mono">
-                      <label className="font-sans text-[9px] uppercase tracking-wider text-neutral-400">UPI Address (VPA)</label>
-                      <input 
-                        type="text" 
-                        value={upiId}
-                        onChange={e => setUpiId(e.target.value)}
-                        placeholder="julia@okhdfcbank" 
-                        className="w-full p-2.5 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-white text-sm" 
-                      />
+                    <div className="flex flex-col gap-4 items-center justify-center p-6 text-center text-neutral-500 font-sans text-xs">
+                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mb-2">
+                         <line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                       </svg>
+                       <p>You can pay via Cash or UPI when the package is delivered to your door.</p>
+                       <p className="italic text-neutral-400">Please keep the exact change ready.</p>
                     </div>
                   )}
                 </div>
@@ -502,10 +587,84 @@ const Checkout: React.FC = () => {
           <span className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">Total Price</span>
           <span className="font-sans text-2xl font-bold">
             <span className="text-xs text-neutral-400 mr-2 font-normal font-mono">INR</span>
-            <span className="font-mono">₹{(stepNumber >= 2 ? totals.grandTotal : totals.subtotal).toLocaleString()}</span>
+            <span className="font-mono">
+              ₹{(paymentOption === 'online' && codData && codData.prepaidDiscountAmount > 0 
+                  ? (stepNumber >= 2 ? totals.grandTotal : totals.subtotal) - codData.prepaidDiscountAmount 
+                  : (stepNumber >= 2 ? totals.grandTotal : totals.subtotal)
+                ).toLocaleString()}
+            </span>
           </span>
         </div>
       </div>
+
+      {/* Processing Overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+          <div className="w-12 h-12 border-2 border-neutral-200 border-t-[#A34A38] rounded-full animate-spin mb-6"></div>
+          <p className="font-sans text-sm tracking-widest uppercase text-[#1C1C1B] font-semibold">{processingMessage}</p>
+        </div>
+      )}
+
+      {/* OTP Verification Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-[#1C1C1B]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white max-w-md w-full p-8 rounded-sm shadow-xl flex flex-col items-center relative">
+            <button 
+              type="button" 
+              onClick={() => {
+                setShowOtpModal(false);
+                setIsProcessing(false);
+              }}
+              className="absolute top-4 right-4 bg-transparent border-none text-neutral-400 hover:text-[#1C1C1B] cursor-pointer"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="mb-4">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+
+            <h3 className="font-serif text-2xl text-[#1C1C1B] mb-2 text-center">Verify Your Account</h3>
+            <p className="text-sm text-neutral-500 text-center mb-8 font-sans">
+              To ensure the security of your high-value or COD order, we've sent a verification code to <span className="font-semibold text-[#1C1C1B]">{(user as any)?.phone || contactEmail}</span>.
+            </p>
+
+            {otpError && (
+              <div className="w-full bg-red-50 text-red-700 text-xs p-3 mb-6 border border-red-100 rounded-sm font-sans text-center">
+                {otpError}
+              </div>
+            )}
+
+            <div className="w-full flex flex-col gap-6">
+              <input 
+                type="text" 
+                value={otpValue}
+                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="Enter 6-digit code"
+                className="w-full p-4 border border-neutral-300 focus:border-[#A34A38] text-center tracking-[0.5em] text-lg font-mono rounded-sm outline-none"
+              />
+
+              <button
+                type="button"
+                onClick={handleVerifyOtp}
+                disabled={otpValue.length !== 6 || isVerifyingOtp}
+                className="w-full bg-[#1C1C1B] text-white py-4 font-sans text-xs uppercase tracking-widest font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors rounded-sm"
+              >
+                {isVerifyingOtp ? 'Verifying...' : 'Verify & Continue'}
+              </button>
+            </div>
+            
+            <button 
+              type="button" 
+              onClick={() => riskService.sendOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION')}
+              className="mt-6 text-xs font-sans uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] underline underline-offset-4 bg-transparent border-none cursor-pointer"
+            >
+              Resend Code
+            </button>
+          </div>
+        </div>
+      )}
+
 
     </div>
   );

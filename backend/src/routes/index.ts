@@ -45,4 +45,11 @@ import adminPaymentRoutes from './admin-payment.routes';
 router.use('/payments',       paymentRoutes);
 router.use('/admin/payments', adminPaymentRoutes);
 
+// Trust & Risk Management (Phase 5C)
+import { riskRoutes, adminRiskRoutes } from './risk.routes';
+
+router.use('/risk',       riskRoutes);
+router.use('/admin/risk', adminRiskRoutes);
+
 export default router;
+
