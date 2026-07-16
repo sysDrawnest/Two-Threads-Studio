@@ -18,16 +18,16 @@ const startServer = async () => {
     // Start Express server
     const server = app.listen(env.PORT, () => {
       if (env.NODE_ENV === 'development') {
-        const border = '═'.repeat(60);
+        const border = '-'.repeat(60);
         const dateStr = new Date().toLocaleString('en-IN', { hour12: false });
         console.log(`
-\x1b[36m╔${border}╗
-║                                                            ║
-║                 \x1b[1mTWO THREADS STUDIO API\x1b[0m\x1b[36m                     ║
-║                                                            ║
-║        Premium Commerce Backend v1.0.0                     ║
-║                                                            ║
-╚${border}╝\x1b[0m
+\x1b[36m+${border}+
+|                                                            |
+|                 \x1b[1mTWO THREADS STUDIO API\x1b[0m\x1b[36m                     |
+|                                                            |
+|        Premium Commerce Backend v1.0.0                     |
+|                                                            |
++${border}+\x1b[0m
 
 \x1b[1mEnvironment\x1b[0m      : ${env.NODE_ENV}
 \x1b[1mNode\x1b[0m             : ${process.version}
@@ -40,15 +40,15 @@ const startServer = async () => {
 \x1b[1mOrder Engine\x1b[0m     : Enabled
 \x1b[1mStarted\x1b[0m          : ${dateStr}
 
-\x1b[36m────────────────────────────────────────────────────────────\x1b[0m
+\x1b[36m------------------------------------------------------------\x1b[0m
 
-\x1b[32m✓ Connected to PostgreSQL\x1b[0m
-\x1b[32m✓ Prisma Client Initialized\x1b[0m
-\x1b[32m✓ Event Listeners Registered\x1b[0m
-\x1b[32m✓ Routes Loaded\x1b[0m
-\x1b[32m✓ Server Ready\x1b[0m
+\x1b[32m[OK] Connected to PostgreSQL\x1b[0m
+\x1b[32m[OK] Prisma Client Initialized\x1b[0m
+\x1b[32m[OK] Event Listeners Registered\x1b[0m
+\x1b[32m[OK] Routes Loaded\x1b[0m
+\x1b[32m[OK] Server Ready\x1b[0m
 
-\x1b[36m────────────────────────────────────────────────────────────\x1b[0m
+\x1b[36m------------------------------------------------------------\x1b[0m
 `);
       } else {
         logger.info(`🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);

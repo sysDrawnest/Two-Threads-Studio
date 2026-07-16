@@ -46,10 +46,10 @@ export const formatBusinessEvent = (log: any) => {
 
   if (type === 'order_created') {
     return `
-🛒 ${colors.bold}${colors.yellow}ORDER CREATED${colors.reset}
+[ORDER CREATED] ${colors.bold}${colors.yellow}NEW ORDER PLACED${colors.reset}
 Order No      : ${log.orderNo}
 Customer      : ${log.customer}
-Amount        : ₹${log.amount}
+Amount        : INR ${log.amount}
 Payment       : ${log.payment}
 Risk          : ${log.risk}
 `;
@@ -57,31 +57,31 @@ Risk          : ${log.risk}
 
   if (type === 'payment_verified') {
     return `
-💳 ${colors.bold}${colors.green}PAYMENT VERIFIED${colors.reset}
+[PAYMENT VERIFIED] ${colors.bold}${colors.green}PAYMENT TRANSACTION CONFIRMED${colors.reset}
 Order         : ${log.orderNo}
 Gateway       : ${log.gateway}
 Transaction   : ${log.transaction}
-Amount        : ₹${log.amount}
+Amount        : INR ${log.amount}
 Status        : ${log.status}
 `;
   }
 
   if (type === 'payment_error') {
     return `
-\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-❌ PAYMENT ERROR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+------------------------------------------------------------
+[PAYMENT ERROR] TRANSACTION FAILURE
+------------------------------------------------------------
 Order         : ${log.orderNo}
 Provider      : ${log.provider}
 Message       : ${log.message}
 Time          : ${new Date().toLocaleTimeString('en-IN', { hour12: false })}
-\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+------------------------------------------------------------
 `;
   }
 
   if (type === 'order_shipped') {
     return `
-📦 ${colors.bold}${colors.blue}ORDER SHIPPED${colors.reset}
+[ORDER SHIPPED] ${colors.bold}${colors.blue}PACKAGE SENT TO COURIER${colors.reset}
 Order         : ${log.orderNo}
 Courier       : ${log.courier}
 Tracking      : ${log.tracking}
@@ -92,7 +92,7 @@ Status        : ${log.status}
   if (type === 'risk_analysis') {
     const scoreColor = log.trustScore >= 75 ? colors.green : log.trustScore >= 40 ? colors.yellow : colors.red;
     return `
-🛡 ${colors.bold}${colors.magenta}RISK ANALYSIS${colors.reset}
+[RISK ANALYSIS] ${colors.bold}${colors.magenta}TRUST & FRAUD ENGINE RUN${colors.reset}
 Customer      : ${log.customer}
 Trust Score   : ${scoreColor}${log.trustScore}${colors.reset}
 COD           : ${log.cod}
@@ -102,7 +102,7 @@ Decision      : ${log.decision === 'APPROVED' ? `${colors.green}APPROVED${colors
 
   if (type === 'email_sent') {
     return `
-📨 ${colors.bold}${colors.cyan}EMAIL SENT${colors.reset}
+[EMAIL SENT] ${colors.bold}${colors.cyan}NOTIFICATION DISPATCHED${colors.reset}
 Template      : ${log.template}
 Recipients    : ${log.recipients}
 Status        : ${log.status === 'SUCCESS' ? `${colors.green}SUCCESS${colors.reset}` : `${colors.red}FAILED${colors.reset}`}
@@ -112,7 +112,7 @@ Time          : ${log.time} ms
 
   if (type === 'login_success') {
     return `
-🔐 ${colors.bold}${colors.green}LOGIN SUCCESS${colors.reset}
+[LOGIN SUCCESS] ${colors.bold}${colors.green}SESSION ESTABLISHED${colors.reset}
 Role          : ${log.role}
 Email         : ${log.email}
 IP            : ${log.ip}
@@ -121,7 +121,7 @@ IP            : ${log.ip}
 
   if (type === 'login_failed') {
     return `
-🔐 ${colors.bold}${colors.red}LOGIN FAILED${colors.reset}
+[LOGIN FAILED] ${colors.bold}${colors.red}AUTHENTICATION REJECTED${colors.reset}
 Email         : ${log.email}
 Reason        : ${log.reason}
 `;
@@ -129,7 +129,7 @@ Reason        : ${log.reason}
 
   if (type === 'database_query') {
     return `
-🗄 ${colors.bold}${colors.blue}DATABASE${colors.reset}
+[DATABASE] ${colors.bold}${colors.blue}QUERY EXECUTED${colors.reset}
 Query         : ${log.query}
 Duration      : ${log.duration} ms
 `;
@@ -137,7 +137,7 @@ Duration      : ${log.duration} ms
 
   if (type === 'slow_query') {
     return `
-⚠ ${colors.bold}${colors.red}SLOW QUERY${colors.reset}
+[SLOW QUERY] ${colors.bold}${colors.red}DATABASE LATENCY WARNING${colors.reset}
 Duration      : ${colors.red}${colors.bold}${log.duration} ms${colors.reset}
 Route         : ${log.route}
 `;
@@ -145,7 +145,7 @@ Route         : ${log.route}
 
   if (type === 'low_stock') {
     return `
-⚠ ${colors.bold}${colors.yellow}LOW STOCK${colors.reset}
+[LOW STOCK] ${colors.bold}${colors.yellow}INVENTORY DEPLTETION WARNING${colors.reset}
 Product       : ${log.product}
 Remaining     : ${colors.red}${log.remaining}${colors.reset}
 Threshold     : ${log.threshold}
@@ -154,7 +154,7 @@ Threshold     : ${log.threshold}
 
   if (type === 'customer_registered') {
     return `
-✓ ${colors.bold}${colors.green}Customer Registered${colors.reset}
+[CUSTOMER REGISTERED] ${colors.bold}${colors.green}NEW ACCOUNT CREATED${colors.reset}
 Email         : ${log.email}
 ID            : ${log.userId}
 `;
@@ -170,9 +170,9 @@ export const formatErrorLog = (log: any) => {
   const time = new Date().toLocaleTimeString('en-IN', { hour12: false });
 
   let output = `
-\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-❌ ${name.toUpperCase()}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m
+------------------------------------------------------------
+[ERROR] ${name.toUpperCase()} OCCURRED
+------------------------------------------------------------
 Message       : ${errMsg}
 Time          : ${time}
 `;
@@ -180,7 +180,7 @@ Time          : ${time}
   if (env.NODE_ENV === 'development' && errStack) {
     output += `\nStack:\n${colors.dim}${errStack}${colors.reset}\n`;
   }
-  output += `\x1b[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n`;
+  output += `------------------------------------------------------------\n`;
 
   return output;
 };

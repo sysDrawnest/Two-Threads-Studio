@@ -7,7 +7,7 @@ let logger: pino.Logger;
 if (loggerConfig.pretty) {
   const prettyStream = pretty({
     colorize: true,
-    ignore: 'pid,hostname',
+    ignore: 'pid,hostname,type,req,res,responseTime,userRole,userEmail,duration,route,query,role,email,ip,reason,orderNo,customer,amount,payment,risk,gateway,transaction,status,provider,message,product,remaining,threshold,template,recipients,time,userId,err,error,msg,path',
     translateTime: 'SYS:standard',
     messageFormat: (log: any, messageKey: string) => {
       // 1. Check if it's an error log (fatal/error levels or contains error objects)
