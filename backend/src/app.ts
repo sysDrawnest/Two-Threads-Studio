@@ -9,6 +9,7 @@ import { randomUUID } from 'crypto';
 import { corsConfig } from './config/cors';
 import { limiter } from './config/rateLimit';
 import { swaggerConfig } from './config/swagger';
+import { env } from './config/env';
 import logger from './lib/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
@@ -60,6 +61,33 @@ app.use(
     },
     autoLogging: {
       ignore: (req) => req.url === `${BASE_API_PATH}/health` || req.url === '/',
+    },
+    customProps: (req) => {
+      return {
+        userRole: (req as any).user?.role || 'Guest',
+        userEmail: (req as any).user?.email || null,
+      };
+    },
+    serializers: {
+      req: (req: any) => {
+        const rawReq = req.raw || req;
+        const serialized: any = {
+          method: rawReq.method,
+          url: rawReq.url,
+          remoteAddress: rawReq.socket?.remoteAddress || rawReq.ip || '::1',
+        };
+        if (env.LOG_HTTP_BODY && rawReq.body) {
+          const bodyCopy = { ...rawReq.body };
+          if (bodyCopy.password) bodyCopy.password = '******';
+          if (bodyCopy.newPassword) bodyCopy.newPassword = '******';
+          if (bodyCopy.currentPassword) bodyCopy.currentPassword = '******';
+          serialized.body = bodyCopy;
+        }
+        if (env.LOG_HEADERS) {
+          serialized.headers = rawReq.headers;
+        }
+        return serialized;
+      },
     },
   })
 );

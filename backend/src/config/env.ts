@@ -17,6 +17,10 @@ const envSchema = z.object({
   RAZORPAY_KEY_ID: z.string().min(1),
   RAZORPAY_SECRET: z.string().min(1),
   FRONTEND_URL: z.string().url(),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  LOG_HTTP_BODY: z.string().default('false').transform((v) => v === 'true'),
+  LOG_HEADERS: z.string().default('false').transform((v) => v === 'true'),
+  LOG_PRETTY: z.string().default('true').transform((v) => v === 'true'),
 });
 
 const _env = envSchema.safeParse(process.env);

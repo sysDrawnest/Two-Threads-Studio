@@ -73,9 +73,22 @@ const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
     if (productIds.length > 0) {
       products = await prisma.product.findMany({
         where: { id: { in: productIds } },
-        select: { id: true, stockQuantity: true, lowStockThreshold: true }
+        select: { id: true, name: true, stockQuantity: true, lowStockThreshold: true }
       });
     }
+    
+    // Log low stock warnings
+    products.forEach((p) => {
+      const threshold = p.lowStockThreshold || 5;
+      if (p.stockQuantity <= threshold) {
+        logger.warn({
+          type: 'low_stock',
+          product: p.name,
+          remaining: p.stockQuantity,
+          threshold,
+        });
+      }
+    });
     
     const enrichedOrder = {
       ...order,
@@ -85,7 +98,8 @@ const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
       })) || []
     };
 
-    await Promise.allSettled(adminEmails.map(email => 
+    const startTime = Date.now();
+    const results = await Promise.allSettled(adminEmails.map(email => 
       emailService.send({
         to: email,
         subject,
@@ -93,6 +107,16 @@ const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
         attachments,
       })
     ));
+    const duration = Date.now() - startTime;
+    const sentCount = results.filter(r => r.status === 'fulfilled').length;
+
+    logger.info({
+      type: 'email_sent',
+      template: 'Admin Order Notification',
+      recipients: adminEmails.length,
+      status: sentCount > 0 ? 'SUCCESS' : 'FAILED',
+      time: duration,
+    });
   } catch (err) {
     logger.error({ err, orderId: order.id }, 'Failed to send admin order notification email');
   }

@@ -7,7 +7,14 @@ import { AuditAction, AuditActorType } from '@prisma/client';
 
 // Listen to order.created
 eventDispatcher.on(OrderEvents.CREATED, (order: any) => {
-  logger.info({ orderId: order.id, orderNumber: order.orderNumber }, 'Event Listener: order.created');
+  logger.info({
+    type: 'order_created',
+    orderNo: order.orderNumber,
+    customer: `${order.user?.firstName || ''} ${order.user?.lastName || ''}`.trim() || 'Guest',
+    amount: Number(order.grandTotal),
+    payment: order.paymentMethod,
+    risk: (order.user?.customerRisk?.trustScore ?? 100) < 40 ? 'HIGH' : 'LOW',
+  });
   orderNotifications.onOrderCreated(order).catch((err) => {
     logger.error({ err }, 'Failed to process order creation notification');
   });

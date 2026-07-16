@@ -1,6 +1,40 @@
 import pino from 'pino';
-import { loggerConfig } from '../config/logger';
+import pretty from 'pino-pretty';
+import { loggerConfig, formatHTTPLog, formatBusinessEvent, formatErrorLog } from '../config/logger';
 
-const logger = pino(loggerConfig);
+let logger: pino.Logger;
+
+if (loggerConfig.pretty) {
+  const prettyStream = pretty({
+    colorize: true,
+    ignore: 'pid,hostname',
+    translateTime: 'SYS:standard',
+    messageFormat: (log: any, messageKey: string) => {
+      // 1. Check if it's an error log (fatal/error levels or contains error objects)
+      const isErrorLog = log.level >= 50 || log.err || log.error;
+      if (isErrorLog && log.type !== 'payment_error') {
+        return formatErrorLog(log);
+      }
+
+      // 2. Check if it's an HTTP request log
+      if (log.req) {
+        return formatHTTPLog(log);
+      }
+
+      // 3. Check if it's a structured business event
+      if (log.type) {
+        const formatted = formatBusinessEvent(log);
+        if (formatted) return formatted;
+      }
+
+      // 4. Fallback to normal message formatting
+      return log[messageKey] || '';
+    },
+  });
+
+  logger = pino({ level: loggerConfig.level }, prettyStream);
+} else {
+  logger = pino({ level: loggerConfig.level });
+}
 
 export default logger;
