@@ -269,7 +269,16 @@ export const orderService = {
       return tx.order.findUnique({
         where: { id: order.id },
         include: {
-          items: true,
+          items: {
+            include: {
+              product: {
+                select: {
+                  stockQuantity: true,
+                  lowStockThreshold: true,
+                },
+              },
+            },
+          },
           statusHistory: {
             orderBy: { createdAt: 'asc' },
           },
