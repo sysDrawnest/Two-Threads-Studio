@@ -21,6 +21,7 @@ import { deliveredTemplate } from '../email/templates/delivered';
 import { refundInitiatedTemplate } from '../email/templates/refund-initiated';
 
 import { adminNewOrderTemplate } from '../email/templates/admin-new-order';
+import prisma from '../prisma';
 
 function getCustomerEmail(order: any): string | null {
   return order.user?.email || null;
@@ -43,15 +44,55 @@ const sendCustomerOrderConfirmation = async (order: any, attachments?: any[]) =>
 };
 
 const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'sethysaiyangyadatta@gmail.com';
+  const adminEmailsStr = process.env.ADMIN_NOTIFICATION_EMAILS || 'sethysaiyangyadatta@gmail.com,shreyasisahoo116@gmail.com';
+  const adminEmails = adminEmailsStr.split(',').map(e => e.trim()).filter(Boolean);
   
+  const highValueThreshold = parseInt(process.env.HIGH_VALUE_ORDER_THRESHOLD_INR || '5000', 10);
+  const isHighValue = Number(order.grandTotal) >= highValueThreshold;
+  
+  const customerRisk = order.user?.customerRisk || {};
+  const isHighRisk = (customerRisk.trustScore ?? 50) < 40;
+
+  let subject = '';
+  const priceFormatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(order.grandTotal);
+  
+  if (order.paymentMethod === 'COD' && isHighRisk) {
+    subject = `🔴 COD HIGH RISK • Order #${order.orderNumber} • ${priceFormatted}`;
+  } else if (isHighValue) {
+    subject = `🚨 HIGH VALUE ORDER • Order #${order.orderNumber} • ${priceFormatted}`;
+  } else if (order.paymentMethod === 'PREPAID' || order.paymentMethod === 'ONLINE') {
+    subject = `🟢 PREPAID • Order #${order.orderNumber} • ${priceFormatted}`;
+  } else {
+    subject = `🟠 COD • Order #${order.orderNumber} • ${priceFormatted}`;
+  }
+
   try {
-    await emailService.send({
-      to: adminEmail,
-      subject: `🧵 New Order ${order.orderNumber}`,
-      html: adminNewOrderTemplate(order),
-      attachments,
-    });
+    // Fetch stock quantities for inventory warning
+    const productIds = order.items?.map((i: any) => i.productId).filter(Boolean) || [];
+    let products: any[] = [];
+    if (productIds.length > 0) {
+      products = await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, stockQuantity: true, lowStockThreshold: true }
+      });
+    }
+    
+    const enrichedOrder = {
+      ...order,
+      items: order.items?.map((item: any) => ({
+        ...item,
+        product: products.find(p => p.id === item.productId)
+      })) || []
+    };
+
+    await Promise.allSettled(adminEmails.map(email => 
+      emailService.send({
+        to: email,
+        subject,
+        html: adminNewOrderTemplate(enrichedOrder),
+        attachments,
+      })
+    ));
   } catch (err) {
     logger.error({ err, orderId: order.id }, 'Failed to send admin order notification email');
   }
