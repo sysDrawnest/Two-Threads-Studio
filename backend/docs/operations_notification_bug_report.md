@@ -10,7 +10,7 @@
 **Actual Result:** The layout breaks and elements stack chaotically.  
 **Root Cause:** The `admin-new-order.ts` template uses `<div style="display: flex; gap: 16px;">` for the product rows. The `flex` and `gap` properties have notoriously poor support across major email clients.  
 **Suggested Fix:** Refactor the product item row into a classic HTML `<table>` with `<td>` padding instead of relying on modern CSS flexbox.  
-**Status:** Open  
+**Status:** Resolved  
 
 ---
 
@@ -23,7 +23,7 @@
 **Actual Result:** Only the total price (`formatCurrency(item.lineTotal)`) is shown.  
 **Root Cause:** The `unitPrice` field from `item.unitPrice` was omitted from the template string.  
 **Suggested Fix:** Update the item row template to include `${formatCurrency(item.unitPrice)} x ${item.quantity}`.  
-**Status:** Open  
+**Status:** Resolved  
 
 ---
 
@@ -48,4 +48,4 @@ user: {
   } 
 }
 ```  
-**Status:** Open  
+**Status:** Resolved  

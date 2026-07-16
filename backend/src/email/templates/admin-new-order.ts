@@ -44,20 +44,24 @@ export function adminNewOrderTemplate(order: any): string {
         : '';
 
       return `
-      <div style="display: flex; gap: 16px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #eee;">
-        ${item.productImage ? `<img src="${item.productImage}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;" alt="Product"/>` : ''}
-        <div style="flex: 1;">
-          <strong style="font-size:16px;color:#1C1C1B;">${item.productName}</strong><br/>
-          <span style="color:#6B6B6B;font-size:14px;">Qty: ${item.quantity}</span><br/>
-          <strong style="color:#A34A38;font-size:14px;">${formatCurrency(item.lineTotal)}</strong>
-          ${item.variantName ? `<br/><span style="color:#444;font-size:13px;display:inline-block;margin-top:4px;">Variant: <strong>${item.variantName}</strong></span>` : ''}
-          ${item.sku ? `<br/><span style="color:#444;font-size:13px;">SKU: ${item.sku}</span>` : ''}
-          ${item.customization?.hoopFinish ? `<br/><span style="color:#444;font-size:13px;">Hoop: <strong>${item.customization.hoopFinish}</strong></span>` : ''}
-          ${item.engravingText ? `<br/><span style="color:#A34A38;font-size:13px;font-weight:bold;">Engraved: "${item.engravingText}"</span>` : ''}
-          ${item.giftWrap ? `<br/><span style="color:#A34A38;font-size:13px;font-weight:bold;">🎁 Gift Wrap Requested</span>` : ''}
-          ${inventoryWarning}
-        </div>
-      </div>`;
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-bottom: 1px solid #eee; margin-bottom: 24px; border-collapse: collapse;">
+        <tr>
+          <td style="width: 96px; vertical-align: top; padding-right: 16px; padding-bottom: 24px;">
+            ${item.productImage ? `<img src="${item.productImage}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block;" alt="Product"/>` : ''}
+          </td>
+          <td style="vertical-align: top; padding-bottom: 24px;">
+            <strong style="font-size:16px;color:#1C1C1B;">${item.productName}</strong><br/>
+            <span style="color:#6B6B6B;font-size:14px;">Qty: ${item.quantity}</span><br/>
+            <strong style="color:#A34A38;font-size:14px;">${formatCurrency(item.unitPrice || item.lineTotal / item.quantity)} × ${item.quantity} = ${formatCurrency(item.lineTotal)}</strong>
+            ${item.variantName ? `<br/><span style="color:#444;font-size:13px;display:inline-block;margin-top:4px;">Variant: <strong>${item.variantName}</strong></span>` : ''}
+            ${item.sku ? `<br/><span style="color:#444;font-size:13px;">SKU: ${item.sku}</span>` : ''}
+            ${item.customization?.hoopFinish ? `<br/><span style="color:#444;font-size:13px;">Hoop: <strong>${item.customization.hoopFinish}</strong></span>` : ''}
+            ${item.engravingText ? `<br/><span style="color:#A34A38;font-size:13px;font-weight:bold;">Engraved: "${item.engravingText}"</span>` : ''}
+            ${item.giftWrap ? `<br/><span style="color:#A34A38;font-size:13px;font-weight:bold;">🎁 Gift Wrap Requested</span>` : ''}
+            ${inventoryWarning}
+          </td>
+        </tr>
+      </table>`;
     })
     .join('');
 

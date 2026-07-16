@@ -276,7 +276,11 @@ export const orderService = {
           shippingAddress: true,
           billingAddress: true,
           user: {
-            include: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+              phone: true,
               customerRisk: true,
             },
           },
