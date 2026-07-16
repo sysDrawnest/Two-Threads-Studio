@@ -20,9 +20,42 @@ import { orderShippedTemplate } from '../email/templates/order-shipped';
 import { deliveredTemplate } from '../email/templates/delivered';
 import { refundInitiatedTemplate } from '../email/templates/refund-initiated';
 
+import { adminNewOrderTemplate } from '../email/templates/admin-new-order';
+
 function getCustomerEmail(order: any): string | null {
   return order.user?.email || null;
 }
+
+const sendCustomerOrderConfirmation = async (order: any, attachments?: any[]) => {
+  const email = getCustomerEmail(order);
+  if (!email) return;
+
+  try {
+    await emailService.send({
+      to: email,
+      subject: `Order Confirmation — ${order.orderNumber}`,
+      html: orderConfirmationTemplate(order),
+      attachments,
+    });
+  } catch (err) {
+    logger.error({ err, orderId: order.id }, 'Failed to send customer order confirmation email');
+  }
+};
+
+const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'sethysaiyangyadatta@gmail.com';
+  
+  try {
+    await emailService.send({
+      to: adminEmail,
+      subject: `🧵 New Order ${order.orderNumber}`,
+      html: adminNewOrderTemplate(order),
+      attachments,
+    });
+  } catch (err) {
+    logger.error({ err, orderId: order.id }, 'Failed to send admin order notification email');
+  }
+};
 
 export const orderNotifications = {
   // ───── Order lifecycle ─────────────────────────────────────────────────────
@@ -30,32 +63,23 @@ export const orderNotifications = {
   onOrderCreated: async (order: any): Promise<void> => {
     logger.info({ orderId: order.id, orderNumber: order.orderNumber }, '🔔 Notification: order.created');
 
-    const email = getCustomerEmail(order);
-    if (!email) return;
-
+    let attachments: Array<{ filename: string; content: Buffer; contentType: string }> | undefined;
     try {
-      // Generate PDF invoice and attach it
-      let attachments: Array<{ filename: string; content: Buffer; contentType: string }> | undefined;
-      try {
-        const pdfBytes = await invoiceService.generateInvoicePdf(order);
-        attachments = [{
-          filename: `invoice_${order.orderNumber}.pdf`,
-          content: Buffer.from(pdfBytes),
-          contentType: 'application/pdf',
-        }];
-      } catch (pdfErr) {
-        logger.warn({ pdfErr }, 'PDF invoice generation failed; sending email without attachment');
-      }
-
-      await emailService.send({
-        to: email,
-        subject: `Order Confirmation — ${order.orderNumber}`,
-        html: orderConfirmationTemplate(order),
-        attachments,
-      });
-    } catch (err) {
-      logger.error({ err, orderId: order.id }, 'Failed to send order confirmation email');
+      const pdfBytes = await invoiceService.generateInvoicePdf(order);
+      attachments = [{
+        filename: `invoice_${order.orderNumber}.pdf`,
+        content: Buffer.from(pdfBytes),
+        contentType: 'application/pdf',
+      }];
+    } catch (pdfErr) {
+      logger.warn({ pdfErr }, 'PDF invoice generation failed; sending email without attachment');
     }
+
+    // Send emails in parallel
+    await Promise.allSettled([
+      sendCustomerOrderConfirmation(order, attachments),
+      sendAdminOrderNotification(order, attachments)
+    ]);
   },
 
   onOrderConfirmed: async (order: any): Promise<void> => {

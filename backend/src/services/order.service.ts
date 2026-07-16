@@ -275,6 +275,11 @@ export const orderService = {
           },
           shippingAddress: true,
           billingAddress: true,
+          user: {
+            include: {
+              customerRisk: true,
+            },
+          },
         },
       });
     }, { timeout: 20000 });
