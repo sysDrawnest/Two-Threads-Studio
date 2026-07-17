@@ -67,6 +67,7 @@ export const authService = {
     }
 
     const passwordMatch = await comparePassword(dto.password, user.passwordHash);
+
     if (!passwordMatch) throw invalidCredentials;
 
     const { accessToken, rawRefreshToken } = issueTokenPair(user);
