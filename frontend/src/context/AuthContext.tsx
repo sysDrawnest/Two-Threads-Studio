@@ -51,34 +51,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data?.user) {
-            setUser(mapBackendUserToAuthUser(result.data.user));
-          } else {
-            // Invalid token
-            localStorage.removeItem('tt_access_token');
-            localStorage.removeItem('tt_refresh_token');
-          }
+        const { apiClient } = await import('../services/apiClient');
+        const result = await apiClient.get('/auth/me');
+        if (result.success && result.data?.user) {
+          setUser(mapBackendUserToAuthUser(result.data.user));
         } else {
-          // Token expired or invalid
           localStorage.removeItem('tt_access_token');
           localStorage.removeItem('tt_refresh_token');
+          setUser(null);
         }
       } catch (err) {
         console.error('Failed to restore auth session:', err);
+        localStorage.removeItem('tt_access_token');
+        localStorage.removeItem('tt_refresh_token');
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeAuth();
+
+    const handleLogoutEvent = () => {
+      localStorage.removeItem('tt_access_token');
+      localStorage.removeItem('tt_refresh_token');
+      setUser(null);
+    };
+
+    window.addEventListener('auth:logout', handleLogoutEvent);
+    return () => {
+      window.removeEventListener('auth:logout', handleLogoutEvent);
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

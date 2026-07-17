@@ -10,7 +10,7 @@ export const AdminLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background font-sans text-primary-container selection:bg-surface-container">
+    <div className="min-h-screen bg-background dark:bg-[#1a1816] font-sans text-primary-container dark:text-inverse-on-surface selection:bg-surface-container transition-colors duration-200">
       {/* Toast Provider */}
       <AdminToast />
       

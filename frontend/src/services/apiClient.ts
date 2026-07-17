@@ -66,6 +66,62 @@ async function request(path: string, options: RequestOptions = {}) {
     data = await response.json();
   }
 
+  // Handle 401 Unauthorized by attempting to refresh the token
+  if (response.status === 401 && !url.includes('/auth/refresh') && !url.includes('/auth/login')) {
+    const refreshToken = localStorage.getItem('tt_refresh_token');
+    
+    if (refreshToken) {
+      try {
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken })
+        });
+        
+        if (refreshResponse.ok) {
+          const refreshResult = await refreshResponse.json();
+          if (refreshResult.success && refreshResult.data) {
+            localStorage.setItem('tt_access_token', refreshResult.data.accessToken);
+            if (refreshResult.data.refreshToken) {
+              localStorage.setItem('tt_refresh_token', refreshResult.data.refreshToken);
+            }
+            
+            // Retry the original request
+            const retryHeaders = new Headers(options.headers);
+            retryHeaders.set('Authorization', `Bearer ${refreshResult.data.accessToken}`);
+            
+            // Set Content-Type correctly for retry
+            if (options.body && typeof options.body === 'object') {
+              retryHeaders.set('Content-Type', 'application/json');
+            }
+
+            const retryResponse = await fetch(url, { ...options, headers: retryHeaders });
+            
+            let retryData: any = null;
+            const retryContentType = retryResponse.headers.get('content-type');
+            if (retryContentType && retryContentType.includes('application/json')) {
+              retryData = await retryResponse.json();
+            }
+
+            if (!retryResponse.ok) {
+              const errorMessage = retryData?.message || retryResponse.statusText || 'An error occurred';
+              throw new ApiError(errorMessage, retryResponse.status, retryData);
+            }
+            
+            return retryData;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to refresh token', err);
+      }
+    }
+    
+    // If refresh failed or there is no refresh token, dispatch logout event
+    window.dispatchEvent(new Event('auth:logout'));
+    const errorMessage = data?.message || response.statusText || 'Unauthorized';
+    throw new ApiError(errorMessage, response.status, data);
+  }
+
   if (!response.ok) {
     const errorMessage = data?.message || response.statusText || 'An error occurred';
     throw new ApiError(errorMessage, response.status, data);

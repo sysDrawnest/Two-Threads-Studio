@@ -8,7 +8,7 @@ interface AdminTopBarProps {
 
 export const AdminTopBar: React.FC<AdminTopBarProps> = ({ onMenuClick }) => {
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-outline-variant bg-background px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-outline-variant dark:border-surface-variant bg-background dark:bg-inverse-surface px-4 sm:px-6 transition-colors duration-200">
       <div className="flex items-center">
         <button
           onClick={onMenuClick}
@@ -23,9 +23,9 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({ onMenuClick }) => {
           <input
             type="text"
             placeholder="Search orders, customers, products..."
-            className="h-9 w-full rounded-md border border-outline-variant bg-surface-container/30 pl-9 pr-4 text-sm text-primary-container placeholder:text-on-secondary-container focus:border-on-secondary-container focus:outline-none focus:ring-1 focus:ring-on-secondary-container"
+            className="h-9 w-full rounded-md border border-outline-variant dark:border-surface-variant bg-surface-container/30 dark:bg-black/20 pl-9 pr-4 text-sm text-primary-container dark:text-inverse-on-surface placeholder:text-on-secondary-container focus:border-on-secondary-container dark:focus:border-inverse-primary focus:outline-none focus:ring-1 focus:ring-on-secondary-container dark:focus:ring-inverse-primary transition-colors"
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-secondary-container font-mono border border-outline-variant rounded px-1.5 py-0.5 bg-background">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-secondary-container dark:text-inverse-on-surface/70 font-mono border border-outline-variant dark:border-surface-variant rounded px-1.5 py-0.5 bg-background dark:bg-inverse-surface">
             ⌘K
           </div>
         </div>
