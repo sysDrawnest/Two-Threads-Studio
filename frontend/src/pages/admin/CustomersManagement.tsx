@@ -1,88 +1,159 @@
 import React, { useState } from 'react';
-import DataTable from '../../components/ui/DataTable';
-import Modal from '../../components/ui/Modal';
-import { mockAdminCustomers, AdminCustomer } from '../../data/adminData';
+import { Link } from 'react-router-dom';
+import { Users, Eye, MoreVertical } from 'lucide-react';
+import { useAdminCustomers, useUpdateCustomerStatus } from '../../hooks/useAdminData';
+import { 
+  AdminTable,
+  AdminTableBody,
+  AdminTableCell,
+  AdminTableHead,
+  AdminTableHeader,
+  AdminTableRow,
+  AdminBadge,
+  AdminPagination,
+  AdminSearchBar,
+  AdminFilterBar,
+  AdminSkeleton,
+  AdminEmptyState
+} from '../../components/admin/ui';
 
-const membershipColors: Record<string, string> = {
-  none: 'bg-surface-container text-on-surface-variant',
-  artisan: 'bg-[#fef3e8] text-[#8b5a00]',
-  master: 'bg-primary-container text-inverse-on-surface',
-};
+export const CustomersManagement: React.FC = () => {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
 
-const CustomersManagement: React.FC = () => {
-  const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomer | null>(null);
+  const { data: response, isLoading } = useAdminCustomers({
+    page,
+    limit: 15,
+    search,
+    isActive: status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined,
+  });
 
-  const columns = [
-    {
-      key: 'name', label: 'Customer', sortable: true,
-      render: (c: AdminCustomer) => (
-        <div className="flex items-center gap-3">
-          <img src={c.avatar} alt={c.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-          <div>
-            <p className="font-sans text-sm text-primary-container">{c.name}</p>
-            <p className="font-sans text-xs text-on-surface-variant">{c.email}</p>
-          </div>
-        </div>
-      )
-    },
-    { key: 'joined', label: 'Joined', sortable: true },
-    { key: 'orders', label: 'Orders', sortable: true },
-    { key: 'totalSpent', label: 'Total Spent', sortable: true, render: (c: AdminCustomer) => <span className="font-medium">${c.totalSpent}</span> },
-    {
-      key: 'membership', label: 'Membership',
-      render: (c: AdminCustomer) => (
-        <span className={`font-sans text-[10px] px-2 py-1 uppercase tracking-wider capitalize ${membershipColors[c.membership]}`}>{c.membership === 'none' ? 'Free' : c.membership}</span>
-      )
-    },
-    {
-      key: 'actions', label: 'Actions',
-      render: (c: AdminCustomer) => (
-        <button onClick={() => setSelectedCustomer(c)} className="font-sans text-xs text-on-secondary-container hover:text-primary-container bg-transparent border-none cursor-pointer underline">View Profile</button>
-      )
-    },
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateCustomerStatus();
+
+  const handleToggleStatus = (id: string, currentStatus: boolean) => {
+    updateStatus({ id, isActive: !currentStatus });
+  };
+
+  const statusOptions = [
+    { label: 'All', value: '' },
+    { label: 'Active', value: 'ACTIVE' },
+    { label: 'Inactive', value: 'INACTIVE' },
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-3xl font-light text-primary-container">Customers</h1>
-        <p className="font-sans text-sm text-on-surface-variant mt-1">{mockAdminCustomers.length} registered customers</p>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-primary-container">Customers</h1>
+          <p className="text-sm text-on-secondary-container mt-1">Manage user accounts and profiles</p>
+        </div>
       </div>
 
-      <div className="bg-background border border-outline-variant p-6">
-        <DataTable data={mockAdminCustomers} columns={columns} searchPlaceholder="Search customers..." />
-      </div>
+      <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-outline-variant bg-surface-container/30">
+          <AdminSearchBar 
+            value={search}
+            onChange={(v) => { setSearch(v); setPage(1); }}
+            placeholder="Search by name, email or phone..."
+            className="w-full sm:w-80"
+          />
+          <AdminFilterBar
+            label="Status"
+            options={statusOptions}
+            value={status}
+            onChange={(v) => { setStatus(v); setPage(1); }}
+          />
+        </div>
 
-      {selectedCustomer && (
-        <Modal isOpen={!!selectedCustomer} onClose={() => setSelectedCustomer(null)} title="Customer Profile" size="md">
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-4 pb-6 border-b border-outline-variant">
-              <img src={selectedCustomer.avatar} alt={selectedCustomer.name} className="w-16 h-16 rounded-full object-cover" />
-              <div>
-                <h3 className="font-serif text-2xl text-primary-container">{selectedCustomer.name}</h3>
-                <p className="font-sans text-sm text-on-surface-variant">{selectedCustomer.email}</p>
-                <span className={`inline-block mt-2 font-sans text-[10px] px-2 py-1 uppercase tracking-wider capitalize ${membershipColors[selectedCustomer.membership]}`}>
-                  {selectedCustomer.membership === 'none' ? 'Free Member' : `${selectedCustomer.membership} Tier`}
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              {[
-                { label: 'Orders', value: selectedCustomer.orders },
-                { label: 'Total Spent', value: `$${selectedCustomer.totalSpent}` },
-                { label: 'Member Since', value: selectedCustomer.joined.substring(0, 7) },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-surface-container p-3">
-                  <p className="font-serif text-xl text-primary-container">{value}</p>
-                  <p className="font-sans text-xs text-on-surface-variant uppercase tracking-widest mt-1">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Modal>
-      )}
+        {isLoading ? (
+          <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
+        ) : !response?.data?.users || response.data.users.length === 0 ? (
+          <AdminEmptyState
+            icon={Users}
+            title="No customers found"
+            description={search || status ? "Try adjusting your filters" : "You don't have any customers yet."}
+          />
+        ) : (
+          <>
+            <AdminTable>
+              <AdminTableHeader>
+                <AdminTableRow>
+                  <AdminTableHead>Customer</AdminTableHead>
+                  <AdminTableHead>Contact</AdminTableHead>
+                  <AdminTableHead>Orders</AdminTableHead>
+                  <AdminTableHead>Total Spent</AdminTableHead>
+                  <AdminTableHead>Joined</AdminTableHead>
+                  <AdminTableHead>Status</AdminTableHead>
+                  <AdminTableHead className="text-right">Actions</AdminTableHead>
+                </AdminTableRow>
+              </AdminTableHeader>
+              <AdminTableBody>
+                {response.data.users.map((user: any) => (
+                  <AdminTableRow key={user.id}>
+                    <AdminTableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-surface-container flex items-center justify-center text-xs font-medium text-on-secondary-container">
+                          {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-primary-container">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <p className="text-xs text-on-secondary-container">{user.role}</p>
+                        </div>
+                      </div>
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <p className="text-sm text-primary-container">{user.email}</p>
+                      {user.phone && <p className="text-xs text-on-secondary-container">{user.phone}</p>}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      {user._count?.orders || 0}
+                    </AdminTableCell>
+                    <AdminTableCell className="font-medium">
+                      ₹{/* Would normally calculate or fetch total spent, for now using 0 */}
+                      {user.totalSpent || 0}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      {new Date(user.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'short', year: 'numeric'
+                      })}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <AdminBadge variant={user.isActive ? 'success' : 'error'}>
+                        {user.isActive ? 'ACTIVE' : 'INACTIVE'}
+                      </AdminBadge>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleToggleStatus(user.id, user.isActive)}
+                          disabled={isUpdating}
+                          className="text-xs border border-outline-variant px-2 py-1 rounded hover:bg-surface-container disabled:opacity-50"
+                        >
+                          {user.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <Link 
+                          to={`/admin/customers/${user.id}`}
+                          className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </AdminTableCell>
+                  </AdminTableRow>
+                ))}
+              </AdminTableBody>
+            </AdminTable>
+            <AdminPagination
+              currentPage={response.data.pagination.page}
+              totalPages={response.data.pagination.totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };
-
-export default CustomersManagement;

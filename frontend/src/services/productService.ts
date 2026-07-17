@@ -112,6 +112,7 @@ export const productService = {
     search?: string;
     page?: number;
     limit?: number;
+    status?: string;
   } = {}): Promise<{ products: Product[]; total: number }> => {
     const params = new URLSearchParams();
     if (filters.category) params.append('category', filters.category);
@@ -121,6 +122,7 @@ export const productService = {
     if (filters.search) params.append('search', filters.search);
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.limit) params.append('limit', filters.limit.toString());
+    if (filters.status) params.append('status', filters.status);
 
     const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`);
     if (!response.ok) {

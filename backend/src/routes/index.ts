@@ -51,5 +51,10 @@ import { riskRoutes, adminRiskRoutes } from './risk.routes';
 router.use('/risk',       riskRoutes);
 router.use('/admin/risk', adminRiskRoutes);
 
+// Phase 6A — Admin Commerce Platform
+import adminRoutes from './admin.routes';
+
+router.use('/admin', adminRoutes);
+
 export default router;
 

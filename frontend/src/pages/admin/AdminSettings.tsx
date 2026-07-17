@@ -1,119 +1,248 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Save, Store, Truck, Building, FileText } from 'lucide-react';
+import { useAdminSettings, useUpdateSettings } from '../../hooks/useAdminData';
+import { AdminSkeleton } from '../../components/admin/ui';
 
-const tabs = ['General', 'Branding', 'SEO', 'Email Templates', 'Membership', 'Payment'] as const;
-type Tab = typeof tabs[number];
+export const AdminSettings: React.FC = () => {
+  const { data: response, isLoading } = useAdminSettings();
+  const { mutate: updateSettings, isPending: isUpdating } = useUpdateSettings();
 
-const inputCls = "w-full p-2.5 border border-outline-variant focus:border-primary-container focus:outline-none bg-transparent font-sans text-sm";
-const labelCls = "block font-sans text-xs uppercase tracking-widest text-primary-container mb-1.5";
+  const [activeTab, setActiveTab] = useState('company');
+  const [formData, setFormData] = useState<any>({});
 
-const AdminSettings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('General');
+  useEffect(() => {
+    if (response?.data) {
+      setFormData(response.data);
+    }
+  }, [response]);
+
+  if (isLoading) return <AdminSkeleton className="h-[600px] w-full" />;
+  if (!response?.data) return <div className="text-error">Failed to load settings.</div>;
+
+  const handleInputChange = (section: string, field: string, value: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSave = () => {
+    updateSettings({ section: activeTab, data: formData[activeTab] });
+  };
+
+  const tabs = [
+    { id: 'company', label: 'Company Profile', icon: Store },
+    { id: 'gst', label: 'Tax & GST', icon: Building },
+    { id: 'shipping', label: 'Shipping & Delivery', icon: Truck },
+    { id: 'invoice', label: 'Invoice Settings', icon: FileText },
+  ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-3xl font-light text-primary-container">Settings</h1>
-        <p className="font-sans text-sm text-on-surface-variant mt-1">Configure your TwoThreads Studio platform.</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-primary-container">Store Settings</h1>
+          <p className="text-sm text-on-secondary-container mt-1">Manage your business configuration and preferences</p>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={isUpdating}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50"
+        >
+          <Save className="h-4 w-4" />
+          {isUpdating ? 'Saving...' : 'Save Settings'}
+        </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar Tabs */}
-        <nav className="md:w-48 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Sidebar Navigation */}
+        <div className="w-full md:w-64 space-y-1">
           {tabs.map(tab => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-left px-4 py-2.5 font-sans text-sm transition-colors whitespace-nowrap rounded-sm border-none cursor-pointer ${
-                activeTab === tab ? 'bg-primary-container text-inverse-on-surface' : 'bg-transparent text-on-surface-variant hover:text-primary-container hover:bg-surface-container'
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === tab.id 
+                  ? 'bg-surface-container text-primary-container' 
+                  : 'text-on-secondary-container hover:bg-surface-container/50'
               }`}
             >
-              {tab}
+              <tab.icon className="h-5 w-5" />
+              {tab.label}
             </button>
           ))}
-        </nav>
+        </div>
 
-        {/* Panel */}
-        <div className="flex-1 bg-background border border-outline-variant p-6 md:p-8">
-          {activeTab === 'General' && (
-            <form className="flex flex-col gap-5 max-w-xl" onSubmit={e => e.preventDefault()}>
-              <h2 className="font-serif text-2xl text-primary-container mb-2">General Settings</h2>
-              <div><label className={labelCls}>Studio Name</label><input defaultValue="TwoThreads Studio" className={inputCls} /></div>
-              <div><label className={labelCls}>Contact Email</label><input type="email" defaultValue="hello@twothreadsstudio.com" className={inputCls} /></div>
-              <div><label className={labelCls}>Studio Address</label><input defaultValue="124 Artisan Way, Portland OR 97209" className={inputCls} /></div>
-              <div><label className={labelCls}>Currency</label><select defaultValue="USD" className={inputCls}><option value="USD">USD — US Dollar</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — British Pound</option></select></div>
-              <div><label className={labelCls}>Timezone</label><select className={inputCls}><option>America/Los_Angeles</option><option>America/New_York</option><option>Europe/London</option></select></div>
-              <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-8 py-3 font-sans text-xs tracking-widest uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors">Save Changes</button>
-            </form>
-          )}
-
-          {activeTab === 'Branding' && (
-            <form className="flex flex-col gap-5 max-w-xl" onSubmit={e => e.preventDefault()}>
-              <h2 className="font-serif text-2xl text-primary-container mb-2">Branding</h2>
-              <div><label className={labelCls}>Primary Color</label><div className="flex gap-3 items-center"><input type="color" defaultValue="#2d2520" className="w-12 h-10 border border-outline-variant cursor-pointer" /><input defaultValue="#2d2520" className={`${inputCls} flex-1`} /></div></div>
-              <div><label className={labelCls}>Logo URL</label><input defaultValue="https://twothreadsstudio.com/logo.png" className={inputCls} /></div>
-              <div><label className={labelCls}>Heading Font</label><select className={inputCls} defaultValue="Cormorant Garamond"><option>Cormorant Garamond</option><option>Playfair Display</option><option>Libre Baskerville</option></select></div>
-              <div><label className={labelCls}>Body Font</label><select className={inputCls} defaultValue="Lato"><option>Lato</option><option>Inter</option><option>Roboto</option></select></div>
-              <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-8 py-3 font-sans text-xs tracking-widest uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors">Save Branding</button>
-            </form>
-          )}
-
-          {activeTab === 'SEO' && (
-            <form className="flex flex-col gap-5 max-w-xl" onSubmit={e => e.preventDefault()}>
-              <h2 className="font-serif text-2xl text-primary-container mb-2">SEO Settings</h2>
-              <div><label className={labelCls}>Meta Title</label><input defaultValue="TwoThreads Studio — Luxury Artisan Embroidery" className={inputCls} /></div>
-              <div><label className={labelCls}>Meta Description</label><textarea rows={3} defaultValue="Premium handcrafted embroidery kits, sustainable textile decor, and creative learning for modern makers." className={inputCls} /></div>
-              <div><label className={labelCls}>Google Analytics ID</label><input defaultValue="G-XXXXXXXXXX" className={inputCls} /></div>
-              <div><label className={labelCls}>OG Image URL</label><input placeholder="https://..." className={inputCls} /></div>
-              <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-8 py-3 font-sans text-xs tracking-widest uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors">Save SEO</button>
-            </form>
-          )}
-
-          {activeTab === 'Email Templates' && (
-            <div className="flex flex-col gap-4 max-w-xl">
-              <h2 className="font-serif text-2xl text-primary-container mb-2">Email Templates</h2>
-              <p className="font-sans text-sm text-on-surface-variant">Customize transactional email templates for your customers.</p>
-              {['Order Confirmation', 'Shipping Notification', 'Password Reset', 'Welcome Email', 'Membership Renewal'].map(template => (
-                <div key={template} className="flex justify-between items-center p-4 border border-outline-variant hover:bg-surface-container transition-colors">
-                  <p className="font-sans text-sm text-primary-container">{template}</p>
-                  <button className="font-sans text-xs text-on-secondary-container hover:text-primary-container bg-transparent border-none cursor-pointer underline">Edit Template</button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'Membership' && (
-            <form className="flex flex-col gap-5 max-w-xl" onSubmit={e => e.preventDefault()}>
-              <h2 className="font-serif text-2xl text-primary-container mb-2">Membership Settings</h2>
-              <div><label className={labelCls}>Artisan Tier Price ($/month)</label><input type="number" defaultValue="12" className={inputCls} /></div>
-              <div><label className={labelCls}>Master Tier Price ($/month)</label><input type="number" defaultValue="28" className={inputCls} /></div>
-              <div><label className={labelCls}>Trial Period (days)</label><input type="number" defaultValue="7" className={inputCls} /></div>
-              <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-8 py-3 font-sans text-xs tracking-widest uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors">Save Membership</button>
-            </form>
-          )}
-
-          {activeTab === 'Payment' && (
-            <form className="flex flex-col gap-5 max-w-xl" onSubmit={e => e.preventDefault()}>
-              <h2 className="font-serif text-2xl text-primary-container mb-2">Payment Settings</h2>
-              <div className="p-4 bg-surface-container border border-outline-variant">
-                <p className="font-sans text-sm text-on-surface-variant">🔒 Payment credentials are stored securely and never exposed in the frontend. Configure via your backend environment.</p>
-              </div>
-              <div><label className={labelCls}>Stripe Publishable Key</label><input type="password" defaultValue="pk_test_••••••••" className={inputCls} /></div>
-              <div><label className={labelCls}>Payment Methods</label>
-                <div className="flex flex-col gap-2 mt-2">
-                  {['Credit / Debit Card', 'Apple Pay', 'Google Pay', 'PayPal'].map(m => (
-                    <label key={m} className="flex items-center gap-2 cursor-pointer font-sans text-sm text-primary-container">
-                      <input type="checkbox" defaultChecked className="accent-primary-container" /> {m}
-                    </label>
-                  ))}
+        {/* Content Area */}
+        <div className="flex-1">
+          <div className="rounded-xl border border-outline-variant bg-background p-6 lg:p-8">
+            
+            {activeTab === 'company' && (
+              <div className="space-y-6">
+                <h2 className="font-serif text-xl font-medium text-primary-container border-b border-outline-variant pb-4">Company Profile</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Company Name</label>
+                    <input 
+                      type="text" 
+                      value={formData.company?.name || ''}
+                      onChange={(e) => handleInputChange('company', 'name', e.target.value)}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Legal Name</label>
+                    <input 
+                      type="text" 
+                      value={formData.company?.legalName || ''}
+                      onChange={(e) => handleInputChange('company', 'legalName', e.target.value)}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-on-secondary-container mb-1">Support Email</label>
+                      <input 
+                        type="email" 
+                        value={formData.company?.supportEmail || ''}
+                        onChange={(e) => handleInputChange('company', 'supportEmail', e.target.value)}
+                        className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-on-secondary-container mb-1">Support Phone</label>
+                      <input 
+                        type="text" 
+                        value={formData.company?.supportPhone || ''}
+                        onChange={(e) => handleInputChange('company', 'supportPhone', e.target.value)}
+                        className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Business Address</label>
+                    <textarea 
+                      rows={3} 
+                      value={formData.company?.address || ''}
+                      onChange={(e) => handleInputChange('company', 'address', e.target.value)}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
                 </div>
               </div>
-              <button type="submit" className="self-start mt-4 bg-primary-container text-inverse-on-surface px-8 py-3 font-sans text-xs tracking-widest uppercase border-none cursor-pointer hover:bg-[#5a3d2b] transition-colors">Save Payment</button>
-            </form>
-          )}
+            )}
+
+            {activeTab === 'gst' && (
+              <div className="space-y-6">
+                <h2 className="font-serif text-xl font-medium text-primary-container border-b border-outline-variant pb-4">Tax & GST Configuration</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="gstEnabled"
+                      checked={formData.gst?.enabled || false}
+                      onChange={(e) => handleInputChange('gst', 'enabled', e.target.checked)}
+                      className="h-4 w-4 rounded border-outline-variant text-primary-container focus:ring-primary-container"
+                    />
+                    <label htmlFor="gstEnabled" className="text-sm font-medium text-primary-container">Enable GST Calculation</label>
+                  </div>
+                  {formData.gst?.enabled && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-on-secondary-container mb-1">GSTIN</label>
+                        <input 
+                          type="text" 
+                          value={formData.gst?.gstin || ''}
+                          onChange={(e) => handleInputChange('gst', 'gstin', e.target.value)}
+                          placeholder="e.g. 27AAAAA0000A1Z5"
+                          className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none font-mono" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-on-secondary-container mb-1">Default GST Rate (%)</label>
+                        <input 
+                          type="number" 
+                          value={formData.gst?.defaultRate || 18}
+                          onChange={(e) => handleInputChange('gst', 'defaultRate', parseFloat(e.target.value))}
+                          className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'shipping' && (
+              <div className="space-y-6">
+                <h2 className="font-serif text-xl font-medium text-primary-container border-b border-outline-variant pb-4">Shipping Rules</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Free Shipping Threshold (₹)</label>
+                    <input 
+                      type="number" 
+                      value={formData.shipping?.freeShippingThreshold || 0}
+                      onChange={(e) => handleInputChange('shipping', 'freeShippingThreshold', parseFloat(e.target.value))}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                    <p className="text-xs text-on-secondary-container mt-1">Orders above this amount will get free shipping.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Standard Shipping Cost (₹)</label>
+                    <input 
+                      type="number" 
+                      value={formData.shipping?.standardCost || 0}
+                      onChange={(e) => handleInputChange('shipping', 'standardCost', parseFloat(e.target.value))}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Estimated Delivery Days</label>
+                    <input 
+                      type="text" 
+                      value={formData.shipping?.estimatedDays || '5-7'}
+                      onChange={(e) => handleInputChange('shipping', 'estimatedDays', e.target.value)}
+                      placeholder="e.g. 5-7"
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'invoice' && (
+              <div className="space-y-6">
+                <h2 className="font-serif text-xl font-medium text-primary-container border-b border-outline-variant pb-4">Invoice Settings</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Invoice Prefix</label>
+                    <input 
+                      type="text" 
+                      value={formData.invoice?.prefix || 'TTS-'}
+                      onChange={(e) => handleInputChange('invoice', 'prefix', e.target.value)}
+                      placeholder="e.g. TTS-"
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none font-mono" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Invoice Footer Note</label>
+                    <textarea 
+                      rows={3} 
+                      value={formData.invoice?.footerNote || ''}
+                      onChange={(e) => handleInputChange('invoice', 'footerNote', e.target.value)}
+                      className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default AdminSettings;

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Auth
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import AdminLayout from './components/dashboard/AdminLayout';
+import { AdminLayout } from './components/admin/layout/AdminLayout';
 
 // Intro & Layout
 import IntroAnimation from './components/IntroAnimation';
@@ -70,14 +70,19 @@ const EmailVerified = lazy(() => import('./pages/auth/EmailVerified'));
 const AccessDenied = lazy(() => import('./pages/auth/AccessDenied'));
 
 // Lazy Admin Pages
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const ProductsManagement = lazy(() => import('./pages/admin/ProductsManagement'));
-const OrdersManagement = lazy(() => import('./pages/admin/OrdersManagement'));
-const CustomersManagement = lazy(() => import('./pages/admin/CustomersManagement'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
+const ProductsManagement = lazy(() => import('./pages/admin/ProductsManagement').then(module => ({ default: module.ProductsManagement })));
+const ProductForm = lazy(() => import('./pages/admin/ProductForm').then(module => ({ default: module.ProductForm })));
+const InventoryManagement = lazy(() => import('./pages/admin/InventoryManagement').then(module => ({ default: module.InventoryManagement })));
+const OrdersManagement = lazy(() => import('./pages/admin/OrdersManagement').then(module => ({ default: module.OrdersManagement })));
+const OrderDetail = lazy(() => import('./pages/admin/OrderDetail').then(module => ({ default: module.OrderDetail })));
+const CustomersManagement = lazy(() => import('./pages/admin/CustomersManagement').then(module => ({ default: module.CustomersManagement })));
+const CustomerProfile = lazy(() => import('./pages/admin/CustomerProfile').then(module => ({ default: module.CustomerProfile })));
 const TutorialsManagement = lazy(() => import('./pages/admin/TutorialsManagement'));
-const ReviewsManagement = lazy(() => import('./pages/admin/ReviewsManagement'));
-const AnalyticsDashboard = lazy(() => import('./pages/admin/AnalyticsDashboard'));
-const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const ReviewsManagement = lazy(() => import('./pages/admin/ReviewsManagement').then(module => ({ default: module.ReviewsManagement })));
+const RiskCenter = lazy(() => import('./pages/admin/RiskCenter').then(module => ({ default: module.RiskCenter })));
+const AnalyticsDashboard = lazy(() => import('./pages/admin/AnalyticsDashboard').then(module => ({ default: module.AnalyticsDashboard })));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings').then(module => ({ default: module.AdminSettings })));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storefront wrapper (with Navbar, Footer, page transitions)
@@ -160,10 +165,16 @@ const AdminRoutes: React.FC = () => (
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="products" element={<ProductsManagement />} />
+        <Route path="products/new" element={<ProductForm />} />
+        <Route path="products/:id/edit" element={<ProductForm />} />
+        <Route path="inventory" element={<InventoryManagement />} />
         <Route path="orders" element={<OrdersManagement />} />
+        <Route path="orders/:id" element={<OrderDetail />} />
         <Route path="customers" element={<CustomersManagement />} />
+        <Route path="customers/:id" element={<CustomerProfile />} />
         <Route path="tutorials" element={<TutorialsManagement />} />
         <Route path="reviews" element={<ReviewsManagement />} />
+        <Route path="risk" element={<RiskCenter />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

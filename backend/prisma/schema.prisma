@@ -823,3 +823,72 @@ model ReturnPolicy {
 
   @@map("return_policies")
 }
+
+// ─────────────────────────────────────────────
+// Studio Settings (Phase 6A)
+// ─────────────────────────────────────────────
+
+/// Single-row configuration table for all business settings.
+/// Use StudioSettings.upsert({ where: { singleton: true } }) pattern.
+model StudioSettings {
+  id        String   @id @default(cuid())
+  /// Enforced singleton: always true — ensures only one row exists
+  singleton Boolean  @unique @default(true)
+
+  // ── Company Details ───────────────────────
+  companyName      String  @default("Two Threads Studio")
+  companyTagline   String?
+  companyEmail     String  @default("hello@twothreads.in")
+  companyPhone     String?
+  companyAddress   String?
+  companyCity      String?
+  companyState     String?
+  companyCountry   String  @default("India")
+  companyPincode   String?
+  companyWebsite   String?
+
+  // ── GST & Tax ─────────────────────────────
+  gstNumber        String?
+  gstEnabled       Boolean @default(true)
+  gstPercent       Decimal @default(0) @db.Decimal(5, 2)
+  /// "inclusive" = price includes GST | "exclusive" = GST added on top
+  gstMode          String  @default("inclusive")
+  hsnCode          String?
+
+  // ── Invoice Settings ──────────────────────
+  invoicePrefix    String  @default("INV")
+  invoiceFooter    String?
+  invoiceLogo      String?
+
+  // ── Shipping Configuration ────────────────
+  freeShippingThreshold  Decimal  @default(500) @db.Decimal(10, 2)
+  standardShippingCharge Decimal  @default(60)  @db.Decimal(10, 2)
+  expressShippingCharge  Decimal  @default(150) @db.Decimal(10, 2)
+  shippingEnabled        Boolean  @default(true)
+  shippingNote           String?
+
+  // ── COD Rules ─────────────────────────────
+  codEnabled             Boolean  @default(true)
+  codMaxOrderValue       Decimal  @default(5000) @db.Decimal(10, 2)
+  codExtraCharge         Decimal  @default(0)    @db.Decimal(10, 2)
+  prepaidDiscountPercent Decimal  @default(5)    @db.Decimal(5, 2)
+
+  // ── Return Policy (Global Default) ───────
+  returnWindowDays       Int      @default(7)
+  exchangeWindowDays     Int      @default(14)
+  returnPolicy           String?
+
+  // ── Business Contact ──────────────────────
+  supportEmail           String?
+  supportPhone           String?
+  supportHours           String?
+
+  // ── Email Templates ───────────────────────
+  orderConfirmationNote  String?
+  shippingUpdateNote     String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("studio_settings")
+}

@@ -1,97 +1,167 @@
 import React, { useState } from 'react';
-import DataTable from '../../components/ui/DataTable';
-import Modal from '../../components/ui/Modal';
-import { mockAdminOrders, AdminOrder } from '../../data/adminData';
+import { Link } from 'react-router-dom';
+import { Eye, Package } from 'lucide-react';
+import { useAdminOrders } from '../../hooks/useAdminData';
+import { 
+  AdminTable,
+  AdminTableBody,
+  AdminTableCell,
+  AdminTableHead,
+  AdminTableHeader,
+  AdminTableRow,
+  AdminBadge,
+  AdminPagination,
+  AdminSearchBar,
+  AdminFilterBar,
+  AdminSkeleton,
+  AdminEmptyState
+} from '../../components/admin/ui';
 
-const statusColors: Record<string, string> = {
-  pending: 'bg-[#fef3e8] text-[#8b5a00]',
-  processing: 'bg-[#e8f0fe] text-[#1a56db]',
-  shipped: 'bg-[#e8f4e8] text-[#3a6b3a]',
-  delivered: 'bg-[#d4edda] text-[#2d5a2d]',
-  cancelled: 'bg-error-container text-error',
-};
+export const OrdersManagement: React.FC = () => {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
 
-const OrdersManagement: React.FC = () => {
-  const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+  const { data: response, isLoading } = useAdminOrders({
+    page,
+    limit: 15,
+    search,
+    status
+  });
 
-  const columns = [
-    { key: 'id', label: 'Order ID', sortable: true },
-    { key: 'customer', label: 'Customer', sortable: true },
-    { key: 'email', label: 'Email' },
-    { key: 'items', label: 'Items', render: (o: AdminOrder) => `${o.items} item${o.items > 1 ? 's' : ''}` },
-    { key: 'amount', label: 'Amount', sortable: true, render: (o: AdminOrder) => <span className="font-medium text-primary-container">${o.amount}</span> },
-    { key: 'date', label: 'Date', sortable: true },
-    {
-      key: 'status', label: 'Status',
-      render: (o: AdminOrder) => (
-        <span className={`font-sans text-[10px] px-2 py-1 uppercase tracking-wider ${statusColors[o.status]}`}>{o.status}</span>
-      )
-    },
-    {
-      key: 'actions', label: 'Actions',
-      render: (o: AdminOrder) => (
-        <button onClick={() => setSelectedOrder(o)} className="font-sans text-xs text-on-secondary-container hover:text-primary-container bg-transparent border-none cursor-pointer underline">View</button>
-      )
-    },
+  const getStatusVariant = (status: string) => {
+    switch(status) {
+      case 'DELIVERED': return 'success';
+      case 'CANCELLED': 
+      case 'RETURNED': return 'error';
+      case 'SHIPPED': return 'info';
+      case 'PENDING':
+      case 'PROCESSING': return 'warning';
+      default: return 'default';
+    }
+  };
+
+  const statusOptions = [
+    { label: 'All', value: '' },
+    { label: 'Pending', value: 'PENDING' },
+    { label: 'Processing', value: 'PROCESSING' },
+    { label: 'Handcrafting', value: 'HANDCRAFTING' },
+    { label: 'Shipped', value: 'SHIPPED' },
+    { label: 'Delivered', value: 'DELIVERED' },
+    { label: 'Cancelled', value: 'CANCELLED' }
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-serif text-3xl font-light text-primary-container">Orders</h1>
-        <p className="font-sans text-sm text-on-surface-variant mt-1">{mockAdminOrders.length} orders total</p>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-primary-container">Orders</h1>
+          <p className="text-sm text-on-secondary-container mt-1">Manage and fulfill customer orders</p>
+        </div>
       </div>
 
-      {/* Status Tabs Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {(['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const).map(s => {
-          const count = mockAdminOrders.filter(o => o.status === s).length;
-          return (
-            <div key={s} className={`p-3 border text-center ${statusColors[s]} border-current/20`}>
-              <p className="font-sans text-xs uppercase tracking-widest mb-1">{s}</p>
-              <p className="font-serif text-2xl">{count}</p>
-            </div>
-          );
-        })}
-      </div>
+      <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-outline-variant bg-surface-container/30">
+          <AdminSearchBar 
+            value={search}
+            onChange={(v) => { setSearch(v); setPage(1); }}
+            placeholder="Search by order ID, email or name..."
+            className="w-full sm:w-80"
+          />
+          <AdminFilterBar
+            label="Status"
+            options={statusOptions}
+            value={status}
+            onChange={(v) => { setStatus(v); setPage(1); }}
+          />
+        </div>
 
-      <div className="bg-background border border-outline-variant p-6">
-        <DataTable data={mockAdminOrders} columns={columns} searchPlaceholder="Search orders..." />
-      </div>
-
-      {selectedOrder && (
-        <Modal isOpen={!!selectedOrder} onClose={() => setSelectedOrder(null)} title={`Order ${selectedOrder.id}`} size="md">
-          <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'Customer', value: selectedOrder.customer },
-                { label: 'Email', value: selectedOrder.email },
-                { label: 'Date', value: selectedOrder.date },
-                { label: 'Items', value: `${selectedOrder.items} item(s)` },
-                { label: 'Amount', value: `$${selectedOrder.amount}` },
-                { label: 'Status', value: selectedOrder.status },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <p className="font-sans text-xs uppercase tracking-widest text-on-surface-variant mb-1">{label}</p>
-                  <p className="font-sans text-sm text-primary-container capitalize">{value}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 pt-4 border-t border-outline-variant">
-              <p className="font-sans text-xs uppercase tracking-widest text-primary-container mb-3">Update Status</p>
-              <div className="flex flex-wrap gap-2">
-                {(['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const).map(s => (
-                  <button key={s} className={`px-3 py-1.5 font-sans text-xs uppercase border cursor-pointer transition-colors ${selectedOrder.status === s ? 'bg-primary-container text-inverse-on-surface border-primary-container' : 'bg-transparent border-outline-variant text-on-surface-variant hover:border-primary-container'}`}>
-                    {s}
-                  </button>
+        {isLoading ? (
+          <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
+        ) : !response?.data?.orders || response.data.orders.length === 0 ? (
+          <AdminEmptyState
+            icon={Package}
+            title="No orders found"
+            description={search || status ? "Try adjusting your filters" : "You haven't received any orders yet."}
+          />
+        ) : (
+          <>
+            <AdminTable>
+              <AdminTableHeader>
+                <AdminTableRow>
+                  <AdminTableHead>Order ID</AdminTableHead>
+                  <AdminTableHead>Date</AdminTableHead>
+                  <AdminTableHead>Customer</AdminTableHead>
+                  <AdminTableHead>Status</AdminTableHead>
+                  <AdminTableHead>Payment</AdminTableHead>
+                  <AdminTableHead className="text-right">Total</AdminTableHead>
+                  <AdminTableHead className="text-right">Actions</AdminTableHead>
+                </AdminTableRow>
+              </AdminTableHeader>
+              <AdminTableBody>
+                {response.data.orders.map((order: any) => (
+                  <AdminTableRow key={order.id}>
+                    <AdminTableCell className="font-medium">
+                      #{order.id.slice(-8).toUpperCase()}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'short', year: 'numeric'
+                      })}
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <div>
+                        <p className="font-medium text-primary-container">
+                          {order.user?.firstName} {order.user?.lastName}
+                        </p>
+                        <p className="text-xs text-on-secondary-container">{order.user?.email}</p>
+                      </div>
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <AdminBadge variant={getStatusVariant(order.orderStatus)}>
+                        {order.orderStatus}
+                      </AdminBadge>
+                    </AdminTableCell>
+                    <AdminTableCell>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-medium bg-surface-container px-1.5 py-0.5 rounded">
+                          {order.paymentMethod}
+                        </span>
+                        {order.paymentStatus === 'CAPTURED' && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#137333]"></span>
+                        )}
+                        {order.paymentStatus === 'PENDING' && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#b06000]"></span>
+                        )}
+                        {order.paymentStatus === 'FAILED' && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#c5221f]"></span>
+                        )}
+                      </div>
+                    </AdminTableCell>
+                    <AdminTableCell className="text-right font-medium">
+                      ₹{order.grandTotal}
+                    </AdminTableCell>
+                    <AdminTableCell className="text-right">
+                      <Link 
+                        to={`/admin/orders/${order.id}`}
+                        className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">View</span>
+                      </Link>
+                    </AdminTableCell>
+                  </AdminTableRow>
                 ))}
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
+              </AdminTableBody>
+            </AdminTable>
+            <AdminPagination
+              currentPage={response.data.pagination.page}
+              totalPages={response.data.pagination.totalPages}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };
-
-export default OrdersManagement;

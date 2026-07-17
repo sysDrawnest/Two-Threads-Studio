@@ -2,6 +2,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api
 
 interface RequestOptions extends RequestInit {
   body?: any;
+  params?: Record<string, any>;
 }
 
 export class ApiError extends Error {
@@ -17,7 +18,21 @@ export class ApiError extends Error {
 }
 
 async function request(path: string, options: RequestOptions = {}) {
-  const url = `${API_BASE_URL}${path}`;
+  let url = `${API_BASE_URL}${path}`;
+
+  if (options.params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(options.params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(key, String(value));
+      }
+    });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += (url.includes('?') ? '&' : '?') + queryString;
+    }
+  }
+
   const headers = new Headers(options.headers);
 
   // Set Content-Type to JSON if sending a body and it is a plain object
