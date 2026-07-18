@@ -43,8 +43,35 @@ export const AdminDashboard: React.FC = () => {
   const { data } = dashboardData;
   const { revenue, orders, customers, inventory, riskAlerts, recentOrders } = data;
 
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <div className="space-y-6">
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary-container to-primary dark:from-[#17110c] dark:to-[#0c0907] py-4 px-6 text-white shadow-sm border border-outline-variant/10">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="font-serif text-lg md:text-xl font-medium tracking-tight text-white">
+              Welcome back, Artisan Admin
+            </h1>
+            <p className="text-[11px] text-outline-variant/90 mt-0.5">
+              {formattedDate} &bull; Real-time studio operations and fraud monitoring.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10 self-start sm:self-auto">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
+            <span className="text-[9px] font-semibold text-white/95 tracking-wider uppercase">Studio Live</span>
+          </div>
+        </div>
+        {/* Soft abstract brand decoration */}
+        <div className="absolute right-0 top-0 bottom-0 w-32 opacity-15 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white to-transparent pointer-events-none"></div>
+      </div>
+
       {/* Risk Alerts Banner */}
       {(riskAlerts.manualReview > 0 || riskAlerts.fraudFlags > 0) && (
         <div className="flex items-center gap-3 rounded-lg border border-[#fce8e6] bg-[#fce8e6]/50 px-4 py-3 text-[#c5221f]">
