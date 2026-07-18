@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Edit, Plus, Trash2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { productService } from '../../services/productService'; // Assuming we have this
+import { adminService } from '../../services/adminService';
 import { 
   AdminTable,
   AdminTableBody,
@@ -25,7 +25,7 @@ export const ProductsManagement: React.FC = () => {
 
   const { data: response, isLoading } = useQuery({
     queryKey: ['admin-products', { page, search, status }],
-    queryFn: () => productService.getProducts({ page, limit: 15, search, status }),
+    queryFn: () => adminService.listProducts({ page, limit: 15, search, status }),
   });
 
   const statusOptions = [

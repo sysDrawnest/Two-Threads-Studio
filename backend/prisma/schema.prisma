@@ -21,6 +21,7 @@ enum Role {
 enum ProductStatus {
   DRAFT
   ACTIVE
+  HIDDEN
   ARCHIVED
   OUT_OF_STOCK
 }
@@ -161,6 +162,40 @@ enum ReturnEligibility {
   NO_RETURN
 }
 
+enum StudioProductType {
+  EMBROIDERY_KIT
+  DIY_KIT
+  DIGITAL_PATTERN
+  FINISHED_HOOP
+  HOME_DECOR
+  ACCESSORY
+  FABRIC
+  WORKSHOP
+  GIFT_CARD
+}
+
+enum HomepageSection {
+  HERO
+  BEST_SELLERS
+  NEW_ARRIVALS
+  TRENDING
+  FEATURED_COLLECTION
+  GIFT_GUIDE
+  JUST_FOR_YOU
+  RECOMMENDED
+  SALE_BANNER
+  ARTISAN_PICKS
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  YOUTUBE
+  INSTAGRAM_REEL
+  THREE_SIXTY
+  TUTORIAL
+}
+
 // ─────────────────────────────────────────────
 // Authentication Models (Phase 2)
 // ─────────────────────────────────────────────
@@ -234,7 +269,8 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  products Product[]
+  products          Product[]
+  secondaryProducts ProductSecondaryCategory[]
 
   @@index([isActive])
   @@index([sortOrder])
@@ -252,7 +288,8 @@ model Collection {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  products Product[]
+  products           Product[]
+  additionalProducts ProductAdditionalCollection[]
 
   @@index([isActive])
   @@map("collections")
@@ -288,9 +325,33 @@ model Product {
 
   status     ProductStatus   @default(DRAFT)
   type       ProductType     @default(PHYSICAL)
-  badge      BadgeType?
   difficulty DifficultyLevel?
-  featured   Boolean         @default(false)
+  
+  // Classification
+  studioType        StudioProductType?
+  homepageSections  HomepageSection[]
+
+  // Boolean Labels (replaces single badge enum and featured)
+  isFeatured        Boolean   @default(false)
+  isNewArrival      Boolean   @default(false)
+  isBestSeller      Boolean   @default(false)
+  isLimitedEdition  Boolean   @default(false)
+  isExclusive       Boolean   @default(false)
+  isEcoFriendly     Boolean   @default(false)
+  isDigitalDownload Boolean   @default(false)
+
+  // Publishing
+  publishedAt       DateTime?
+  isVisible         Boolean   @default(true)
+  sortOrder         Int       @default(0)
+
+  // Extended content
+  subtitle          String?
+  productStory      String?   @db.Text
+  artisanNotes      String?   @db.Text
+  whatsIncluded     String?
+  barcode           String?
+  searchKeywords    String[]
 
   isHandmade              Boolean @default(true)
   isSustainable           Boolean @default(false)
@@ -310,8 +371,29 @@ model Product {
   weight     Float?
   dimensions Json?
 
+  // SEO (extended)
   seoTitle       String?
   seoDescription String?
+  seoKeywords    String?
+  ogImageUrl     String?
+  canonicalUrl   String?
+  robotsMeta     String?   @default("index,follow")
+
+  // Inventory extended
+  allowBackorders   Boolean   @default(false)
+  reservedQuantity  Int       @default(0)
+  incomingQuantity  Int       @default(0)
+
+  // Pricing extended
+  taxClass          String?
+  hsnCode           String?
+  gstPercent        Decimal?  @db.Decimal(5,2)
+
+  // Shipping extended
+  shippingClass     String?
+  isFreeShipping    Boolean   @default(false)
+  isFragile         Boolean   @default(false)
+  packageSize       String?
 
   /// Phase 5C: false for personalized/custom products — enforced by CodEligibilityEngine
   allowCod  Boolean @default(true)
@@ -330,18 +412,56 @@ model Product {
   wishlist   Wishlist[]
   cartItems  CartItem[]
   returnPolicy ReturnPolicy?
+  media                 ProductMedia[]
+  secondaryCategories   ProductSecondaryCategory[]
+  additionalCollections ProductAdditionalCollection[]
 
   @@index([status])
-  @@index([featured])
+  @@index([isFeatured])
   @@index([categoryId])
   @@index([collectionId])
   @@index([price])
   @@index([createdAt(sort: Desc)])
-  @@index([badge])
-  @@index([status, featured])
+  @@index([status, isFeatured])
   @@index([status, categoryId])
   @@index([salesCount(sort: Desc)])
   @@map("products")
+}
+
+model ProductMedia {
+  id        String    @id @default(cuid())
+  productId String
+  type      MediaType @default(IMAGE)
+  url       String
+  thumbnail String?
+  altText   String?
+  caption   String?
+  sortOrder Int       @default(0)
+  isPrimary Boolean   @default(false)
+  width     Int?
+  height    Int?
+  createdAt DateTime  @default(now())
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@index([productId])
+  @@map("product_media")
+}
+
+model ProductSecondaryCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([productId, categoryId])
+  @@map("product_secondary_categories")
+}
+
+model ProductAdditionalCollection {
+  productId    String
+  collectionId String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  @@id([productId, collectionId])
+  @@map("product_additional_collections")
 }
 
 model ProductImage {

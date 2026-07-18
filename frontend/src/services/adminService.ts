@@ -14,9 +14,10 @@ export interface PaginatedResponse<T> {
   };
 }
 
+import { Product } from '../types/product';
+
 // Basic types to satisfy the compiler
 export type Order = any;
-export type Product = any;
 export type User = any;
 export type Review = any;
 
@@ -64,17 +65,80 @@ export const adminService = {
     return response;
   },
   
-  // ── Products & Inventory ──────────────────────────────────────────────────
-  // Note: Standard product CRUD uses existing productService, 
-  // but we can proxy admin-specific ones here or use them directly.
+  // ── PIM / Products ────────────────────────────────────────────────────────
+  listProducts: async (params?: any): Promise<PaginatedResponse<Product>> => {
+    const response = await apiClient.get('/products/admin', { params });
+    return response.data;
+  },
+  
+  getProduct: async (id: string) => {
+    const response = await apiClient.get(`/products/admin/${id}`);
+    return response.data;
+  },
+  
+  createProduct: async (data: any) => {
+    const response = await apiClient.post('/products', data);
+    return response.data;
+  },
+  
+  updateProduct: async (id: string, data: any) => {
+    const response = await apiClient.put(`/products/${id}`, data);
+    return response.data;
+  },
+  
+  deleteProduct: async (id: string) => {
+    const response = await apiClient.delete(`/products/${id}`);
+    return response.data;
+  },
+  
+  duplicateProduct: async (id: string, data: any) => {
+    const response = await apiClient.post(`/products/${id}/duplicate`, data);
+    return response.data;
+  },
+  
+  bulkProductAction: async (data: any) => {
+    const response = await apiClient.post('/products/admin/bulk-action', data);
+    return response.data;
+  },
+  
+  addProductMedia: async (id: string, data: any) => {
+    const response = await apiClient.post(`/products/${id}/media`, data);
+    return response.data;
+  },
+  
+  removeProductMedia: async (id: string, mediaId: string) => {
+    const response = await apiClient.delete(`/products/${id}/media/${mediaId}`);
+    return response.data;
+  },
+  
+  reorderProductMedia: async (id: string, data: any) => {
+    const response = await apiClient.put(`/products/${id}/media/reorder`, data);
+    return response.data;
+  },
+  
+  upsertProductVariant: async (id: string, data: any) => {
+    const response = await apiClient.post(`/products/${id}/variants`, data);
+    return response.data;
+  },
+  
+  deleteProductVariant: async (id: string, variantId: string) => {
+    const response = await apiClient.delete(`/products/${id}/variants/${variantId}`);
+    return response.data;
+  },
+  
+  getProductAnalytics: async (id: string) => {
+    const response = await apiClient.get(`/products/${id}/analytics`);
+    return response.data;
+  },
+  
   listInventory: async (params?: any): Promise<PaginatedResponse<Product>> => {
     const response = await apiClient.get('/admin/inventory', { params });
-    return response;
+    return response.data;
   },
   
   adjustStock: async (id: string, data: { adjustment: number, reason?: string, variantId?: string }) => {
     const response = await apiClient.patch(`/admin/inventory/${id}`, data);
-    return response;
+    return response.data;
   },
   
   // ── Reviews ───────────────────────────────────────────────────────────────

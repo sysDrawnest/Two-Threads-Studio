@@ -1,58 +1,62 @@
 import { z } from 'zod';
-import { ProductStatus, ProductType, BadgeType, DifficultyLevel } from '@prisma/client';
+import { ProductStatus, StudioProductType, HomepageSection, MediaType, DifficultyLevel } from '@prisma/client';
 
-// ─── Query: List Products ──────────────────────────────────────────────────────
+// ─── Query: List Products (Public) ─────────────────────────────────────────────
 export const listProductsQuerySchema = z.object({
   query: z.object({
-    // Pagination
     page:  z.string().optional().default('1').transform(Number).pipe(z.number().int().positive()),
     limit: z.string().optional().default('12').transform(Number).pipe(z.number().int().min(1).max(100)),
-
-    // Filters
     category:   z.string().optional(),
     collection: z.string().optional(),
     tag:        z.string().optional(),
-    featured:   z.enum(['true', 'false']).optional().transform(v => v === 'true'),
+    isFeatured: z.enum(['true', 'false']).optional().transform(v => v === 'true'),
     available:  z.enum(['true', 'false']).optional().transform(v => v === 'true'),
-    type:       z.nativeEnum(ProductType).optional(),
-    badge:      z.nativeEnum(BadgeType).optional(),
+    studioType: z.nativeEnum(StudioProductType).optional(),
     difficulty: z.nativeEnum(DifficultyLevel).optional(),
-    handmade:   z.enum(['true', 'false']).optional().transform(v => v === 'true'),
-    customizable: z.enum(['true', 'false']).optional().transform(v => v === 'true'),
-
-    // Price range (in INR paise or full rupees — we use full rupees)
-    minPrice: z.string().optional().transform(Number).pipe(z.number().nonnegative()).optional(),
-    maxPrice: z.string().optional().transform(Number).pipe(z.number().positive()).optional(),
-
-    // Search
-    search: z.string().max(200).optional(),
-
-    // Sorting
-    sort: z.enum(['newest', 'oldest', 'price_asc', 'price_desc', 'rating', 'popular']).optional().default('newest'),
+    minPrice:   z.string().optional().transform(Number).pipe(z.number().nonnegative()).optional(),
+    maxPrice:   z.string().optional().transform(Number).pipe(z.number().positive()).optional(),
+    search:     z.string().max(200).optional(),
+    sort:       z.enum(['newest', 'oldest', 'price_asc', 'price_desc', 'rating', 'popular']).optional().default('newest'),
   }),
 });
 
 export type ListProductsQuery = z.infer<typeof listProductsQuerySchema>['query'];
 
-// ─── Params: Slug ──────────────────────────────────────────────────────────────
+// ─── Query: Admin List Products ───────────────────────────────────────────────
+export const adminListProductsQuerySchema = z.object({
+  query: z.object({
+    page:  z.string().optional().default('1').transform(Number).pipe(z.number().int().positive()),
+    limit: z.string().optional().default('30').transform(Number).pipe(z.number().int().min(1).max(100)),
+    status:       z.nativeEnum(ProductStatus).optional(),
+    category:     z.string().optional(),
+    collection:   z.string().optional(),
+    studioType:   z.nativeEnum(StudioProductType).optional(),
+    search:       z.string().max(200).optional(),
+    sort:         z.enum(['newest', 'oldest', 'price_asc', 'price_desc', 'stock_asc', 'stock_desc', 'name_asc', 'name_desc']).optional().default('newest'),
+    homepageSection: z.nativeEnum(HomepageSection).optional(),
+  }),
+});
+
+export type AdminListProductsQuery = z.infer<typeof adminListProductsQuerySchema>['query'];
+
+// ─── Params ───────────────────────────────────────────────────────────────────
 export const productSlugParamsSchema = z.object({
-  params: z.object({
-    slug: z.string().min(1).max(255),
-  }),
+  params: z.object({ slug: z.string().min(1).max(255) }),
 });
 
-export type ProductSlugParams = z.infer<typeof productSlugParamsSchema>['params'];
-
-// ─── Params: ID ───────────────────────────────────────────────────────────────
 export const productIdParamsSchema = z.object({
-  params: z.object({
-    id: z.string().cuid('Invalid product ID'),
-  }),
+  params: z.object({ id: z.string().cuid('Invalid product ID') }),
 });
 
-export type ProductIdParams = z.infer<typeof productIdParamsSchema>['params'];
+export const mediaIdParamsSchema = z.object({
+  params: z.object({ mediaId: z.string().cuid('Invalid media ID') }),
+});
 
-// ─── Body: Create Product ──────────────────────────────────────────────────────
+export const variantIdParamsSchema = z.object({
+  params: z.object({ variantId: z.string().cuid('Invalid variant ID') }),
+});
+
+// ─── Body: Create/Update Product Base ─────────────────────────────────────────
 const productBaseSchema = z.object({
   name:             z.string().min(1, 'Name is required').max(255).trim(),
   shortDescription: z.string().max(500).trim().optional(),
@@ -61,7 +65,7 @@ const productBaseSchema = z.object({
   categoryId:       z.string().cuid('Invalid category ID'),
   collectionId:     z.string().cuid('Invalid collection ID').optional(),
 
-  // Pricing — stored as strings from JSON but validated as numbers
+  // Pricing
   price:        z.number().positive('Price must be positive'),
   comparePrice: z.number().positive().optional(),
   costPrice:    z.number().nonnegative().optional(),
@@ -71,14 +75,35 @@ const productBaseSchema = z.object({
   lowStockThreshold: z.number().int().nonnegative().default(5),
   trackInventory:    z.boolean().default(true),
 
-  // Status & classification
   status:     z.nativeEnum(ProductStatus).default(ProductStatus.DRAFT),
-  type:       z.nativeEnum(ProductType).default(ProductType.PHYSICAL),
-  badge:      z.nativeEnum(BadgeType).optional(),
   difficulty: z.nativeEnum(DifficultyLevel).optional(),
-  featured:   z.boolean().default(false),
+  
+  // Classification
+  studioType:       z.nativeEnum(StudioProductType).optional(),
+  homepageSections: z.array(z.nativeEnum(HomepageSection)).default([]),
 
-  // Artisan fields
+  // Boolean Labels
+  isFeatured:        z.boolean().default(false),
+  isNewArrival:      z.boolean().default(false),
+  isBestSeller:      z.boolean().default(false),
+  isLimitedEdition:  z.boolean().default(false),
+  isExclusive:       z.boolean().default(false),
+  isEcoFriendly:     z.boolean().default(false),
+  isDigitalDownload: z.boolean().default(false),
+
+  // Publishing
+  publishedAt: z.coerce.date().optional(),
+  isVisible:   z.boolean().default(true),
+  sortOrder:   z.number().int().default(0),
+
+  // Extended content
+  subtitle:       z.string().max(255).optional(),
+  productStory:   z.string().optional(),
+  artisanNotes:   z.string().optional(),
+  whatsIncluded:  z.string().optional(),
+  barcode:        z.string().max(100).optional(),
+  searchKeywords: z.array(z.string()).default([]),
+
   isHandmade:               z.boolean().default(true),
   isSustainable:            z.boolean().default(false),
   isCustomizable:           z.boolean().default(false),
@@ -94,7 +119,6 @@ const productBaseSchema = z.object({
   careInstructions:  z.string().optional(),
   origin:            z.string().max(200).optional(),
 
-  // Physical
   weight:     z.number().positive().optional(),
   dimensions: z.object({
     length: z.number().positive(),
@@ -106,29 +130,33 @@ const productBaseSchema = z.object({
   // SEO
   seoTitle:       z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
+  seoKeywords:    z.string().max(255).optional(),
+  ogImageUrl:     z.string().url().optional(),
+  canonicalUrl:   z.string().url().optional(),
+  robotsMeta:     z.string().max(100).default('index,follow'),
 
-  // Nested images (optional on create — can be added separately)
-  images: z.array(z.object({
-    url:       z.string().url('Image must be a valid URL'),
-    altText:   z.string().max(255).optional(),
-    sortOrder: z.number().int().nonnegative().default(0),
-    isPrimary: z.boolean().default(false),
-    width:     z.number().int().positive().optional(),
-    height:    z.number().int().positive().optional(),
-  })).optional().default([]),
+  // Inventory extended
+  allowBackorders:  z.boolean().default(false),
+  reservedQuantity: z.number().int().nonnegative().default(0),
+  incomingQuantity: z.number().int().nonnegative().default(0),
 
-  // Nested variants (optional)
-  variants: z.array(z.object({
-    name:            z.string().min(1).max(100),
-    value:           z.string().min(1).max(100),
-    sku:             z.string().max(100).optional(),
-    priceAdjustment: z.number().default(0),
-    stockQuantity:   z.number().int().nonnegative().default(0),
-    isActive:        z.boolean().default(true),
-  })).optional().default([]),
+  // Pricing extended
+  taxClass:   z.string().max(100).optional(),
+  hsnCode:    z.string().max(100).optional(),
+  gstPercent: z.number().nonnegative().optional(),
 
-  // Tag IDs to connect
+  // Shipping extended
+  shippingClass:  z.string().max(100).optional(),
+  isFreeShipping: z.boolean().default(false),
+  isFragile:      z.boolean().default(false),
+  packageSize:    z.string().max(100).optional(),
+
+  allowCod: z.boolean().default(true),
+
+  // Relations
   tagIds: z.array(z.string().cuid()).optional().default([]),
+  secondaryCategoryIds: z.array(z.string().cuid()).optional().default([]),
+  additionalCollectionIds: z.array(z.string().cuid()).optional().default([]),
 });
 
 export const createProductSchema = z.object({
@@ -137,7 +165,6 @@ export const createProductSchema = z.object({
 
 export type CreateProductDto = z.infer<typeof createProductSchema>['body'];
 
-// ─── Body: Update Product ──────────────────────────────────────────────────────
 export const updateProductSchema = z.object({
   params: z.object({
     id: z.string().cuid('Invalid product ID'),
@@ -147,28 +174,82 @@ export const updateProductSchema = z.object({
 
 export type UpdateProductDto = z.infer<typeof updateProductSchema>['body'];
 
-// ─── Body: Patch Status ────────────────────────────────────────────────────────
-export const patchStatusSchema = z.object({
+// ─── Bulk Actions ─────────────────────────────────────────────────────────────
+export const bulkActionSchema = z.object({
+  body: z.object({
+    action: z.enum([
+      'publish', 'hide', 'archive', 'delete', 'feature', 'unfeature',
+      'mark_best_seller', 'mark_new_arrival', 'change_category',
+      'change_collection', 'add_homepage_section', 'remove_homepage_section'
+    ]),
+    ids: z.array(z.string().cuid()).min(1),
+    extra: z.any().optional(), // Used for passing categoryId, section, etc.
+  }),
+});
+
+export type BulkActionDto = z.infer<typeof bulkActionSchema>['body'];
+
+// ─── Duplicate ────────────────────────────────────────────────────────────────
+export const duplicateProductSchema = z.object({
   params: z.object({
     id: z.string().cuid('Invalid product ID'),
   }),
   body: z.object({
-    status: z.nativeEnum(ProductStatus, { message: 'Invalid status value' }),
-  }),
+    withImages: z.boolean().default(true),
+    withInventory: z.boolean().default(false),
+  }).optional(),
 });
 
-export type PatchStatusDto = z.infer<typeof patchStatusSchema>['body'];
+export type DuplicateProductDto = z.infer<typeof duplicateProductSchema>['body'];
 
-// ─── Body: Patch Inventory ─────────────────────────────────────────────────────
-export const patchInventorySchema = z.object({
+// ─── Media Management ─────────────────────────────────────────────────────────
+export const mediaUpsertSchema = z.object({
   params: z.object({
     id: z.string().cuid('Invalid product ID'),
   }),
   body: z.object({
-    stockQuantity:    z.number().int().nonnegative('Stock cannot be negative'),
-    lowStockThreshold: z.number().int().nonnegative().optional(),
-    trackInventory:   z.boolean().optional(),
+    type:      z.nativeEnum(MediaType).default(MediaType.IMAGE),
+    url:       z.string().url('Must be a valid URL'),
+    thumbnail: z.string().url().optional(),
+    altText:   z.string().max(255).optional(),
+    caption:   z.string().max(255).optional(),
+    sortOrder: z.number().int().nonnegative().default(0),
+    isPrimary: z.boolean().default(false),
+    width:     z.number().int().positive().optional(),
+    height:    z.number().int().positive().optional(),
   }),
 });
 
-export type PatchInventoryDto = z.infer<typeof patchInventorySchema>['body'];
+export type MediaUpsertDto = z.infer<typeof mediaUpsertSchema>['body'];
+
+export const reorderSchema = z.object({
+  params: z.object({
+    id: z.string().cuid('Invalid product ID'),
+  }),
+  body: z.object({
+    items: z.array(z.object({
+      id: z.string().cuid(),
+      sortOrder: z.number().int().nonnegative(),
+    })),
+  }),
+});
+
+export type ReorderDto = z.infer<typeof reorderSchema>['body'];
+
+// ─── Variant Management ───────────────────────────────────────────────────────
+export const variantUpsertSchema = z.object({
+  params: z.object({
+    id: z.string().cuid('Invalid product ID'),
+  }),
+  body: z.object({
+    id:              z.string().cuid().optional(), // If missing, create new
+    name:            z.string().min(1).max(100),
+    value:           z.string().min(1).max(100),
+    sku:             z.string().max(100).optional(),
+    priceAdjustment: z.number().default(0),
+    stockQuantity:   z.number().int().nonnegative().default(0),
+    isActive:        z.boolean().default(true),
+  }),
+});
+
+export type VariantUpsertDto = z.infer<typeof variantUpsertSchema>['body'];

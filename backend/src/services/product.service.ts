@@ -8,10 +8,16 @@ import { generateSlug, makeSlugUnique } from '../utils/slug';
 import { SimpleCache } from '../lib/cache';
 import type {
   ListProductsQuery,
+  AdminListProductsQuery,
   CreateProductDto,
   UpdateProductDto,
   PatchStatusDto,
   PatchInventoryDto,
+  BulkActionDto,
+  DuplicateProductDto,
+  MediaUpsertDto,
+  ReorderDto,
+  VariantUpsertDto
 } from '../validators/product.validator';
 
 const homepageCache = new SimpleCache<any>(60 * 1000); // 60 seconds TTL
@@ -22,19 +28,12 @@ export const clearHomepageCache = () => {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Computes average rating from the reviews relation.
- * Prisma doesn't yet expose _avg in a findUnique include, so we compute it.
- */
 function computeAverageRating(reviews: Array<{ rating: number }>): number | null {
   if (!reviews || reviews.length === 0) return null;
   const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
   return Math.round((sum / reviews.length) * 10) / 10;
 }
 
-/**
- * Generates a unique slug, appending a numeric suffix if needed.
- */
 async function uniqueSlug(name: string, excludeId?: string): Promise<string> {
   const base = generateSlug(name);
   let slug = base;
@@ -47,9 +46,6 @@ async function uniqueSlug(name: string, excludeId?: string): Promise<string> {
   return slug;
 }
 
-// ─── Transforms ───────────────────────────────────────────────────────────────
-
-/** Flattens tags from { tag: { id, name, slug } }[] to { id, name, slug }[] */
 function flattenTags(tags: Array<{ tag: { id: string; name: string; slug: string } }>) {
   return tags.map(t => t.tag);
 }
@@ -57,12 +53,11 @@ function flattenTags(tags: Array<{ tag: { id: string; name: string; slug: string
 // ─── Product Service ──────────────────────────────────────────────────────────
 
 export const productService = {
-  /**
-   * Paginated product listing with filtering, search, and sorting.
-   */
+  
+  // ─── Public ───
+
   listProducts: async (query: ListProductsQuery) => {
     const { products, total } = await productRepository.findMany(query);
-
     const totalPages = Math.ceil(total / query.limit);
 
     const formattedProducts = products.map(p => ({
@@ -75,109 +70,81 @@ export const productService = {
     return {
       products: formattedProducts,
       pagination: {
-        page:       query.page,
-        limit:      query.limit,
-        total,
-        totalPages,
-        hasNextPage: query.page < totalPages,
-        hasPrevPage: query.page > 1,
+        page: query.page, limit: query.limit, total, totalPages,
+        hasNextPage: query.page < totalPages, hasPrevPage: query.page > 1,
       },
     };
   },
 
-  /**
-   * Full product detail by slug (public).
-   * Only returns ACTIVE products to public callers.
-   */
   getProductBySlug: async (slug: string) => {
     const product = await productRepository.findBySlug(slug);
-
     if (!product || product.status !== ProductStatus.ACTIVE) {
       throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     }
-
     const averageRating = computeAverageRating(product.reviews);
-
     return {
       ...product,
-      tags:          flattenTags(product.tags),
-      averageRating,
-      reviewCount:   product._count.reviews,
-      wishlistCount: product._count.wishlist,
-      _count:        undefined,
+      tags: flattenTags(product.tags),
+      averageRating, reviewCount: product._count.reviews, wishlistCount: product._count.wishlist, _count: undefined,
     };
   },
 
-  /**
-   * Full product detail by ID (admin — returns any status).
-   */
-  getProductById: async (id: string) => {
-    const product = await productRepository.findById(id);
+  // ─── Admin List & Detail ───
 
+  listProductsAdmin: async (query: AdminListProductsQuery) => {
+    const { products, total } = await productRepository.findManyAdmin(query);
+    const totalPages = Math.ceil(total / query.limit);
+
+    const formattedProducts = products.map(p => ({
+      ...p,
+      tags: flattenTags(p.tags),
+      reviewCount: p._count.reviews,
+      _count: undefined,
+    }));
+
+    return {
+      products: formattedProducts,
+      pagination: {
+        page: query.page, limit: query.limit, total, totalPages,
+        hasNextPage: query.page < totalPages, hasPrevPage: query.page > 1,
+      },
+    };
+  },
+
+  getProductById: async (id: string) => {
+    const product = await productRepository.findByIdAdmin(id);
     if (!product) {
       throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     }
-
     const averageRating = computeAverageRating(product.reviews);
-
     return {
       ...product,
-      tags:          flattenTags(product.tags),
-      averageRating,
-      reviewCount:   product._count.reviews,
-      wishlistCount: product._count.wishlist,
-      _count:        undefined,
+      tags: flattenTags(product.tags),
+      averageRating, reviewCount: product._count.reviews, wishlistCount: product._count.wishlist, _count: undefined,
     };
   },
 
-  /**
-   * Featured products for homepage.
-   */
+  // ─── Homepage Helpers ───
+
   getFeaturedProducts: async () => {
     const products = await productRepository.findFeatured(8);
-    return products.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
+    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
   },
 
-  /**
-   * New arrivals for homepage.
-   */
   getNewArrivals: async () => {
     const products = await productRepository.findNewArrivals(8);
-    return products.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
+    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
   },
 
-  /**
-   * Best sellers for homepage.
-   */
   getBestSellers: async () => {
     const products = await productRepository.findBestSellers(8);
-    return products.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
+    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
   },
 
-  /**
-   * Consolidated homepage data.
-   */
   getHomepageData: async () => {
     const cacheKey = 'homepage_data';
     const cached = homepageCache.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
 
     const [featuredRaw, bestSellersRaw, newArrivalsRaw, categories, collections] = await Promise.all([
       productRepository.findFeatured(8),
@@ -187,31 +154,10 @@ export const productService = {
       collectionRepository.findAll(),
     ]);
 
-    const featured = featuredRaw.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
-
-    const bestSellers = bestSellersRaw.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
-
-    const newArrivals = newArrivalsRaw.map(p => ({
-      ...p,
-      tags:        flattenTags(p.tags),
-      reviewCount: p._count.reviews,
-      _count:      undefined,
-    }));
-
     const data = {
-      featured,
-      bestSellers,
-      newArrivals,
+      featured: featuredRaw.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined })),
+      bestSellers: bestSellersRaw.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined })),
+      newArrivals: newArrivalsRaw.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined })),
       categories,
       collections,
     };
@@ -220,116 +166,194 @@ export const productService = {
     return data;
   },
 
-  /**
-   * Admin: Create a new product.
-   */
+  // ─── Mutations ───
+
   createProduct: async (dto: CreateProductDto) => {
-    // Validate category exists
     const category = await categoryRepository.findById(dto.categoryId);
-    if (!category) {
-      throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
-    }
+    if (!category) throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
 
     const slug = await uniqueSlug(dto.name);
-
-    const product = await productRepository.create({
-      slug,
-      dto,
-      categoryId: dto.categoryId,
-    });
-
-    const averageRating = computeAverageRating(product.reviews);
-
+    const product = await productRepository.create({ slug, dto, categoryId: dto.categoryId });
     clearHomepageCache();
 
+    const averageRating = computeAverageRating(product.reviews);
     return {
       ...product,
-      tags:          flattenTags(product.tags),
-      averageRating,
-      reviewCount:   product._count.reviews,
-      wishlistCount: product._count.wishlist,
-      _count:        undefined,
+      tags: flattenTags(product.tags),
+      averageRating, reviewCount: product._count.reviews, wishlistCount: product._count.wishlist, _count: undefined,
     };
   },
 
-  /**
-   * Admin: Update an existing product.
-   */
   updateProduct: async (id: string, dto: UpdateProductDto) => {
-    // Ensure product exists
-    const existing = await productRepository.findById(id);
-    if (!existing) {
-      throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
-    }
+    const existing = await productRepository.findByIdAdmin(id);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
 
-    // Validate category if it's being changed
     if (dto.categoryId && dto.categoryId !== existing.categoryId) {
       const category = await categoryRepository.findById(dto.categoryId);
-      if (!category) {
-        throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
-      }
+      if (!category) throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
     }
 
-    // Generate new slug if name changed
     let newSlug: string | undefined;
     if (dto.name && dto.name !== existing.name) {
       newSlug = await uniqueSlug(dto.name, id);
     }
 
     const product = await productRepository.update(id, dto, newSlug);
-    const averageRating = computeAverageRating(product.reviews);
-
+    if (dto.secondaryCategoryIds) {
+      await productRepository.updateSecondaryCategories(id, dto.secondaryCategoryIds);
+    }
+    if (dto.additionalCollectionIds) {
+      await productRepository.updateAdditionalCollections(id, dto.additionalCollectionIds);
+    }
+    
     clearHomepageCache();
 
+    const averageRating = computeAverageRating(product.reviews);
     return {
       ...product,
-      tags:          flattenTags(product.tags),
-      averageRating,
-      reviewCount:   product._count.reviews,
-      wishlistCount: product._count.wishlist,
-      _count:        undefined,
+      tags: flattenTags(product.tags),
+      averageRating, reviewCount: product._count.reviews, wishlistCount: product._count.wishlist, _count: undefined,
     };
   },
 
-  /**
-   * Admin: Soft delete (archive) a product.
-   */
   deleteProduct: async (id: string) => {
-    const existing = await productRepository.findById(id);
-    if (!existing) {
-      throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
-    }
-
+    const existing = await productRepository.findByIdAdmin(id);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     clearHomepageCache();
-
     return productRepository.archive(id);
   },
 
-  /**
-   * Admin: Patch product status.
-   */
   patchStatus: async (id: string, dto: PatchStatusDto) => {
-    const existing = await productRepository.findById(id);
-    if (!existing) {
-      throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
-    }
-
+    const existing = await productRepository.findByIdAdmin(id);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     clearHomepageCache();
-
     return productRepository.updateStatus(id, dto.status);
   },
 
-  /**
-   * Admin: Patch inventory fields.
-   */
   patchInventory: async (id: string, dto: PatchInventoryDto) => {
-    const existing = await productRepository.findById(id);
-    if (!existing) {
-      throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
-    }
-
+    const existing = await productRepository.findByIdAdmin(id);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     clearHomepageCache();
-
     return productRepository.updateInventory(id, dto);
   },
+
+  // ─── Bulk & Duplication ───
+
+  bulkAction: async (dto: BulkActionDto) => {
+    const { action, ids, extra } = dto;
+    clearHomepageCache();
+    
+    switch (action) {
+      case 'publish': return productRepository.bulkUpdateStatus(ids, ProductStatus.ACTIVE);
+      case 'hide': return productRepository.bulkUpdateStatus(ids, ProductStatus.HIDDEN);
+      case 'archive': return productRepository.bulkUpdateStatus(ids, ProductStatus.ARCHIVED);
+      case 'delete': return productRepository.bulkUpdateStatus(ids, ProductStatus.ARCHIVED); // Soft delete
+      case 'feature': return productRepository.bulkUpdateLabels(ids, { isFeatured: true });
+      case 'unfeature': return productRepository.bulkUpdateLabels(ids, { isFeatured: false });
+      case 'mark_best_seller': return productRepository.bulkUpdateLabels(ids, { isBestSeller: true });
+      case 'mark_new_arrival': return productRepository.bulkUpdateLabels(ids, { isNewArrival: true });
+      case 'change_category': 
+        if (!extra?.categoryId) throw new AppError('Category ID required', HTTP_STATUS.BAD_REQUEST);
+        return productRepository.bulkUpdateCategory(ids, extra.categoryId);
+      case 'change_collection':
+        if (!extra?.collectionId) throw new AppError('Collection ID required', HTTP_STATUS.BAD_REQUEST);
+        return productRepository.bulkUpdateCollection(ids, extra.collectionId);
+      case 'add_homepage_section':
+        if (!extra?.section) throw new AppError('Section required', HTTP_STATUS.BAD_REQUEST);
+        return productRepository.bulkAddHomepageSection(ids, extra.section);
+      case 'remove_homepage_section':
+        if (!extra?.section) throw new AppError('Section required', HTTP_STATUS.BAD_REQUEST);
+        return productRepository.bulkRemoveHomepageSection(ids, extra.section);
+      default: throw new AppError('Invalid bulk action', HTTP_STATUS.BAD_REQUEST);
+    }
+  },
+
+  duplicateProduct: async (id: string, opts?: DuplicateProductDto) => {
+    const original = await productRepository.findByIdAdmin(id);
+    if (!original) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+
+    const newName = original.name + ' (Copy)';
+    
+    const dto: CreateProductDto = {
+      name: newName,
+      description: original.description,
+      shortDescription: original.shortDescription || undefined,
+      categoryId: original.categoryId,
+      collectionId: original.collectionId || undefined,
+      price: Number(original.price),
+      comparePrice: original.comparePrice ? Number(original.comparePrice) : undefined,
+      costPrice: original.costPrice ? Number(original.costPrice) : undefined,
+      status: ProductStatus.DRAFT,
+      stockQuantity: opts?.withInventory ? original.stockQuantity : 0,
+      lowStockThreshold: original.lowStockThreshold,
+      trackInventory: original.trackInventory,
+      difficulty: original.difficulty || undefined,
+      studioType: original.studioType || undefined,
+      isHandmade: original.isHandmade,
+      // Default to false for copied labels
+      isFeatured: false, isBestSeller: false, isNewArrival: false,
+    };
+    
+    const newSlug = await uniqueSlug(newName);
+    const product = await productRepository.create({ slug: newSlug, dto, categoryId: original.categoryId });
+    
+    // Copy media if requested
+    if (opts?.withImages !== false && original.media && original.media.length > 0) {
+      for (const m of original.media) {
+         await productRepository.addMedia(product.id, {
+           type: m.type, url: m.url, thumbnail: m.thumbnail || undefined, altText: m.altText || undefined,
+           caption: m.caption || undefined, sortOrder: m.sortOrder, isPrimary: m.isPrimary,
+           width: m.width || undefined, height: m.height || undefined
+         });
+      }
+    }
+    
+    clearHomepageCache();
+    return product;
+  },
+
+  // ─── Media & Variants ───
+
+  addMedia: async (productId: string, dto: MediaUpsertDto) => {
+    const existing = await productRepository.findByIdAdmin(productId);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    clearHomepageCache();
+    return productRepository.addMedia(productId, dto);
+  },
+
+  removeMedia: async (productId: string, mediaId: string) => {
+    const existing = await productRepository.findByIdAdmin(productId);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    clearHomepageCache();
+    return productRepository.removeMedia(mediaId);
+  },
+
+  reorderMedia: async (productId: string, dto: ReorderDto) => {
+    const existing = await productRepository.findByIdAdmin(productId);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    clearHomepageCache();
+    return productRepository.reorderMedia(productId, dto.items);
+  },
+
+  upsertVariant: async (productId: string, dto: VariantUpsertDto) => {
+    const existing = await productRepository.findByIdAdmin(productId);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    clearHomepageCache();
+    return productRepository.upsertVariant(productId, dto);
+  },
+
+  deleteVariant: async (productId: string, variantId: string) => {
+    const existing = await productRepository.findByIdAdmin(productId);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    clearHomepageCache();
+    return productRepository.deleteVariant(variantId);
+  },
+
+  // ─── Analytics ───
+
+  getProductAnalytics: async (id: string) => {
+    const existing = await productRepository.findByIdAdmin(id);
+    if (!existing) throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
+    return productRepository.getProductAnalytics(id);
+  }
 };

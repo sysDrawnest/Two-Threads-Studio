@@ -39,6 +39,11 @@ export const getHomepageData = catchAsync(async (_req: Request, res: Response) =
 
 // ─── Admin Endpoints ──────────────────────────────────────────────────────────
 
+export const listProductsAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await productService.listProductsAdmin(req.query as any);
+  return successResponse(res, result, MESSAGES.SUCCESS);
+});
+
 export const getProductById = catchAsync(async (req: Request, res: Response) => {
   const product = await productService.getProductById(String(req.params.id));
   return successResponse(res, { product }, MESSAGES.SUCCESS);
@@ -67,4 +72,52 @@ export const patchProductStatus = catchAsync(async (req: Request, res: Response)
 export const patchProductInventory = catchAsync(async (req: Request, res: Response) => {
   const result = await productService.patchInventory(String(req.params.id), req.body);
   return successResponse(res, result, 'Inventory updated');
+});
+
+// ─── Admin Bulk Actions ───
+
+export const bulkAction = catchAsync(async (req: Request, res: Response) => {
+  const result = await productService.bulkAction(req.body);
+  return successResponse(res, result, 'Bulk action completed');
+});
+
+export const duplicateProduct = catchAsync(async (req: Request, res: Response) => {
+  const product = await productService.duplicateProduct(String(req.params.id), req.body);
+  return successResponse(res, { product }, 'Product duplicated successfully');
+});
+
+// ─── Admin Media Management ───
+
+export const addMedia = catchAsync(async (req: Request, res: Response) => {
+  const media = await productService.addMedia(String(req.params.id), req.body);
+  return successResponse(res, { media }, 'Media added', HTTP_STATUS.CREATED);
+});
+
+export const removeMedia = catchAsync(async (req: Request, res: Response) => {
+  await productService.removeMedia(String(req.params.id), String(req.params.mediaId));
+  return successResponse(res, null, 'Media removed');
+});
+
+export const reorderMedia = catchAsync(async (req: Request, res: Response) => {
+  const result = await productService.reorderMedia(String(req.params.id), req.body);
+  return successResponse(res, result, 'Media reordered');
+});
+
+// ─── Admin Variant Management ───
+
+export const upsertVariant = catchAsync(async (req: Request, res: Response) => {
+  const variant = await productService.upsertVariant(String(req.params.id), req.body);
+  return successResponse(res, { variant }, 'Variant updated', HTTP_STATUS.CREATED);
+});
+
+export const deleteVariant = catchAsync(async (req: Request, res: Response) => {
+  await productService.deleteVariant(String(req.params.id), String(req.params.variantId));
+  return successResponse(res, null, 'Variant deleted');
+});
+
+// ─── Analytics ───
+
+export const getProductAnalytics = catchAsync(async (req: Request, res: Response) => {
+  const analytics = await productService.getProductAnalytics(String(req.params.id));
+  return successResponse(res, { analytics }, MESSAGES.SUCCESS);
 });

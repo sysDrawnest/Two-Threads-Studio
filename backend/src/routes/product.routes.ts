@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate';
-import { requireAuth } from '../middleware/auth.middleware';
-import { requireRole } from '../middleware/auth.middleware';
+import { requireAuth, requireRole } from '../middleware/auth.middleware';
 import {
   listProducts,
   getProductBySlug,
@@ -9,28 +8,43 @@ import {
   getNewArrivals,
   getBestSellers,
   getHomepageData,
+  listProductsAdmin,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
   patchProductStatus,
   patchProductInventory,
+  bulkAction,
+  duplicateProduct,
+  addMedia,
+  removeMedia,
+  reorderMedia,
+  upsertVariant,
+  deleteVariant,
+  getProductAnalytics
 } from '../controllers/product.controller';
 import {
   listProductsQuerySchema,
+  adminListProductsQuerySchema,
   productSlugParamsSchema,
   productIdParamsSchema,
+  mediaIdParamsSchema,
+  variantIdParamsSchema,
   createProductSchema,
   updateProductSchema,
   patchStatusSchema,
   patchInventorySchema,
+  bulkActionSchema,
+  duplicateProductSchema,
+  mediaUpsertSchema,
+  reorderSchema,
+  variantUpsertSchema
 } from '../validators/product.validator';
 
 const router = Router();
 
 // ─── Public Routes ─────────────────────────────────────────────────────────────
-// IMPORTANT: Static routes MUST come before /:slug to avoid "featured", 
-// "new-arrivals", and "best-sellers" being interpreted as slugs.
 
 router.get('/featured',     getFeaturedProducts);
 router.get('/new-arrivals', getNewArrivals);
@@ -50,7 +64,14 @@ router.get(
 );
 
 // ─── Admin Routes ──────────────────────────────────────────────────────────────
-// All admin routes require authentication + ADMIN role.
+
+router.get(
+  '/admin',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(adminListProductsQuerySchema),
+  listProductsAdmin
+);
 
 router.get(
   '/admin/:id',
@@ -58,6 +79,14 @@ router.get(
   requireRole('ADMIN'),
   validate(productIdParamsSchema),
   getProductById
+);
+
+router.post(
+  '/admin/bulk-action',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(bulkActionSchema),
+  bulkAction
 );
 
 router.post(
@@ -98,6 +127,74 @@ router.patch(
   requireRole('ADMIN'),
   validate(patchInventorySchema),
   patchProductInventory
+);
+
+router.post(
+  '/:id/duplicate',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(duplicateProductSchema),
+  duplicateProduct
+);
+
+// ─── Media Management ───
+
+router.post(
+  '/:id/media',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(mediaUpsertSchema),
+  addMedia
+);
+
+router.delete(
+  '/:id/media/:mediaId',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(mediaIdParamsSchema),
+  removeMedia
+);
+
+router.put(
+  '/:id/media/reorder',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(reorderSchema),
+  reorderMedia
+);
+
+// ─── Variant Management ───
+
+router.post(
+  '/:id/variants',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(variantUpsertSchema),
+  upsertVariant
+);
+
+router.delete(
+  '/:id/variants/:variantId',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  validate(variantIdParamsSchema),
+  deleteVariant
+);
+
+// ─── Analytics ───
+
+router.get(
+  '/:id/analytics',
+  requireAuth,
+  requireRole('ADMIN'),
+  validate(productIdParamsSchema),
+  getProductAnalytics
 );
 
 export default router;
