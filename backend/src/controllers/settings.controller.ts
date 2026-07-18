@@ -1,7 +1,8 @@
 /**
- * Settings Controller — Phase 6A
+ * Settings Controller — Phase 6A/6B
  * Business settings stored in the database — never exposes .env secrets.
  * Uses singleton pattern: one StudioSettings row, always upserted.
+ * Maps between flat database schema and frontend nested structure.
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -9,6 +10,32 @@ import prisma from '../prisma';
 import { successResponse } from '../utils/response';
 
 const SINGLETON_WHERE = { singleton: true };
+
+const mapSettingsToFrontend = (settings: any) => {
+  return {
+    company: {
+      name: settings.companyName,
+      legalName: settings.companyName,
+      supportEmail: settings.supportEmail || settings.companyEmail,
+      supportPhone: settings.supportPhone || settings.companyPhone,
+      address: settings.companyAddress,
+    },
+    gst: {
+      enabled: settings.gstEnabled,
+      gstin: settings.gstNumber,
+      defaultRate: settings.gstPercent ? Number(settings.gstPercent) : 18,
+    },
+    shipping: {
+      freeShippingThreshold: settings.freeShippingThreshold ? Number(settings.freeShippingThreshold) : 0,
+      standardCost: settings.standardShippingCharge ? Number(settings.standardShippingCharge) : 0,
+      estimatedDays: settings.shippingNote || '5-7',
+    },
+    invoice: {
+      prefix: settings.invoicePrefix,
+      footerNote: settings.invoiceFooter,
+    }
+  };
+};
 
 export const settingsController = {
   // ── Get settings ──────────────────────────────────────────────────────────
@@ -21,7 +48,7 @@ export const settingsController = {
         settings = await prisma.studioSettings.create({ data: {} });
       }
 
-      return successResponse(res, settings);
+      return successResponse(res, mapSettingsToFrontend(settings));
     } catch (err) {
       next(err);
     }
@@ -30,23 +57,25 @@ export const settingsController = {
   // ── Update company details ────────────────────────────────────────────────
   updateCompany: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        companyName, companyTagline, companyEmail, companyPhone,
-        companyAddress, companyCity, companyState, companyCountry,
-        companyPincode, companyWebsite,
-      } = req.body;
+      const { name, legalName, supportEmail, supportPhone, address } = req.body;
 
       const settings = await prisma.studioSettings.upsert({
         where: SINGLETON_WHERE,
-        create: { ...req.body },
+        create: {
+          companyName: name || 'Two Threads Studio',
+          supportEmail,
+          supportPhone,
+          companyAddress: address,
+        },
         update: {
-          companyName, companyTagline, companyEmail, companyPhone,
-          companyAddress, companyCity, companyState, companyCountry,
-          companyPincode, companyWebsite,
+          companyName: name,
+          supportEmail,
+          supportPhone,
+          companyAddress: address,
         },
       });
 
-      return successResponse(res, settings, 'Company details updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Company details updated');
     } catch (err) {
       next(err);
     }
@@ -55,15 +84,23 @@ export const settingsController = {
   // ── Update GST settings ───────────────────────────────────────────────────
   updateGst: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { gstNumber, gstEnabled, gstPercent, gstMode, hsnCode } = req.body;
+      const { enabled, gstin, defaultRate } = req.body;
 
       const settings = await prisma.studioSettings.upsert({
         where: SINGLETON_WHERE,
-        create: { gstNumber, gstEnabled, gstPercent, gstMode, hsnCode },
-        update: { gstNumber, gstEnabled, gstPercent, gstMode, hsnCode },
+        create: {
+          gstEnabled: enabled ?? true,
+          gstNumber: gstin,
+          gstPercent: defaultRate ?? 0,
+        },
+        update: {
+          gstEnabled: enabled,
+          gstNumber: gstin,
+          gstPercent: defaultRate,
+        },
       });
 
-      return successResponse(res, settings, 'GST settings updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'GST settings updated');
     } catch (err) {
       next(err);
     }
@@ -72,18 +109,23 @@ export const settingsController = {
   // ── Update shipping configuration ─────────────────────────────────────────
   updateShipping: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        freeShippingThreshold, standardShippingCharge,
-        expressShippingCharge, shippingEnabled, shippingNote,
-      } = req.body;
+      const { freeShippingThreshold, standardCost, estimatedDays } = req.body;
 
       const settings = await prisma.studioSettings.upsert({
         where: SINGLETON_WHERE,
-        create: { freeShippingThreshold, standardShippingCharge, expressShippingCharge, shippingEnabled, shippingNote },
-        update: { freeShippingThreshold, standardShippingCharge, expressShippingCharge, shippingEnabled, shippingNote },
+        create: {
+          freeShippingThreshold: freeShippingThreshold ?? 0,
+          standardShippingCharge: standardCost ?? 0,
+          shippingNote: estimatedDays,
+        },
+        update: {
+          freeShippingThreshold: freeShippingThreshold ?? 0,
+          standardShippingCharge: standardCost ?? 0,
+          shippingNote: estimatedDays,
+        },
       });
 
-      return successResponse(res, settings, 'Shipping settings updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Shipping settings updated');
     } catch (err) {
       next(err);
     }
@@ -100,7 +142,7 @@ export const settingsController = {
         update: { codEnabled, codMaxOrderValue, codExtraCharge, prepaidDiscountPercent },
       });
 
-      return successResponse(res, settings, 'COD rules updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'COD rules updated');
     } catch (err) {
       next(err);
     }
@@ -117,7 +159,7 @@ export const settingsController = {
         update: { returnWindowDays, exchangeWindowDays, returnPolicy },
       });
 
-      return successResponse(res, settings, 'Return policy updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Return policy updated');
     } catch (err) {
       next(err);
     }
@@ -126,15 +168,21 @@ export const settingsController = {
   // ── Update invoice settings ───────────────────────────────────────────────
   updateInvoice: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { invoicePrefix, invoiceFooter, invoiceLogo } = req.body;
+      const { prefix, footerNote } = req.body;
 
       const settings = await prisma.studioSettings.upsert({
         where: SINGLETON_WHERE,
-        create: { invoicePrefix, invoiceFooter, invoiceLogo },
-        update: { invoicePrefix, invoiceFooter, invoiceLogo },
+        create: {
+          invoicePrefix: prefix || 'INV',
+          invoiceFooter: footerNote,
+        },
+        update: {
+          invoicePrefix: prefix,
+          invoiceFooter: footerNote,
+        },
       });
 
-      return successResponse(res, settings, 'Invoice settings updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Invoice settings updated');
     } catch (err) {
       next(err);
     }
@@ -151,7 +199,7 @@ export const settingsController = {
         update: { supportEmail, supportPhone, supportHours },
       });
 
-      return successResponse(res, settings, 'Support contact updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Support contact updated');
     } catch (err) {
       next(err);
     }
@@ -168,7 +216,7 @@ export const settingsController = {
         update: { orderConfirmationNote, shippingUpdateNote },
       });
 
-      return successResponse(res, settings, 'Email templates updated');
+      return successResponse(res, mapSettingsToFrontend(settings), 'Email templates updated');
     } catch (err) {
       next(err);
     }
