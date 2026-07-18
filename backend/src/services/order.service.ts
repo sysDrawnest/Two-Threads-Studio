@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { orderRepository } from '../repositories/order.repository';
+import { clearHomepageCache } from './product.service';
 import { cartService } from './cart.service';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
@@ -158,6 +159,12 @@ export const orderService = {
           }
         }
 
+        // Increment sales count
+        await tx.product.update({
+          where: { id: product.id },
+          data: { salesCount: { increment: item.quantity } },
+        });
+
         const lineTotal = finalUnitPrice * item.quantity;
         calculatedSubtotal += lineTotal;
 
@@ -289,6 +296,7 @@ export const orderService = {
     }, { timeout: 20000 });
 
     if (resultOrder) {
+      clearHomepageCache();
       // Emit event post-commit
       eventDispatcher.emit(OrderEvents.CREATED, resultOrder).catch((err) => {
         logger.error({ err, orderId: resultOrder.id }, 'Failed to emit Order Created event');
@@ -371,6 +379,14 @@ export const orderService = {
             });
           }
         }
+
+        if (product) {
+          // Decrement sales count
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { salesCount: { decrement: item.quantity } },
+          });
+        }
       }
 
       // Update order status
@@ -416,6 +432,7 @@ export const orderService = {
     }, { timeout: 20000 });
 
     if (updatedOrder) {
+      clearHomepageCache();
       // Emit event post-commit
       eventDispatcher.emit(OrderEvents.CANCELLED, updatedOrder).catch((err) => {
         logger.error({ err, orderId: updatedOrder.id }, 'Failed to emit Order Cancelled event');
@@ -496,6 +513,14 @@ export const orderService = {
               });
             }
           }
+
+          if (product) {
+            // Decrement sales count
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { salesCount: { decrement: item.quantity } },
+            });
+          }
         }
       }
 
@@ -544,6 +569,7 @@ export const orderService = {
     }, { timeout: 20000 });
 
     if (updated) {
+      clearHomepageCache();
       // Emit status changed event post-commit
       eventDispatcher
         .emit(OrderEvents.STATUS_CHANGED, {

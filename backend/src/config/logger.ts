@@ -136,8 +136,9 @@ Duration      : ${log.duration} ms
   }
 
   if (type === 'slow_query') {
+    const sevColor = log.severity === 'CRITICAL' ? colors.red : log.severity === 'SEVERE' ? colors.yellow : colors.cyan;
     return `
-[SLOW QUERY] ${colors.bold}${colors.red}DATABASE LATENCY WARNING${colors.reset}
+[SLOW QUERY] ${colors.bold}${sevColor}${log.severity || 'WARNING'}${colors.reset} DATABASE LATENCY WARNING
 Duration      : ${colors.red}${colors.bold}${log.duration} ms${colors.reset}
 Route         : ${log.route}
 `;

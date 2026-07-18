@@ -32,6 +32,11 @@ export const getBestSellers = catchAsync(async (_req: Request, res: Response) =>
   return successResponse(res, { products }, MESSAGES.SUCCESS);
 });
 
+export const getHomepageData = catchAsync(async (_req: Request, res: Response) => {
+  const result = await productService.getHomepageData();
+  return successResponse(res, result, MESSAGES.SUCCESS);
+});
+
 // ─── Admin Endpoints ──────────────────────────────────────────────────────────
 
 export const getProductById = catchAsync(async (req: Request, res: Response) => {

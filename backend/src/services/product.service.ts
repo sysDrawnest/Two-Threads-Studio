@@ -3,7 +3,9 @@ import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import { productRepository } from '../repositories/product.repository';
 import { categoryRepository } from '../repositories/category.repository';
+import { collectionRepository } from '../repositories/collection.repository';
 import { generateSlug, makeSlugUnique } from '../utils/slug';
+import { SimpleCache } from '../lib/cache';
 import type {
   ListProductsQuery,
   CreateProductDto,
@@ -11,6 +13,12 @@ import type {
   PatchStatusDto,
   PatchInventoryDto,
 } from '../validators/product.validator';
+
+const homepageCache = new SimpleCache<any>(60 * 1000); // 60 seconds TTL
+
+export const clearHomepageCache = () => {
+  homepageCache.clear();
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -162,6 +170,57 @@ export const productService = {
   },
 
   /**
+   * Consolidated homepage data.
+   */
+  getHomepageData: async () => {
+    const cacheKey = 'homepage_data';
+    const cached = homepageCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const [featuredRaw, bestSellersRaw, newArrivalsRaw, categories, collections] = await Promise.all([
+      productRepository.findFeatured(8),
+      productRepository.findBestSellers(8),
+      productRepository.findNewArrivals(8),
+      categoryRepository.findAll(),
+      collectionRepository.findAll(),
+    ]);
+
+    const featured = featuredRaw.map(p => ({
+      ...p,
+      tags:        flattenTags(p.tags),
+      reviewCount: p._count.reviews,
+      _count:      undefined,
+    }));
+
+    const bestSellers = bestSellersRaw.map(p => ({
+      ...p,
+      tags:        flattenTags(p.tags),
+      reviewCount: p._count.reviews,
+      _count:      undefined,
+    }));
+
+    const newArrivals = newArrivalsRaw.map(p => ({
+      ...p,
+      tags:        flattenTags(p.tags),
+      reviewCount: p._count.reviews,
+      _count:      undefined,
+    }));
+
+    const data = {
+      featured,
+      bestSellers,
+      newArrivals,
+      categories,
+      collections,
+    };
+
+    homepageCache.set(cacheKey, data);
+    return data;
+  },
+
+  /**
    * Admin: Create a new product.
    */
   createProduct: async (dto: CreateProductDto) => {
@@ -180,6 +239,8 @@ export const productService = {
     });
 
     const averageRating = computeAverageRating(product.reviews);
+
+    clearHomepageCache();
 
     return {
       ...product,
@@ -218,6 +279,8 @@ export const productService = {
     const product = await productRepository.update(id, dto, newSlug);
     const averageRating = computeAverageRating(product.reviews);
 
+    clearHomepageCache();
+
     return {
       ...product,
       tags:          flattenTags(product.tags),
@@ -237,6 +300,8 @@ export const productService = {
       throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     }
 
+    clearHomepageCache();
+
     return productRepository.archive(id);
   },
 
@@ -249,6 +314,8 @@ export const productService = {
       throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     }
 
+    clearHomepageCache();
+
     return productRepository.updateStatus(id, dto.status);
   },
 
@@ -260,6 +327,8 @@ export const productService = {
     if (!existing) {
       throw new AppError('Product not found', HTTP_STATUS.NOT_FOUND);
     }
+
+    clearHomepageCache();
 
     return productRepository.updateInventory(id, dto);
   },

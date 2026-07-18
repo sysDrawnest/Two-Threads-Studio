@@ -316,6 +316,8 @@ model Product {
   /// Phase 5C: false for personalized/custom products — enforced by CodEligibilityEngine
   allowCod  Boolean @default(true)
 
+  salesCount Int    @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -338,6 +340,7 @@ model Product {
   @@index([badge])
   @@index([status, featured])
   @@index([status, categoryId])
+  @@index([salesCount(sort: Desc)])
   @@map("products")
 }
 

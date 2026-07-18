@@ -222,9 +222,9 @@ export const productRepository = {
    */
   findBestSellers: async (limit: number = 8) => {
     return prisma.product.findMany({
-      where:   { status: ProductStatus.ACTIVE, badge: BadgeType.BEST_SELLER },
+      where:   { status: ProductStatus.ACTIVE },
       include: listInclude,
-      orderBy: [{ reviews: { _count: 'desc' } }, { createdAt: 'desc' }],
+      orderBy: [{ salesCount: 'desc' }, { createdAt: 'desc' }],
       take:    limit,
     });
   },

@@ -20,8 +20,15 @@ if (env.NODE_ENV === 'development') {
   (prisma as any).$on('query', (e: any) => {
     const duration = e.duration;
     if (duration > 150) {
+      let severity = 'WARNING';
+      if (duration > 1000) {
+        severity = 'CRITICAL';
+      } else if (duration > 500) {
+        severity = 'SEVERE';
+      }
       logger.info({
         type: 'slow_query',
+        severity,
         duration,
         route: e.query,
       });

@@ -8,6 +8,7 @@ import {
   getFeaturedProducts,
   getNewArrivals,
   getBestSellers,
+  getHomepageData,
   getProductById,
   createProduct,
   updateProduct,
@@ -34,6 +35,7 @@ const router = Router();
 router.get('/featured',     getFeaturedProducts);
 router.get('/new-arrivals', getNewArrivals);
 router.get('/best-sellers', getBestSellers);
+router.get('/homepage',     getHomepageData);
 
 router.get(
   '/',
