@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
+import ourStoryImg from '../../assets/our_story_section.png';
 
 const stats = [
   { value: '500+', label: 'Happy Makers' },
@@ -14,7 +15,7 @@ export default function OurStory() {
       <div className="max-w-7xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-20 items-center">
         <ScrollReveal direction="left" className="relative -mx-6 md:mx-0">
           <img
-            src="https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            src={ourStoryImg}
             alt="Our Story - artisan at work"
             className="w-full h-[400px] md:h-[600px] object-cover object-center"
             loading="lazy"
