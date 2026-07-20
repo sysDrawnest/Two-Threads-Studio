@@ -2,30 +2,19 @@ import React, { Suspense, lazy } from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import {
   Hero,
-  TrustBar,
   BestSellers,
 } from '../components/sections';
 
 // Lazy load all below-fold sections for performance
 const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
-const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
-const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
-const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
-const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
-const OurStory = lazy(() => import('../components/sections/OurStory'));
-const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
-const SustainabilitySection = lazy(() => import('../components/sections/SustainabilitySection'));
 const Reviews = lazy(() => import('../components/sections/Reviews'));
-const CommunityGallery = lazy(() => import('../components/sections/CommunityGallery'));
-const Learning = lazy(() => import('../components/sections/Learning'));
-const CorporateBulkOrders = lazy(() => import('../components/sections/CorporateOrders'));
 const Newsletter = lazy(() => import('../components/sections/Newsletter'));
 
 // Lightweight fallback skeleton for lazy-loaded sections
 const SectionFallback = () => (
-  <div className="w-full py-24 flex items-center justify-center bg-[#fef8f3]">
+  <div className="w-full py-24 flex items-center justify-center bg-[#FAF9F7]">
     <div className="flex gap-2">
       <span className="w-2 h-2 rounded-full bg-[#d2c4bc] animate-pulse" />
       <span className="w-2 h-2 rounded-full bg-[#d2c4bc] animate-pulse" style={{ animationDelay: '0.2s' }} />
@@ -37,61 +26,18 @@ const SectionFallback = () => (
 const Home: React.FC = () => {
   return (
     <PageContainer disablePadding={true}>
-      {/*
-        ════════════════════════════════════════
-         HOMEPAGE SECTION ORDER — 17 Sections
-        ════════════════════════════════════════
-        1.  Hero                   (KEEP)
-        2.  TrustBar               (NEW)
-        3.  BestSellers            (ENHANCED)
-        4.  VideoBanner            (KEEP)
-        5.  ShopByCategory         (NEW)
-        6.  ShopByOccasion         (NEW)
-        7.  FeaturedCollections    (NEW)
-        8.  Banner/ArtisanGuild    (RENAMED)
-        9.  JustForYou             (KEEP)
-        10. CustomCreations        (NEW)
-        11. OurStory/BrandStory    (REDUCED)
-        12. CraftingProcess        (NEW)
-        13. Reviews                (ENHANCED)
-        14. CommunityGallery       (NEW)
-        15. Learning               (KEEP)
-        16. CorporateBulkOrders    (NEW)
-        17. Newsletter             (ENHANCED)
-      */}
-
       {/* ─── Above fold — eagerly loaded ─── */}
       <Hero />
-      <TrustBar />
-      <BestSellers />
-
-      <Suspense fallback={<SectionFallback />}>
-        <VideoBanner />
-      </Suspense>
 
       {/* ─── Below fold — lazily loaded ─── */}
       <Suspense fallback={<SectionFallback />}>
         <ShopByCategory />
       </Suspense>
 
-      <Suspense fallback={<SectionFallback />}>
-        <ShopByOccasion />
-      </Suspense>
+      <BestSellers />
 
       <Suspense fallback={<SectionFallback />}>
-        <FeaturedCollections />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <SacredTraditionsCollection />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <JustForYou />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <SustainabilitySection />
+        <VideoBanner />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
@@ -99,27 +45,7 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <OurStory />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <CraftingProcess />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
         <Reviews />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <CommunityGallery />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <Learning />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <CorporateBulkOrders />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
