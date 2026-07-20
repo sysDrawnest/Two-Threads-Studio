@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const cols = [
@@ -45,6 +46,12 @@ const Footer: React.FC = () => {
     },
   ];
 
+  const [openCol, setOpenCol] = useState<number | null>(null);
+
+  const toggleCol = (i: number) => {
+    setOpenCol(openCol === i ? null : i);
+  };
+
   return (
     <footer className="bg-[#1e1812] pt-20 px-6 md:px-16 pb-8">
       <div className="max-w-7xl mx-auto">
@@ -66,19 +73,29 @@ const Footer: React.FC = () => {
           </div>
           
           {cols.map((col, i) => (
-            <div key={i}>
-              <h4 className="font-sans text-xs tracking-widest uppercase text-inverse-on-surface/60 mb-5">
-                {col.title}
-              </h4>
-              {col.links.map(l => (
-                <Link 
-                  key={l.name} 
-                  to={l.path} 
-                  className="block font-sans text-sm text-inverse-on-surface/45 no-underline mb-3 leading-relaxed hover:text-inverse-on-surface/70 transition-colors"
-                >
-                  {l.name}
-                </Link>
-              ))}
+            <div key={i} className="border-b border-inverse-on-surface/10 md:border-none pb-4 md:pb-0">
+              <button 
+                onClick={() => toggleCol(i)}
+                className="w-full flex items-center justify-between md:cursor-default"
+                disabled={window.innerWidth >= 768} // simple hack, rely on CSS mostly
+              >
+                <h4 className="font-sans text-xs tracking-widest uppercase text-inverse-on-surface/60 md:mb-5">
+                  {col.title}
+                </h4>
+                <ChevronDown size={14} className={`text-inverse-on-surface/60 md:hidden transition-transform ${openCol === i ? 'rotate-180' : ''}`} />
+              </button>
+              
+              <div className={`overflow-hidden transition-all duration-300 md:!max-h-none ${openCol === i ? 'max-h-64 mt-4 md:mt-0' : 'max-h-0'}`}>
+                {col.links.map(l => (
+                  <Link 
+                    key={l.name} 
+                    to={l.path} 
+                    className="block font-sans text-sm text-inverse-on-surface/45 no-underline mb-3 leading-relaxed hover:text-inverse-on-surface/70 transition-colors"
+                  >
+                    {l.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           ))}
         </div>

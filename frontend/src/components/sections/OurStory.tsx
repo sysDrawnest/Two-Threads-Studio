@@ -10,9 +10,9 @@ const stats = [
 
 export default function OurStory() {
   return (
-    <section id="our-story" className="py-24 px-6 md:px-16 bg-primary-container">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center">
-        <ScrollReveal direction="left" className="relative">
+    <section id="our-story" className="py-16 md:py-24 px-6 md:px-16 bg-primary-container">
+      <div className="max-w-7xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-20 items-center">
+        <ScrollReveal direction="left" className="relative -mx-6 md:mx-0">
           <img
             src="https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
             alt="Our Story - artisan at work"
@@ -44,7 +44,7 @@ export default function OurStory() {
 
           {/* Stats */}
           <ScrollReveal direction="right" delay={0.54}>
-            <div className="flex gap-8 mb-8 border-t border-b border-white/10 py-6">
+            <div className="flex flex-wrap gap-6 md:gap-8 mb-8 border-t border-b border-white/10 py-6">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <p className="font-serif text-2xl md:text-3xl font-light text-inverse-on-surface">

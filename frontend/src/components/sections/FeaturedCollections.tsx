@@ -44,8 +44,8 @@ export default function FeaturedCollections() {
           <div className="md:hidden border-t border-dotted border-outline-variant max-w-[80px] mx-auto mt-6" />
         </ScrollReveal>
 
-        {/* Asymmetrical Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+        {/* Asymmetrical Editorial Grid / Mobile Swipe Gallery */}
+        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12 pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
           {featuredCollections.map((collection, index) => {
             const count = getProductCount(collection.slug);
             
@@ -71,7 +71,7 @@ export default function FeaturedCollections() {
                 key={collection.id} 
                 direction="up" 
                 delay={index * 0.05}
-                className={`group flex flex-col justify-between border border-[#c0b4a4]/40 bg-white/50 p-6 md:p-8 rounded-none transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 ${gridSpanClass}`}
+                className={`group flex flex-col justify-between border border-[#c0b4a4]/40 bg-white/50 p-5 md:p-8 rounded-none transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 w-[85vw] flex-shrink-0 snap-center md:w-auto ${gridSpanClass}`}
               >
                 <a 
                   href={`/shop?collection=${collection.slug}`}

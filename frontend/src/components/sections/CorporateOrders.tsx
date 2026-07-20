@@ -38,7 +38,7 @@ const clientTypes = [
 
 export default function CorporateBulkOrders() {
   return (
-    <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 md:px-16 bg-[#2d2520]">
+    <section className="py-16 md:py-24 px-6 md:px-16 bg-[#2d2520]">
       <div className="max-w-7xl mx-auto">
         {/* Heading */}
         <ScrollReveal direction="up" className="mb-10 md:mb-14">
@@ -54,7 +54,7 @@ export default function CorporateBulkOrders() {
             <div className="flex-shrink-0">
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 bg-[#f4ebd9] text-[#1C1C1B] px-8 py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase font-medium hover:bg-white transition-colors duration-200 no-underline"
+                className="inline-flex w-full md:w-auto justify-center items-center gap-2 bg-[#f4ebd9] text-[#1C1C1B] px-8 py-4 md:py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase font-medium hover:bg-white transition-colors duration-200 no-underline"
               >
                 Get a Custom Quote
                 <ArrowRight size={13} />

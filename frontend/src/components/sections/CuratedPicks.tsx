@@ -20,20 +20,21 @@ export default function CuratedPicks() {
       });
   }, []);
 
-  // Helper for responsive grid heights
+  // Helper for responsive grid heights and mobile carousel width
   const getGridClasses = (index: number) => {
+    const base = "w-[75vw] flex-shrink-0 snap-center md:w-auto";
     switch (index) {
       case 0:
-        return "col-span-1 sm:col-span-2 lg:col-span-8 h-[280px] sm:h-[300px] md:h-[340px]";
+        return `${base} col-span-1 sm:col-span-2 lg:col-span-8 h-[280px] sm:h-[300px] md:h-[340px]`;
       case 1:
-        return "col-span-1 sm:col-span-1 lg:col-span-4 h-[240px] sm:h-[280px] md:h-[340px]";
+        return `${base} col-span-1 sm:col-span-1 lg:col-span-4 h-[240px] sm:h-[280px] md:h-[340px]`;
       case 2:
-        return "col-span-1 sm:col-span-1 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]";
+        return `${base} col-span-1 sm:col-span-1 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]`;
       case 3:
-        return "col-span-1 sm:col-span-1 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]";
+        return `${base} col-span-1 sm:col-span-1 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]`;
       case 4:
       default:
-        return "col-span-1 sm:col-span-2 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]";
+        return `${base} col-span-1 sm:col-span-2 lg:col-span-4 h-[200px] sm:h-[220px] md:h-[260px]`;
     }
   };
 
@@ -49,7 +50,7 @@ export default function CuratedPicks() {
           </h2>
         </ScrollReveal>
         
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
+        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6 pb-4 md:pb-0 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0">
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className={`animate-pulse bg-neutral-200 ${getGridClasses(i)}`} />

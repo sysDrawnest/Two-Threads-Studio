@@ -9,7 +9,7 @@ export default function Learning() {
   ];
 
   return (
-    <section id="learning" className="py-24 px-6 md:px-16 bg-[#ede6de]">
+    <section id="learning" className="py-16 md:py-24 px-6 md:px-16 bg-[#ede6de]">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal direction="up" className="text-center mb-4">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-2">Learning Studio</p>
@@ -21,10 +21,10 @@ export default function Learning() {
           </p>
         </ScrollReveal>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14">
+        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-4 md:gap-6 mt-10 md:mt-14 pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
           {tutorials.map((t, i) => (
             <ScrollReveal key={i} direction="up">
-              <div className="bg-white cursor-pointer shadow-sm hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300">
+              <div className="bg-white cursor-pointer shadow-sm hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300 w-[85vw] flex-shrink-0 snap-center md:w-auto">
                 <div className="h-48 relative overflow-hidden" style={{ backgroundColor: t.thumbnail }}>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-12 h-12 rounded-full bg-inverse-on-surface/90 flex items-center justify-center shadow-lg hover:scale-105 transition-transform">

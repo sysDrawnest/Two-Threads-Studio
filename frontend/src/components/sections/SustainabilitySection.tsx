@@ -24,7 +24,7 @@ const sustainabilityPoints = [
 
 export default function SustainabilitySection() {
   return (
-    <section className="py-20 sm:py-24 px-4 sm:px-6 md:px-16 bg-[#F8F7F5] border-t border-b border-outline-variant/10">
+    <section className="py-16 md:py-24 px-6 md:px-16 bg-[#F8F7F5] border-t border-b border-outline-variant/10">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
         
         {/* Left Side: Editorial Content */}
@@ -41,7 +41,7 @@ export default function SustainabilitySection() {
             </p>
             <Link
               to="/sustainability"
-              className="inline-flex items-center gap-2 bg-[#A34A38] text-white px-8 py-3.5 font-sans text-xs tracking-widest uppercase hover:bg-[#83382a] transition-all cursor-pointer rounded-sm shadow-sm font-semibold no-underline"
+              className="inline-flex items-center justify-center gap-2 w-full md:w-auto bg-[#A34A38] text-white px-8 py-4 md:py-3.5 font-sans text-xs tracking-widest uppercase hover:bg-[#83382a] transition-all cursor-pointer rounded-sm shadow-sm font-semibold no-underline"
             >
               Our Impact Standards <ArrowRight size={14} />
             </Link>
@@ -50,7 +50,7 @@ export default function SustainabilitySection() {
 
         {/* Right Side: Highlight Cards */}
         <div className="w-full lg:w-7/12">
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4 md:gap-6">
             {sustainabilityPoints.map((point, index) => (
               <ScrollReveal key={index} direction="right" delay={index * 0.1}>
                 <motion.div

@@ -57,7 +57,7 @@ export default function Newsletter() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="flex max-w-md mx-auto justify-center"
+            className="flex flex-col md:flex-row max-w-md mx-auto justify-center gap-3 md:gap-0"
           >
             <input
               type="email"
@@ -66,11 +66,11 @@ export default function Newsletter() {
               placeholder="Your email address"
               aria-label="Your email address"
               required
-              className="flex-1 min-w-[200px] px-5 py-3.5 bg-inverse-on-surface/10 border border-inverse-on-surface/20 text-inverse-on-surface font-sans text-sm outline-none border-r-0 focus:border-on-secondary-container placeholder:text-inverse-on-surface/40"
+              className="w-full md:flex-1 min-w-[200px] px-5 py-4 md:py-3.5 bg-inverse-on-surface/10 border border-inverse-on-surface/20 text-inverse-on-surface font-sans text-sm outline-none md:border-r-0 focus:border-on-secondary-container placeholder:text-inverse-on-surface/40"
             />
             <button
               type="submit"
-              className="bg-on-secondary-container text-inverse-on-surface border border-on-secondary-container px-8 py-3.5 font-sans text-sm tracking-wider uppercase cursor-pointer hover:opacity-90 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-on-secondary-container flex-shrink-0"
+              className="w-full md:w-auto bg-on-secondary-container text-inverse-on-surface border border-on-secondary-container px-8 py-4 md:py-3.5 font-sans text-sm tracking-wider uppercase cursor-pointer hover:opacity-90 transition-opacity outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-on-secondary-container flex-shrink-0"
             >
               Subscribe
             </button>

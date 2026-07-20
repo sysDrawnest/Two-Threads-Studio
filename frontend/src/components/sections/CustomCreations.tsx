@@ -71,14 +71,14 @@ export default function CustomCreations() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 to="/shop?type=custom"
-                className="inline-flex items-center justify-center gap-2 bg-[#f4ebd9] text-[#1C1C1B] px-8 py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase font-medium hover:bg-white transition-colors duration-200 no-underline"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-[#f4ebd9] text-[#1C1C1B] px-8 py-4 sm:py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase font-medium hover:bg-white transition-colors duration-200 no-underline"
               >
                 <Paintbrush2 size={13} />
                 Start Your Custom Order
               </Link>
               <Link
                 to="/shop?type=custom"
-                className="inline-flex items-center justify-center gap-2 border border-white/40 text-white px-8 py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase hover:border-white/70 transition-colors duration-200 no-underline"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 border border-white/40 text-white px-8 py-4 sm:py-3.5 font-sans text-[10px] tracking-[0.18em] uppercase hover:border-white/70 transition-colors duration-200 no-underline"
               >
                 See Examples <ArrowRight size={13} />
               </Link>

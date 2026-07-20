@@ -37,7 +37,7 @@ const reviews = [
 
 export default function Reviews() {
   return (
-    <section id="patterns" className="py-24 px-6 md:px-16 bg-inverse-on-surface">
+    <section id="patterns" className="py-16 md:py-24 px-6 md:px-16 bg-inverse-on-surface">
       <div className="max-w-7xl mx-auto">
         <ScrollReveal direction="up" className="text-center mb-12">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-2">
@@ -48,10 +48,10 @@ export default function Reviews() {
           </h2>
         </ScrollReveal>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-4 md:gap-6 pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
           {reviews.map((r, i) => (
             <ScrollReveal key={i} direction="up">
-              <div className="bg-white p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-outline-variant/30 h-full flex flex-col justify-between">
+              <div className="bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-outline-variant/30 h-full flex flex-col justify-between w-[85vw] flex-shrink-0 snap-center md:w-auto">
                 <div>
                   {/* Stars */}
                   <div className="flex gap-1 mb-5">
