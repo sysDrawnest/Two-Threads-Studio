@@ -17,7 +17,7 @@ interface DecorationProps {
   strokeWidth?: number;
   opacity?: number;
   animate?: 'draw' | 'none';
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'absolute';
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'absolute' | 'relative';
   rotate?: number;
   scale?: number;
   className?: string;
@@ -43,7 +43,7 @@ export function Decoration({
 
   // Helper for absolute positioning presets
   const positionStyles: React.CSSProperties = {
-    position: 'absolute',
+    position: position === 'relative' ? 'relative' : 'absolute',
     ...(position === 'top-left' ? { top: 0, left: 0 } : {}),
     ...(position === 'top-right' ? { top: 0, right: 0 } : {}),
     ...(position === 'bottom-left' ? { bottom: 0, left: 0 } : {}),
