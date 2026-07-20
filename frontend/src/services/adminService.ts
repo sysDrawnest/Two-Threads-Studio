@@ -4,6 +4,8 @@
  */
 
 import { apiClient } from './apiClient';
+import { Product } from '../types/product';
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -13,8 +15,6 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
-
-import { Product } from '../types/product';
 
 // Basic types to satisfy the compiler
 export type Order = any;
