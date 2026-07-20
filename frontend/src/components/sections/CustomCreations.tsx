@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
-import { Decoration } from '../ui/Decoration';
 
 // Assets representing the physical objects on the desk
 import imgPhoto from '../../assets/portrait_of_personalized_portraits_for_a_luxur.png';
@@ -10,7 +9,6 @@ import imgThread from '../../assets/stitch/an_artistic_flat_lay_of_embroidery_ma
 import imgHeirloom from '../../assets/stitch/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an.png';
 
 const Annotation = ({ step, title, desc, className = '' }: { step: string, title: string, desc: string, className?: string }) => (
-
   <div className={`max-w-[200px] flex flex-col ${className}`}>
     <div className="w-8 h-px bg-[#1C1C1B]/30 mb-3" />
     <p className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#A34A38] font-semibold mb-1">
@@ -93,16 +91,10 @@ export default function CustomCreations() {
       {/* Desktop Layout: Artisan's Desk (Absolute Scattered) */}
       <div className="hidden md:block relative w-full h-[850px] lg:h-[950px] max-w-[1400px] mx-auto">
         
-        {/* Decorative background threads */}
-        <Decoration variant="wave-long" colorTheme="light-sand" strokeWidth={3} opacity={0.4} position="absolute" className="-top-32 -left-32 w-full h-full pointer-events-none" />
-
         {/* Header (Stamped) */}
         <div className="absolute top-16 left-1/2 -translate-x-1/2 text-center z-50">
           <p className="font-serif italic text-3xl lg:text-4xl text-[#1C1C1B]/80 mb-2">Custom Commissions</p>
-          <p className="font-sans text-[9px] tracking-[0.3em] uppercase text-[#1C1C1B]/50 mb-4">Memory to Heirloom</p>
-          <div className="relative w-48 h-6 mx-auto">
-             <Decoration variant="divider-stitch" colorTheme="deep-bronze" strokeWidth={1.5} opacity={0.4} className="w-full h-full" />
-          </div>
+          <p className="font-sans text-[9px] tracking-[0.3em] uppercase text-[#1C1C1B]/50">Memory to Heirloom</p>
         </div>
 
         {/* 1. The Reference */}
