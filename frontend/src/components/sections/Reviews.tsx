@@ -37,8 +37,8 @@ const reviews = [
 
 export default function Reviews() {
   return (
-    <section id="patterns" className="py-16 md:py-24 px-6 md:px-16 bg-inverse-on-surface">
-      <div className="max-w-7xl mx-auto">
+    <section id="patterns" className="py-16 md:py-24 bg-inverse-on-surface overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-16">
         <ScrollReveal direction="up" className="text-center mb-12">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-2">
             Community Love
@@ -47,9 +47,10 @@ export default function Reviews() {
             What Our Makers Say
           </h2>
         </ScrollReveal>
+      </div>
 
-        {/* Auto-scrolling Marquee */}
-        <div className="relative overflow-hidden w-full -mx-6 md:mx-0 py-2">
+      {/* Auto-scrolling Marquee */}
+      <div className="relative w-full py-2">
           <style>{`
             @keyframes scroll {
               0% { transform: translateX(0); }
@@ -131,7 +132,6 @@ export default function Reviews() {
             ))}
           </div>
         </div>
-      </div>
     </section>
   );
 }
