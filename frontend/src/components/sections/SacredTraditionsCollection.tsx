@@ -19,14 +19,14 @@ export default function SacredTraditionsCollection() {
 
       {/* Floating Content Card */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16">
-        <ScrollReveal direction="right" className="max-w-md bg-[#FAF9F7]/95 backdrop-blur-md p-6 md:p-12 shadow-xl border border-neutral-200/40 rounded-sm mx-auto md:mx-0">
+        <ScrollReveal direction="right" className="max-w-[90%] sm:max-w-[320px] md:max-w-md bg-[#FAF9F7]/85 md:bg-[#FAF9F7]/95 backdrop-blur-md p-5 md:p-10 shadow-xl border border-neutral-200/40 rounded-sm mx-auto md:mx-0 mt-16 md:mt-0">
           <p className="font-sans text-[10px] md:text-xs tracking-[0.25em] text-[#A34A38] uppercase font-semibold mb-3">
             Inspired by Timeless India
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-light text-[#1C1C1B] leading-tight mb-4">
+          <h2 className="font-serif text-2xl md:text-4xl font-light text-[#1C1C1B] leading-tight mb-3 md:mb-4">
             Sacred Traditions Collection
           </h2>
-          <p className="font-sans text-xs md:text-sm text-neutral-500 leading-relaxed mb-8">
+          <p className="font-sans text-[11px] md:text-sm text-neutral-500 leading-relaxed mb-6 md:mb-8">
             Inspired by India's living heritage—from temple carvings and sacred symbols to ancient embroidery traditions—this collection celebrates craftsmanship, culture, and stories passed through generations.
           </p>
           <button 
