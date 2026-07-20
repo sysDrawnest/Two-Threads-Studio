@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollReveal, StaggerContainer } from '../ui/ScrollReveal';
+import { ScrollReveal } from '../ui/ScrollReveal';
 import { Star, BadgeCheck } from 'lucide-react';
 
 const reviews = [
@@ -48,10 +48,36 @@ export default function Reviews() {
           </h2>
         </ScrollReveal>
 
-        <StaggerContainer className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-3 gap-4 md:gap-6 pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
-          {reviews.map((r, i) => (
-            <ScrollReveal key={i} direction="up">
-              <div className="bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-outline-variant/30 h-full flex flex-col justify-between w-[85vw] flex-shrink-0 snap-center md:w-auto">
+        {/* Auto-scrolling Marquee */}
+        <div className="relative overflow-hidden w-full -mx-6 md:mx-0 py-2">
+          <style>{`
+            @keyframes scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(calc(-50% - 0.75rem)); }
+            }
+            .animate-marquee {
+              animation: scroll 25s linear infinite;
+              /* On mobile, we might want to make it slightly faster */
+            }
+            @media (max-width: 768px) {
+              .animate-marquee {
+                animation-duration: 20s;
+              }
+            }
+            .animate-marquee:hover {
+              animation-play-state: paused;
+            }
+            .animate-marquee:active {
+              animation-play-state: paused;
+            }
+          `}</style>
+          
+          <div className="flex w-max animate-marquee gap-4 md:gap-6 pl-4 md:pl-0">
+            {[...reviews, ...reviews].map((r, i) => (
+              <div 
+                key={i} 
+                className="bg-white p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300 border border-outline-variant/30 flex flex-col justify-between w-[80vw] sm:w-[340px] md:w-[380px] flex-shrink-0"
+              >
                 <div>
                   {/* Stars */}
                   <div className="flex gap-1 mb-5">
@@ -102,9 +128,9 @@ export default function Reviews() {
                   </div>
                 </div>
               </div>
-            </ScrollReveal>
-          ))}
-        </StaggerContainer>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
