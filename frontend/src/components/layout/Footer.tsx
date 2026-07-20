@@ -75,9 +75,9 @@ const Footer: React.FC = () => {
           {cols.map((col, i) => (
             <div key={i} className="border-b border-inverse-on-surface/10 md:border-none pb-4 md:pb-0">
               <button 
+                type="button"
                 onClick={() => toggleCol(i)}
-                className="w-full flex items-center justify-between md:cursor-default"
-                disabled={window.innerWidth >= 768} // simple hack, rely on CSS mostly
+                className="w-full flex items-center justify-between md:cursor-default md:pointer-events-none"
               >
                 <h4 className="font-sans text-xs tracking-widest uppercase text-inverse-on-surface/60 md:mb-5">
                   {col.title}
