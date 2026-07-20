@@ -68,7 +68,15 @@ export const authService = {
 
     const passwordMatch = await comparePassword(dto.password, user.passwordHash);
 
-    if (!passwordMatch) throw invalidCredentials;
+    if (!passwordMatch) {
+      console.log('--- PASSWORD MISMATCH ---');
+      console.log('Provided Password:', dto.password);
+      console.log('Stored Hash:', user.passwordHash);
+      console.log('Length of provided password:', dto.password.length);
+      console.log('Hex of provided password:', Buffer.from(dto.password).toString('hex'));
+      console.log('-------------------------');
+      throw invalidCredentials;
+    }
 
     const { accessToken, rawRefreshToken } = issueTokenPair(user);
 
