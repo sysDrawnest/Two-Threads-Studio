@@ -48,46 +48,19 @@ export default function CustomCreations() {
                 Hand Stitched
               </h2>
               
-              <p className="font-sans text-sm text-[#5a4a3f] leading-loose mb-10 max-w-sm">
-                We believe the most beautiful art is personal. From the quiet companionship of a beloved pet to the fleeting joy of a wedding day, our artisans carefully translate your cherished photographs into timeless heirloom textiles. Crafted by women artisans across India.
+              <p className="font-sans text-sm text-[#5a4a3f] leading-loose mb-12 max-w-sm">
+                We believe the most beautiful art is personal. From the quiet companionship of a beloved pet to the fleeting joy of a wedding day, our artisans carefully translate your cherished photographs into timeless heirloom textiles.
               </p>
-
-              {/* Stats Block */}
-              <div className="flex gap-8 mb-12 border-t border-[#1C1C1B]/10 pt-8 max-w-sm">
-                <div>
-                  <p className="font-serif text-2xl lg:text-3xl text-[#1C1C1B] mb-1">500+</p>
-                  <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Women Artisans</p>
-                </div>
-                <div className="w-px bg-[#1C1C1B]/10"></div>
-                <div>
-                  <p className="font-serif text-2xl lg:text-3xl text-[#1C1C1B] mb-1">100%</p>
-                  <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Handmade</p>
-                </div>
-                <div className="w-px bg-[#1C1C1B]/10"></div>
-                <div>
-                  <p className="font-serif text-2xl lg:text-3xl text-[#1C1C1B] mb-1">4.9★</p>
-                  <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Rating</p>
-                </div>
-              </div>
               
-              <div className="flex flex-col gap-6 items-start">
-                <Link 
-                  to="/shop?type=custom"
-                  className="group inline-flex items-center gap-4 font-sans text-xs tracking-[0.2em] uppercase text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
-                >
-                  <span className="border-b border-[#1C1C1B]/30 group-hover:border-[#A34A38] pb-1 transition-colors">
-                    Begin Your Commission
-                  </span>
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link 
-                  to="/our-story"
-                  className="group inline-flex items-center gap-4 font-sans text-[10px] tracking-[0.15em] uppercase text-[#5a4a3f] hover:text-[#1C1C1B] transition-colors"
-                >
-                  Read Our Story
-                </Link>
-              </div>
+              <Link 
+                to="/shop?type=custom"
+                className="group inline-flex items-center gap-4 font-sans text-xs tracking-[0.2em] uppercase text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+              >
+                <span className="border-b border-[#1C1C1B]/30 group-hover:border-[#A34A38] pb-1 transition-colors">
+                  Begin Your Commission
+                </span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
             </ScrollReveal>
           </div>
 
@@ -124,30 +97,12 @@ export default function CustomCreations() {
           {/* 4. Paragraph */}
           <ScrollReveal direction="up" delay={0.2}>
             <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-10 text-center px-2">
-              We believe the most beautiful art is personal. From the quiet companionship of a beloved pet to the fleeting joy of a wedding day, our artisans carefully translate your cherished photographs into timeless heirloom textiles. Crafted by women artisans across India.
+              We believe the most beautiful art is personal. From the quiet companionship of a beloved pet to the fleeting joy of a wedding day, our artisans carefully translate your cherished photographs into timeless heirloom textiles.
             </p>
           </ScrollReveal>
 
-          {/* Stats Block Mobile */}
-          <ScrollReveal direction="up" delay={0.25} className="flex justify-center gap-6 mb-12 border-t border-[#1C1C1B]/10 pt-8 mx-4">
-            <div className="text-center">
-              <p className="font-serif text-2xl text-[#1C1C1B] mb-1">500+</p>
-              <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Artisans</p>
-            </div>
-            <div className="w-px bg-[#1C1C1B]/10"></div>
-            <div className="text-center">
-              <p className="font-serif text-2xl text-[#1C1C1B] mb-1">100%</p>
-              <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Handmade</p>
-            </div>
-            <div className="w-px bg-[#1C1C1B]/10"></div>
-            <div className="text-center">
-              <p className="font-serif text-2xl text-[#1C1C1B] mb-1">4.9★</p>
-              <p className="font-sans text-[9px] tracking-widest uppercase text-[#5a4a3f]">Rating</p>
-            </div>
-          </ScrollReveal>
-
-          {/* 5. CTAs */}
-          <ScrollReveal direction="up" delay={0.3} className="flex flex-col items-center gap-6 mb-16">
+          {/* 5. Begin -> */}
+          <ScrollReveal direction="up" delay={0.3} className="flex justify-center mb-16">
             <Link 
               to="/shop?type=custom"
               className="group inline-flex items-center gap-3 font-sans text-xs tracking-[0.2em] uppercase text-[#1C1C1B]"
@@ -156,12 +111,6 @@ export default function CustomCreations() {
                 Begin Your Commission
               </span>
               <ArrowRight size={14} />
-            </Link>
-            <Link 
-              to="/our-story"
-              className="font-sans text-[10px] tracking-[0.15em] uppercase text-[#5a4a3f]"
-            >
-              Read Our Story
             </Link>
           </ScrollReveal>
 
