@@ -8,8 +8,10 @@ const THEME_COLORS: Record<DecorationColorTheme, string> = {
   'warm-linen': '#E6D8C5',
   'soft-gold': '#C8A97E',
   'deep-bronze': '#A8844A',
-  'light-sand': 'rgba(200,169,126,0.08)',
+  'light-sand': '#EADECF',
 };
+
+export type DecorationPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'absolute' | 'relative' | 'inline';
 
 interface DecorationProps {
   variant: DecorationVariant;
@@ -17,7 +19,7 @@ interface DecorationProps {
   strokeWidth?: number;
   opacity?: number;
   animate?: 'draw' | 'none';
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'absolute' | 'relative';
+  position?: DecorationPosition;
   rotate?: number;
   scale?: number;
   className?: string;
@@ -27,7 +29,7 @@ interface DecorationProps {
 export function Decoration({
   variant,
   colorTheme = 'soft-gold',
-  strokeWidth = 1.2,
+  strokeWidth = 1.5,
   opacity = 1,
   animate = 'draw',
   position = 'absolute',
@@ -41,17 +43,27 @@ export function Decoration({
 
   const color = THEME_COLORS[colorTheme];
 
-  // Helper for absolute positioning presets
-  const positionStyles: React.CSSProperties = {
-    position: position === 'relative' ? 'relative' : 'absolute',
-    ...(position === 'top-left' ? { top: 0, left: 0 } : {}),
-    ...(position === 'top-right' ? { top: 0, right: 0 } : {}),
-    ...(position === 'bottom-left' ? { bottom: 0, left: 0 } : {}),
-    ...(position === 'bottom-right' ? { bottom: 0, right: 0 } : {}),
-    ...(position === 'center' ? { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' } : {}),
+  const getPositionStyles = (): React.CSSProperties => {
+    if (position === 'relative') return { position: 'relative' };
+    if (position === 'inline') return { position: 'relative', display: 'inline-block' };
+
+    return {
+      position: 'absolute',
+      ...(position === 'top-left' ? { top: 0, left: 0 } : {}),
+      ...(position === 'top-right' ? { top: 0, right: 0 } : {}),
+      ...(position === 'bottom-left' ? { bottom: 0, left: 0 } : {}),
+      ...(position === 'bottom-right' ? { bottom: 0, right: 0 } : {}),
+      ...(position === 'center' ? { top: '50%', left: '50%' } : {}),
+    };
   };
 
-  const transformString = `${position === 'center' ? 'translate(-50%, -50%) ' : ''}rotate(${rotate}deg) scale(${scale})`;
+  const positionStyles = getPositionStyles();
+
+  const transformParts = [];
+  if (position === 'center') transformParts.push('translate(-50%, -50%)');
+  if (rotate !== 0) transformParts.push(`rotate(${rotate}deg)`);
+  if (scale !== 1) transformParts.push(`scale(${scale})`);
+  const transformString = transformParts.join(' ');
 
   return (
     <div 
@@ -59,7 +71,7 @@ export function Decoration({
       style={{
         ...positionStyles,
         opacity,
-        transform: transformString,
+        ...(transformString ? { transform: transformString } : {}),
         ...style
       }}
       aria-hidden="true"
@@ -70,7 +82,7 @@ export function Decoration({
         xmlns="http://www.w3.org/2000/svg"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-full h-full"
+        className="w-full h-full overflow-visible"
       >
         {data.paths.map((p, i) => {
           const sw = p.strokeWidth ?? strokeWidth;
@@ -86,8 +98,8 @@ export function Decoration({
                 fill="none"
                 initial={{ pathLength: 0, opacity: 0 }}
                 whileInView={{ pathLength: 1, opacity: 1 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 6, ease: "easeInOut", delay: 0.2 }}
+                viewport={{ once: true }}
+                transition={{ duration: 2.5, ease: "easeInOut", delay: 0.1 }}
               />
             );
           }
@@ -107,3 +119,4 @@ export function Decoration({
     </div>
   );
 }
+
