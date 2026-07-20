@@ -3,71 +3,61 @@ import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import ourStoryImg from '../../assets/our_story_section.png';
 
-const stats = [
-  { value: '500+', label: 'Happy Makers' },
-  { value: '100%', label: 'Handmade' },
-  { value: '4.9★', label: 'Avg. Rating' },
-];
-
 export default function OurStory() {
   return (
-    <section id="our-story" className="py-16 md:py-24 px-6 md:px-16 bg-primary-container">
-      <div className="max-w-7xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-20 items-center">
-        <ScrollReveal direction="left" className="relative -mx-6 md:mx-0">
-          <img
-            src={ourStoryImg}
-            alt="Our Story - artisan at work"
-            className="w-full h-[400px] md:h-[600px] object-cover object-center"
-            loading="lazy"
-          />
-          <div className="absolute -top-5 -left-5 w-full h-full border border-white/10 pointer-events-none" />
+    <section id="our-story" className="bg-white py-16 md:py-32 overflow-hidden border-t border-outline-variant/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-16">
+        
+        {/* Large Editorial Photo */}
+        <ScrollReveal direction="up" duration={1.2}>
+          <div className="w-full h-[50vh] md:h-[70vh] mb-16 md:mb-24 overflow-hidden">
+            <img
+              src={ourStoryImg}
+              alt="Artisan craftsmanship"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
         </ScrollReveal>
 
-        <div>
-          <ScrollReveal direction="right" delay={0.15}>
-            <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-4">
-              Our Story
+        {/* Editorial Text Block */}
+        <div className="max-w-3xl mx-auto text-center">
+          <ScrollReveal direction="up">
+            <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-semibold mb-6">
+              Our Philosophy
             </p>
           </ScrollReveal>
 
-          <ScrollReveal direction="right" delay={0.3}>
-            <h2 className="font-serif text-3xl md:text-5xl font-light text-inverse-on-surface leading-tight mb-6">
-              TwoThreads celebrates <br className="hidden md:block" />the art of making.
+          <ScrollReveal direction="up" delay={0.1}>
+            <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl font-light text-[#1C1C1B] leading-[1.15] mb-8">
+              The Art of Intentional Making
             </h2>
           </ScrollReveal>
 
-          <ScrollReveal direction="right" delay={0.42}>
-            <p className="font-sans text-sm leading-loose text-inverse-on-surface/75 mb-8">
-              We partner with women artisans across India to bring heritage craft into modern homes — 
-              one slow, intentional stitch at a time.
-            </p>
-          </ScrollReveal>
-
-          {/* Stats */}
-          <ScrollReveal direction="right" delay={0.54}>
-            <div className="flex flex-wrap gap-6 md:gap-8 mb-8 border-t border-b border-white/10 py-6">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <p className="font-serif text-2xl md:text-3xl font-light text-inverse-on-surface">
-                    {stat.value}
-                  </p>
-                  <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-on-secondary-container mt-1">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
+          <ScrollReveal direction="up" delay={0.2}>
+            <div className="font-sans text-sm text-[#5a4a3f] leading-loose space-y-6 mb-12">
+              <p>
+                We partner with women artisans across India to bring heritage craft into modern homes. Our work is a celebration of the human touch—where every stitch is placed with purpose, preserving techniques that have been passed down for generations.
+              </p>
+              <p>
+                True luxury lies in patience. By choosing sustainable materials and supporting ethical livelihoods, we ensure that the art you bring into your home leaves a positive mark on the world.
+              </p>
             </div>
           </ScrollReveal>
 
-          <ScrollReveal direction="right" delay={0.65}>
+          <ScrollReveal direction="up" delay={0.3}>
             <Link
               to="/our-story"
-              className="inline-flex items-center gap-2 font-sans text-sm tracking-[0.15em] uppercase text-inverse-on-surface/80 hover:text-inverse-on-surface transition-colors no-underline border-b border-white/30 hover:border-white/60 pb-0.5"
+              className="group inline-flex items-center gap-3 font-sans text-xs tracking-[0.2em] uppercase text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
-              Read Our Full Story →
+              <span className="border-b border-[#1C1C1B]/30 group-hover:border-[#A34A38] pb-1 transition-colors">
+                Discover Our Heritage
+              </span>
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
           </ScrollReveal>
         </div>
+
       </div>
     </section>
   );
