@@ -19,6 +19,12 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 export const login = catchAsync(async (req: Request, res: Response) => {
+  console.log('--- LOGIN DEBUG ---');
+  console.log('Email received:', req.body.email);
+  console.log('Password length:', req.body.password?.length);
+  console.log('Password value:', req.body.password);
+  console.log('-------------------');
+  
   const ipAddress = req.ip;
   const deviceInfo = req.headers['user-agent'];
 
