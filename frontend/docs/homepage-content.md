@@ -1,25 +1,14 @@
 # Homepage Render Flow
 
-The homepage renders in the following top-to-bottom sequence of components:
+The homepage renders in the following top-to-bottom sequence of components to maintain a premium, uncrowded narrative:
 
 1. `Hero` (Eagerly Loaded)
-2. `TrustBar` (Eagerly Loaded)
+2. `ShopByCategory` (Lazy Loaded)
 3. `BestSellers` (Eagerly Loaded)
-4. `VideoBanner` (Lazy Loaded - Exclusive Collection)
-5. `ShopByCategory` (Lazy Loaded)
-6. `ShopByOccasion` (Lazy Loaded)
-7. `FeaturedCollections` (Lazy Loaded)
-8. `SacredTraditionsCollection` (Lazy Loaded - Sacred Traditions)
-9. `JustForYou` (Lazy Loaded - Curated Picks)
-10. `SustainabilitySection` (Lazy Loaded - Conscious Crafting) -- **NEW**
-11. `CustomCreations` (Lazy Loaded)
-12. `OurStory` (Lazy Loaded - Brand Story)
-13. `CraftingProcess` (Lazy Loaded)
-14. `Reviews` (Lazy Loaded)
-15. `CommunityGallery` (Lazy Loaded)
-16. `Learning` (Lazy Loaded - Learning Studio)
-17. `CorporateBulkOrders` (Lazy Loaded)
-18. `Newsletter` (Lazy Loaded)
+4. `ExclusiveCollection` (Video Banner, Lazy Loaded - Lifestyle Collection)
+5. `CustomCreations` (Lazy Loaded - Includes Merged Brand Story stats)
+6. `Reviews` (Lazy Loaded)
+7. `Newsletter` (Lazy Loaded)
 
 ---
 
@@ -98,6 +87,7 @@ Establishes credibility, customer satisfaction, and outlines key service/shippin
 ### Content
 
 Displays six standard brand trust points with corresponding inline icons:
+
 1. "Handmade in India" (Package icon)
 2. "Free Shipping Above ₹2,999" (Truck icon)
 3. "Sustainable Materials" (Leaf icon)
@@ -379,7 +369,6 @@ Organizes the storefront around carefully curated editorial collections using an
 - `ScrollReveal` component.
 
 ---
-
 
 ## VideoBanner
 
