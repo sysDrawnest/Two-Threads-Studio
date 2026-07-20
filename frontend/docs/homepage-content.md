@@ -602,44 +602,42 @@ Educates visitors on the brand's commitment to earth-first materials, building t
 
 ### Purpose
 
-Bespoke conversion funnel. Promotes personalized products (e.g. portraits, name hoops) to drive higher margins and AOV.
+A premium, luxury commission service landing section that focuses on emotional storytelling and editorial design over promotional tactics to drive high-margin bespoke orders.
 
 ### Content
 
-- **Overline Text**: "Custom Creations"
-- **Title**: "Made *Just* for You"
-- **Description**: "Turn your most treasured memories into handcrafted art..."
-- **Custom tags**: "Portrait Embroidery 🎨", "Pet Portraits 🐾", "Wedding Gifts 💍", "Family Embroidery 🌸", "Name Hoops ✍️".
-- **CTA Buttons**: "Start Your Custom Order" and "See Examples" buttons.
-- **Decorative Vertical Accent**: "Bespoke · Handcrafted · Yours" string.
+- **Overline Text**: "Custom Commissions"
+- **Title**: "Your Story, Hand Stitched"
+- **Description**: "We believe the most beautiful art is personal. From the quiet companionship of a beloved pet to the fleeting joy of a wedding day..."
+- **CTA Link**: "Begin Your Commission →"
+- **Mobile Gallery**: Three visual examples labeled "Portrait", "Wedding", and "Pet".
 
 ### Layout
 
-- **Desktop**: Content is left-aligned within a `max-w-xl` width constraint. Vertical decorative accent text sits absolute-positioned on the far-right edge.
-- **Mobile**: Vertical column layout. Side accent text is hidden.
+- **Desktop**: Asymmetrical Editorial Split. A large striking photograph commands the left side (`md:col-span-7`), while the narrative text sits on the right side (`md:col-span-5`), intentionally pushed down (`pt-32`) to create massive, luxurious whitespace.
+- **Mobile**: Linear editorial flow. Full-width bleed image -> Label -> Heading -> Paragraph -> CTA -> Horizontal scroll-snapping gallery of examples.
 
 ### Styling
 
-- **Colors**: Full cover background image with gradient overlay (`from-[#1C1C1B]/90 via-[#1C1C1B]/65 to-[#1C1C1B]/20`).
-- **Custom tags**: Translucent base (`bg-white/10`), backdrop blur, border `border-white/20`.
-- **Buttons**: Primary has a solid cream background (`#f4ebd9`), secondary has a white outline.
+- **Colors**: Calm, warm white background (`bg-[#FAF9F7]`) to maintain the homepage rhythm and provide breathing room.
+- **CTAs**: Minimalist text links with thin bottom borders that expand on hover, avoiding heavy "SaaS-style" buttons.
 
 ### Animations
 
-- **Scroll Reveal**: Left-aligned copy reveals from the right with staggered delays.
-- **Vertical Accent**: Fades in smoothly on scroll with Framer Motion.
+- **Scroll Reveal**: Simple, calm upward fade-ins for all textual elements and images. Avoids complex parallax or floating elements to maintain a restrained luxury feel.
 
 ### User Interaction
 
-- **CTAs**: Both buttons navigate to `/shop?type=custom`.
+- **CTAs**: Navigates to `/shop?type=custom`.
+- **Mobile Swipe**: Horizontal scroll gallery for examples.
 
 ### Backend Integration Readiness
 
-- **Static**: Copy, custom tags, and buttons are static.
+- **Static**: Copy and visual examples are static, easily configured in a CMS.
 
 ### Dependencies
 
-- Hoop image asset (`hoopImg`).
+- High-resolution portrait/wedding imagery assets.
 - `ScrollReveal` component.
 - Lucide React icons.
 
