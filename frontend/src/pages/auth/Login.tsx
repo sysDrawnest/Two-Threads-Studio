@@ -30,10 +30,6 @@ const Login: React.FC = () => {
       return;
     }
 
-    console.log('--- FRONTEND LOGIN PAYLOAD ---');
-    console.log({ email, password, length: password.length });
-    console.log('------------------------------');
-
     const result = await login(email, password);
     if (result.success) {
       if (email === 'admin@twothreads.com') {

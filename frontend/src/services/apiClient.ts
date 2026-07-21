@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+// In development: use relative path so Vite's dev proxy handles routing
+// (avoids cross-origin CORS entirely in dev — browser sees same-origin requests).
+// In production: VITE_API_URL must be set to the absolute backend URL.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 interface RequestOptions extends RequestInit {
   body?: any;
