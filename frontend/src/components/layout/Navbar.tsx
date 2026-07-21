@@ -63,11 +63,6 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Announcement Banner */}
-      <div className="bg-[#1C1C1B] text-[#FAF9F7] text-[10px] md:text-[11px] font-sans tracking-[0.2em] uppercase py-2 px-4 text-center relative z-50 flex items-center justify-center gap-2 border-b border-[#2D2B29]">
-        <span className="text-[#C8A97E]">Handcrafted Luxury Embroidery</span>
-      </div>
-
       <nav
         className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 px-5 md:px-12 lg:px-16 ${
           scrolled 
