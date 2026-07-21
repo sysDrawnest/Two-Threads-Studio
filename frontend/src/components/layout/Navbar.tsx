@@ -26,13 +26,11 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  // Close mobile menu & dropdowns on route change
   useEffect(() => {
     setMenuOpen(false);
     setActiveDropdown(null);
   }, [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden';
@@ -64,10 +62,10 @@ const Navbar: React.FC = () => {
   return (
     <>
       <nav
-        className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 px-5 md:px-12 lg:px-16 ${
+        className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 px-5 md:px-10 lg:px-14 ${
           scrolled 
-            ? 'bg-[#FAF9F7]/90 backdrop-blur-md border-b border-[#E8E4DF]/70 py-3.5 shadow-sm' 
-            : 'bg-[#FAF9F7] border-b border-[#E8E4DF]/40 py-5'
+            ? 'bg-[#FAF9F7]/90 backdrop-blur-md border-b border-[#E8E4DF]/70 py-3 shadow-sm' 
+            : 'bg-[#FAF9F7] border-b border-[#E8E4DF]/40 py-4'
         }`}
       >
         {/* Desktop Layout */}
@@ -77,33 +75,32 @@ const Navbar: React.FC = () => {
           <div className="w-1/4 flex justify-start">
             <Link 
               to="/" 
-              className="font-serif text-[24px] lg:text-[26px] tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+              className="font-serif text-[22px] lg:text-[24px] tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               TwoThreads Studio
             </Link>
           </div>
 
           {/* Center: Commerce-Focused Links */}
-          <div className="w-2/4 flex justify-center gap-8 lg:gap-10 items-center">
+          <div className="w-2/4 flex justify-center gap-7 lg:gap-9 items-center">
             
-            {/* Shop Mega Dropdown */}
+            {/* Shop Dropdown */}
             <div 
-              className="relative group py-2"
+              className="relative group py-1.5"
               onMouseEnter={() => setActiveDropdown('shop')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <Link 
                 to="/shop" 
-                className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 flex items-center gap-1 transition-colors font-medium"
+                className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 flex items-center gap-1 transition-colors font-medium"
               >
                 Shop
-                <ChevronDown size={12} className="opacity-60 group-hover:rotate-180 transition-transform duration-200" />
+                <ChevronDown size={11} className="opacity-60 group-hover:rotate-180 transition-transform duration-200" />
               </Link>
               
-              {/* Dropdown Menu */}
               {activeDropdown === 'shop' && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-64 bg-[#FAF9F7] border border-[#E8E4DF] shadow-xl py-4 px-5 rounded-sm animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-neutral-400 mb-3 border-b border-[#E8E4DF] pb-1.5 font-semibold">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-60 bg-[#FAF9F7] border border-[#E8E4DF] shadow-xl py-4 px-5 rounded-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-neutral-400 mb-2.5 border-b border-[#E8E4DF] pb-1.5 font-semibold">
                     Shop Categories
                   </div>
                   <div className="flex flex-col gap-2.5">
@@ -123,22 +120,21 @@ const Navbar: React.FC = () => {
 
             {/* Collections Dropdown */}
             <div 
-              className="relative group py-2"
+              className="relative group py-1.5"
               onMouseEnter={() => setActiveDropdown('collections')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <Link 
                 to="/collections" 
-                className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 flex items-center gap-1 transition-colors font-medium"
+                className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 flex items-center gap-1 transition-colors font-medium"
               >
                 Collections
-                <ChevronDown size={12} className="opacity-60 group-hover:rotate-180 transition-transform duration-200" />
+                <ChevronDown size={11} className="opacity-60 group-hover:rotate-180 transition-transform duration-200" />
               </Link>
               
-              {/* Dropdown Menu */}
               {activeDropdown === 'collections' && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-64 bg-[#FAF9F7] border border-[#E8E4DF] shadow-xl py-4 px-5 rounded-sm animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-neutral-400 mb-3 border-b border-[#E8E4DF] pb-1.5 font-semibold">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-60 bg-[#FAF9F7] border border-[#E8E4DF] shadow-xl py-4 px-5 rounded-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="text-[10px] font-sans tracking-[0.2em] uppercase text-neutral-400 mb-2.5 border-b border-[#E8E4DF] pb-1.5 font-semibold">
                     Curated Collections
                   </div>
                   <div className="flex flex-col gap-2.5">
@@ -159,7 +155,7 @@ const Navbar: React.FC = () => {
             {/* Custom Commissions */}
             <Link 
               to="/our-story#custom-creations" 
-              className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium flex items-center gap-1.5"
+              className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium flex items-center gap-1.5"
             >
               Custom
               <span className="w-1.5 h-1.5 rounded-full bg-[#A34A38] animate-pulse" />
@@ -168,85 +164,80 @@ const Navbar: React.FC = () => {
             {/* Our Story */}
             <Link 
               to="/our-story" 
-              className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium"
+              className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium"
             >
               About
             </Link>
 
           </div>
 
-          {/* Right: Prominent Search, Wishlist, Account, Cart */}
-          <div className="w-1/4 flex justify-end gap-6 items-center">
+          {/* Right: Icons */}
+          <div className="w-1/4 flex justify-end gap-5 items-center">
             
-            {/* Admin Access Icon */}
             {isAuthenticated && user?.role === 'admin' && (
               <Link 
                 to="/admin" 
-                className="text-neutral-700 hover:text-[#A34A38] transition-colors p-1"
+                className="text-neutral-700 hover:text-[#A34A38] transition-colors"
                 aria-label="Admin Dashboard"
                 title="Admin Dashboard"
               >
-                <Shield strokeWidth={1.5} size={19} />
+                <Shield strokeWidth={1.5} size={18} />
               </Link>
             )}
 
-            {/* Prominent Search Trigger */}
             <button 
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 text-neutral-700 hover:text-[#A34A38] transition-colors font-sans text-xs tracking-[0.15em] uppercase py-1"
+              className="flex items-center gap-1.5 text-neutral-700 hover:text-[#A34A38] transition-colors font-sans text-[10px] tracking-[0.15em] uppercase"
               aria-label="Search Collection"
             >
               <Search strokeWidth={1.3} size={18} />
-              <span className="hidden lg:inline text-[11px]">Search</span>
+              <span className="hidden lg:inline text-[10px]">Search</span>
             </button>
 
-            {/* Wishlist Icon */}
             <Link 
               to="/wishlist" 
-              className="text-neutral-700 hover:text-[#A34A38] transition-colors p-1"
+              className="text-neutral-700 hover:text-[#A34A38] transition-colors"
               aria-label="Wishlist"
               title="Wishlist"
             >
-              <Heart strokeWidth={1.3} size={19} />
+              <Heart strokeWidth={1.3} size={18} />
             </Link>
 
-            {/* User Account */}
             {isAuthenticated ? (
               <Link 
                 to="/account" 
-                className="text-neutral-700 hover:text-[#A34A38] transition-colors p-1"
+                className="text-neutral-700 hover:text-[#A34A38] transition-colors"
                 aria-label="Account Profile"
                 title="My Account"
               >
-                <User strokeWidth={1.4} size={19} />
+                <User strokeWidth={1.4} size={18} />
               </Link>
             ) : (
               <Link 
                 to="/auth/login?redirect=/account" 
-                className="text-neutral-700 hover:text-[#A34A38] transition-colors p-1"
+                className="text-neutral-700 hover:text-[#A34A38] transition-colors"
                 aria-label="Login"
                 title="Log In"
               >
-                <User strokeWidth={1.3} size={19} />
+                <User strokeWidth={1.3} size={18} />
               </Link>
             )}
 
-            {/* Cart Icon + Badge / Value */}
             <button 
               onClick={() => setCartOpen(true)}
-              className="flex items-center gap-2 text-[#1C1C1B] hover:text-[#A34A38] transition-colors relative py-1"
+              className="flex items-center gap-1.5 text-[#1C1C1B] hover:text-[#A34A38] transition-colors relative"
               aria-label="Cart"
             >
               <div className="relative">
-                <ShoppingBag strokeWidth={1.3} size={20} />
+                <ShoppingBag strokeWidth={1.3} size={19} />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-[#1C1C1B] text-[#FAF9F7] text-[9px] font-semibold w-4 h-4 flex items-center justify-center rounded-full shadow-sm ring-2 ring-[#FAF9F7]">
+                  <span className="absolute -top-1.5 -right-1.5 bg-[#1C1C1B] text-[#FAF9F7] text-[8px] font-semibold w-4 h-4 flex items-center justify-center rounded-full shadow-sm ring-2 ring-[#FAF9F7]">
                     {cartItemCount}
                   </span>
                 )}
               </div>
               {cartSubtotal && (
-                <span className="hidden xl:inline text-[11px] font-sans tracking-wide font-medium text-neutral-800">
+                <span className="hidden xl:inline text-[10px] font-sans tracking-wide font-medium text-neutral-800">
                   {cartSubtotal}
                 </span>
               )}
@@ -255,42 +246,39 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Layout Header Bar */}
-        <div className="flex md:hidden items-center justify-between w-full">
-          {/* Left: Hamburger */}
+        {/* Mobile Layout */}
+        <div className="flex md:hidden items-center justify-between w-full py-0.5">
           <div className="flex-1 flex justify-start">
             <button 
               onClick={() => setMenuOpen(true)}
-              className="text-[#1C1C1B] p-1 -ml-1 hover:text-[#A34A38]"
+              className="text-[#1C1C1B] p-0.5 -ml-1 hover:text-[#A34A38]"
               aria-label="Open Menu"
             >
-              <Menu strokeWidth={1.3} size={24} />
+              <Menu strokeWidth={1.3} size={23} />
             </button>
           </div>
           
-          {/* Center: Logo */}
           <div className="flex-1 flex justify-center">
             <Link 
               to="/" 
-              className="font-serif text-[22px] tracking-wide text-[#1C1C1B]"
+              className="font-serif text-xl tracking-wide text-[#1C1C1B]"
             >
               TwoThreads
             </Link>
           </div>
 
-          {/* Right: Cart */}
-          <div className="flex-1 flex justify-end items-center gap-3">
-            <Link to="/wishlist" className="text-[#1C1C1B] hover:text-[#A34A38] p-1">
-              <Heart strokeWidth={1.3} size={20} />
+          <div className="flex-1 flex justify-end items-center gap-2.5">
+            <Link to="/wishlist" className="text-[#1C1C1B] hover:text-[#A34A38]">
+              <Heart strokeWidth={1.3} size={19} />
             </Link>
             <button 
               onClick={() => setCartOpen(true)}
-              className="text-[#1C1C1B] relative p-1 -mr-1 hover:text-[#A34A38]"
+              className="text-[#1C1C1B] relative hover:text-[#A34A38]"
               aria-label="Cart"
             >
-              <ShoppingBag strokeWidth={1.3} size={22} />
+              <ShoppingBag strokeWidth={1.3} size={21} />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#1C1C1B] text-[#FAF9F7] text-[9px] font-semibold w-4 h-4 flex items-center justify-center rounded-full shadow-sm ring-2 ring-[#FAF9F7]">
+                <span className="absolute -top-1 -right-1 bg-[#1C1C1B] text-[#FAF9F7] text-[8px] font-semibold w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm ring-2 ring-[#FAF9F7]">
                   {cartItemCount}
                 </span>
               )}
@@ -299,7 +287,7 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {/* Magazine-Style Full-Screen Mobile Navigation Overlay */}
+      {/* Mobile Menu - Unchanged */}
       <div 
         className={`fixed inset-0 z-[60] bg-[#FAF9F7] flex flex-col transition-all duration-300 ${
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -307,9 +295,8 @@ const Navbar: React.FC = () => {
       >
         <div className="flex flex-col h-full w-full px-6 py-6 max-w-lg mx-auto overflow-y-auto">
           
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between mb-10 pb-4 border-b border-[#E8E4DF]">
-            <Link to="/" className="font-serif text-[24px] tracking-wide text-[#1C1C1B]">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E8E4DF]">
+            <Link to="/" className="font-serif text-2xl tracking-wide text-[#1C1C1B]">
               TwoThreads Studio
             </Link>
             <button 
@@ -317,92 +304,89 @@ const Navbar: React.FC = () => {
               className="text-[#1C1C1B] p-1.5 rounded-full hover:bg-neutral-200/50 transition-colors"
               aria-label="Close Menu"
             >
-              <X strokeWidth={1.3} size={26} />
+              <X strokeWidth={1.3} size={24} />
             </button>
           </div>
 
-          {/* Main Editorial Links */}
-          <div className="flex flex-col gap-6 items-start my-auto">
+          <div className="flex flex-col gap-5 items-start my-auto">
             <Link 
               to="/shop" 
-              className="font-serif text-[34px] leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Shop
             </Link>
             <Link 
               to="/collections" 
-              className="font-serif text-[34px] leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Collections
             </Link>
             <Link 
               to="/our-story#custom-creations" 
-              className="font-serif text-[34px] leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors flex items-center gap-3"
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors flex items-center gap-3"
             >
               Custom Orders
               <span className="text-xs font-sans tracking-widest uppercase bg-[#A34A38] text-[#FAF9F7] px-2 py-0.5 rounded-full">Artisan</span>
             </Link>
             <Link 
               to="/our-story" 
-              className="font-serif text-[34px] leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Our Story
             </Link>
             <Link 
               to="/account?tab=orders" 
-              className="font-serif text-[34px] leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors flex items-center gap-3"
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors flex items-center gap-3"
             >
-              <Truck size={24} className="text-[#A34A38]" /> Track Order
+              <Truck size={22} className="text-[#A34A38]" /> Track Order
             </Link>
           </div>
 
-          {/* Secondary Utilities & Actions */}
-          <div className="flex flex-col gap-5 border-t border-[#E8E4DF] pt-8 mt-10 pb-6">
+          <div className="flex flex-col gap-4 border-t border-[#E8E4DF] pt-6 mt-8 pb-4">
             <button 
               onClick={() => {
                 setMenuOpen(false);
                 setTimeout(() => setIsSearchOpen(true), 50);
               }}
-              className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
+              className="font-sans text-[10px] tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
             >
-              <Search size={18} strokeWidth={1.3} /> Search Collection
+              <Search size={16} strokeWidth={1.3} /> Search Collection
             </button>
 
             <Link 
               to="/wishlist" 
-              className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
+              className="font-sans text-[10px] tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
             >
-              <Heart size={18} strokeWidth={1.3} /> Wishlist
+              <Heart size={16} strokeWidth={1.3} /> Wishlist
             </Link>
 
             {isAuthenticated ? (
               <Link 
                 to="/account" 
-                className="font-sans text-xs tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 font-medium hover:text-[#1C1C1B] transition-colors"
+                className="font-sans text-[10px] tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 font-medium hover:text-[#1C1C1B] transition-colors"
               >
-                <User size={18} strokeWidth={1.4} /> My Profile
+                <User size={16} strokeWidth={1.4} /> My Profile
               </Link>
             ) : (
               <Link 
                 to="/auth/login?redirect=/account" 
-                className="font-sans text-xs tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
+                className="font-sans text-[10px] tracking-[0.2em] text-[#1C1C1B] uppercase flex items-center gap-3 hover:text-[#A34A38] transition-colors"
               >
-                <User size={18} strokeWidth={1.3} /> Log In
+                <User size={16} strokeWidth={1.3} /> Log In
               </Link>
             )}
 
             {isAuthenticated && user?.role === 'admin' && (
               <Link 
                 to="/admin" 
-                className="font-sans text-xs tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 font-semibold hover:text-[#1C1C1B] transition-colors"
+                className="font-sans text-[10px] tracking-[0.2em] text-[#A34A38] uppercase flex items-center gap-3 font-semibold hover:text-[#1C1C1B] transition-colors"
               >
-                <Shield size={18} strokeWidth={1.5} /> Admin Dashboard
+                <Shield size={16} strokeWidth={1.5} /> Admin Dashboard
               </Link>
             )}
           </div>
 
-          {/* Social & Contact Footer */}
-          <div className="flex items-center justify-between border-t border-[#E8E4DF] pt-6 text-[10px] font-sans tracking-[0.2em] uppercase text-neutral-500">
+          <div className="flex items-center justify-between border-t border-[#E8E4DF] pt-4 text-[9px] font-sans tracking-[0.2em] uppercase text-neutral-500">
             <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#1C1C1B]">Instagram</a>
             <a href="https://pinterest.com" target="_blank" rel="noreferrer" className="hover:text-[#1C1C1B]">Pinterest</a>
             <Link to="/contact" className="hover:text-[#1C1C1B]">Contact Atelier</Link>
