@@ -274,7 +274,7 @@ export const productService = {
 
     const newName = original.name + ' (Copy)';
     
-    const dto: CreateProductDto = {
+    const dto: any = {
       name: newName,
       description: original.description,
       shortDescription: original.shortDescription || undefined,
