@@ -29,10 +29,12 @@ export const validate =
           message: err.message,
         }));
         
+        const firstMessage = formattedErrors[0]?.message || MESSAGES.VALIDATION_ERROR;
         return next(
           new AppError(
-            MESSAGES.VALIDATION_ERROR,
+            firstMessage,
             HTTP_STATUS.BAD_REQUEST,
+            'VALIDATION_ERROR',
             formattedErrors
           )
         );

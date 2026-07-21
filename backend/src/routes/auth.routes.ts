@@ -21,7 +21,6 @@ import {
 
 const router = Router();
 
-// Stricter rate limit for auth routes: 10 requests per 15 minutes per IP
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -29,7 +28,11 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    message: 'Too many authentication attempts. Please try again in 15 minutes.',
+    code: 'TOO_MANY_ATTEMPTS',
+    message: 'Too many failed login attempts. Please try again in 15 minutes.',
+  },
+  handler: (_req, res, _next, options) => {
+    res.status(429).json(options.message);
   },
 });
 

@@ -28,7 +28,7 @@ export const authService = {
   register: async (dto: RegisterDto): Promise<SafeUser> => {
     const existing = await userRepository.findByEmail(dto.email);
     if (existing) {
-      throw new AppError('An account with this email already exists', HTTP_STATUS.CONFLICT);
+      throw new AppError('An account with this email already exists.', HTTP_STATUS.CONFLICT, 'EMAIL_EXISTS');
     }
 
     const passwordHash = await hashPassword(dto.password);
@@ -52,30 +52,20 @@ export const authService = {
     ipAddress?: string,
     deviceInfo?: string
   ): Promise<{ user: SafeUser; accessToken: string; refreshToken: string }> => {
-    // Always fetch with passwordHash for comparison
     const user = await userRepository.findByEmailWithPassword(dto.email);
 
-    // Use consistent error to prevent user enumeration
-    const invalidCredentials = new AppError(
-      'Invalid email or password',
-      HTTP_STATUS.UNAUTHORIZED
-    );
+    if (!user) {
+      throw new AppError('No account found with this email address.', HTTP_STATUS.NOT_FOUND, 'USER_NOT_FOUND');
+    }
 
-    if (!user) throw invalidCredentials;
     if (!user.isActive) {
-      throw new AppError('Your account has been deactivated', HTTP_STATUS.UNAUTHORIZED);
+      throw new AppError('Your account has been temporarily suspended. Please contact support.', HTTP_STATUS.FORBIDDEN, 'ACCOUNT_BLOCKED');
     }
 
     const passwordMatch = await comparePassword(dto.password, user.passwordHash);
 
     if (!passwordMatch) {
-      console.log('--- PASSWORD MISMATCH ---');
-      console.log('Provided Password:', dto.password);
-      console.log('Stored Hash:', user.passwordHash);
-      console.log('Length of provided password:', dto.password.length);
-      console.log('Hex of provided password:', Buffer.from(dto.password).toString('hex'));
-      console.log('-------------------------');
-      throw invalidCredentials;
+      throw new AppError('Incorrect password. Please try again.', HTTP_STATUS.UNAUTHORIZED, 'INVALID_PASSWORD');
     }
 
     const { accessToken, rawRefreshToken } = issueTokenPair(user);

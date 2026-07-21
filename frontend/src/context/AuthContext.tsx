@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+import { apiClient } from '../services/apiClient';
+import { getFriendlyErrorMessage } from '../utils/getFriendlyErrorMessage';
 
 export type UserRole = 'customer' | 'admin';
 
@@ -51,7 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const { apiClient } = await import('../services/apiClient');
         const result = await apiClient.get('/auth/me');
         if (result.success && result.data?.user) {
           setUser(mapBackendUserToAuthUser(result.data.user));
@@ -87,15 +86,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await apiClient.post('/auth/login', { email, password });
 
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        return { success: false, error: result.message || 'Login failed' };
+      if (!result.success || !result.data) {
+        return { success: false, error: getFriendlyErrorMessage(result, 'login') };
       }
 
       const { user: backendUser, accessToken, refreshToken } = result.data;
@@ -106,14 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const guestId = localStorage.getItem('tts_guest_id');
       if (guestId) {
         try {
-          await fetch(`${API_BASE_URL}/cart/merge`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ guestId }),
-          });
+          await apiClient.post('/cart/merge', { guestId });
           localStorage.removeItem('tts_guest_id');
         } catch (mergeErr) {
           console.error('Failed to merge guest cart on login:', mergeErr);
@@ -124,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authUser);
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'Network error occurred' };
+      return { success: false, error: getFriendlyErrorMessage(err, 'login') };
     } finally {
       setIsLoading(false);
     }
@@ -133,25 +120,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = useCallback(async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Split full name
       const [firstName, ...lastNameParts] = name.trim().split(' ');
       const lastName = lastNameParts.join(' ') || ' ';
 
-      const registerResponse = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email, password }),
-      });
+      const registerResult = await apiClient.post('/auth/register', { firstName, lastName, email, password });
 
-      const registerResult = await registerResponse.json();
-      if (!registerResponse.ok || !registerResult.success) {
-        return { success: false, error: registerResult.message || 'Signup failed' };
+      if (!registerResult.success) {
+        return { success: false, error: getFriendlyErrorMessage(registerResult, 'register') };
       }
 
-      // Auto login after successful signup
       return await login(email, password);
     } catch (err: any) {
-      return { success: false, error: err.message || 'Network error occurred' };
+      return { success: false, error: getFriendlyErrorMessage(err, 'register') };
     } finally {
       setIsLoading(false);
     }
@@ -160,11 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(() => {
     const refreshToken = localStorage.getItem('tt_refresh_token');
     if (refreshToken) {
-      fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
-      }).catch(err => console.error('Silent logout error:', err));
+      apiClient.post('/auth/logout', { refreshToken }).catch(err => console.error('Silent logout error:', err));
     }
 
     localStorage.removeItem('tt_access_token');

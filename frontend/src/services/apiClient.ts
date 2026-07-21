@@ -7,17 +7,28 @@ interface RequestOptions extends RequestInit {
 
 export class ApiError extends Error {
   status: number;
+  code?: string;
   data: any;
 
-  constructor(message: string, status: number, data?: any) {
+  constructor(message: string, status: number, code?: string, data?: any) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
+    this.code = code;
     this.data = data;
   }
 }
 
 async function request(path: string, options: RequestOptions = {}) {
+  // Check browser online status
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    throw new ApiError(
+      'No internet connection. Please check your network and try again.',
+      0,
+      'OFFLINE'
+    );
+  }
+
   let url = `${API_BASE_URL}${path}`;
 
   if (options.params) {
@@ -58,7 +69,17 @@ async function request(path: string, options: RequestOptions = {}) {
     headers,
   };
 
-  const response = await fetch(url, finalOptions);
+  let response: Response;
+  try {
+    response = await fetch(url, finalOptions);
+  } catch (netErr: any) {
+    throw new ApiError(
+      'Unable to connect to the server. Please check your network and try again.',
+      0,
+      'ERR_NETWORK',
+      netErr
+    );
+  }
 
   let data: any = null;
   const contentType = response.headers.get('content-type');
@@ -90,7 +111,6 @@ async function request(path: string, options: RequestOptions = {}) {
             const retryHeaders = new Headers(options.headers);
             retryHeaders.set('Authorization', `Bearer ${refreshResult.data.accessToken}`);
             
-            // Set Content-Type correctly for retry
             if (options.body && typeof options.body === 'object') {
               retryHeaders.set('Content-Type', 'application/json');
             }
@@ -105,7 +125,8 @@ async function request(path: string, options: RequestOptions = {}) {
 
             if (!retryResponse.ok) {
               const errorMessage = retryData?.message || retryResponse.statusText || 'An error occurred';
-              throw new ApiError(errorMessage, retryResponse.status, retryData);
+              const code = retryData?.code || 'RETRY_FAILED';
+              throw new ApiError(errorMessage, retryResponse.status, code, retryData);
             }
             
             return retryData;
@@ -119,12 +140,14 @@ async function request(path: string, options: RequestOptions = {}) {
     // If refresh failed or there is no refresh token, dispatch logout event
     window.dispatchEvent(new Event('auth:logout'));
     const errorMessage = data?.message || response.statusText || 'Unauthorized';
-    throw new ApiError(errorMessage, response.status, data);
+    const code = data?.code || 'UNAUTHORIZED';
+    throw new ApiError(errorMessage, response.status, code, data);
   }
 
   if (!response.ok) {
     const errorMessage = data?.message || response.statusText || 'An error occurred';
-    throw new ApiError(errorMessage, response.status, data);
+    const code = data?.code;
+    throw new ApiError(errorMessage, response.status, code, data);
   }
 
   // Return standard response structure or data
