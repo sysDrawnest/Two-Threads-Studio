@@ -37,10 +37,10 @@ export default function Hero() {
     <section 
       ref={sectionRef}
       id="hero" 
-      className="relative h-screen w-full overflow-hidden bg-[#ab5a46]"
+      className="relative h-[calc(100vh-65px)] md:h-[calc(100vh-70px)] min-h-[520px] w-full overflow-hidden bg-[#ab5a46]"
     >
       {/* Huge Background Text with Entrance Animation */}
-      <div className="absolute inset-0 flex flex-col items-center justify-start md:justify-center pt-[18vh] md:pt-0 pointer-events-none select-none z-0 overflow-hidden">
+      <div className="absolute inset-0 flex flex-col items-center justify-start pt-2 md:pt-3 pointer-events-none select-none z-0 overflow-hidden">
         <h1 className="font-serif text-[#f4ebd9] font-normal text-center w-full" style={{ lineHeight: '0.85' }}>
           <span 
             className="hidden md:block text-[17vw] tracking-tighter"
@@ -94,19 +94,19 @@ export default function Hero() {
              ref={imageRef}
              src={heroMobile} 
              alt="Artisanal Creations" 
-             className="w-full max-w-[500px] h-[70vh] md:h-auto object-contain object-bottom block md:hidden drop-shadow-2xl transition-transform duration-100 will-change-transform" 
+             className="w-full max-w-[480px] h-[62vh] object-contain object-bottom block md:hidden drop-shadow-2xl transition-transform duration-100 will-change-transform" 
              style={{ transform: 'scale(1)' }}
            />
            <img 
              ref={imageRef}
              src={heroPc} 
              alt="Two Thread Studio Kits" 
-             className="w-full max-w-[1000px] h-[80vh] object-contain object-bottom hidden md:block drop-shadow-2xl transition-transform duration-100 will-change-transform" 
+             className="w-full max-w-[900px] h-[68vh] md:h-[70vh] object-contain object-bottom hidden md:block drop-shadow-2xl transition-transform duration-100 will-change-transform" 
              style={{ transform: 'scale(1)' }}
            />
 
            {/* Text and Button Overlaying the Rock */}
-           <div className="absolute bottom-[8%] md:bottom-[10%] left-1/2 transform -translate-x-1/2 w-full text-center flex flex-col items-center z-20 px-4">
+           <div className="absolute bottom-[5%] md:bottom-[6%] left-1/2 transform -translate-x-1/2 w-full text-center flex flex-col items-center z-20 px-4">
              <ScrollReveal direction="up" delay={0.2}>
                <p className="font-sans text-[8px] md:text-[10px] lg:text-xs tracking-[0.2em] md:tracking-[0.25em] text-[#e3d5c8] uppercase mb-4 md:mb-5 whitespace-nowrap">
                  Indigo Embroidery Kits &bull; Limited Batches &bull; Mindful Craft
