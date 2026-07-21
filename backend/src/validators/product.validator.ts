@@ -174,6 +174,32 @@ export const updateProductSchema = z.object({
 
 export type UpdateProductDto = z.infer<typeof updateProductSchema>['body'];
 
+// ─── Status & Inventory Patch ──────────────────────────────────────────────────
+export const patchStatusSchema = z.object({
+  params: z.object({
+    id: z.string().cuid('Invalid product ID'),
+  }),
+  body: z.object({
+    status: z.nativeEnum(ProductStatus),
+  }),
+});
+
+export type PatchStatusDto = z.infer<typeof patchStatusSchema>['body'];
+
+export const patchInventorySchema = z.object({
+  params: z.object({
+    id: z.string().cuid('Invalid product ID'),
+  }),
+  body: z.object({
+    stockQuantity: z.number().int().nonnegative().optional(),
+    lowStockThreshold: z.number().int().nonnegative().optional(),
+    trackInventory: z.boolean().optional(),
+    allowBackorders: z.boolean().optional(),
+  }),
+});
+
+export type PatchInventoryDto = z.infer<typeof patchInventorySchema>['body'];
+
 // ─── Bulk Actions ─────────────────────────────────────────────────────────────
 export const bulkActionSchema = z.object({
   body: z.object({
