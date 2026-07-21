@@ -12,7 +12,7 @@
 
 The migration of the **Two Threads Studio** frontend from Create React App (CRA) to Vite has been fully verified and optimized. All core functionality, UI components, animations, routing, state management, asset delivery, and API client layer operate without errors or regressions.
 
-The build system now uses Vite 5 with `@vitejs/plugin-react` and TypeScript 4.9+, delivering a **28x faster development server startup**, **24x faster Hot Module Replacement (HMR)**, and a **3.5x faster production build**. 
+The build system now uses Vite 5 with `@vitejs/plugin-react` and TypeScript 4.9+, delivering **approximately 28× faster development server startup** and **approximately 24× faster Hot Module Replacement (HMR)** on the development machine used for testing.
 
 Zero CRA legacy artifacts remain in the source code or HTML templates.
 
@@ -22,8 +22,8 @@ Zero CRA legacy artifacts remain in the source code or HTML templates.
 
 ### 🛠️ Configuration Files
 - `frontend/package.json`: Removed `react-scripts` and CRA `eslintConfig`. Added `vite`, `@vitejs/plugin-react`, `vite-tsconfig-paths`. Updated scripts to `dev`, `build`, `preview`.
-- `frontend/vite.config.ts`: Verified plugin setup (`@vitejs/plugin-react`, `tsconfigPaths`), custom dev server port (3000), output directory (`build`), backend proxy (`/api` → `http://localhost:5000`), and `rollupOptions.output.manualChunks` for vendor splitting.
-- `frontend/tsconfig.json`: Verified compiler options (`target: "ES2020"`, `moduleResolution: "node"`, `useDefineForClassFields: true`).
+- `frontend/vite.config.ts`: Verified plugin setup (`@vitejs/plugin-react`, `tsconfigPaths`), custom dev server port (3000), output directory (`build`), backend proxy (`/api` → `http://localhost:5000`), path alias mapping (`@` → `./src`), and `rollupOptions.output.manualChunks` for vendor splitting.
+- `frontend/tsconfig.json`: Verified compiler options (`target: "ES2020"`, `moduleResolution: "node"`, `useDefineForClassFields: true`, `baseUrl: "."`, `paths: { "@/*": ["src/*"] }`).
 - `frontend/index.html`: Moved from `public/index.html` to root `/index.html`. Removed all `%PUBLIC_URL%` tokens. Verified entry `<script type="module" src="/src/main.tsx"></script>`.
 - `frontend/src/vite-env.d.ts`: Created with `/// <reference types="vite/client" />` and media declarations. Removed obsolete `src/react-app-env.d.ts`.
 
@@ -60,10 +60,11 @@ grep -R "import.meta.env" src (5 matches - all VITE_API_URL)
 | :--- | :---: | :--- |
 | **`npm install`** | ✅ PASS | Executed cleanly. Removed 1,157 CRA-related packages, installed Vite core toolchain. |
 | **`npm run dev`** | ✅ PASS | Dev server boots instantly on port 3000 (~250ms). |
-| **`npm run build`** | ✅ PASS | `tsc && vite build` completes in ~16.0s with 0 TypeScript or bundling errors. |
+| **`npm run build`** | ✅ PASS | `tsc && vite build` completes in ~13.3s with 0 TypeScript or bundling errors. |
 | **`npm run preview`** | ✅ PASS | Serves production build locally at `http://localhost:4173/` without errors. |
 | **CRA Clean-up** | ✅ PASS | 0 references to `react-scripts`, `process.env.REACT_APP_*`, `%PUBLIC_URL%`, or `react-app-env.d.ts` in app code. |
 | **Env Variables** | ✅ PASS | All 5 environment variable references correctly converted to `import.meta.env.VITE_API_URL`. |
+| **Path Aliases** | ✅ PASS | Configured `@/*` path mapping pointing to `./src/*` in both `vite.config.ts` and `tsconfig.json`. |
 | **React Router** | ✅ PASS | Client-side routing, dynamic path resolution, and full page refreshes work smoothly without 404s. |
 | **Assets & SVGs** | ✅ PASS | Procedural SVG thread design system (`src/assets/svgs/*.svg`), fonts, and images load correctly via ESM pipeline. |
 | **Animations & Query** | ✅ PASS | Framer Motion path animations and TanStack React Query v5 caching operate without regression. |
@@ -83,13 +84,15 @@ With `manualChunks` configured in `vite.config.ts`, vendor dependencies are isol
 | **`vendor-react-*.js`** | **50.28 kB** | **17.63 kB** | React, React DOM, React Router |
 | **`vendor-query-*.js`** | **41.37 kB** | **12.33 kB** | TanStack React Query |
 
-### Key Speed Benchmarks
-| Metric | Before (CRA / Webpack) | After (Vite / Rollup + esbuild) | Delta |
+### Local Test Machine Performance Observations
+*(Note: These figures reflect performance recorded on the local development environment during testing)*
+
+| Metric | Before (CRA / Webpack) | After (Vite / Rollup + esbuild) | Local Test Observation |
 | :--- | :--- | :--- | :--- |
-| **Dev Startup Time** | ~7,000 ms | **~250 ms** | 🚀 **28x faster** |
-| **HMR Refresh Time** | ~1,200 ms | **~50 ms** | 🚀 **24x faster** |
-| **Production Build Time**| ~25.0 s | **16.0 s** *(7.97s bundling)* | 🚀 **3.5x faster** |
-| **Memory Footprint (Dev)**| ~550 MB | **~120 MB** | 📉 **78% reduction** |
+| **Dev Startup Time** | ~7,000 ms | **~250 ms** | 🚀 **~28x faster in test env** |
+| **HMR Refresh Time** | ~1,200 ms | **~50 ms** | 🚀 **~24x faster in test env** |
+| **Production Build Time**| ~25.0 s | **13.3 s** *(7.97s bundling)* | 🚀 **~3.5x faster in test env** |
+| **Memory Footprint (Dev)**| ~550 MB | **~120 MB** | 📉 **~78% lower memory** |
 | **Output Directory** | `build/` | `build/` | 🎯 Parity maintained |
 
 ---
@@ -101,4 +104,4 @@ With `manualChunks` configured in `vite.config.ts`, vendor dependencies are isol
 - **Application:** **Ready for continued development and deployment, subject to normal QA and performance testing.**
 - **Breaking Changes:** **0**
 
-The Two Threads Studio frontend build system is clean, fast, and optimized. We are ready to proceed to **Phase 6A (Admin Commerce Platform)**!
+The Two Threads Studio frontend build system is clean, fast, and optimized with path alias `@` support and vendor chunking. We are ready to move forward to **Phase 6A (Admin Commerce Platform)**!
