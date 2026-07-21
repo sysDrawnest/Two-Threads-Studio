@@ -5,6 +5,7 @@ import type {
   AdminListProductsQuery,
   CreateProductDto, 
   UpdateProductDto,
+  PatchInventoryDto,
   MediaUpsertDto,
   VariantUpsertDto
 } from '../validators/product.validator';
@@ -296,6 +297,18 @@ export const productRepository = {
     };
 
     return prisma.product.update({ where: { id }, data, include: detailInclude });
+  },
+
+  archive: async (id: string) => {
+    return prisma.product.update({ where: { id }, data: { status: ProductStatus.ARCHIVED } });
+  },
+
+  updateStatus: async (id: string, status: ProductStatus) => {
+    return prisma.product.update({ where: { id }, data: { status } });
+  },
+
+  updateInventory: async (id: string, dto: PatchInventoryDto) => {
+    return prisma.product.update({ where: { id }, data: dto });
   },
 
   // ─── Relations & Media ───
