@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import waveImage from '../../assets/wave-haikei.png';
 
 const Footer: React.FC = () => {
   const cols = [
@@ -55,8 +54,20 @@ const Footer: React.FC = () => {
 
   return (
     <>
-      <img src={waveImage} alt="Decorative wave" className="w-full h-auto block" />
-      <footer className="bg-[#1e1812] pt-12 px-6 md:px-16 pb-8">
+      <div className="w-full overflow-hidden leading-none bg-primary-container">
+        <svg 
+          className="w-full h-[60px] md:h-[100px] lg:h-[140px] block" 
+          viewBox="0 0 1440 120" 
+          preserveAspectRatio="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path 
+            fill="#1e1812" 
+            d="M0,120 L1440,120 L1440,40 C1100,140 800,0 400,80 C200,120 100,60 0,40 Z"
+          />
+        </svg>
+      </div>
+      <footer className="bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Grid Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
