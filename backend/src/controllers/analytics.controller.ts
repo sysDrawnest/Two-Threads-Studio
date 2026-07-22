@@ -225,10 +225,12 @@ export const analyticsController = {
 
       // Fetch product → category mapping
       const productIds = [...new Set(items.map(i => i.productId).filter(Boolean))] as string[];
-      const products = await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, category: { select: { id: true, name: true } } },
-      });
+      const products = productIds.length > 0
+        ? await prisma.product.findMany({
+            where: { id: { in: productIds } },
+            select: { id: true, category: { select: { id: true, name: true } } },
+          })
+        : [];
 
       const productCategoryMap = new Map(products.map(p => [p.id, p.category]));
 
