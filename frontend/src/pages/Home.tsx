@@ -21,7 +21,6 @@ const Reviews = lazy(() => import('../components/sections/Reviews'));
 const CommunityGallery = lazy(() => import('../components/sections/CommunityGallery'));
 const Learning = lazy(() => import('../components/sections/Learning'));
 const CorporateBulkOrders = lazy(() => import('../components/sections/CorporateOrders'));
-const Newsletter = lazy(() => import('../components/sections/Newsletter'));
 
 // Lightweight fallback skeleton for lazy-loaded sections
 const SectionFallback = () => (
@@ -39,7 +38,7 @@ const Home: React.FC = () => {
     <PageContainer disablePadding={true}>
       {/*
         ════════════════════════════════════════
-         HOMEPAGE SECTION ORDER — 17 Sections
+         HOMEPAGE SECTION ORDER — 16 Sections
         ════════════════════════════════════════
         1.  Hero                   (KEEP)
         2.  TrustBar               (NEW)
@@ -57,7 +56,6 @@ const Home: React.FC = () => {
         14. CommunityGallery       (NEW)
         15. Learning               (KEEP)
         16. CorporateBulkOrders    (NEW)
-        17. Newsletter             (ENHANCED)
       */}
 
       {/* ─── Above fold — eagerly loaded ─── */}
@@ -120,10 +118,6 @@ const Home: React.FC = () => {
 
       <Suspense fallback={<SectionFallback />}>
         <CorporateBulkOrders />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <Newsletter />
       </Suspense>
     </PageContainer>
   );

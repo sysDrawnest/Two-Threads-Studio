@@ -47,9 +47,19 @@ const Footer: React.FC = () => {
   ];
 
   const [openCol, setOpenCol] = useState<number | null>(null);
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const toggleCol = (i: number) => {
     setOpenCol(openCol === i ? null : i);
+  };
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setSubmitted(true);
+      setEmail('');
+    }
   };
 
   return (
@@ -70,7 +80,7 @@ const Footer: React.FC = () => {
       <footer className="bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Grid Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
             <div className="lg:col-span-1">
               <h3 className="font-serif text-2xl text-inverse-on-surface font-light mb-4">
                 TwoThreads Studio
@@ -113,6 +123,38 @@ const Footer: React.FC = () => {
                 </div>
               </div>
             ))}
+
+            {/* Newsletter Column */}
+            <div className="md:col-span-2 lg:col-span-1 border-t border-inverse-on-surface/10 pt-6 md:border-none md:pt-0">
+              <h4 className="font-sans text-xs tracking-widest uppercase text-inverse-on-surface/60 mb-5">
+                Newsletter
+              </h4>
+              <p className="font-sans text-xs text-inverse-on-surface/50 leading-relaxed mb-4">
+                Subscribe for early access, tutorials, and studio updates.
+              </p>
+              {submitted ? (
+                <p className="font-serif text-sm text-on-secondary-container/90 mt-2">
+                  Welcome to the community ✦
+                </p>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    required
+                    className="flex-1 min-w-0 px-3 py-2 bg-inverse-on-surface/5 border border-inverse-on-surface/15 text-inverse-on-surface font-sans text-xs outline-none focus:border-on-secondary-container/60 placeholder:text-inverse-on-surface/30"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-on-secondary-container text-[#1e1812] px-3.5 py-2 font-sans text-[10px] tracking-widest uppercase font-semibold hover:opacity-90 transition-opacity outline-none"
+                  >
+                    Join
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
           
           {/* Bottom Section */}
