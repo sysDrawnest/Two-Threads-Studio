@@ -68,7 +68,7 @@ const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
 
   try {
     // Fetch stock quantities for inventory warning
-    const productIds = order.items?.map((i: any) => i.productId).filter(Boolean) || [];
+    const productIds = order.items?.map((i: any) => i.productId).filter((id: any): id is string => Boolean(id) && id !== 'null') || [];
     let products: any[] = [];
     if (productIds.length > 0) {
       products = await prisma.product.findMany({

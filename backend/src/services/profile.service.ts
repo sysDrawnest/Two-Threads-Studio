@@ -51,49 +51,46 @@ export const profileService = {
       throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
     }
 
-    // 1. Wishlist Count
-    const wishlistCount = await prisma.wishlist.count({
-      where: { userId },
-    });
-
-    // 2. Cart Count (sum of item quantities)
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      select: {
-        items: {
-          select: {
-            quantity: true,
+    // Run dashboard queries concurrently for maximum performance
+    const [wishlistCount, cart, addressCount, recommendedProducts] = await Promise.all([
+      prisma.wishlist.count({
+        where: { userId },
+      }),
+      prisma.cart.findUnique({
+        where: { userId },
+        select: {
+          items: {
+            select: {
+              quantity: true,
+            },
           },
         },
-      },
-    });
-    const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
-
-    // 3. Saved Addresses Count (not soft-deleted)
-    const addressCount = await prisma.address.count({
-      where: { userId, deletedAt: null },
-    });
-
-    // 4. Recommended Products (fetch up to 4 featured products)
-    const recommendedProducts = await prisma.product.findMany({
-      where: {
-        status: 'ACTIVE',
-        featured: true,
-      },
-      take: 4,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        price: true,
-        comparePrice: true,
-        images: {
-          where: { isPrimary: true },
-          select: { url: true, altText: true },
-          take: 1,
+      }),
+      prisma.address.count({
+        where: { userId, deletedAt: null },
+      }),
+      prisma.product.findMany({
+        where: {
+          status: 'ACTIVE',
+          isFeatured: true,
         },
-      },
-    });
+        take: 4,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          price: true,
+          comparePrice: true,
+          images: {
+            where: { isPrimary: true },
+            select: { url: true, altText: true },
+            take: 1,
+          },
+        },
+      }),
+    ]);
+
+    const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
     // Format recommended products to include primary image directly
     const formattedRecommendations = recommendedProducts.map((p) => ({

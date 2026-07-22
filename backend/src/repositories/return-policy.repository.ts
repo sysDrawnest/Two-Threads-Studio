@@ -28,8 +28,10 @@ export const returnPolicyRepository = {
   },
 
   findMany: async (productIds: string[]): Promise<ReturnPolicy[]> => {
+    const validIds = productIds.filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return [];
     return prisma.returnPolicy.findMany({
-      where: { productId: { in: productIds } },
+      where: { productId: { in: validIds } },
     });
   },
 

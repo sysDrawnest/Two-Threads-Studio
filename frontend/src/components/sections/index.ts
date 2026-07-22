@@ -14,5 +14,4 @@ export { default as Reviews } from './Reviews';
 export { default as CommunityGallery } from './CommunityGallery';
 export { default as Learning } from './Learning';
 export { default as CorporateBulkOrders } from './CorporateOrders';
-export { default as Newsletter } from './Newsletter';
 export { default as SustainabilitySection } from './SustainabilitySection';

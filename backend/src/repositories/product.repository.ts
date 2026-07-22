@@ -386,25 +386,33 @@ export const productRepository = {
   // ─── Bulk Actions ───
 
   bulkUpdateStatus: async (ids: string[], status: ProductStatus) => {
-    return prisma.product.updateMany({ where: { id: { in: ids } }, data: { status } });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return { count: 0 };
+    return prisma.product.updateMany({ where: { id: { in: validIds } }, data: { status } });
   },
 
   bulkUpdateLabels: async (ids: string[], labels: Partial<Record<'isFeatured'|'isBestSeller'|'isNewArrival', boolean>>) => {
-    return prisma.product.updateMany({ where: { id: { in: ids } }, data: labels });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return { count: 0 };
+    return prisma.product.updateMany({ where: { id: { in: validIds } }, data: labels });
   },
 
   bulkUpdateCategory: async (ids: string[], categoryId: string) => {
-    return prisma.product.updateMany({ where: { id: { in: ids } }, data: { categoryId } });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return { count: 0 };
+    return prisma.product.updateMany({ where: { id: { in: validIds } }, data: { categoryId } });
   },
 
   bulkUpdateCollection: async (ids: string[], collectionId: string) => {
-    return prisma.product.updateMany({ where: { id: { in: ids } }, data: { collectionId } });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return { count: 0 };
+    return prisma.product.updateMany({ where: { id: { in: validIds } }, data: { collectionId } });
   },
 
   bulkAddHomepageSection: async (ids: string[], section: HomepageSection) => {
-    // Prisma currently lacks a way to array_append in updateMany directly across multiple records using push in some versions,
-    // so we will fetch, append, and update individually inside a transaction
-    const products = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, homepageSections: true } });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return [];
+    const products = await prisma.product.findMany({ where: { id: { in: validIds } }, select: { id: true, homepageSections: true } });
     const tx = products.map(p => {
       const newSections = Array.from(new Set([...p.homepageSections, section]));
       return prisma.product.update({ where: { id: p.id }, data: { homepageSections: newSections } });
@@ -413,7 +421,9 @@ export const productRepository = {
   },
   
   bulkRemoveHomepageSection: async (ids: string[], section: HomepageSection) => {
-    const products = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, homepageSections: true } });
+    const validIds = (ids || []).filter((id): id is string => Boolean(id) && id !== 'null');
+    if (validIds.length === 0) return [];
+    const products = await prisma.product.findMany({ where: { id: { in: validIds } }, select: { id: true, homepageSections: true } });
     const tx = products.map(p => {
       const newSections = p.homepageSections.filter(s => s !== section);
       return prisma.product.update({ where: { id: p.id }, data: { homepageSections: newSections } });

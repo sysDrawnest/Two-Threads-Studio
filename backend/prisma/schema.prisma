@@ -424,6 +424,11 @@ model Product {
   @@index([createdAt(sort: Desc)])
   @@index([status, isFeatured])
   @@index([status, categoryId])
+  @@index([status, isNewArrival])
+  @@index([status, isBestSeller])
+  @@index([status, isNewArrival, createdAt(sort: Desc)])
+  @@index([status, isBestSeller, salesCount(sort: Desc)])
+  @@index([status, studioType])
   @@index([salesCount(sort: Desc)])
   @@map("products")
 }
@@ -443,6 +448,7 @@ model ProductMedia {
   createdAt DateTime  @default(now())
   product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   @@index([productId])
+  @@index([productId, isPrimary])
   @@map("product_media")
 }
 
@@ -478,6 +484,7 @@ model ProductImage {
 
   @@index([productId])
   @@index([productId, sortOrder])
+  @@index([productId, isPrimary])
   @@map("product_images")
 }
 
@@ -617,6 +624,7 @@ model CartItem {
   @@unique([cartId, productId, variantId])
   @@index([cartId])
   @@index([productId])
+  @@index([cartId, createdAt(sort: Desc)])
   @@map("cart_items")
 }
 
@@ -680,6 +688,7 @@ model Order {
   fraudFlags    FraudFlag[]
 
   @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
   @@index([orderStatus])
   @@index([paymentStatus])
   @@index([riskDecision])

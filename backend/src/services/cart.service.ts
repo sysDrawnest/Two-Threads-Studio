@@ -47,11 +47,28 @@ export const cartService = {
 
     const cart = await prisma.cart.findUnique({
       where: whereClause,
-      include: {
+      select: {
+        id: true,
         items: {
-          include: {
+          select: {
+            id: true,
+            productId: true,
+            variantId: true,
+            quantity: true,
+            unitPrice: true,
+            productName: true,
+            primaryImage: true,
+            sku: true,
+            variantName: true,
+            customization: true,
+            giftWrap: true,
+            engravingText: true,
             product: {
-              include: {
+              select: {
+                id: true,
+                status: true,
+                trackInventory: true,
+                stockQuantity: true,
                 images: {
                   where: { isPrimary: true },
                   select: { url: true },
@@ -59,7 +76,13 @@ export const cartService = {
                 },
               },
             },
-            variant: true,
+            variant: {
+              select: {
+                id: true,
+                stockQuantity: true,
+                isActive: true,
+              },
+            },
           },
           orderBy: { createdAt: 'desc' },
         },

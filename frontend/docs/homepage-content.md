@@ -98,6 +98,7 @@ Establishes credibility, customer satisfaction, and outlines key service/shippin
 ### Content
 
 Displays six standard brand trust points with corresponding inline icons:
+
 1. "Handmade in India" (Package icon)
 2. "Free Shipping Above ₹2,999" (Truck icon)
 3. "Sustainable Materials" (Leaf icon)
@@ -379,7 +380,6 @@ Organizes the storefront around carefully curated editorial collections using an
 - `ScrollReveal` component.
 
 ---
-
 
 ## VideoBanner
 

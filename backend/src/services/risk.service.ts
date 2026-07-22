@@ -53,11 +53,13 @@ export const riskService = {
     });
 
     // Fetch product allowCod flags for items in cart
-    const productIds = input.cartItems.map((i) => i.productId);
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
-      select: { id: true, allowCod: true, isPersonalizable: true, madeToOrder: true },
-    });
+    const productIds = input.cartItems.map((i) => i.productId).filter((id): id is string => Boolean(id) && id !== 'null');
+    const products = productIds.length > 0
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true, allowCod: true, isPersonalizable: true, madeToOrder: true },
+        })
+      : [];
 
     const hasCodDisabledProducts = products.some((p: { allowCod: boolean }) => !p.allowCod);
     const hasPersonalizedItems =
@@ -181,16 +183,19 @@ export const riskService = {
     orderTotal: number,
     productIds: string[]
   ) => {
+    const validProductIds = (productIds || []).filter((id): id is string => Boolean(id) && id !== 'null');
     const [user, riskProfile, products] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
         select: { phoneVerified: true, memberSince: true, phone: true },
       }),
       customerRiskRepository.getOrCreate(userId),
-      prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, allowCod: true, isPersonalizable: true, madeToOrder: true },
-      }),
+      validProductIds.length > 0
+        ? prisma.product.findMany({
+            where: { id: { in: validProductIds } },
+            select: { id: true, allowCod: true, isPersonalizable: true, madeToOrder: true },
+          })
+        : Promise.resolve([]),
     ]);
 
     if (!user) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
