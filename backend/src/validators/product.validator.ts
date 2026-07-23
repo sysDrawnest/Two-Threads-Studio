@@ -76,10 +76,16 @@ const productBaseSchema = z.object({
   trackInventory:    z.boolean().default(true),
 
   status:     z.nativeEnum(ProductStatus).default(ProductStatus.DRAFT),
-  difficulty: z.nativeEnum(DifficultyLevel).optional(),
+  difficulty: z.preprocess(
+    (val) => (typeof val === 'string' && val.trim() ? val.trim().toUpperCase() : val),
+    z.nativeEnum(DifficultyLevel).optional()
+  ),
   
   // Classification
-  studioType:       z.nativeEnum(StudioProductType).optional(),
+  studioType: z.preprocess(
+    (val) => (typeof val === 'string' && val.trim() ? val.trim().toUpperCase() : val),
+    z.nativeEnum(StudioProductType).optional()
+  ),
   homepageSections: z.array(z.nativeEnum(HomepageSection)).default([]),
 
   // Boolean Labels
