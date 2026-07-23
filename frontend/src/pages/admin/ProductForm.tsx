@@ -346,9 +346,18 @@ export const ProductForm: React.FC = () => {
     try {
       const cleanUrl = (val?: string | null) => (val && val.trim() !== '' ? val.trim() : undefined);
 
+      let difficulty: string | undefined = product.difficulty ? String(product.difficulty).toUpperCase() : undefined;
+      if (difficulty && !['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].includes(difficulty)) {
+        difficulty = undefined;
+      }
+
+      let studioType: string | undefined = product.studioType ? String(product.studioType).toUpperCase() : undefined;
+
       const payload: any = {
         ...product,
         status: statusOverride || product.status || ProductStatus.DRAFT,
+        difficulty,
+        studioType,
         price: Number(product.price),
         comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined,
         costPrice: product.costPrice ? Number(product.costPrice) : undefined,
@@ -797,7 +806,7 @@ export const ProductForm: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Category Selection */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
@@ -839,6 +848,22 @@ export const ProductForm: React.FC = () => {
                       placeholder="Optional collection ID..."
                       className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                      Skill / Difficulty Level
+                    </label>
+                    <select
+                      name="difficulty"
+                      value={product.difficulty ? String(product.difficulty).toUpperCase() : 'BEGINNER'}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
+                    >
+                      <option value="BEGINNER">Beginner</option>
+                      <option value="INTERMEDIATE">Intermediate</option>
+                      <option value="ADVANCED">Advanced</option>
+                    </select>
                   </div>
                 </div>
 
