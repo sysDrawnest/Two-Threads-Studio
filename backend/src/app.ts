@@ -40,9 +40,13 @@ app.use(BASE_API_PATH, limiter);
 // If express.json() runs first, the Buffer is destroyed.
 app.use('/webhooks', express.raw({ type: 'application/json' }), webhookRoutes);
 
-// Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+// Body parser, reading data from body into req.body (10MB for rich product payloads/images)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static uploads
+import path from 'path';
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 // Cookie parser
 app.use(cookieParser());

@@ -22,6 +22,26 @@ export type User = any;
 export type Review = any;
 
 export const adminService = {
+  // ── Upload ────────────────────────────────────────────────────────────────
+  getUploadStatus: async () => {
+    const response = await apiClient.get('/upload/status');
+    return response;
+  },
+
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await apiClient.post('/upload/single', formData);
+    return response;
+  },
+
+  uploadMultipleImages: async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('images', file));
+    const response = await apiClient.post('/upload/multiple', formData);
+    return response;
+  },
+
   // ── Dashboard ─────────────────────────────────────────────────────────────
   getDashboard: async () => {
     const response = await apiClient.get('/admin/dashboard');

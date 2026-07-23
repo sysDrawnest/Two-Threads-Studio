@@ -7,7 +7,7 @@ export interface JwtPayload {
   role: string;
 }
 
-const ACCESS_TOKEN_EXPIRY = '15m';
+const ACCESS_TOKEN_EXPIRY = '2h';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
 /**

@@ -54,9 +54,11 @@ router.use('/admin/risk', adminRiskRoutes);
 // Phase 6A — Admin Commerce Platform
 import adminRoutes from './admin.routes';
 import devRoutes from './dev.routes';
+import uploadRoutes from './upload.routes';
 
-router.use('/admin', adminRoutes);
-router.use('/dev',   devRoutes);
+router.use('/admin',  adminRoutes);
+router.use('/dev',    devRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
 
