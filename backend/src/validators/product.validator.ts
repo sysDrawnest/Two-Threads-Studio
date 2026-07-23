@@ -131,7 +131,7 @@ const productBaseSchema = z.object({
   seoTitle:       z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
   seoKeywords:    z.string().max(255).optional(),
-  ogImageUrl:     z.string().url().optional(),
+  ogImageUrl:     z.string().optional(),
   canonicalUrl:   z.string().url().optional(),
   robotsMeta:     z.string().max(100).default('index,follow'),
 
@@ -235,8 +235,8 @@ export const mediaUpsertSchema = z.object({
   }),
   body: z.object({
     type:      z.nativeEnum(MediaType).default(MediaType.IMAGE),
-    url:       z.string().url('Must be a valid URL'),
-    thumbnail: z.string().url().optional(),
+    url:       z.string().min(1, 'URL is required'),
+    thumbnail: z.string().optional(),
     altText:   z.string().max(255).optional(),
     caption:   z.string().max(255).optional(),
     sortOrder: z.number().int().nonnegative().default(0),

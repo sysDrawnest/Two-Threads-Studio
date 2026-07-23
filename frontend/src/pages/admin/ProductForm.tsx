@@ -342,6 +342,8 @@ export const ProductForm: React.FC = () => {
     setIsSaving(true);
 
     try {
+      const cleanUrl = (val?: string | null) => (val && val.trim() !== '' ? val.trim() : undefined);
+
       const payload: any = {
         ...product,
         status: statusOverride || product.status || ProductStatus.DRAFT,
@@ -352,7 +354,8 @@ export const ProductForm: React.FC = () => {
         lowStockThreshold: Number(product.lowStockThreshold || 5),
         collectionId: product.collectionId?.trim() ? product.collectionId : undefined,
         sku: product.sku?.trim() ? product.sku : undefined,
-        ogImageUrl: galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl || undefined,
+        ogImageUrl: cleanUrl(galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl),
+        canonicalUrl: cleanUrl(product.canonicalUrl),
       };
 
       if (isEdit && id) {

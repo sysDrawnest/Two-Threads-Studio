@@ -172,6 +172,11 @@ export const productService = {
     const category = await categoryRepository.findById(dto.categoryId);
     if (!category) throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
 
+    if (dto.collectionId) {
+      const collection = await collectionRepository.findById(dto.collectionId);
+      if (!collection) throw new AppError('Specified Collection not found', HTTP_STATUS.NOT_FOUND);
+    }
+
     const slug = await uniqueSlug(dto.name);
     const product = await productRepository.create({ slug, dto, categoryId: dto.categoryId });
     clearHomepageCache();
@@ -191,6 +196,11 @@ export const productService = {
     if (dto.categoryId && dto.categoryId !== existing.categoryId) {
       const category = await categoryRepository.findById(dto.categoryId);
       if (!category) throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (dto.collectionId && dto.collectionId !== existing.collectionId) {
+      const collection = await collectionRepository.findById(dto.collectionId);
+      if (!collection) throw new AppError('Specified Collection not found', HTTP_STATUS.NOT_FOUND);
     }
 
     let newSlug: string | undefined;
