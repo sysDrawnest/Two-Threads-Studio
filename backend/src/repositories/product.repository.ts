@@ -208,6 +208,7 @@ export const productRepository = {
         shippingClass: dto.shippingClass, isFreeShipping: dto.isFreeShipping ?? false, isFragile: dto.isFragile ?? false, packageSize: dto.packageSize,
         allowCod: dto.allowCod ?? true,
 
+        images: dto.ogImageUrl ? { create: [{ url: dto.ogImageUrl, isPrimary: true, sortOrder: 0 }] } : undefined,
         tags: { create: (dto.tagIds ?? []).map(tagId => ({ tagId })) },
         secondaryCategories: { create: (dto.secondaryCategoryIds ?? []).map(id => ({ categoryId: id })) },
         additionalCollections: { create: (dto.additionalCollectionIds ?? []).map(id => ({ collectionId: id })) },
@@ -296,7 +297,21 @@ export const productRepository = {
       ...(dto.allowCod !== undefined && { allowCod: dto.allowCod }),
     };
 
-    return prisma.product.update({ where: { id }, data, include: detailInclude });
+    const updatedProduct = await prisma.product.update({ where: { id }, data, include: detailInclude });
+
+    if (dto.ogImageUrl && updatedProduct.images.length === 0) {
+      await prisma.productImage.create({
+        data: {
+          productId: id,
+          url: dto.ogImageUrl,
+          isPrimary: true,
+          sortOrder: 0,
+        },
+      });
+      return prisma.product.findUnique({ where: { id }, include: detailInclude }) as any;
+    }
+
+    return updatedProduct;
   },
 
   archive: async (id: string) => {

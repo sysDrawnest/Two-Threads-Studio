@@ -38,14 +38,19 @@ export function mapApiProductToFrontend(apiProd: any): Product {
     stock = 'Low Stock';
   }
 
-  // Map images
+  // Map images from relational tables (images, media) and fallback fields (ogImageUrl, imageUrl, primaryImage)
   let images: string[] = [];
-  if (Array.isArray(apiProd.images)) {
-    images = apiProd.images.map((img: any) => img.url);
+  if (Array.isArray(apiProd.images) && apiProd.images.length > 0) {
+    images = apiProd.images.map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
   }
-  // Fallback to primary image URL if list is empty
-  if (images.length === 0 && apiProd.imageUrl) {
-    images = [apiProd.imageUrl];
+  if (images.length === 0 && Array.isArray(apiProd.media) && apiProd.media.length > 0) {
+    images = apiProd.media.map((m: any) => (typeof m === 'string' ? m : m.url)).filter(Boolean);
+  }
+  const fallbackUrl = apiProd.ogImageUrl || apiProd.imageUrl || apiProd.primaryImage || apiProd.image;
+  if (images.length === 0 && fallbackUrl) {
+    images = [fallbackUrl];
+  } else if (images.length > 0 && fallbackUrl && !images.includes(fallbackUrl)) {
+    images.unshift(fallbackUrl);
   }
   if (images.length === 0) {
     images = ['https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop'];
