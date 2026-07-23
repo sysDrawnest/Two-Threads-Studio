@@ -69,89 +69,102 @@ export const ProductsManagement: React.FC = () => {
 
         {isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
-        ) : !response?.data || response.data.length === 0 ? (
-          <AdminEmptyState
-            icon={Package}
-            title="No products found"
-            description={search || status ? "Try adjusting your filters" : "You haven't added any products to your catalog yet."}
-            action={
-              !search && !status && (
-                <Link to="/admin/products/new" className="mt-4 inline-flex items-center justify-center rounded-md border border-outline-variant px-4 py-2 text-sm font-medium text-primary-container hover:bg-surface-container transition-colors">
-                  Add your first product
-                </Link>
-              )
-            }
-          />
-        ) : (
-          <>
-            <AdminTable>
-              <AdminTableHeader>
-                <AdminTableRow>
-                  <AdminTableHead>Product</AdminTableHead>
-                  <AdminTableHead>Category</AdminTableHead>
-                  <AdminTableHead>Price</AdminTableHead>
-                  <AdminTableHead>Status</AdminTableHead>
-                  <AdminTableHead className="text-right">Actions</AdminTableHead>
-                </AdminTableRow>
-              </AdminTableHeader>
-              <AdminTableBody>
-                {response.data.map((product: any) => (
-                  <AdminTableRow key={product.id}>
-                    <AdminTableCell>
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-md bg-surface-container flex-shrink-0 overflow-hidden">
-                          {product.images && product.images.length > 0 ? (
-                            <img src={product.images[0].url} alt={product.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-on-secondary-container/50">
-                              <Package className="h-5 w-5" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-primary-container">{product.name}</p>
-                          <p className="text-xs text-on-secondary-container">SKU: {product.sku || 'N/A'}</p>
-                        </div>
-                      </div>
-                    </AdminTableCell>
-                    <AdminTableCell>
-                      {product.category?.name || 'Uncategorized'}
-                    </AdminTableCell>
-                    <AdminTableCell className="font-medium">
-                      ₹{product.price}
-                    </AdminTableCell>
-                    <AdminTableCell>
-                      <AdminBadge variant={product.status === 'ACTIVE' ? 'success' : product.status === 'DRAFT' ? 'warning' : 'default'}>
-                        {product.status}
-                      </AdminBadge>
-                    </AdminTableCell>
-                    <AdminTableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link 
-                          to={`/admin/products/${product.id}/edit`}
-                          className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Link>
-                        <button 
-                          className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-[#fce8e6] hover:text-[#c5221f] rounded-md transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </AdminTableCell>
+        ) : (() => {
+          const productsList: any[] = Array.isArray(response)
+            ? response
+            : response?.products || response?.data?.products || (Array.isArray(response?.data) ? response.data : []);
+          const paginationData = response?.pagination || response?.data?.pagination;
+
+          if (productsList.length === 0) {
+            return (
+              <AdminEmptyState
+                icon={Package}
+                title="No products found"
+                description={search || status ? "Try adjusting your filters" : "You haven't added any products to your catalog yet."}
+                action={
+                  !search && !status && (
+                    <Link to="/admin/products/new" className="mt-4 inline-flex items-center justify-center rounded-md border border-outline-variant px-4 py-2 text-sm font-medium text-primary-container hover:bg-surface-container transition-colors">
+                      Add your first product
+                    </Link>
+                  )
+                }
+              />
+            );
+          }
+
+          return (
+            <>
+              <AdminTable>
+                <AdminTableHeader>
+                  <AdminTableRow>
+                    <AdminTableHead>Product</AdminTableHead>
+                    <AdminTableHead>Category</AdminTableHead>
+                    <AdminTableHead>Price</AdminTableHead>
+                    <AdminTableHead>Status</AdminTableHead>
+                    <AdminTableHead className="text-right">Actions</AdminTableHead>
                   </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-            {/* Implement Pagination when API supports it properly for products */}
-            <AdminPagination
-              currentPage={page}
-              totalPages={response.pagination?.totalPages || 1}
-              onPageChange={setPage}
-            />
-          </>
-        )}
+                </AdminTableHeader>
+                <AdminTableBody>
+                  {productsList.map((product: any) => (
+                    <AdminTableRow key={product.id}>
+                      <AdminTableCell>
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 rounded-md bg-surface-container flex-shrink-0 overflow-hidden">
+                            {product.images && product.images.length > 0 ? (
+                              <img src={product.images[0].url} alt={product.name} className="h-full w-full object-cover" />
+                            ) : product.ogImageUrl ? (
+                              <img src={product.ogImageUrl} alt={product.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-on-secondary-container/50">
+                                <Package className="h-5 w-5" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-primary-container">{product.name}</p>
+                            <p className="text-xs text-on-secondary-container">SKU: {product.sku || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </AdminTableCell>
+                      <AdminTableCell>
+                        {product.category?.name || 'Uncategorized'}
+                      </AdminTableCell>
+                      <AdminTableCell className="font-medium">
+                        ₹{product.price}
+                      </AdminTableCell>
+                      <AdminTableCell>
+                        <AdminBadge variant={product.status === 'ACTIVE' ? 'success' : product.status === 'DRAFT' ? 'warning' : 'default'}>
+                          {product.status}
+                        </AdminBadge>
+                      </AdminTableCell>
+                      <AdminTableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link 
+                            to={`/admin/products/${product.id}/edit`}
+                            className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Link>
+                          <button 
+                            className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-[#fce8e6] hover:text-[#c5221f] rounded-md transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </AdminTableCell>
+                    </AdminTableRow>
+                  ))}
+                </AdminTableBody>
+              </AdminTable>
+              <AdminPagination
+                currentPage={page}
+                totalPages={paginationData?.totalPages || 1}
+                onPageChange={setPage}
+              />
+            </>
+          );
+        })()}
+
       </div>
     </div>
   );

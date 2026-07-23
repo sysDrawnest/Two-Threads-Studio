@@ -95,88 +95,102 @@ export const InventoryManagement: React.FC = () => {
 
         {isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
-        ) : !response?.data?.products || response.data.products.length === 0 ? (
-          <AdminEmptyState
-            icon={Package}
-            title="No inventory records found"
-            description={search || status ? "Try adjusting your filters" : "Your catalog inventory is empty."}
-          />
-        ) : (
-          <>
-            <AdminTable>
-              <AdminTableHeader>
-                <AdminTableRow>
-                  <AdminTableHead>Product / SKU</AdminTableHead>
-                  <AdminTableHead>Category</AdminTableHead>
-                  <AdminTableHead className="text-right">Available Stock</AdminTableHead>
-                  <AdminTableHead className="text-right">Threshold</AdminTableHead>
-                  <AdminTableHead>Status</AdminTableHead>
-                  <AdminTableHead className="text-right">Actions</AdminTableHead>
-                </AdminTableRow>
-              </AdminTableHeader>
-              <AdminTableBody>
-                {response.data.products.map((item: any) => (
-                  <AdminTableRow key={item.id}>
-                    <AdminTableCell>
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-md bg-surface-container flex-shrink-0 overflow-hidden">
-                          {item.primaryImage ? (
-                            <img src={item.primaryImage} alt={item.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-on-secondary-container/50">
-                              <Package className="h-5 w-5" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-primary-container">{item.name}</p>
-                          <p className="font-mono text-xs text-on-secondary-container">SKU: {item.sku || 'N/A'}</p>
-                        </div>
-                      </div>
-                    </AdminTableCell>
-                    <AdminTableCell className="text-on-secondary-container">
-                      {item.category?.name || 'General'}
-                    </AdminTableCell>
-                    <AdminTableCell className="font-medium text-primary-container text-right text-lg">
-                      {item.stockQuantity}
-                    </AdminTableCell>
-                    <AdminTableCell className="text-right text-on-secondary-container">
-                      {item.lowStockThreshold || 5}
-                    </AdminTableCell>
-                    <AdminTableCell>
-                      {item.stockStatus === 'OUT_OF_STOCK' ? (
-                        <AdminBadge variant="error">Out of Stock</AdminBadge>
-                      ) : item.stockStatus === 'LOW_STOCK' ? (
-                        <AdminBadge variant="warning">Low Stock</AdminBadge>
-                      ) : (
-                        <AdminBadge variant="success">In Stock</AdminBadge>
-                      )}
-                    </AdminTableCell>
-                    <AdminTableCell className="text-right">
-                      <button
-                        onClick={() => {
-                          setSelectedProduct(item);
-                          setAdjustmentValue(0);
-                          setIsAdjustOpen(true);
-                        }}
-                        className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors"
-                      >
-                        Adjust Stock
-                      </button>
-                    </AdminTableCell>
-                  </AdminTableRow>
-                ))}
-              </AdminTableBody>
-            </AdminTable>
-            {response.data.pagination && (
-              <AdminPagination
-                currentPage={response.data.pagination.page}
-                totalPages={response.data.pagination.totalPages}
-                onPageChange={setPage}
+        ) : (() => {
+          const inventoryList: any[] = Array.isArray(response)
+            ? response
+            : response?.products || response?.data?.products || (Array.isArray(response?.data) ? response.data : []);
+          const paginationData = response?.pagination || response?.data?.pagination;
+
+          if (inventoryList.length === 0) {
+            return (
+              <AdminEmptyState
+                icon={Package}
+                title="No inventory records found"
+                description={search || status ? "Try adjusting your filters" : "Your catalog inventory is empty."}
               />
-            )}
-          </>
-        )}
+            );
+          }
+
+          return (
+            <>
+              <AdminTable>
+                <AdminTableHeader>
+                  <AdminTableRow>
+                    <AdminTableHead>Product / SKU</AdminTableHead>
+                    <AdminTableHead>Category</AdminTableHead>
+                    <AdminTableHead className="text-right">Available Stock</AdminTableHead>
+                    <AdminTableHead className="text-right">Threshold</AdminTableHead>
+                    <AdminTableHead>Status</AdminTableHead>
+                    <AdminTableHead className="text-right">Actions</AdminTableHead>
+                  </AdminTableRow>
+                </AdminTableHeader>
+                <AdminTableBody>
+                  {inventoryList.map((item: any) => (
+                    <AdminTableRow key={item.id}>
+                      <AdminTableCell>
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 rounded-md bg-surface-container flex-shrink-0 overflow-hidden">
+                            {item.primaryImage ? (
+                              <img src={item.primaryImage} alt={item.name} className="h-full w-full object-cover" />
+                            ) : item.ogImageUrl ? (
+                              <img src={item.ogImageUrl} alt={item.name} className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-on-secondary-container/50">
+                                <Package className="h-5 w-5" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-primary-container">{item.name}</p>
+                            <p className="font-mono text-xs text-on-secondary-container">SKU: {item.sku || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </AdminTableCell>
+                      <AdminTableCell className="text-on-secondary-container">
+                        {item.category?.name || 'General'}
+                      </AdminTableCell>
+                      <AdminTableCell className="font-medium text-primary-container text-right text-lg">
+                        {item.stockQuantity}
+                      </AdminTableCell>
+                      <AdminTableCell className="text-right text-on-secondary-container">
+                        {item.lowStockThreshold || 5}
+                      </AdminTableCell>
+                      <AdminTableCell>
+                        {item.stockStatus === 'OUT_OF_STOCK' || item.stockQuantity === 0 ? (
+                          <AdminBadge variant="error">Out of Stock</AdminBadge>
+                        ) : item.stockStatus === 'LOW_STOCK' || item.stockQuantity <= (item.lowStockThreshold || 5) ? (
+                          <AdminBadge variant="warning">Low Stock</AdminBadge>
+                        ) : (
+                          <AdminBadge variant="success">In Stock</AdminBadge>
+                        )}
+                      </AdminTableCell>
+                      <AdminTableCell className="text-right">
+                        <button
+                          onClick={() => {
+                            setSelectedProduct(item);
+                            setAdjustmentValue(0);
+                            setIsAdjustOpen(true);
+                          }}
+                          className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors"
+                        >
+                          Adjust Stock
+                        </button>
+                      </AdminTableCell>
+                    </AdminTableRow>
+                  ))}
+                </AdminTableBody>
+              </AdminTable>
+              {paginationData && (
+                <AdminPagination
+                  currentPage={paginationData.page}
+                  totalPages={paginationData.totalPages}
+                  onPageChange={setPage}
+                />
+              )}
+            </>
+          );
+        })()}
+
       </div>
 
       {/* Stock Adjustment Modal */}
