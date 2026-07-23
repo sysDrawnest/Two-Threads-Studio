@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Package, User, CreditCard, Clock, CheckCircle, Truck, FileText } from 'lucide-react';
+import { ArrowLeft, Package, User, CreditCard, Clock, CheckCircle, Truck, FileText, Printer, RotateCcw, X } from 'lucide-react';
 import { useAdminOrderDetail, useUpdateOrderStatus } from '../../hooks/useAdminData';
-import { AdminBadge, AdminSkeleton } from '../../components/admin/ui';
+import { AdminBadge, AdminSkeleton, AdminTimeline } from '../../components/admin/ui';
+import { adminService } from '../../services/adminService';
+import toast from 'react-hot-toast';
 
 export const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: orderResponse, isLoading } = useAdminOrderDetail(id!);
+  const { data: orderResponse, isLoading, refetch } = useAdminOrderDetail(id!);
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateOrderStatus();
   
   const [note, setNote] = useState('');
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [isRefunding, setIsRefunding] = useState(false);
 
   if (isLoading) {
     return <AdminSkeleton className="h-[600px] w-full" />;
@@ -26,6 +32,33 @@ export const OrderDetail: React.FC = () => {
     setNote('');
   };
 
+  const handleProcessRefund = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!order.payment?.id && !order.paymentId) {
+      toast.error('No valid payment record found for this order');
+      return;
+    }
+
+    const paymentId = order.payment?.id || order.paymentId;
+    const amount = parseFloat(refundAmount) || Number(order.grandTotal);
+
+    try {
+      setIsRefunding(true);
+      await adminService.processRefund(paymentId, { amount, reason: refundReason });
+      toast.success('Refund processed successfully');
+      setIsRefundModalOpen(false);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to process refund');
+    } finally {
+      setIsRefunding(false);
+    }
+  };
+
+  const handlePrintInvoice = () => {
+    window.print();
+  };
+
   const getStatusVariant = (status: string) => {
     switch(status) {
       case 'DELIVERED': return 'success';
@@ -38,8 +71,26 @@ export const OrderDetail: React.FC = () => {
     }
   };
 
+  // Build timeline events
+  const timelineEvents = [
+    { id: '1', title: 'Order Placed', date: new Date(order.createdAt).toLocaleString('en-IN'), isActive: true },
+    { id: '2', title: 'Processing', date: order.orderStatus !== 'PENDING' ? 'Confirmed' : 'Pending', isActive: ['PROCESSING', 'HANDCRAFTING', 'SHIPPED', 'DELIVERED'].includes(order.orderStatus) },
+    { id: '3', title: 'Handcrafted / Packed', date: ['HANDCRAFTING', 'SHIPPED', 'DELIVERED'].includes(order.orderStatus) ? 'Completed' : 'Pending', isActive: ['HANDCRAFTING', 'SHIPPED', 'DELIVERED'].includes(order.orderStatus) },
+    { id: '4', title: 'Shipped', date: ['SHIPPED', 'DELIVERED'].includes(order.orderStatus) ? 'Dispatched' : 'Pending', isActive: ['SHIPPED', 'DELIVERED'].includes(order.orderStatus) },
+    { id: '5', title: 'Delivered', date: order.orderStatus === 'DELIVERED' ? 'Delivered' : 'Pending', isActive: order.orderStatus === 'DELIVERED' }
+  ];
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
+      {/* Printable Invoice Header styling */}
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #printable-order, #printable-order * { visibility: visible; }
+          #printable-order { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+      `}</style>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -61,20 +112,41 @@ export const OrderDetail: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button 
+            onClick={handlePrintInvoice}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md border border-outline-variant text-primary-container hover:bg-surface-container transition-colors"
+          >
+            <Printer className="h-4 w-4" />
+            Print Invoice / Packing Slip
+          </button>
+
+          {order.paymentStatus === 'CAPTURED' && order.orderStatus !== 'REFUNDED' && (
+            <button 
+              onClick={() => {
+                setRefundAmount(order.grandTotal.toString());
+                setIsRefundModalOpen(true);
+              }} 
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm rounded-md border border-[#c5221f] text-[#c5221f] hover:bg-[#fce8e6] transition-colors"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Refund Order
+            </button>
+          )}
+
           {/* Status Actions based on current status */}
           {order.orderStatus === 'PENDING' && (
-            <button onClick={() => handleStatusChange('PROCESSING')} disabled={isUpdating} className="btn-primary px-4 py-2 text-sm rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
+            <button onClick={() => handleStatusChange('PROCESSING')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
               Mark as Processing
             </button>
           )}
           {order.orderStatus === 'PROCESSING' && (
-            <button onClick={() => handleStatusChange('SHIPPED')} disabled={isUpdating} className="btn-primary px-4 py-2 text-sm rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
+            <button onClick={() => handleStatusChange('SHIPPED')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
               Mark as Shipped
             </button>
           )}
           {order.orderStatus === 'SHIPPED' && (
-            <button onClick={() => handleStatusChange('DELIVERED')} disabled={isUpdating} className="btn-primary px-4 py-2 text-sm rounded-md bg-[#137333] text-white hover:bg-[#137333]/90 transition-colors disabled:opacity-50">
+            <button onClick={() => handleStatusChange('DELIVERED')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-[#137333] text-white hover:bg-[#137333]/90 transition-colors disabled:opacity-50">
               Mark as Delivered
             </button>
           )}
@@ -86,9 +158,16 @@ export const OrderDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content (Items & Timeline) */}
+      {/* Main Order View */}
+      <div id="printable-order" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content (Items, Timeline & Notes) */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Order Progress Timeline */}
+          <div className="rounded-xl border border-outline-variant bg-background p-6">
+            <h2 className="font-serif text-lg font-medium text-primary-container mb-4">Fulfillment Timeline</h2>
+            <AdminTimeline events={timelineEvents} />
+          </div>
+
           {/* Items */}
           <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
             <div className="border-b border-outline-variant px-6 py-4 bg-surface-container/30 flex items-center gap-2">
@@ -157,7 +236,7 @@ export const OrderDetail: React.FC = () => {
           <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
             <div className="border-b border-outline-variant px-6 py-4 bg-surface-container/30 flex items-center gap-2">
               <FileText className="h-5 w-5 text-on-secondary-container" />
-              <h2 className="font-serif text-lg font-medium text-primary-container">Order Notes & Activity</h2>
+              <h2 className="font-serif text-lg font-medium text-primary-container">Order Notes & Internal Log</h2>
             </div>
             <div className="p-6">
               <div className="flex gap-2 mb-6">
@@ -166,7 +245,7 @@ export const OrderDetail: React.FC = () => {
                   value={note}
                   onChange={e => setNote(e.target.value)}
                   placeholder="Add an internal note..."
-                  className="flex-1 rounded-md border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-container"
+                  className="flex-1 rounded-md border border-outline-variant px-3.5 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-container"
                 />
                 <button 
                   onClick={() => handleStatusChange(order.orderStatus)}
@@ -266,6 +345,61 @@ export const OrderDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Refund Modal */}
+      {isRefundModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-xl bg-background border border-outline-variant shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface-container/20">
+              <h3 className="font-serif text-lg font-bold text-primary-container">Process Refund</h3>
+              <button onClick={() => setIsRefundModalOpen(false)} className="text-on-secondary-container hover:text-primary-container">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleProcessRefund} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Refund Amount (₹)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={refundAmount} 
+                  onChange={e => setRefundAmount(e.target.value)}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Reason / Note</label>
+                <textarea 
+                  value={refundReason} 
+                  onChange={e => setRefundReason(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                  placeholder="Reason for refunding this order..."
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                <button 
+                  type="button" 
+                  onClick={() => setIsRefundModalOpen(false)}
+                  className="px-4 py-2 rounded-md border border-outline-variant text-sm font-medium text-primary-container hover:bg-surface-container transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isRefunding}
+                  className="px-4 py-2 rounded-md bg-[#c5221f] text-sm font-medium text-white hover:bg-[#a51c1a] transition-colors disabled:opacity-50"
+                >
+                  {isRefunding ? 'Processing...' : 'Confirm Refund'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

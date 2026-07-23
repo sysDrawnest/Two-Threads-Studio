@@ -305,4 +305,10 @@ export const adminService = {
     const response = await apiClient.delete(`/collections/${id}`);
     return response.data;
   },
+
+  // ── Refunds ───────────────────────────────────────────────────────────────
+  processRefund: async (paymentId: string, data: { amount?: number; reason?: string }) => {
+    const response = await apiClient.post(`/admin/payments/${paymentId}/refund`, data);
+    return response;
+  },
 };

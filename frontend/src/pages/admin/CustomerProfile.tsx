@@ -1,18 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag, Clock } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, ShoppingBag, Heart, ShieldAlert, FileText, Check } from 'lucide-react';
 import { useAdminCustomerDetail, useUpdateCustomerStatus } from '../../hooks/useAdminData';
 import { AdminBadge, AdminSkeleton, AdminTable, AdminTableBody, AdminTableCell, AdminTableHead, AdminTableHeader, AdminTableRow } from '../../components/admin/ui';
+import { adminService } from '../../services/adminService';
+import toast from 'react-hot-toast';
 
 export const CustomerProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: response, isLoading } = useAdminCustomerDetail(id!);
+  const { data: response, isLoading, refetch } = useAdminCustomerDetail(id!);
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateCustomerStatus();
+
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockReason, setBlockReason] = useState('');
+  const [isBlockPending, setIsBlockPending] = useState(false);
 
   if (isLoading) return <AdminSkeleton className="h-[600px] w-full" />;
   if (!response?.data) return <div className="text-[#c5221f]">Customer not found</div>;
 
   const customer = response.data;
+  
+  // Calculate LTV
+  const totalSpent = customer.orders?.reduce((acc: number, o: any) => acc + (Number(o.grandTotal) || 0), 0) || customer.totalSpent || 0;
+
+  const handleToggleBlock = async () => {
+    try {
+      setIsBlockPending(true);
+      const newStatus = !customer.isBlocked;
+      await adminService.blockCustomer(customer.id, { isBlocked: newStatus, reason: blockReason });
+      toast.success(newStatus ? 'Customer blocked' : 'Customer unblocked');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update customer block status');
+    } finally {
+      setIsBlockPending(false);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -34,6 +57,9 @@ export const CustomerProfile: React.FC = () => {
                 <AdminBadge variant={customer.isActive ? 'success' : 'error'}>
                   {customer.isActive ? 'ACTIVE' : 'INACTIVE'}
                 </AdminBadge>
+                {customer.isBlocked && (
+                  <AdminBadge variant="error">BLOCKED</AdminBadge>
+                )}
                 <AdminBadge variant={customer.role === 'ADMIN' ? 'info' : 'default'}>
                   {customer.role}
                 </AdminBadge>
@@ -45,7 +71,14 @@ export const CustomerProfile: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        <div className="flex gap-2">
+          <button 
+            onClick={handleToggleBlock}
+            disabled={isBlockPending}
+            className="px-4 py-2 text-sm rounded-md border border-[#c5221f] text-[#c5221f] font-medium hover:bg-[#fce8e6] transition-colors disabled:opacity-50"
+          >
+            {customer.isBlocked ? 'Unblock Customer' : 'Block Customer'}
+          </button>
           <button 
             onClick={() => updateStatus({ id: customer.id, isActive: !customer.isActive })}
             disabled={isUpdating}
@@ -106,7 +139,7 @@ export const CustomerProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content (Orders) */}
+        {/* Main Content (Orders, LTV, Wishlist) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl border border-outline-variant bg-surface-container/20 p-6">
@@ -114,20 +147,20 @@ export const CustomerProfile: React.FC = () => {
                 <ShoppingBag className="h-5 w-5 text-on-secondary-container" />
                 <h3 className="text-sm font-medium text-on-secondary-container">Total Orders</h3>
               </div>
-              <p className="text-3xl font-serif text-primary-container">{customer._count?.orders || 0}</p>
+              <p className="text-3xl font-serif text-primary-container">{customer._count?.orders || customer.orders?.length || 0}</p>
             </div>
             <div className="rounded-xl border border-outline-variant bg-surface-container/20 p-6">
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-serif text-lg text-on-secondary-container font-medium">₹</span>
-                <h3 className="text-sm font-medium text-on-secondary-container">Total Spent</h3>
+                <h3 className="text-sm font-medium text-on-secondary-container">Lifetime Value (LTV)</h3>
               </div>
               <p className="text-3xl font-serif text-primary-container">
-                {/* Assuming total spent is calculated by backend or sum orders here. For now defaulting 0. */}
-                {customer.totalSpent?.toLocaleString() || 0}
+                ₹{totalSpent.toLocaleString('en-IN')}
               </p>
             </div>
           </div>
 
+          {/* Order History */}
           <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
             <div className="border-b border-outline-variant px-6 py-4 bg-surface-container/30">
               <h2 className="font-serif text-lg font-medium text-primary-container">Order History</h2>

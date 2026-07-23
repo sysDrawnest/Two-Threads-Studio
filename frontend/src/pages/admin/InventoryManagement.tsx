@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, AlertCircle } from 'lucide-react';
+import { Package, AlertCircle, Plus, Minus, X } from 'lucide-react';
 import { useAdminInventory, useAdjustStock } from '../../hooks/useAdminData';
 import { 
   AdminTable,
@@ -13,20 +13,21 @@ import {
   AdminSearchBar,
   AdminFilterBar,
   AdminSkeleton,
-  AdminEmptyState,
-  AdminConfirmDialog
+  AdminEmptyState
 } from '../../components/admin/ui';
+import toast from 'react-hot-toast';
 
 export const InventoryManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+  
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [adjustmentValue, setAdjustmentValue] = useState(0);
-  const [adjustmentReason, setAdjustmentReason] = useState('');
+  const [adjustmentReason, setAdjustmentReason] = useState('Manual Stock Adjustment');
   const [isAdjustOpen, setIsAdjustOpen] = useState(false);
 
-  const { data: response, isLoading } = useAdminInventory({
+  const { data: response, isLoading, refetch } = useAdminInventory({
     page,
     limit: 15,
     search,
@@ -35,16 +36,26 @@ export const InventoryManagement: React.FC = () => {
 
   const { mutate: adjustStock, isPending: isAdjusting } = useAdjustStock();
 
-  const handleAdjustSubmit = () => {
+  const handleAdjustSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedProduct) return;
+    if (adjustmentValue === 0) {
+      toast.error('Adjustment value cannot be zero');
+      return;
+    }
+
     adjustStock(
       { id: selectedProduct.id, data: { adjustment: adjustmentValue, reason: adjustmentReason } },
       {
         onSuccess: () => {
+          toast.success('Stock adjusted successfully');
           setIsAdjustOpen(false);
           setSelectedProduct(null);
           setAdjustmentValue(0);
-          setAdjustmentReason('');
+          refetch();
+        },
+        onError: (err: any) => {
+          toast.error(err.response?.data?.message || 'Failed to adjust stock');
         }
       }
     );
@@ -61,8 +72,8 @@ export const InventoryManagement: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold text-primary-container">Inventory</h1>
-          <p className="text-sm text-on-secondary-container mt-1">Track and manage product stock levels</p>
+          <h1 className="font-serif text-2xl font-bold text-primary-container">Inventory Management</h1>
+          <p className="text-sm text-on-secondary-container mt-1">Track stock levels, incoming inventory, and reserved units</p>
         </div>
       </div>
 
@@ -84,32 +95,33 @@ export const InventoryManagement: React.FC = () => {
 
         {isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
-        ) : !response?.data?.inventory || response.data.inventory.length === 0 ? (
+        ) : !response?.data?.products || response.data.products.length === 0 ? (
           <AdminEmptyState
             icon={Package}
-            title="No inventory found"
-            description={search || status ? "Try adjusting your filters" : "Your catalog is empty."}
+            title="No inventory records found"
+            description={search || status ? "Try adjusting your filters" : "Your catalog inventory is empty."}
           />
         ) : (
           <>
             <AdminTable>
               <AdminTableHeader>
                 <AdminTableRow>
-                  <AdminTableHead>Product / Variant</AdminTableHead>
-                  <AdminTableHead>SKU</AdminTableHead>
-                  <AdminTableHead>Available</AdminTableHead>
+                  <AdminTableHead>Product / SKU</AdminTableHead>
+                  <AdminTableHead>Category</AdminTableHead>
+                  <AdminTableHead className="text-right">Available Stock</AdminTableHead>
+                  <AdminTableHead className="text-right">Threshold</AdminTableHead>
                   <AdminTableHead>Status</AdminTableHead>
                   <AdminTableHead className="text-right">Actions</AdminTableHead>
                 </AdminTableRow>
               </AdminTableHeader>
               <AdminTableBody>
-                {response.data.inventory.map((item: any) => (
+                {response.data.products.map((item: any) => (
                   <AdminTableRow key={item.id}>
                     <AdminTableCell>
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 rounded-md bg-surface-container flex-shrink-0 overflow-hidden">
-                          {item.image ? (
-                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                          {item.primaryImage ? (
+                            <img src={item.primaryImage} alt={item.name} className="h-full w-full object-cover" />
                           ) : (
                             <div className="h-full w-full flex items-center justify-center text-on-secondary-container/50">
                               <Package className="h-5 w-5" />
@@ -118,20 +130,23 @@ export const InventoryManagement: React.FC = () => {
                         </div>
                         <div>
                           <p className="font-medium text-primary-container">{item.name}</p>
-                          {item.variantName && <p className="text-xs text-on-secondary-container">{item.variantName}</p>}
+                          <p className="font-mono text-xs text-on-secondary-container">SKU: {item.sku || 'N/A'}</p>
                         </div>
                       </div>
                     </AdminTableCell>
-                    <AdminTableCell className="font-mono text-sm text-on-secondary-container">
-                      {item.sku || 'N/A'}
+                    <AdminTableCell className="text-on-secondary-container">
+                      {item.category?.name || 'General'}
                     </AdminTableCell>
-                    <AdminTableCell className="font-medium text-primary-container text-lg">
+                    <AdminTableCell className="font-medium text-primary-container text-right text-lg">
                       {item.stockQuantity}
                     </AdminTableCell>
+                    <AdminTableCell className="text-right text-on-secondary-container">
+                      {item.lowStockThreshold || 5}
+                    </AdminTableCell>
                     <AdminTableCell>
-                      {item.stockQuantity === 0 ? (
+                      {item.stockStatus === 'OUT_OF_STOCK' ? (
                         <AdminBadge variant="error">Out of Stock</AdminBadge>
-                      ) : item.stockQuantity < 10 ? (
+                      ) : item.stockStatus === 'LOW_STOCK' ? (
                         <AdminBadge variant="warning">Low Stock</AdminBadge>
                       ) : (
                         <AdminBadge variant="success">In Stock</AdminBadge>
@@ -141,9 +156,10 @@ export const InventoryManagement: React.FC = () => {
                       <button
                         onClick={() => {
                           setSelectedProduct(item);
+                          setAdjustmentValue(0);
                           setIsAdjustOpen(true);
                         }}
-                        className="px-3 py-1.5 text-xs font-medium rounded border border-outline-variant text-primary-container hover:bg-surface-container transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors"
                       >
                         Adjust Stock
                       </button>
@@ -152,27 +168,103 @@ export const InventoryManagement: React.FC = () => {
                 ))}
               </AdminTableBody>
             </AdminTable>
-            <AdminPagination
-              currentPage={response.data.pagination.page}
-              totalPages={response.data.pagination.totalPages}
-              onPageChange={setPage}
-            />
+            {response.data.pagination && (
+              <AdminPagination
+                currentPage={response.data.pagination.page}
+                totalPages={response.data.pagination.totalPages}
+                onPageChange={setPage}
+              />
+            )}
           </>
         )}
       </div>
 
-      <AdminConfirmDialog
-        isOpen={isAdjustOpen}
-        onClose={() => setIsAdjustOpen(false)}
-        title="Adjust Stock"
-        description={`You are adjusting stock for ${selectedProduct?.name}. Enter the adjustment amount (+/-).`}
-        onConfirm={handleAdjustSubmit}
-        confirmText="Save Adjustment"
-        isLoading={isAdjusting}
-      />
-      {/* We should ideally inject a form into the dialog, but since AdminConfirmDialog only takes a string description, 
-          let's just make sure this modal functions or we create a custom modal for this. 
-          For Phase 6A UI prototype, this is acceptable. */}
+      {/* Stock Adjustment Modal */}
+      {isAdjustOpen && selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-xl bg-background border border-outline-variant shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface-container/20">
+              <h3 className="font-serif text-lg font-bold text-primary-container">
+                Adjust Stock: {selectedProduct.name}
+              </h3>
+              <button onClick={() => setIsAdjustOpen(false)} className="text-on-secondary-container hover:text-primary-container">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAdjustSubmit} className="p-6 space-y-4">
+              <div className="bg-surface-container/30 p-3 rounded-lg flex justify-between items-center text-sm">
+                <span className="text-on-secondary-container">Current Quantity:</span>
+                <span className="font-bold text-primary-container text-base">{selectedProduct.stockQuantity}</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">
+                  Adjustment Amount (+ to add, - to reduce)
+                </label>
+                <div className="flex items-center gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setAdjustmentValue(prev => prev - 1)}
+                    className="p-2 rounded border border-outline-variant hover:bg-surface-container text-primary-container"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <input 
+                    type="number" 
+                    value={adjustmentValue} 
+                    onChange={e => setAdjustmentValue(parseInt(e.target.value) || 0)}
+                    className="flex-1 rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-center font-bold text-[#1f1610] outline-none"
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setAdjustmentValue(prev => prev + 1)}
+                    className="p-2 rounded border border-outline-variant hover:bg-surface-container text-primary-container"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-on-secondary-container mt-1">
+                  New Total will be: <strong className="text-primary-container">{Math.max(0, selectedProduct.stockQuantity + adjustmentValue)}</strong>
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Reason for Adjustment</label>
+                <select 
+                  value={adjustmentReason} 
+                  onChange={e => setAdjustmentReason(e.target.value)}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                >
+                  <option value="Manual Stock Adjustment">Manual Stock Adjustment</option>
+                  <option value="New Inventory Received">New Inventory Received</option>
+                  <option value="Damaged / Spoiled Goods">Damaged / Spoiled Goods</option>
+                  <option value="Audit Correction">Audit Correction</option>
+                  <option value="Return to Stock">Return to Stock</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                <button 
+                  type="button" 
+                  onClick={() => setIsAdjustOpen(false)}
+                  className="px-4 py-2 rounded-md border border-outline-variant text-sm font-medium text-primary-container hover:bg-surface-container transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isAdjusting || adjustmentValue === 0}
+                  className="px-4 py-2 rounded-md bg-primary-container text-sm font-medium text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50"
+                >
+                  {isAdjusting ? 'Saving...' : 'Apply Adjustment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
