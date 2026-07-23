@@ -13,7 +13,9 @@ import {
   X,
   LogOut,
   Moon,
-  Sun
+  Sun,
+  FolderKanban,
+  Tags
 } from 'lucide-react';
 import { cn } from '../ui/AdminBadge';
 import { useAuth } from '../../../context/AuthContext';
@@ -42,6 +44,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
       items: [
         { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
         { name: 'Products', href: '/admin/products', icon: Package },
+        { name: 'Categories', href: '/admin/categories', icon: Tags },
+        { name: 'Collections', href: '/admin/collections', icon: FolderKanban },
         { name: 'Inventory', href: '/admin/inventory', icon: Package },
         { name: 'Customers', href: '/admin/customers', icon: Users },
       ]

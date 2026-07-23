@@ -269,4 +269,40 @@ export const adminService = {
     const response = await apiClient.patch('/admin/settings/email-templates', data);
     return response;
   },
+
+  // ── Categories ────────────────────────────────────────────────────────────
+  listCategoriesAdmin: async (): Promise<any> => {
+    const response = await apiClient.get('/categories');
+    return response.data;
+  },
+  createCategory: async (data: any) => {
+    const response = await apiClient.post('/categories', data);
+    return response.data;
+  },
+  updateCategory: async (id: string, data: any) => {
+    const response = await apiClient.put(`/categories/${id}`, data);
+    return response.data;
+  },
+  deleteCategory: async (id: string) => {
+    const response = await apiClient.delete(`/categories/${id}`);
+    return response.data;
+  },
+
+  // ── Collections ───────────────────────────────────────────────────────────
+  listCollectionsAdmin: async (): Promise<any> => {
+    const response = await apiClient.get('/collections');
+    return response.data;
+  },
+  createCollection: async (data: any) => {
+    const response = await apiClient.post('/collections', data);
+    return response.data;
+  },
+  updateCollection: async (id: string, data: any) => {
+    const response = await apiClient.put(`/collections/${id}`, data);
+    return response.data;
+  },
+  deleteCollection: async (id: string) => {
+    const response = await apiClient.delete(`/collections/${id}`);
+    return response.data;
+  },
 };

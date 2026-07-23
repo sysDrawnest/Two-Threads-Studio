@@ -74,6 +74,8 @@ const AccessDenied = lazy(() => import('./pages/auth/AccessDenied'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const ProductsManagement = lazy(() => import('./pages/admin/ProductsManagement').then(module => ({ default: module.ProductsManagement })));
 const ProductForm = lazy(() => import('./pages/admin/ProductForm').then(module => ({ default: module.ProductForm })));
+const CategoryManagement = lazy(() => import('./pages/admin/CategoryManagement').then(module => ({ default: module.CategoryManagement })));
+const CollectionsManagement = lazy(() => import('./pages/admin/CollectionsManagement').then(module => ({ default: module.CollectionsManagement })));
 const InventoryManagement = lazy(() => import('./pages/admin/InventoryManagement').then(module => ({ default: module.InventoryManagement })));
 const OrdersManagement = lazy(() => import('./pages/admin/OrdersManagement').then(module => ({ default: module.OrdersManagement })));
 const OrderDetail = lazy(() => import('./pages/admin/OrderDetail').then(module => ({ default: module.OrderDetail })));
@@ -168,6 +170,8 @@ const AdminRoutes: React.FC = () => (
         <Route path="products" element={<ProductsManagement />} />
         <Route path="products/new" element={<ProductForm />} />
         <Route path="products/:id/edit" element={<ProductForm />} />
+        <Route path="categories" element={<CategoryManagement />} />
+        <Route path="collections" element={<CollectionsManagement />} />
         <Route path="inventory" element={<InventoryManagement />} />
         <Route path="orders" element={<OrdersManagement />} />
         <Route path="orders/:id" element={<OrderDetail />} />
