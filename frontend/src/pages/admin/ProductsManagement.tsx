@@ -101,10 +101,11 @@ export const ProductsManagement: React.FC = () => {
         ) : isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
         ) : (() => {
-          const productsList: any[] = Array.isArray(response)
-            ? response
-            : response?.products || response?.data?.products || (Array.isArray(response?.data) ? response.data : []);
-          const paginationData = response?.pagination || response?.data?.pagination;
+          const resObj = response as any;
+          const productsList: any[] = Array.isArray(resObj)
+            ? resObj
+            : resObj?.products || resObj?.data?.products || (Array.isArray(resObj?.data) ? resObj.data : []);
+          const paginationData = resObj?.pagination || resObj?.data?.pagination;
 
           if (productsList.length === 0) {
             return (
