@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Image as ImageIcon, Tags, Package, Settings, BarChart2, Star, Sparkles, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, Image as ImageIcon, Tags, Package, Settings, BarChart2, Star, Sparkles, AlertCircle, Plus, Search, Check, X } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { Product, ProductStatus, ProductType, StudioProductType, HomepageSection, DifficultyLevel } from '../../types/product';
 import { AdminSkeleton } from '../../components/admin/ui';
+import toast from 'react-hot-toast';
 
 export const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,14 @@ export const ProductForm: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(isEdit);
   const [activeTab, setActiveTab] = useState('basic');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categorySearch, setCategorySearch] = useState('');
+  const [categoryError, setCategoryError] = useState(false);
+  const [isQuickCatOpen, setIsQuickCatOpen] = useState(false);
+  const [quickCatName, setQuickCatName] = useState('');
+  const [quickCatDesc, setQuickCatDesc] = useState('');
+  const [isCreatingCat, setIsCreatingCat] = useState(false);
+
   const [product, setProduct] = useState<Partial<Product>>({
     status: ProductStatus.DRAFT,
     type: ProductType.PHYSICAL,
@@ -27,7 +36,27 @@ export const ProductForm: React.FC = () => {
     materialsIncluded: [],
   });
 
+  const fetchCategories = async () => {
+    try {
+      const res = await adminService.listCategoriesAdmin();
+      const catList = res?.categories || [];
+      // Sort active categories by sortOrder ascending, then name alphabetically
+      const activeCats = catList
+        .filter((c: any) => c.isActive !== false)
+        .sort((a: any, b: any) => {
+          if ((a.sortOrder ?? 0) !== (b.sortOrder ?? 0)) {
+            return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+          }
+          return a.name.localeCompare(b.name);
+        });
+      setCategories(activeCats);
+    } catch (err) {
+      console.error('Failed to load categories', err);
+    }
+  };
+
   useEffect(() => {
+    fetchCategories();
     if (isEdit && id) {
       adminService.getProduct(id).then(data => {
         setProduct(data.product);
@@ -41,6 +70,9 @@ export const ProductForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
+    if (name === 'categoryId' && value) {
+      setCategoryError(false);
+    }
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setProduct(prev => ({ ...prev, [name]: checked }));
@@ -51,22 +83,56 @@ export const ProductForm: React.FC = () => {
     }
   };
 
+  const handleQuickCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickCatName.trim()) return;
+    try {
+      setIsCreatingCat(true);
+      const newCat = await adminService.createCategory({ name: quickCatName, description: quickCatDesc, isActive: true });
+      toast.success('Category created');
+      await fetchCategories();
+      if (newCat?.id) {
+        setProduct(prev => ({ ...prev, categoryId: newCat.id }));
+        setCategoryError(false);
+      }
+      setIsQuickCatOpen(false);
+      setQuickCatName('');
+      setQuickCatDesc('');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create category');
+    } finally {
+      setIsCreatingCat(false);
+    }
+  };
+
   const handleSave = async () => {
+    if (!product.categoryId) {
+      setCategoryError(true);
+      toast.error('Please select a product category before saving.');
+      setActiveTab('basic');
+      return;
+    }
+
     setIsSaving(true);
     try {
       if (isEdit && id) {
         await adminService.updateProduct(id, product);
+        toast.success('Product updated');
       } else {
         await adminService.createProduct(product);
+        toast.success('Product created');
       }
       navigate('/admin/products');
-    } catch (error) {
-      console.error('Failed to save product', error);
-      alert('Failed to save product. Check console for details.');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to save product');
     } finally {
       setIsSaving(false);
     }
   };
+
+  const filteredCategories = categories.filter(c => 
+    c.name.toLowerCase().includes(categorySearch.toLowerCase())
+  );
 
   if (isLoading) {
     return (
@@ -155,11 +221,63 @@ export const ProductForm: React.FC = () => {
                   <textarea name="description" value={product.description || ''} onChange={handleChange} rows={6} className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="Rich product description..." required></textarea>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Product Category Dropdown */}
                   <div>
-                    <label className="block text-sm font-medium text-on-secondary-container mb-1">Category ID *</label>
-                    <input name="categoryId" value={product.categoryId || ''} onChange={handleChange} type="text" className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="Category UUID" required />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium text-on-secondary-container">
+                        Product Category *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsQuickCatOpen(true)}
+                        className="text-xs font-semibold text-primary-container hover:underline flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" /> Create Category
+                      </button>
+                    </div>
+
+                    {categories.length === 0 ? (
+                      <div className="p-3 rounded-md border border-dashed border-[#c8b5aa] bg-surface-container/20 text-xs text-on-secondary-container flex flex-col gap-2">
+                        <p>No categories available. Please create a category first.</p>
+                        <button
+                          type="button"
+                          onClick={() => setIsQuickCatOpen(true)}
+                          className="self-start px-2.5 py-1 rounded bg-primary-container text-white text-xs font-medium hover:bg-primary-container/90 transition-colors"
+                        >
+                          + Create New Category
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <div className="relative">
+                          <select
+                            name="categoryId"
+                            value={product.categoryId || ''}
+                            onChange={handleChange}
+                            className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 bg-background appearance-none pr-8 ${
+                              categoryError ? 'border-[#c5221f] focus:ring-[#c5221f]' : 'border-outline-variant focus:ring-primary-container'
+                            }`}
+                            required
+                          >
+                            <option value="">▼ Select Category</option>
+                            {categories.map((c: any) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-on-secondary-container">
+                            ▼
+                          </div>
+                        </div>
+                        {categoryError && (
+                          <p className="text-xs font-medium text-[#c5221f]">Please select a product category.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-on-secondary-container mb-1">Collection ID</label>
                     <input name="collectionId" value={product.collectionId || ''} onChange={handleChange} type="text" className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary-container" placeholder="Collection UUID" />
@@ -373,6 +491,59 @@ export const ProductForm: React.FC = () => {
           
         </div>
       </div>
+
+      {/* Quick Category Creation Modal */}
+      {isQuickCatOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-xl bg-background border border-outline-variant shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface-container/20">
+              <h3 className="font-serif text-lg font-bold text-primary-container">Create New Category</h3>
+              <button type="button" onClick={() => setIsQuickCatOpen(false)} className="text-on-secondary-container hover:text-primary-container">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleQuickCreateCategory} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Category Name *</label>
+                <input 
+                  type="text" 
+                  value={quickCatName} 
+                  onChange={e => setQuickCatName(e.target.value)}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                  placeholder="e.g. Home Decor" 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Description</label>
+                <textarea 
+                  value={quickCatDesc} 
+                  onChange={e => setQuickCatDesc(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                  placeholder="Brief category description..."
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                <button 
+                  type="button" 
+                  onClick={() => setIsQuickCatOpen(false)}
+                  className="px-4 py-2 rounded-md border border-outline-variant text-sm font-medium text-primary-container hover:bg-surface-container transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isCreatingCat}
+                  className="px-4 py-2 rounded-md bg-primary-container text-sm font-medium text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50"
+                >
+                  {isCreatingCat ? 'Creating...' : 'Save & Assign Category'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
