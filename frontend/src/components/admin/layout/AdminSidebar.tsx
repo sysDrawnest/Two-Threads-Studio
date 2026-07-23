@@ -63,8 +63,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
   const sidebarContent = (
     <div className="flex h-full flex-col bg-[#fef8f3] dark:bg-[#171311] border-r border-[#c8b5aa]/60 dark:border-[#3d332b] transition-colors duration-200">
       <div className="flex h-16 shrink-0 items-center px-6">
-        <h1 className="font-serif text-xl font-bold tracking-tight text-[#1f1610] dark:text-[#ffffff]">
-          TWO THREADS <span className="font-sans text-xs uppercase tracking-widest text-[#4e3c30] dark:text-[#ccb08a] block mt-0.5 font-bold">Admin OS</span>
+        <h1 className="font-serif text-xl font-medium tracking-tight text-[#1f1610] dark:text-[#ffffff]">
+          TWO THREADS <span className="font-sans text-[11px] uppercase tracking-widest text-[#786455] dark:text-[#ccb08a] block mt-0.5 font-medium">Admin OS</span>
         </h1>
         <button onClick={onClose} aria-label="Close menu" className="ml-auto md:hidden text-[#1f1610] dark:text-[#ffffff]">
           <X className="h-5 w-5" />
@@ -74,7 +74,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {navGroups.map((group, i) => (
           <div key={group.label} className={cn("mb-6", i !== 0 && "mt-2")}>
-            <h2 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a]/90">
+            <h2 className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-[#786455] dark:text-[#ccb08a]/90">
               {group.label}
             </h2>
             <nav className="space-y-1" aria-label={group.label}>
@@ -87,7 +87,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
                     if (window.innerWidth < 768) onClose();
                   }}
                   className={({ isActive }) => cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold transition-all border",
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all border",
                     isActive
                       ? "bg-[#d1c4bd]/40 dark:bg-[#2c231c] text-[#120a05] dark:text-[#ffffff] border-[#a89990] dark:border-[#52443a] shadow-xs"
                       : "text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] border-transparent"
@@ -106,7 +106,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
         <button
           onClick={toggleTheme}
           aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
-          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-semibold text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] transition-colors"
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] transition-colors"
         >
           <div className="flex items-center gap-3">
             {theme === 'dark' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5" />}
@@ -119,7 +119,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
         <button
           onClick={() => logout()}
           aria-label="Sign out of admin"
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#b14833] dark:hover:text-[#f28b82] transition-colors"
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#b14833] dark:hover:text-[#f28b82] transition-colors"
         >
           <LogOut className="h-4.5 w-4.5" />
           Sign out
