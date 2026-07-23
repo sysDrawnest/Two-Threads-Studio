@@ -19,6 +19,7 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
         {/* Mobile menu trigger */}
         <button
           onClick={onMenuClick}
+          aria-label="Open navigation menu"
           className="mr-3 rounded-md p-2 text-[#2d2520] dark:text-[#f4efe9] hover:bg-[#d1c4bd]/35 dark:hover:bg-[#211c18] md:hidden transition-colors"
         >
           <Menu className="h-5 w-5" />
@@ -27,6 +28,7 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
         {/* Desktop sidebar toggle trigger */}
         <button
           onClick={onToggleSidebar}
+          aria-label={isSidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
           className="mr-4 rounded-md p-2 text-[#2d2520] dark:text-[#f4efe9] hover:bg-[#d1c4bd]/35 dark:hover:bg-[#211c18] hidden md:flex items-center justify-center transition-colors"
           title={isSidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
         >
@@ -39,6 +41,7 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
           <input
             type="text"
             placeholder="Search orders, customers, products..."
+            aria-label="Global admin search"
             className="h-9 w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#211c18] pl-9 pr-4 text-sm text-[#1f1610] dark:text-[#ffffff] placeholder-[#786455] dark:placeholder-[#a5a19d] focus:border-[#4e3c30] dark:focus:border-[#ccb08a] focus:outline-none focus:ring-1 focus:ring-[#4e3c30] dark:focus:ring-[#ccb08a] transition-all font-medium"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#4e3c30] dark:text-[#ccb08a] font-mono border border-[#c8b5aa] dark:border-[#3d332b] rounded px-1.5 py-0.5 bg-[#fef8f3] dark:bg-[#171311] font-semibold">
@@ -51,6 +54,7 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
         <Link 
           to="/" 
           target="_blank"
+          aria-label="Open storefront in new tab"
           className="hidden sm:flex items-center space-x-1.5 text-sm font-semibold text-[#4e3c30] dark:text-[#ccb08a] hover:text-[#1f1610] dark:hover:text-[#ffffff] transition-colors"
         >
           <span>Storefront</span>
@@ -59,15 +63,21 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
         
         <div className="h-6 w-px bg-[#c8b5aa]/60 dark:bg-[#3d332b] hidden sm:block mx-2" />
         
-        <button className="relative rounded-full p-2 text-[#4e3c30] dark:text-[#ccb08a] hover:bg-[#d1c4bd]/35 dark:hover:bg-[#211c18] transition-colors">
+        <button 
+          aria-label="View notifications"
+          className="relative rounded-full p-2 text-[#4e3c30] dark:text-[#ccb08a] hover:bg-[#d1c4bd]/35 dark:hover:bg-[#211c18] transition-colors"
+        >
           <Bell className="h-5 w-5" />
           <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-[#b14833] ring-2 ring-[#fef8f3] dark:ring-[#171311]"></span>
         </button>
         
-        <button className="h-8 w-8 overflow-hidden rounded-full border border-[#c8b5aa] dark:border-[#3d332b] bg-[#fef8f3] ml-2">
+        <button 
+          aria-label="Admin user profile menu"
+          className="h-8 w-8 overflow-hidden rounded-full border border-[#c8b5aa] dark:border-[#3d332b] bg-[#fef8f3] ml-2"
+        >
           <img 
             src="https://api.dicebear.com/7.x/initials/svg?seed=Admin&backgroundColor=d1c4bd&textColor=2d2520" 
-            alt="Admin" 
+            alt="Admin Avatar" 
             className="h-full w-full object-cover"
           />
         </button>
