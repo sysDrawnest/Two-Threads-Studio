@@ -311,4 +311,15 @@ export const adminService = {
     const response = await apiClient.post(`/admin/payments/${paymentId}/refund`, data);
     return response;
   },
+
+  // ── Security & RBAC ───────────────────────────────────────────────────────
+  getSecurityAuditLogs: async (params?: any) => {
+    const response = await apiClient.get('/admin/risk/dashboard', { params });
+    return response;
+  },
+
+  updateSecuritySettings: async (data: any) => {
+    const response = await apiClient.patch('/admin/settings/company', data);
+    return response;
+  },
 };
