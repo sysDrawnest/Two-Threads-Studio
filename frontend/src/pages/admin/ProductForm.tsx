@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -8,37 +8,46 @@ import {
   Package, 
   BarChart2, 
   Sparkles, 
-  AlertCircle, 
   Plus, 
   Check, 
   X, 
   ChevronRight, 
   ChevronLeft, 
-  Search, 
-  Tag, 
-  Truck, 
   Globe, 
-  ShieldAlert, 
   Upload, 
   Trash2, 
-  Eye, 
-  FileText,
-  Clock
+  Truck,
+  FolderTree,
+  DollarSign,
+  Layers,
+  CheckCircle2,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
-import { Product, ProductStatus, ProductType, StudioProductType, HomepageSection, DifficultyLevel } from '../../types/product';
+import { Product, ProductStatus, ProductType, StudioProductType } from '../../types/product';
 import { AdminSkeleton } from '../../components/admin/ui';
 import toast from 'react-hot-toast';
 
+// Exact requested step order:
+// 1. Basic Details
+// 2. Pricing
+// 3. Inventory
+// 4. Images
+// 5. Organization (Category, Collection, Tags)
+// 6. Shipping
+// 7. SEO
+// 8. Publish
+
 const WIZARD_STEPS = [
-  { id: 1, title: 'Basic Info', icon: Package, desc: 'Name, Description & Category' },
-  { id: 2, title: 'Pricing & Inventory', icon: BarChart2, desc: 'Prices, Stock & SKU' },
-  { id: 3, title: 'Images & Media', icon: ImageIcon, desc: 'Primary Image & Gallery' },
-  { id: 4, title: 'Product Details', icon: Sparkles, desc: 'Materials & Dimensions' },
-  { id: 5, title: 'Shipping & Tax', icon: Truck, desc: 'GST, HSN & COD' },
-  { id: 6, title: 'SEO & Meta', icon: Globe, desc: 'Search & Meta tags' },
-  { id: 7, title: 'Storefront', icon: Tag, desc: 'Badges & Featured flags' },
-  { id: 8, title: 'Review & Publish', icon: Check, desc: 'Final Verification' },
+  { id: 1, title: 'Basic Details', icon: Package, desc: 'Name & Description' },
+  { id: 2, title: 'Pricing', icon: DollarSign, desc: 'Base Price & Cost' },
+  { id: 3, title: 'Inventory', icon: BarChart2, desc: 'SKU & Stock Level' },
+  { id: 4, title: 'Images', icon: ImageIcon, desc: 'Primary & Gallery Media' },
+  { id: 5, title: 'Organization', icon: FolderTree, desc: 'Category & Collection' },
+  { id: 6, title: 'Shipping', icon: Truck, desc: 'Weight, Dimensions & COD' },
+  { id: 7, title: 'SEO', icon: Globe, desc: 'Search & Meta Tags' },
+  { id: 8, title: 'Publish', icon: CheckCircle2, desc: 'Review & Catalog Publish' },
 ];
 
 export const ProductForm: React.FC = () => {
@@ -54,20 +63,18 @@ export const ProductForm: React.FC = () => {
     provider: 'local',
   });
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Categories & Quick Creation
+  // Category State
   const [categories, setCategories] = useState<any[]>([]);
-  const [categorySearch, setCategorySearch] = useState('');
   const [isQuickCatOpen, setIsQuickCatOpen] = useState(false);
   const [quickCatName, setQuickCatName] = useState('');
   const [quickCatDesc, setQuickCatDesc] = useState('');
   const [isCreatingCat, setIsCreatingCat] = useState(false);
 
-  // Draft Auto-save timestamp
+  // Auto-Save timestamp
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
 
-  // Product State
+  // Form State (Maintained across all wizard steps)
   const [product, setProduct] = useState<Partial<Product>>({
     name: '',
     shortDescription: '',
@@ -91,15 +98,11 @@ export const ProductForm: React.FC = () => {
     isHandmade: true,
     isSustainable: true,
     isEcoFriendly: false,
-    isLimitedEdition: false,
-    isDigitalDownload: false,
     allowCod: true,
     isFreeShipping: false,
     isFragile: false,
-    homepageSections: [],
-    searchKeywords: [],
     materials: [],
-    materialsIncluded: [],
+    searchKeywords: [],
     seoTitle: '',
     seoDescription: '',
     seoKeywords: '',
@@ -112,8 +115,7 @@ export const ProductForm: React.FC = () => {
     shippingClass: 'STANDARD',
   });
 
-  // Image Upload Gallery State
-  const [galleryImages, setGalleryImages] = useState<Array<{ url: string; isPrimary: boolean; altText?: string }>>([]);
+  const [galleryImages, setGalleryImages] = useState<Array<{ url: string; isPrimary: boolean }>>([]);
 
   const fetchCategories = async () => {
     try {
@@ -139,7 +141,6 @@ export const ProductForm: React.FC = () => {
     }
   };
 
-  // Restore or load product
   useEffect(() => {
     fetchCategories();
     fetchUploadStatus();
@@ -152,7 +153,6 @@ export const ProductForm: React.FC = () => {
           setGalleryImages(prodData.images.map((img: any) => ({
             url: img.url,
             isPrimary: Boolean(img.isPrimary),
-            altText: img.altText || '',
           })));
         } else if (prodData.ogImageUrl) {
           setGalleryImages([{ url: prodData.ogImageUrl, isPrimary: true }]);
@@ -164,7 +164,6 @@ export const ProductForm: React.FC = () => {
         setIsLoading(false);
       });
     } else {
-      // Check for local draft backup
       const savedDraft = localStorage.getItem('tts_product_draft');
       if (savedDraft) {
         try {
@@ -172,20 +171,19 @@ export const ProductForm: React.FC = () => {
           if (parsed && parsed.name) {
             toast((t) => (
               <div className="flex items-center gap-3">
-                <span className="text-xs font-medium">Found an unsaved product draft! Restore?</span>
+                <span className="text-xs font-medium">Restored draft for "{parsed.name}"</span>
                 <button 
                   onClick={() => {
                     setProduct(parsed);
                     if (parsed.galleryImages) setGalleryImages(parsed.galleryImages);
                     toast.dismiss(t.id);
-                    toast.success('Draft restored!');
                   }}
-                  className="px-2 py-1 rounded bg-primary-container text-white text-xs font-bold"
+                  className="px-2 py-1 rounded bg-[#4e3c30] text-white text-xs font-bold"
                 >
-                  Restore
+                  Load
                 </button>
               </div>
-            ), { duration: 8000 });
+            ), { duration: 6000 });
           }
         } catch {}
       }
@@ -194,19 +192,17 @@ export const ProductForm: React.FC = () => {
 
   // Auto-Save Draft every 30 seconds
   useEffect(() => {
-    if (isEdit) return; // Only auto-save new creations
+    if (isEdit) return;
     const interval = setInterval(() => {
       if (product.name || product.description || product.price) {
-        const draftData = { ...product, galleryImages };
-        localStorage.setItem('tts_product_draft', JSON.stringify(draftData));
+        localStorage.setItem('tts_product_draft', JSON.stringify({ ...product, galleryImages }));
         setLastAutoSave(new Date());
       }
     }, 30000);
-
     return () => clearInterval(interval);
   }, [product, galleryImages, isEdit]);
 
-  // Keyboard navigation (Alt + Left/Right)
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && e.key === 'ArrowRight') {
@@ -233,23 +229,19 @@ export const ProductForm: React.FC = () => {
     }
   };
 
-  // Image Upload Handlers
+  // Image Upload Handling with friendly error messages
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setIsUploading(true);
-    setUploadProgress(20);
 
     try {
       const fileList = Array.from(files);
-      setUploadProgress(50);
       const res = await adminService.uploadMultipleImages(fileList);
-      setUploadProgress(90);
-
       const uploadedResults = res?.data?.images || res?.images || [res?.data || res];
+      
       const newImages = uploadedResults.map((item: any, idx: number) => ({
         url: item.url || item.filename,
         isPrimary: galleryImages.length === 0 && idx === 0,
-        altText: product.name || 'Product Image',
       }));
 
       setGalleryImages(prev => [...prev, ...newImages]);
@@ -259,10 +251,18 @@ export const ProductForm: React.FC = () => {
       toast.success(`${newImages.length} image(s) uploaded successfully`);
     } catch (err: any) {
       console.error('File upload failed', err);
-      toast.error(err.response?.data?.message || 'Upload failed. Check storage connection.');
+      const msg = err.message || err.response?.data?.message;
+      if (msg?.includes('too large')) {
+        toast.error('File exceeds upload limit of 10 MB per image.');
+      } else if (msg?.includes('Unsupported image format')) {
+        toast.error('Unsupported image format. Allowed: JPEG, PNG, WEBP, GIF, SVG.');
+      } else if (err.status === 0 || err.code === 'ERR_NETWORK') {
+        toast.error('Network connection lost. Please check backend status.');
+      } else {
+        toast.error(msg || 'Image upload failed because storage is unavailable.');
+      }
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
     }
   };
 
@@ -288,15 +288,12 @@ export const ProductForm: React.FC = () => {
   };
 
   const handleSetPrimaryImage = (index: number) => {
-    setGalleryImages(prev => prev.map((img, i) => ({
-      ...img,
-      isPrimary: i === index,
-    })));
+    setGalleryImages(prev => prev.map((img, i) => ({ ...img, isPrimary: i === index })));
     setProduct(prev => ({ ...prev, ogImageUrl: galleryImages[index].url }));
-    toast.success('Primary image set');
+    toast.success('Primary image updated');
   };
 
-  // Quick Category Creator
+  // Quick Category Creation
   const handleQuickCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickCatName.trim()) return;
@@ -305,8 +302,9 @@ export const ProductForm: React.FC = () => {
       const newCat = await adminService.createCategory({ name: quickCatName, description: quickCatDesc, isActive: true });
       toast.success('Category created & selected');
       await fetchCategories();
-      if (newCat?.id || newCat?.data?.id) {
-        setProduct(prev => ({ ...prev, categoryId: newCat?.id || newCat?.data?.id }));
+      const catId = newCat?.id || newCat?.data?.id;
+      if (catId) {
+        setProduct(prev => ({ ...prev, categoryId: catId }));
       }
       setIsQuickCatOpen(false);
       setQuickCatName('');
@@ -318,9 +316,8 @@ export const ProductForm: React.FC = () => {
     }
   };
 
-  // Save / Publish Action
+  // Save / Publish Product
   const handleSaveProduct = async (statusOverride?: ProductStatus) => {
-    // Validation checks
     if (!product.name?.trim()) {
       toast.error('Product Name is required (Step 1)');
       setCurrentStep(1);
@@ -331,14 +328,14 @@ export const ProductForm: React.FC = () => {
       setCurrentStep(1);
       return;
     }
-    if (!product.categoryId) {
-      toast.error('Product Category is required (Step 1)');
-      setCurrentStep(1);
-      return;
-    }
     if (product.price === undefined || product.price === null || Number(product.price) <= 0) {
       toast.error('Valid Price is required (Step 2)');
       setCurrentStep(2);
+      return;
+    }
+    if (!product.categoryId) {
+      toast.error('Category is required (Step 5)');
+      setCurrentStep(5);
       return;
     }
 
@@ -360,16 +357,20 @@ export const ProductForm: React.FC = () => {
 
       if (isEdit && id) {
         await adminService.updateProduct(id, payload);
-        toast.success('Product updated successfully!');
+        toast.success('Product saved successfully.');
       } else {
         await adminService.createProduct(payload);
-        localStorage.removeItem('tts_product_draft'); // Clean up draft
-        toast.success('Product created successfully!');
+        localStorage.removeItem('tts_product_draft');
+        toast.success('Product saved successfully.');
       }
       navigate('/admin/products');
     } catch (err: any) {
       console.error('Failed to save product', err);
-      toast.error(err.response?.data?.message || 'Failed to save product. Please check form values.');
+      if (err.status === 401) {
+        toast.error('Session expired. Please log in again.');
+      } else {
+        toast.error(err.response?.data?.message || err.message || 'Failed to save product.');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -433,9 +434,9 @@ export const ProductForm: React.FC = () => {
         </div>
       </div>
 
-      {/* 8-Step Wizard Progress Bar */}
+      {/* 8-Step Progress Bar (Exact User Requested Order) */}
       <div className="rounded-xl border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 shadow-xs overflow-x-auto scrollbar-none">
-        <div className="flex items-center justify-between min-w-[760px] gap-2">
+        <div className="flex items-center justify-between min-w-[820px] gap-2">
           {WIZARD_STEPS.map((step, index) => {
             const Icon = step.icon;
             const isCompleted = step.id < currentStep;
@@ -468,7 +469,7 @@ export const ProductForm: React.FC = () => {
                   </span>
                 </button>
                 {index < WIZARD_STEPS.length - 1 && (
-                  <div className={`h-0.5 w-4 shrink-0 rounded-full transition-colors ${isCompleted ? 'bg-[#2e7d32]' : 'bg-[#c8b5aa]/30'}`} />
+                  <div className={`h-0.5 w-3 shrink-0 rounded-full transition-colors ${isCompleted ? 'bg-[#2e7d32]' : 'bg-[#c8b5aa]/30'}`} />
                 )}
               </React.Fragment>
             );
@@ -477,15 +478,15 @@ export const ProductForm: React.FC = () => {
       </div>
 
       {/* Step Content Card */}
-      <div className="rounded-xl border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-6 shadow-xs min-h-[480px]">
+      <div className="rounded-xl border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-6 shadow-xs min-h-[460px]">
         <AnimatePresence mode="wait">
           
-          {/* STEP 1: BASIC INFORMATION */}
+          {/* STEP 1: BASIC DETAILS */}
           {currentStep === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 1: Basic Information</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Define core identity, category assignment, and description</p>
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 1: Basic Details</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Define core product name, subtitle, and detailed product description</p>
               </div>
 
               <div className="space-y-4">
@@ -526,126 +527,87 @@ export const ProductForm: React.FC = () => {
                     name="description"
                     value={product.description || ''}
                     onChange={handleChange}
-                    rows={5}
-                    placeholder="Detailed description of craftsmanship, inspiration, and studio details..."
+                    rows={6}
+                    placeholder="Detailed story, craftsmanship notes, materials, and care instructions..."
                     className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none focus:border-[#4e3c30]"
                     required
                   />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Category Selection */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a]">
-                        Product Category <span className="text-[#c62828]">*</span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setIsQuickCatOpen(true)}
-                        className="text-xs font-medium text-[#8c6b3e] hover:underline flex items-center gap-1"
-                      >
-                        <Plus className="h-3 w-3" /> Create Category
-                      </button>
-                    </div>
-
-                    <select
-                      name="categoryId"
-                      value={product.categoryId || ''}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
-                      required
-                    >
-                      <option value="">▼ Select Category</option>
-                      {categories.map((c: any) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Product Type & Status */}
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Publishing Status
-                    </label>
-                    <select
-                      name="status"
-                      value={product.status || 'DRAFT'}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none font-medium"
-                    >
-                      <option value="ACTIVE">Active (Published)</option>
-                      <option value="DRAFT">Draft</option>
-                      <option value="HIDDEN">Hidden</option>
-                      <option value="ARCHIVED">Archived</option>
-                    </select>
-                  </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 2: PRICING & INVENTORY */}
+          {/* STEP 2: PRICING */}
           {currentStep === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 2: Pricing & Inventory</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Set base price, compare price, cost, stock levels and SKU</p>
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 2: Pricing</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Set base selling price, compare at price, and studio cost price</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                    Base Price (₹) <span className="text-[#c62828]">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={product.price ?? ''}
+                    onChange={handleChange}
+                    placeholder="1299"
+                    step="0.01"
+                    className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                    Compare Price (₹)
+                  </label>
+                  <input
+                    type="number"
+                    name="comparePrice"
+                    value={product.comparePrice ?? ''}
+                    onChange={handleChange}
+                    placeholder="1599"
+                    step="0.01"
+                    className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                    Cost Price (Studio Cost ₹)
+                  </label>
+                  <input
+                    type="number"
+                    name="costPrice"
+                    value={product.costPrice ?? ''}
+                    onChange={handleChange}
+                    placeholder="450"
+                    step="0.01"
+                    className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 3: INVENTORY */}
+          {currentStep === 3 && (
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              <div className="border-b border-[#c8b5aa]/30 pb-3">
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 3: Inventory</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">SKU, barcode, stock quantity, low-stock threshold and backorders</p>
               </div>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Base Price (₹) <span className="text-[#c62828]">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={product.price ?? ''}
-                      onChange={handleChange}
-                      placeholder="1299"
-                      step="0.01"
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Compare Price / Original (₹)
-                    </label>
-                    <input
-                      type="number"
-                      name="comparePrice"
-                      value={product.comparePrice ?? ''}
-                      onChange={handleChange}
-                      placeholder="1599"
-                      step="0.01"
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Cost Price (Studio Cost ₹)
-                    </label>
-                    <input
-                      type="number"
-                      name="costPrice"
-                      value={product.costPrice ?? ''}
-                      onChange={handleChange}
-                      placeholder="450"
-                      step="0.01"
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      SKU Number
+                      SKU Code
                     </label>
                     <input
                       type="text"
@@ -673,7 +635,7 @@ export const ProductForm: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Low Stock Threshold
+                      Low Stock Alert Threshold
                     </label>
                     <input
                       type="number"
@@ -694,7 +656,7 @@ export const ProductForm: React.FC = () => {
                       onChange={handleChange}
                       className="rounded border-[#c8b5aa]"
                     />
-                    Track Inventory Automatically
+                    Track Stock Automatically
                   </label>
 
                   <label className="flex items-center gap-2 text-xs font-medium text-[#1f1610] dark:text-[#ffffff] cursor-pointer">
@@ -712,23 +674,23 @@ export const ProductForm: React.FC = () => {
             </motion.div>
           )}
 
-          {/* STEP 3: IMAGES & MEDIA */}
-          {currentStep === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+          {/* STEP 4: IMAGES */}
+          {currentStep === 4 && (
+            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 3: Images & Media Assets</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Upload high-res product photos, primary thumbnail, and gallery images</p>
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 4: Images & Media</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Primary product image, gallery uploads, drag & drop, and previews</p>
               </div>
 
-              {/* Upload Status Banner */}
+              {/* Upload Provider Badge */}
               <div className="rounded-lg border border-[#c8b5aa]/40 bg-[#fef8f3] dark:bg-[#1a1613] p-3 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-2 text-[#5c4a3e] dark:text-[#b8a698]">
                   <Upload className="h-4 w-4 text-[#8c6b3e]" />
                   <span>
-                    Storage Mode: <strong>{uploadStatus.provider === 'cloudinary' ? 'Cloudinary Cloud CDN' : 'Local Storage Mode'}</strong>
+                    Storage Provider: <strong>{uploadStatus.provider === 'cloudinary' ? 'Cloudinary Cloud CDN' : 'Local Storage Mode'}</strong>
                   </span>
                 </div>
-                <span className="text-[11px] text-[#8c7a6b]">PNG, JPG, WEBP accepted (Max 10MB)</span>
+                <span className="text-[11px] text-[#8c7a6b]">PNG, JPG, WEBP, SVG (Max 10MB per file)</span>
               </div>
 
               {/* Drag & Drop File Picker */}
@@ -739,25 +701,26 @@ export const ProductForm: React.FC = () => {
                   accept="image/*"
                   onChange={(e) => handleFileUpload(e.target.files)}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={isUploading}
                 />
                 <div className="flex flex-col items-center gap-2">
                   <div className="h-10 w-10 rounded-full bg-[#ebe2d8] dark:bg-[#2b231d] flex items-center justify-center text-[#4e3c30] dark:text-[#ccb08a]">
-                    <Upload className="h-5 w-5" />
+                    {isUploading ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
                   </div>
                   <p className="text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">
-                    Click or Drag & Drop Product Images
+                    {isUploading ? 'Uploading Image Files...' : 'Click or Drag & Drop Product Images'}
                   </p>
                   <p className="text-[11px] text-[#786455] dark:text-[#a8998c]">
-                    Supports multiple file selection
+                    Multiple files supported
                   </p>
                 </div>
               </div>
 
-              {/* URL Input Fallback */}
+              {/* Image URL Paste Fallback */}
               <div className="flex gap-2">
                 <input
                   type="url"
-                  placeholder="Or paste image URL (e.g. Unsplash image link)..."
+                  placeholder="Or paste direct image URL (e.g. Unsplash link)..."
                   id="directImageUrl"
                   className="flex-1 rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3 py-1.5 text-xs text-[#1f1610] dark:text-[#ffffff] outline-none"
                 />
@@ -776,21 +739,21 @@ export const ProductForm: React.FC = () => {
                 </button>
               </div>
 
-              {/* Uploaded Gallery Grid */}
+              {/* Attached Images Grid */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a]">
-                  Product Gallery ({galleryImages.length} images)
+                  Product Images ({galleryImages.length})
                 </h3>
 
                 {galleryImages.length === 0 ? (
                   <p className="text-xs italic text-[#786455] p-4 text-center border border-dashed border-[#c8b5aa]/40 rounded-lg">
-                    No images added yet. Upload files or paste image URLs above.
+                    No images uploaded yet. Select files or paste image URLs above.
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {galleryImages.map((img, idx) => (
                       <div key={idx} className={`relative group rounded-lg overflow-hidden border aspect-square ${img.isPrimary ? 'border-[#2e7d32] ring-2 ring-[#2e7d32]/30' : 'border-[#c8b5aa]/50'}`}>
-                        <img src={img.url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                        <img src={img.url} alt={`Product ${idx}`} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-2">
                           {!img.isPrimary && (
                             <button
@@ -822,45 +785,100 @@ export const ProductForm: React.FC = () => {
             </motion.div>
           )}
 
-          {/* STEP 4: PRODUCT DETAILS */}
-          {currentStep === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+          {/* STEP 5: ORGANIZATION */}
+          {currentStep === 5 && (
+            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 4: Product Details & Specs</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Crafting technique, materials, origin, dimensions & fulfillment times</p>
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 5: Organization & Categorization</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Assign category, collection, status, and storefront badges</p>
               </div>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Category Selection */}
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Crafting Technique
-                    </label>
-                    <input
-                      type="text"
-                      name="technique"
-                      value={product.technique || ''}
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a]">
+                        Product Category <span className="text-[#c62828]">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsQuickCatOpen(true)}
+                        className="text-xs font-medium text-[#8c6b3e] hover:underline flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" /> Quick Create
+                      </button>
+                    </div>
+
+                    <select
+                      name="categoryId"
+                      value={product.categoryId || ''}
                       onChange={handleChange}
-                      placeholder="e.g. Hand Embroidery / Kantha Stitch"
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
+                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
+                      required
+                    >
+                      <option value="">▼ Select Category</option>
+                      {categories.map((c: any) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Origin / Region
+                      Collection UUID / ID
                     </label>
                     <input
                       type="text"
-                      name="origin"
-                      value={product.origin || ''}
+                      name="collectionId"
+                      value={product.collectionId || ''}
                       onChange={handleChange}
-                      placeholder="e.g. Jaipur, Rajasthan, India"
+                      placeholder="Optional collection ID..."
                       className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
                     />
                   </div>
                 </div>
 
+                <div className="pt-4 border-t border-[#c8b5aa]/30">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-3">
+                    Storefront Badges
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                      <input type="checkbox" name="isFeatured" checked={Boolean(product.isFeatured)} onChange={handleChange} className="rounded text-[#4e3c30]" />
+                      Featured Product
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                      <input type="checkbox" name="isBestSeller" checked={Boolean(product.isBestSeller)} onChange={handleChange} className="rounded text-[#4e3c30]" />
+                      Best Seller
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                      <input type="checkbox" name="isNewArrival" checked={Boolean(product.isNewArrival)} onChange={handleChange} className="rounded text-[#4e3c30]" />
+                      New Arrival
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                      <input type="checkbox" name="isHandmade" checked={Boolean(product.isHandmade ?? true)} onChange={handleChange} className="rounded text-[#4e3c30]" />
+                      Handmade
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                      <input type="checkbox" name="isSustainable" checked={Boolean(product.isSustainable ?? true)} onChange={handleChange} className="rounded text-[#4e3c30]" />
+                      Sustainable / Eco
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 6: SHIPPING */}
+          {currentStep === 6 && (
+            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              <div className="border-b border-[#c8b5aa]/30 pb-3">
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 6: Shipping & Logistics</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Parcel weight, GST rate, HSN code, Cash on Delivery rules, and shipping options</p>
+              </div>
+
+              <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
@@ -877,46 +895,6 @@ export const ProductForm: React.FC = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Est. Production Time (Days)
-                    </label>
-                    <input
-                      type="number"
-                      name="estimatedProductionDays"
-                      value={product.estimatedProductionDays ?? 2}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Est. Shipping Time (Days)
-                    </label>
-                    <input
-                      type="number"
-                      name="estimatedShippingDays"
-                      value={product.estimatedShippingDays ?? 4}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 5: SHIPPING & TAX */}
-          {currentStep === 5 && (
-            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 5: Shipping & Tax Configuration</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">GST %, HSN code, Cash on Delivery rules, and shipping classes</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
                       GST Rate (%)
@@ -941,19 +919,6 @@ export const ProductForm: React.FC = () => {
                       onChange={handleChange}
                       placeholder="6307"
                       className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm font-mono text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Shipping Class
-                    </label>
-                    <input
-                      type="text"
-                      name="shippingClass"
-                      value={product.shippingClass || 'STANDARD'}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
                     />
                   </div>
                 </div>
@@ -989,19 +954,19 @@ export const ProductForm: React.FC = () => {
                       onChange={handleChange}
                       className="rounded border-[#c8b5aa]"
                     />
-                    Fragile Item (Requires Extra Care)
+                    Fragile Item (Extra Protective Packaging)
                   </label>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* STEP 6: SEO */}
-          {currentStep === 6 && (
-            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+          {/* STEP 7: SEO */}
+          {currentStep === 7 && (
+            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 6: SEO & Social Sharing Metadata</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Optimize Google search snippets and Open Graph previews</p>
+                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 7: Search Engine Optimization (SEO)</h2>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Google search snippet titles, meta descriptions, and keywords</p>
               </div>
 
               <div className="space-y-4">
@@ -1035,7 +1000,7 @@ export const ProductForm: React.FC = () => {
                     value={product.seoDescription || ''}
                     onChange={handleChange}
                     rows={3}
-                    placeholder="Handcrafted embroidery kit with natural threads and botanical pattern..."
+                    placeholder="Handcrafted embroidery kit with natural threads..."
                     maxLength={160}
                     className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
                   />
@@ -1044,67 +1009,15 @@ export const ProductForm: React.FC = () => {
             </motion.div>
           )}
 
-          {/* STEP 7: STOREFRONT */}
-          {currentStep === 7 && (
-            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <div className="border-b border-[#c8b5aa]/30 pb-3">
-                <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 7: Storefront Marketing Flags</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Assign badges like Featured, Best Seller, New Arrival, and Artisan labels</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3]/40 dark:bg-[#1a1613] cursor-pointer hover:border-[#8c6b3e] transition-colors">
-                  <input type="checkbox" name="isFeatured" checked={Boolean(product.isFeatured)} onChange={handleChange} className="rounded text-[#4e3c30]" />
-                  <div>
-                    <span className="block text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">Featured Product</span>
-                    <span className="text-[11px] text-[#786455]">Showcase on homepage feature banner</span>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3]/40 dark:bg-[#1a1613] cursor-pointer hover:border-[#8c6b3e] transition-colors">
-                  <input type="checkbox" name="isBestSeller" checked={Boolean(product.isBestSeller)} onChange={handleChange} className="rounded text-[#4e3c30]" />
-                  <div>
-                    <span className="block text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">Best Seller</span>
-                    <span className="text-[11px] text-[#786455]">Highlight in top popular picks</span>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3]/40 dark:bg-[#1a1613] cursor-pointer hover:border-[#8c6b3e] transition-colors">
-                  <input type="checkbox" name="isNewArrival" checked={Boolean(product.isNewArrival)} onChange={handleChange} className="rounded text-[#4e3c30]" />
-                  <div>
-                    <span className="block text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">New Arrival</span>
-                    <span className="text-[11px] text-[#786455]">Display in freshly added collection</span>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3]/40 dark:bg-[#1a1613] cursor-pointer hover:border-[#8c6b3e] transition-colors">
-                  <input type="checkbox" name="isHandmade" checked={Boolean(product.isHandmade ?? true)} onChange={handleChange} className="rounded text-[#4e3c30]" />
-                  <div>
-                    <span className="block text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">Handmade</span>
-                    <span className="text-[11px] text-[#786455]">Artisanal hand-crafted badge</span>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3]/40 dark:bg-[#1a1613] cursor-pointer hover:border-[#8c6b3e] transition-colors">
-                  <input type="checkbox" name="isSustainable" checked={Boolean(product.isSustainable ?? true)} onChange={handleChange} className="rounded text-[#4e3c30]" />
-                  <div>
-                    <span className="block text-xs font-semibold text-[#1f1610] dark:text-[#ffffff]">Sustainable / Eco</span>
-                    <span className="text-[11px] text-[#786455]">Eco-friendly materials badge</span>
-                  </div>
-                </label>
-              </div>
-            </motion.div>
-          )}
-
-          {/* STEP 8: REVIEW & PUBLISH */}
+          {/* STEP 8: PUBLISH */}
           {currentStep === 8 && (
             <motion.div key="step8" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
               <div className="border-b border-[#c8b5aa]/30 pb-3">
                 <h2 className="font-serif text-lg font-medium text-[#1f1610] dark:text-[#ffffff]">Step 8: Final Review & Publish</h2>
-                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Verify all details before saving product into catalog</p>
+                <p className="text-xs text-[#786455] dark:text-[#a8998c]">Verify product overview before publishing to live store catalog</p>
               </div>
 
-              {/* Review Card */}
+              {/* Summary Overview Card */}
               <div className="rounded-lg border border-[#c8b5aa]/40 bg-[#fef8f3] dark:bg-[#1a1613] p-4 space-y-4">
                 <div className="flex items-center justify-between border-b border-[#c8b5aa]/30 pb-3">
                   <div className="flex items-center gap-3">
@@ -1159,7 +1072,7 @@ export const ProductForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Validation Readiness Status */}
+              {/* Validation Status Badges */}
               <div className="space-y-2">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a]">
                   Catalog Readiness Checks
@@ -1210,7 +1123,7 @@ export const ProductForm: React.FC = () => {
 
         </AnimatePresence>
 
-        {/* Wizard Footer Navigation Controls */}
+        {/* Wizard Footer Controls */}
         <div className="flex items-center justify-between pt-6 border-t border-[#c8b5aa]/30 mt-8">
           <button
             type="button"
@@ -1246,7 +1159,7 @@ export const ProductForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Category Creation Modal */}
+      {/* Quick Category Modal */}
       {isQuickCatOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
           <div className="w-full max-w-md rounded-xl bg-white dark:bg-[#211c18] border border-[#c8b5aa]/50 dark:border-[#3d332b] shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">

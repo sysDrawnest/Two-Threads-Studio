@@ -22,6 +22,73 @@ export class ApiError extends Error {
   }
 }
 
+// ─── Token Refresh State ───────────────────────────────────────────────────────
+// Prevent concurrent refresh storms: if a refresh is already in-flight,
+// queue the callers and resolve them all with the same new token.
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string | null) => void> = [];
+
+function subscribeToRefresh(callback: (token: string | null) => void) {
+  refreshSubscribers.push(callback);
+}
+
+function notifyRefreshSubscribers(token: string | null) {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (isRefreshing) {
+    // Another request is already refreshing — wait for it
+    return new Promise((resolve) => {
+      subscribeToRefresh(resolve);
+    });
+  }
+
+  isRefreshing = true;
+  const refreshToken = localStorage.getItem('tt_refresh_token');
+
+  if (!refreshToken) {
+    isRefreshing = false;
+    notifyRefreshSubscribers(null);
+    return null;
+  }
+
+  try {
+    const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!refreshResponse.ok) {
+      isRefreshing = false;
+      notifyRefreshSubscribers(null);
+      return null;
+    }
+
+    const refreshResult = await refreshResponse.json();
+    if (refreshResult.success && refreshResult.data?.accessToken) {
+      const newAccessToken = refreshResult.data.accessToken;
+      localStorage.setItem('tt_access_token', newAccessToken);
+      if (refreshResult.data.refreshToken) {
+        localStorage.setItem('tt_refresh_token', refreshResult.data.refreshToken);
+      }
+      isRefreshing = false;
+      notifyRefreshSubscribers(newAccessToken);
+      return newAccessToken;
+    }
+
+    isRefreshing = false;
+    notifyRefreshSubscribers(null);
+    return null;
+  } catch {
+    isRefreshing = false;
+    notifyRefreshSubscribers(null);
+    return null;
+  }
+}
+
 async function request(path: string, options: RequestOptions = {}) {
   // Check browser online status
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -50,8 +117,8 @@ async function request(path: string, options: RequestOptions = {}) {
   const headers = new Headers(options.headers);
   let requestBody = options.body;
 
-  // Set Content-Type to JSON if sending a body and it is a plain object
-  if (requestBody && typeof requestBody === 'object' && !(requestBody instanceof FormData)) {
+  // Set Content-Type to JSON if sending a plain object (not FormData or Blob)
+  if (requestBody && typeof requestBody === 'object' && !(requestBody instanceof FormData) && !(requestBody instanceof Blob)) {
     if (!headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
@@ -88,6 +155,7 @@ async function request(path: string, options: RequestOptions = {}) {
     );
   }
 
+  // ─── Parse response body ────────────────────────────────────────────────────
   let data: any = null;
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
@@ -98,92 +166,92 @@ async function request(path: string, options: RequestOptions = {}) {
     }
   }
 
-  // Handle 401 Unauthorized by attempting to refresh the token
-  if (response.status === 401 && !url.includes('/auth/refresh') && !url.includes('/auth/login')) {
-    const refreshToken = localStorage.getItem('tt_refresh_token');
-    
-    if (refreshToken) {
+  // ─── Handle 401: Attempt token refresh then retry original request ──────────
+  // IMPORTANT: Only trigger logout if refresh itself definitively fails.
+  // A 400 validation error on the product form must NEVER log the admin out.
+  if (
+    response.status === 401 &&
+    !url.includes('/auth/refresh') &&
+    !url.includes('/auth/login')
+  ) {
+    const newToken = await refreshAccessToken();
+
+    if (newToken) {
+      // Retry the original request with fresh access token
+      const retryHeaders = new Headers(headers);
+      retryHeaders.set('Authorization', `Bearer ${newToken}`);
+
+      // Rebuild body: if FormData, we must re-create it since it may be consumed
+      const retryOptions: RequestInit = {
+        ...options,
+        headers: retryHeaders,
+        body: requestBody,
+      };
+
+      let retryResponse: Response;
       try {
-        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken })
-        });
-        
-        if (refreshResponse.ok) {
-          const refreshResult = await refreshResponse.json();
-          if (refreshResult.success && refreshResult.data) {
-            localStorage.setItem('tt_access_token', refreshResult.data.accessToken);
-            if (refreshResult.data.refreshToken) {
-              localStorage.setItem('tt_refresh_token', refreshResult.data.refreshToken);
-            }
-            
-            // Retry the original request with new access token
-            const retryHeaders = new Headers(headers);
-            retryHeaders.set('Authorization', `Bearer ${refreshResult.data.accessToken}`);
-
-            const retryOptions: RequestInit = {
-              ...options,
-              headers: retryHeaders,
-              body: requestBody,
-            };
-
-            const retryResponse = await fetch(url, retryOptions);
-            
-            let retryData: any = null;
-            const retryContentType = retryResponse.headers.get('content-type');
-            if (retryContentType && retryContentType.includes('application/json')) {
-              try {
-                retryData = await retryResponse.json();
-              } catch {
-                retryData = null;
-              }
-            }
-
-            if (!retryResponse.ok) {
-              const errorMessage = retryData?.message || retryResponse.statusText || 'An error occurred';
-              const code = retryData?.code || 'RETRY_FAILED';
-              throw new ApiError(errorMessage, retryResponse.status, code, retryData);
-            }
-            
-            return retryData;
-          }
-        }
-      } catch (err) {
-        console.error('Failed to refresh token', err);
+        retryResponse = await fetch(url, retryOptions);
+      } catch (netErr: any) {
+        throw new ApiError(
+          'Unable to connect to the server after token refresh.',
+          0,
+          'ERR_NETWORK',
+          netErr
+        );
       }
+
+      let retryData: any = null;
+      const retryContentType = retryResponse.headers.get('content-type');
+      if (retryContentType && retryContentType.includes('application/json')) {
+        try {
+          retryData = await retryResponse.json();
+        } catch {
+          retryData = null;
+        }
+      }
+
+      if (!retryResponse.ok) {
+        // Retry also failed — but only dispatch logout if STILL 401
+        if (retryResponse.status === 401) {
+          window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: 'session_expired' } }));
+        }
+        const errorMessage = retryData?.message || retryResponse.statusText || 'An error occurred';
+        const code = retryData?.code || 'REQUEST_FAILED';
+        throw new ApiError(errorMessage, retryResponse.status, code, retryData);
+      }
+
+      return retryData;
     }
-    
-    // If refresh failed or there is no refresh token, dispatch logout event
-    window.dispatchEvent(new Event('auth:logout'));
-    const errorMessage = data?.message || response.statusText || 'Session expired. Please log in again.';
-    const code = data?.code || 'UNAUTHORIZED';
-    throw new ApiError(errorMessage, response.status, code, data);
+
+    // Refresh definitively failed (no new token returned) — now safe to logout
+    window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: 'refresh_failed' } }));
+    const errorMessage = data?.message || 'Session expired. Please log in again.';
+    throw new ApiError(errorMessage, response.status, data?.code || 'UNAUTHORIZED', data);
   }
 
+  // ─── Non-401 errors: surface them without touching auth state ──────────────
   if (!response.ok) {
     const errorMessage = data?.message || response.statusText || 'An error occurred';
     const code = data?.code;
     throw new ApiError(errorMessage, response.status, code, data);
   }
 
-  // Return standard response structure or data
   return data;
 }
 
 export const apiClient = {
   get: (path: string, options?: RequestOptions) =>
     request(path, { ...options, method: 'GET' }),
-  
+
   post: (path: string, body?: any, options?: RequestOptions) =>
     request(path, { ...options, method: 'POST', body }),
-  
+
   put: (path: string, body?: any, options?: RequestOptions) =>
     request(path, { ...options, method: 'PUT', body }),
-  
+
   patch: (path: string, body?: any, options?: RequestOptions) =>
     request(path, { ...options, method: 'PATCH', body }),
-  
+
   delete: (path: string, options?: RequestOptions) =>
     request(path, { ...options, method: 'DELETE' }),
 };
