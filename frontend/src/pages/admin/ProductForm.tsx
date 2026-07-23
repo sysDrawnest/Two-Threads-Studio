@@ -353,21 +353,34 @@ export const ProductForm: React.FC = () => {
 
       let studioType: string | undefined = product.studioType ? String(product.studioType).toUpperCase() : undefined;
 
+      const num = (val: any) => (val !== undefined && val !== null && val !== '' && !isNaN(Number(val)) ? Number(val) : undefined);
+
       const payload: any = {
         ...product,
         status: statusOverride || product.status || ProductStatus.DRAFT,
         difficulty,
         studioType,
-        price: Number(product.price),
-        comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined,
-        costPrice: product.costPrice ? Number(product.costPrice) : undefined,
-        stockQuantity: Number(product.stockQuantity || 0),
-        lowStockThreshold: Number(product.lowStockThreshold || 5),
+        price: num(product.price),
+        comparePrice: num(product.comparePrice),
+        costPrice: num(product.costPrice),
+        stockQuantity: num(product.stockQuantity) ?? 0,
+        lowStockThreshold: num(product.lowStockThreshold) ?? 5,
+        weight: num(product.weight),
+        gstPercent: num(product.gstPercent),
+        estimatedProductionDays: num(product.estimatedProductionDays),
+        estimatedShippingDays: num(product.estimatedShippingDays),
         collectionId: product.collectionId?.trim() ? product.collectionId : undefined,
         sku: product.sku?.trim() ? product.sku : undefined,
         ogImageUrl: cleanUrl(galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl),
         canonicalUrl: cleanUrl(product.canonicalUrl),
       };
+
+      // Strip null and empty string values so Zod optional schema validation passes
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === null || (typeof payload[key] === 'string' && payload[key].trim() === '')) {
+          payload[key] = undefined;
+        }
+      });
 
       if (isEdit && id) {
         await adminService.updateProduct(id, payload);
