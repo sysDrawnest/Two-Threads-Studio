@@ -2,21 +2,14 @@
  * Email Service
  *
  * Thin wrapper around the Resend SDK.
- * The sender address is read from EMAIL_FROM env var — never hardcoded.
+ * The sender address is read dynamically from EMAIL_FROM env var — never hardcoded.
  *
  * Usage:
- *   await emailService.send({ to: 'user@example.com', subject: '...', html: '...' });
- *
- * To add a background queue later: replace the send() implementation with
- * a BullMQ enqueue call — callers need not change.
+ *   const res = await emailService.send({ to: 'user@example.com', subject: '...', html: '...' });
  */
 
 import { Resend } from 'resend';
 import logger from '../lib/logger';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const FROM = process.env.EMAIL_FROM || 'Two Threads Studio <onboarding@resend.dev>';
 
 export interface SendEmailParams {
   to: string | string[];
@@ -29,16 +22,26 @@ export interface SendEmailParams {
   }>;
 }
 
+export interface SendEmailResult {
+  success: boolean;
+  id?: string;
+  error?: any;
+}
+
 export const emailService = {
-  send: async (params: SendEmailParams): Promise<void> => {
-    if (!process.env.RESEND_API_KEY) {
-      logger.warn({ to: params.to, subject: params.subject }, '[EmailService] RESEND_API_KEY not set — skipping email');
-      return;
+  send: async (params: SendEmailParams): Promise<SendEmailResult> => {
+    const apiKey = process.env.RESEND_API_KEY;
+    const fromAddress = process.env.EMAIL_FROM || 'Two Threads Studio <onboarding@resend.dev>';
+
+    if (!apiKey) {
+      logger.warn({ to: params.to, subject: params.subject }, '[Email] RESEND_API_KEY not set — skipping email dispatch');
+      return { success: false, error: 'RESEND_API_KEY environment variable is missing' };
     }
 
     try {
+      const resend = new Resend(apiKey);
       const payload: any = {
-        from: FROM,
+        from: fromAddress,
         to: Array.isArray(params.to) ? params.to : [params.to],
         subject: params.subject,
         html: params.html,
@@ -52,16 +55,47 @@ export const emailService = {
         }));
       }
 
-      const { data, error } = await resend.emails.send(payload);
+      logger.info({ recipient: params.to, subject: params.subject, from: fromAddress }, '[Email] Sending email...');
 
-      if (error) {
-        logger.error({ error, to: params.to, subject: params.subject }, '[EmailService] Resend API error');
-      } else {
-        logger.info({ id: data?.id, to: params.to, subject: params.subject }, '[EmailService] Email sent');
+      const response = await resend.emails.send(payload);
+
+      if (response.error) {
+        logger.error(
+          {
+            error: response.error,
+            recipient: params.to,
+            subject: params.subject,
+            from: fromAddress,
+          },
+          '[Email] Failed to send email via Resend API'
+        );
+        return { success: false, error: response.error };
       }
-    } catch (err) {
-      // Non-fatal — email failures should not crash the payment flow
-      logger.error({ err, to: params.to, subject: params.subject }, '[EmailService] Failed to send email');
+
+      logger.info(
+        {
+          id: response.data?.id,
+          recipient: params.to,
+          subject: params.subject,
+          from: fromAddress,
+        },
+        '[Email] Email sent successfully'
+      );
+
+      return { success: true, id: response.data?.id };
+    } catch (err: any) {
+      logger.error(
+        {
+          err,
+          message: err.message,
+          stack: err.stack,
+          recipient: params.to,
+          subject: params.subject,
+          from: fromAddress,
+        },
+        '[Email] Unexpected exception during email dispatch'
+      );
+      return { success: false, error: err };
     }
   },
 };
