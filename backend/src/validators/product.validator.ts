@@ -62,8 +62,8 @@ const productBaseSchema = z.object({
   shortDescription: z.string().max(500).trim().optional(),
   description:      z.string().min(1, 'Description is required').trim(),
   sku:              z.string().max(100).trim().optional(),
-  categoryId:       z.string().cuid('Invalid category ID'),
-  collectionId:     z.string().cuid('Invalid collection ID').optional(),
+  categoryId:       z.string().min(1, 'Category is required'),
+  collectionId:     z.string().min(1).optional(),
 
   // Pricing
   price:        z.number().positive('Price must be positive'),

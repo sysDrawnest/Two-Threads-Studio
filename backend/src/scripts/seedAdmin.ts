@@ -4,7 +4,7 @@ import prisma from '../prisma';
 
 async function main() {
   const email = 'admin@twothreads.com';
-  const password = 'password123';
+  const password = 'Admin@12345';
   const passwordHash = await hashPassword(password);
 
   const existing = await prisma.user.findUnique({ where: { email } });
