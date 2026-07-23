@@ -4,7 +4,7 @@ import { Package, Edit, Plus, Trash2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { adminService } from '../../services/adminService';
-import { 
+import {
   AdminTable,
   AdminTableBody,
   AdminTableCell,
@@ -61,8 +61,8 @@ export const ProductsManagement: React.FC = () => {
           <h1 className="font-serif text-2xl font-bold text-primary-container">Products</h1>
           <p className="text-sm text-on-secondary-container mt-1">Manage your catalog, pricing, and visibility</p>
         </div>
-        <Link 
-          to="/admin/products/new" 
+        <Link
+          to="/admin/products/new"
           className="inline-flex items-center justify-center gap-2 rounded-md bg-primary-container px-4 py-2 text-sm font-medium text-white hover:bg-primary-container/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -72,7 +72,7 @@ export const ProductsManagement: React.FC = () => {
 
       <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-outline-variant bg-surface-container/30">
-          <AdminSearchBar 
+          <AdminSearchBar
             value={search}
             onChange={(v) => { setSearch(v); setPage(1); }}
             placeholder="Search products by name or SKU..."
@@ -171,13 +171,13 @@ export const ProductsManagement: React.FC = () => {
                       </AdminTableCell>
                       <AdminTableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Link 
+                          <Link
                             to={`/admin/products/${product.id}/edit`}
                             className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
                           >
                             <Edit className="h-4 w-4" />
                           </Link>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => handleDeleteProduct(product.id, product.name)}
                             className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-[#fce8e6] hover:text-[#c5221f] rounded-md transition-colors"
