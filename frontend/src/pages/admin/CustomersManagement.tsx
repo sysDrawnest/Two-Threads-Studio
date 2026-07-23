@@ -68,7 +68,7 @@ export const CustomersManagement: React.FC = () => {
 
         {isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
-        ) : !response?.data?.users || response.data.users.length === 0 ? (
+        ) : !response?.data || (!response.data.customers?.length && !response.data.users?.length) ? (
           <AdminEmptyState
             icon={Users}
             title="No customers found"
@@ -89,7 +89,7 @@ export const CustomersManagement: React.FC = () => {
                 </AdminTableRow>
               </AdminTableHeader>
               <AdminTableBody>
-                {response.data.users.map((user: any) => (
+                {(response.data.customers || response.data.users || []).map((user: any) => (
                   <AdminTableRow key={user.id}>
                     <AdminTableCell>
                       <div className="flex items-center gap-3">
@@ -109,11 +109,10 @@ export const CustomersManagement: React.FC = () => {
                       {user.phone && <p className="text-xs text-on-secondary-container">{user.phone}</p>}
                     </AdminTableCell>
                     <AdminTableCell>
-                      {user._count?.orders || 0}
+                      {user._count?.orders || user.customerRisk?.ordersPlaced || 0}
                     </AdminTableCell>
                     <AdminTableCell className="font-medium">
-                      ₹{/* Would normally calculate or fetch total spent, for now using 0 */}
-                      {user.totalSpent || 0}
+                      ₹{user.totalSpent || 0}
                     </AdminTableCell>
                     <AdminTableCell>
                       {new Date(user.createdAt).toLocaleDateString('en-IN', {
@@ -146,11 +145,13 @@ export const CustomersManagement: React.FC = () => {
                 ))}
               </AdminTableBody>
             </AdminTable>
-            <AdminPagination
-              currentPage={response.data.pagination.page}
-              totalPages={response.data.pagination.totalPages}
-              onPageChange={setPage}
-            />
+            {response.data.pagination && (
+              <AdminPagination
+                currentPage={response.data.pagination.page}
+                totalPages={response.data.pagination.totalPages}
+                onPageChange={setPage}
+              />
+            )}
           </>
         )}
       </div>
