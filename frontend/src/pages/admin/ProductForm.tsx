@@ -453,17 +453,17 @@ export const ProductForm: React.FC = () => {
                   type="button"
                   onClick={() => setCurrentStep(step.id)}
                   className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-all flex-1 text-center group ${isCurrent
-                      ? 'bg-[#fef8f3] dark:bg-[#28211b] border border-[#8c6b3e]/40'
-                      : isCompleted
-                        ? 'hover:bg-[#f5eeea] dark:hover:bg-[#241e18]'
-                        : 'opacity-60 hover:opacity-100'
+                    ? 'bg-[#fef8f3] dark:bg-[#28211b] border border-[#8c6b3e]/40'
+                    : isCompleted
+                      ? 'hover:bg-[#f5eeea] dark:hover:bg-[#241e18]'
+                      : 'opacity-60 hover:opacity-100'
                     }`}
                 >
                   <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${isCurrent
-                      ? 'bg-[#4e3c30] text-white dark:bg-[#ccb08a] dark:text-[#171311] shadow-xs'
-                      : isCompleted
-                        ? 'bg-[#2e7d32] text-white'
-                        : 'bg-[#ebeeef] dark:bg-[#2c241e] text-[#5c4a3e] dark:text-[#a8998c]'
+                    ? 'bg-[#4e3c30] text-white dark:bg-[#ccb08a] dark:text-[#171311] shadow-xs'
+                    : isCompleted
+                      ? 'bg-[#2e7d32] text-white'
+                      : 'bg-[#ebeeef] dark:bg-[#2c241e] text-[#5c4a3e] dark:text-[#a8998c]'
                     }`}>
                     {isCompleted ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                   </div>
