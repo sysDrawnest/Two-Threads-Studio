@@ -57,12 +57,6 @@ router.get(
   listProducts
 );
 
-router.get(
-  '/:slug',
-  validate(productSlugParamsSchema),
-  getProductBySlug
-);
-
 // ─── Admin Routes ──────────────────────────────────────────────────────────────
 
 router.get(
@@ -87,6 +81,14 @@ router.post(
   requireRole('ADMIN'),
   validate(bulkActionSchema),
   bulkAction
+);
+
+// ─── Dynamic Public Routes ─────────────────────────────────────────────────────
+
+router.get(
+  '/:slug',
+  validate(productSlugParamsSchema),
+  getProductBySlug
 );
 
 router.post(
