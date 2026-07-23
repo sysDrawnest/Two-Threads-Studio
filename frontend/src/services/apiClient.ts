@@ -48,28 +48,32 @@ async function request(path: string, options: RequestOptions = {}) {
   }
 
   const headers = new Headers(options.headers);
+  let requestBody = options.body;
 
   // Set Content-Type to JSON if sending a body and it is a plain object
-  if (options.body && typeof options.body === 'object') {
-    headers.set('Content-Type', 'application/json');
-    options.body = JSON.stringify(options.body);
+  if (requestBody && typeof requestBody === 'object' && !(requestBody instanceof FormData)) {
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+    requestBody = JSON.stringify(requestBody);
   }
 
   // Inject JWT from localStorage
   const token = localStorage.getItem('tt_access_token');
-  if (token) {
+  if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
   // Inject Guest ID
   const guestId = localStorage.getItem('tts_guest_id');
-  if (guestId) {
+  if (guestId && !headers.has('x-guest-id')) {
     headers.set('x-guest-id', guestId);
   }
 
   const finalOptions: RequestInit = {
     ...options,
     headers,
+    body: requestBody,
   };
 
   let response: Response;
@@ -77,7 +81,7 @@ async function request(path: string, options: RequestOptions = {}) {
     response = await fetch(url, finalOptions);
   } catch (netErr: any) {
     throw new ApiError(
-      'Unable to connect to the server. Please check your network and try again.',
+      'Unable to connect to the server. Please check if the backend server is running.',
       0,
       'ERR_NETWORK',
       netErr
@@ -87,7 +91,11 @@ async function request(path: string, options: RequestOptions = {}) {
   let data: any = null;
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
   }
 
   // Handle 401 Unauthorized by attempting to refresh the token
@@ -110,20 +118,26 @@ async function request(path: string, options: RequestOptions = {}) {
               localStorage.setItem('tt_refresh_token', refreshResult.data.refreshToken);
             }
             
-            // Retry the original request
-            const retryHeaders = new Headers(options.headers);
+            // Retry the original request with new access token
+            const retryHeaders = new Headers(headers);
             retryHeaders.set('Authorization', `Bearer ${refreshResult.data.accessToken}`);
-            
-            if (options.body && typeof options.body === 'object') {
-              retryHeaders.set('Content-Type', 'application/json');
-            }
 
-            const retryResponse = await fetch(url, { ...options, headers: retryHeaders });
+            const retryOptions: RequestInit = {
+              ...options,
+              headers: retryHeaders,
+              body: requestBody,
+            };
+
+            const retryResponse = await fetch(url, retryOptions);
             
             let retryData: any = null;
             const retryContentType = retryResponse.headers.get('content-type');
             if (retryContentType && retryContentType.includes('application/json')) {
-              retryData = await retryResponse.json();
+              try {
+                retryData = await retryResponse.json();
+              } catch {
+                retryData = null;
+              }
             }
 
             if (!retryResponse.ok) {
@@ -142,7 +156,7 @@ async function request(path: string, options: RequestOptions = {}) {
     
     // If refresh failed or there is no refresh token, dispatch logout event
     window.dispatchEvent(new Event('auth:logout'));
-    const errorMessage = data?.message || response.statusText || 'Unauthorized';
+    const errorMessage = data?.message || response.statusText || 'Session expired. Please log in again.';
     const code = data?.code || 'UNAUTHORIZED';
     throw new ApiError(errorMessage, response.status, code, data);
   }
