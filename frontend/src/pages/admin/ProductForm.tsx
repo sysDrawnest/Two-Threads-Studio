@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Save, 
-  Image as ImageIcon, 
-  Package, 
-  BarChart2, 
-  Sparkles, 
-  Plus, 
-  Check, 
-  X, 
-  ChevronRight, 
-  ChevronLeft, 
-  Globe, 
-  Upload, 
-  Trash2, 
+import {
+  ArrowLeft,
+  Save,
+  Image as ImageIcon,
+  Package,
+  BarChart2,
+  Sparkles,
+  Plus,
+  Check,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  Globe,
+  Upload,
+  Trash2,
   Truck,
   FolderTree,
   DollarSign,
@@ -172,7 +172,7 @@ export const ProductForm: React.FC = () => {
             toast((t) => (
               <div className="flex items-center gap-3">
                 <span className="text-xs font-medium">Restored draft for "{parsed.name}"</span>
-                <button 
+                <button
                   onClick={() => {
                     setProduct(parsed);
                     if (parsed.galleryImages) setGalleryImages(parsed.galleryImages);
@@ -185,7 +185,7 @@ export const ProductForm: React.FC = () => {
               </div>
             ), { duration: 6000 });
           }
-        } catch {}
+        } catch { }
       }
     }
   }, [id, isEdit]);
@@ -238,7 +238,7 @@ export const ProductForm: React.FC = () => {
       const fileList = Array.from(files);
       const res = await adminService.uploadMultipleImages(fileList);
       const uploadedResults = res?.data?.images || res?.images || [res?.data || res];
-      
+
       const newImages = uploadedResults.map((item: any, idx: number) => ({
         url: item.url || item.filename,
         isPrimary: galleryImages.length === 0 && idx === 0,
@@ -390,7 +390,7 @@ export const ProductForm: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-24 text-[#2d2520] dark:text-[#e2deda]">
-      
+
       {/* Top Bar Header */}
       <div className="sticky top-0 z-30 bg-[#faf6f0]/95 dark:bg-[#1a1613]/95 backdrop-blur-md border-b border-[#c8b5aa]/40 dark:border-[#3d332b] py-3 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
@@ -402,9 +402,8 @@ export const ProductForm: React.FC = () => {
               <h1 className="font-serif text-xl font-semibold tracking-tight text-[#1f1610] dark:text-[#ffffff]">
                 {isEdit ? 'Edit Product' : 'Add New Product'}
               </h1>
-              <span className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                product.status === ProductStatus.ACTIVE ? 'bg-[#2e7d32]/10 text-[#2e7d32]' : 'bg-[#8c6b3e]/10 text-[#8c6b3e]'
-              }`}>
+              <span className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${product.status === ProductStatus.ACTIVE ? 'bg-[#2e7d32]/10 text-[#2e7d32]' : 'bg-[#8c6b3e]/10 text-[#8c6b3e]'
+                }`}>
                 {product.status || 'DRAFT'}
               </span>
             </div>
@@ -416,7 +415,7 @@ export const ProductForm: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <button 
+          <button
             type="button"
             onClick={() => handleSaveProduct(ProductStatus.DRAFT)}
             disabled={isSaving}
@@ -425,7 +424,7 @@ export const ProductForm: React.FC = () => {
             Save Draft
           </button>
 
-          <button 
+          <button
             type="button"
             onClick={() => handleSaveProduct(ProductStatus.ACTIVE)}
             disabled={isSaving}
@@ -450,21 +449,19 @@ export const ProductForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep(step.id)}
-                  className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-all flex-1 text-center group ${
-                    isCurrent 
-                      ? 'bg-[#fef8f3] dark:bg-[#28211b] border border-[#8c6b3e]/40' 
-                      : isCompleted 
-                      ? 'hover:bg-[#f5eeea] dark:hover:bg-[#241e18]' 
-                      : 'opacity-60 hover:opacity-100'
-                  }`}
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-all flex-1 text-center group ${isCurrent
+                      ? 'bg-[#fef8f3] dark:bg-[#28211b] border border-[#8c6b3e]/40'
+                      : isCompleted
+                        ? 'hover:bg-[#f5eeea] dark:hover:bg-[#241e18]'
+                        : 'opacity-60 hover:opacity-100'
+                    }`}
                 >
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                    isCurrent 
-                      ? 'bg-[#4e3c30] text-white dark:bg-[#ccb08a] dark:text-[#171311] shadow-xs' 
-                      : isCompleted 
-                      ? 'bg-[#2e7d32] text-white' 
-                      : 'bg-[#ebeeef] dark:bg-[#2c241e] text-[#5c4a3e] dark:text-[#a8998c]'
-                  }`}>
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${isCurrent
+                      ? 'bg-[#4e3c30] text-white dark:bg-[#ccb08a] dark:text-[#171311] shadow-xs'
+                      : isCompleted
+                        ? 'bg-[#2e7d32] text-white'
+                        : 'bg-[#ebeeef] dark:bg-[#2c241e] text-[#5c4a3e] dark:text-[#a8998c]'
+                    }`}>
                     {isCompleted ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                   </div>
                   <span className={`text-xs font-medium line-clamp-1 ${isCurrent ? 'text-[#1f1610] dark:text-[#ffffff] font-semibold' : 'text-[#5c4a3e] dark:text-[#b8a698]'}`}>
@@ -483,7 +480,7 @@ export const ProductForm: React.FC = () => {
       {/* Step Content Card */}
       <div className="rounded-xl border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-6 shadow-xs min-h-[460px]">
         <AnimatePresence mode="wait">
-          
+
           {/* STEP 1: BASIC DETAILS */}
           {currentStep === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
