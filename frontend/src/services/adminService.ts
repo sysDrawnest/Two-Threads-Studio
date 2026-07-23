@@ -16,6 +16,18 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface PaginatedProductsResponse {
+  products: Product[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage?: boolean;
+    hasPrevPage?: boolean;
+  };
+}
+
 // Basic types to satisfy the compiler
 export type Order = any;
 export type User = any;
@@ -86,7 +98,7 @@ export const adminService = {
   },
   
   // ── PIM / Products ────────────────────────────────────────────────────────
-  listProducts: async (params?: any): Promise<PaginatedResponse<Product>> => {
+  listProducts: async (params?: any): Promise<PaginatedProductsResponse> => {
     const response = await apiClient.get('/products/admin', { params });
     return response.data;
   },
