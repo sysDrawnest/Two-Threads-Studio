@@ -25,9 +25,13 @@ export const ProductsManagement: React.FC = () => {
   const [status, setStatus] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: response, isLoading } = useQuery({
+  const { data: response, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['admin-products', { page, search, status }],
-    queryFn: () => adminService.listProducts({ page, limit: 15, search, status }),
+    queryFn: async () => {
+      const res = await adminService.listProducts({ page, limit: 15, search, status });
+      console.log('[ProductsManagement] Fetched products response:', res);
+      return res;
+    },
     staleTime: 0,
     refetchOnMount: 'always',
   });
@@ -82,7 +86,19 @@ export const ProductsManagement: React.FC = () => {
           />
         </div>
 
-        {isLoading ? (
+        {isError ? (
+          <div className="p-8 text-center bg-[#fce8e6]/40 border border-[#f5c6cb] rounded-lg m-4 text-[#c5221f]">
+            <p className="font-semibold text-base mb-1">Failed to load catalog products</p>
+            <p className="text-xs font-mono mb-4">{(error as any)?.message || String(error)}</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-4 py-2 text-xs font-medium bg-[#c5221f] text-white rounded-md hover:bg-[#a81a17] transition-colors"
+            >
+              Retry Connection
+            </button>
+          </div>
+        ) : isLoading ? (
           <div className="p-4"><AdminSkeleton className="h-96 w-full" /></div>
         ) : (() => {
           const productsList: any[] = Array.isArray(response)
