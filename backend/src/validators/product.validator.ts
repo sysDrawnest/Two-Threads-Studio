@@ -66,13 +66,13 @@ const productBaseSchema = z.object({
   collectionId:     z.string().min(1).optional(),
 
   // Pricing
-  price:        z.number().positive('Price must be positive'),
-  comparePrice: z.number().positive().optional(),
-  costPrice:    z.number().nonnegative().optional(),
+  price:        z.coerce.number().positive('Price must be positive'),
+  comparePrice: z.coerce.number().positive().optional(),
+  costPrice:    z.coerce.number().nonnegative().optional(),
 
   // Inventory
-  stockQuantity:     z.number().int().nonnegative().default(0),
-  lowStockThreshold: z.number().int().nonnegative().default(5),
+  stockQuantity:     z.coerce.number().int().nonnegative().default(0),
+  lowStockThreshold: z.coerce.number().int().nonnegative().default(5),
   trackInventory:    z.boolean().default(true),
 
   status:     z.nativeEnum(ProductStatus).default(ProductStatus.DRAFT),
@@ -100,7 +100,7 @@ const productBaseSchema = z.object({
   // Publishing
   publishedAt: z.coerce.date().optional(),
   isVisible:   z.boolean().default(true),
-  sortOrder:   z.number().int().default(0),
+  sortOrder:   z.coerce.number().int().default(0),
 
   // Extended content
   subtitle:       z.string().max(255).optional(),
@@ -115,8 +115,8 @@ const productBaseSchema = z.object({
   isCustomizable:           z.boolean().default(false),
   isPersonalizable:         z.boolean().default(false),
   madeToOrder:              z.boolean().default(false),
-  estimatedProductionDays:  z.number().int().positive().optional(),
-  estimatedShippingDays:    z.number().int().positive().optional(),
+  estimatedProductionDays:  z.coerce.number().int().positive().optional(),
+  estimatedShippingDays:    z.coerce.number().int().positive().optional(),
   estimatedTime:            z.string().max(100).optional(),
 
   materials:         z.array(z.string()).default([]),
@@ -125,11 +125,11 @@ const productBaseSchema = z.object({
   careInstructions:  z.string().optional(),
   origin:            z.string().max(200).optional(),
 
-  weight:     z.number().positive().optional(),
+  weight:     z.coerce.number().positive().optional(),
   dimensions: z.object({
-    length: z.number().positive(),
-    width:  z.number().positive(),
-    height: z.number().positive(),
+    length: z.coerce.number().positive(),
+    width:  z.coerce.number().positive(),
+    height: z.coerce.number().positive(),
     unit:   z.enum(['cm', 'in']).default('cm'),
   }).optional(),
 
@@ -143,13 +143,13 @@ const productBaseSchema = z.object({
 
   // Inventory extended
   allowBackorders:  z.boolean().default(false),
-  reservedQuantity: z.number().int().nonnegative().default(0),
-  incomingQuantity: z.number().int().nonnegative().default(0),
+  reservedQuantity: z.coerce.number().int().nonnegative().default(0),
+  incomingQuantity: z.coerce.number().int().nonnegative().default(0),
 
   // Pricing extended
   taxClass:   z.string().max(100).optional(),
   hsnCode:    z.string().max(100).optional(),
-  gstPercent: z.number().nonnegative().optional(),
+  gstPercent: z.coerce.number().nonnegative().optional(),
 
   // Shipping extended
   shippingClass:  z.string().max(100).optional(),
@@ -175,7 +175,19 @@ export const updateProductSchema = z.object({
   params: z.object({
     id: z.string().cuid('Invalid product ID'),
   }),
-  body: productBaseSchema.partial(),
+  body: z.preprocess(
+    (obj: any) => {
+      if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+        const cleaned: any = {};
+        for (const [k, v] of Object.entries(obj)) {
+          if (v !== null) cleaned[k] = v;
+        }
+        return cleaned;
+      }
+      return obj;
+    },
+    productBaseSchema.partial()
+  ),
 });
 
 export type UpdateProductDto = z.infer<typeof updateProductSchema>['body'];
