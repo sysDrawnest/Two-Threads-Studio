@@ -17,15 +17,16 @@ export const OrderDetail: React.FC = () => {
   const [refundReason, setRefundReason] = useState('');
   const [isRefunding, setIsRefunding] = useState(false);
 
+  const order = orderResponse?.order || orderResponse?.data;
+
   if (isLoading) {
     return <AdminSkeleton className="h-[600px] w-full" />;
   }
 
-  if (!orderResponse?.data) {
+  if (!order) {
     return <div className="text-error">Order not found</div>;
   }
 
-  const order = orderResponse.data;
 
   const handleStatusChange = (newStatus: string) => {
     updateStatus({ id: order.id, status: newStatus, note });
