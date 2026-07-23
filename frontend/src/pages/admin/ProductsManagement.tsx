@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Edit, Plus, Trash2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { adminService } from '../../services/adminService';
 import { 
   AdminTable,
@@ -22,11 +23,25 @@ export const ProductsManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+  const queryClient = useQueryClient();
 
   const { data: response, isLoading } = useQuery({
     queryKey: ['admin-products', { page, search, status }],
     queryFn: () => adminService.listProducts({ page, limit: 15, search, status }),
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
+
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to archive "${name}"?`)) return;
+    try {
+      await adminService.deleteProduct(id);
+      toast.success(`Product "${name}" archived successfully.`);
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to archive product.');
+    }
+  };
 
   const statusOptions = [
     { label: 'All', value: '' },
@@ -146,7 +161,10 @@ export const ProductsManagement: React.FC = () => {
                             <Edit className="h-4 w-4" />
                           </Link>
                           <button 
+                            type="button"
+                            onClick={() => handleDeleteProduct(product.id, product.name)}
                             className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-[#fce8e6] hover:text-[#c5221f] rounded-md transition-colors"
+                            title="Archive Product"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

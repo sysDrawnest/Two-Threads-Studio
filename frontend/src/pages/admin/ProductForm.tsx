@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -54,6 +55,7 @@ export const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
@@ -366,6 +368,7 @@ export const ProductForm: React.FC = () => {
         localStorage.removeItem('tts_product_draft');
         toast.success('Product saved successfully.');
       }
+      await queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       navigate('/admin/products');
     } catch (err: any) {
       console.error('Failed to save product', err);
