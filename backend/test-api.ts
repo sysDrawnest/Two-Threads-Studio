@@ -1,15 +1,14 @@
-import axios from 'axios';
+import fetch from 'node-fetch';
 
-async function testLogin() {
-  try {
-    const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
-      email: 'qa.customer@test.twothreadsstudio.com',
-      password: 'Test@12345'
-    });
-    console.log('Login success:', res.data);
-  } catch (err: any) {
-    console.error('Login failed:', err.response?.data || err.message);
-  }
+async function main() {
+  const slug = 'midnight-bloom-hand-embroidery-kit-test-demo';
+  const url = `http://localhost:5000/api/v1/products/${slug}`;
+  console.log(`Fetching from: ${url}`);
+  
+  const res = await fetch(url);
+  const data = await res.json();
+  
+  console.log(JSON.stringify(data, null, 2));
 }
 
-testLogin();
+main().catch(console.error);
