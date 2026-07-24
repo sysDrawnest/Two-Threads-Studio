@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  topBgClass?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
+  const location = useLocation();
+
+  // Determine top background class dynamically based on prop or route
+  const getTopBgClass = () => {
+    if (topBgClass) return topBgClass;
+    if (location.pathname === '/') return 'bg-[#2d2520]'; // Homepage bottom section color
+    return 'bg-background'; // Default page background color (#fef8f3)
+  };
+
+  const resolvedTopBg = getTopBgClass();
+
   const cols = [
     { 
       title: "Shop", 
@@ -64,7 +79,7 @@ const Footer: React.FC = () => {
 
   return (
     <>
-      <div className="w-full overflow-hidden leading-none bg-primary-container">
+      <div className={`w-full overflow-hidden leading-none ${resolvedTopBg}`}>
         <svg 
           className="w-full h-[60px] md:h-[100px] lg:h-[140px] block" 
           viewBox="0 0 1440 120" 
