@@ -184,86 +184,94 @@ export const AddressBook: React.FC = () => {
 
   if (error) {
     return (
-      <div className="border border-zinc-200 p-8 text-center bg-zinc-50">
-        <p className="text-zinc-600 text-sm">Failed to retrieve saved addresses.</p>
+      <div className="py-24 text-center">
+        <p className="text-neutral-500 text-sm font-sans">Failed to retrieve saved addresses.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center border-b border-zinc-200 pb-4">
-        <div>
-          <h2 className="text-xl font-medium tracking-tight text-zinc-950 font-sans">Saved Addresses</h2>
-          <p className="text-zinc-500 text-xs mt-1">Manage your default and secondary delivery addresses</p>
-        </div>
+    <div className="space-y-16">
+      {/* Editorial Header */}
+      <div className="text-center space-y-4 relative">
+        <span className="font-sans text-[10px] uppercase tracking-widest text-neutral-400">
+          Locations
+        </span>
+        <h2 className="font-serif text-3xl font-light text-[#1C1C1B]">
+          Address Book
+        </h2>
+        
         {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 bg-zinc-950 text-white text-xs px-4 py-2 hover:bg-zinc-800 transition-colors uppercase tracking-widest font-mono"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Address
-          </button>
+          <div className="md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 mt-6 md:mt-0">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-2 border-b border-[#1C1C1B] text-[#1C1C1B] text-[10px] uppercase tracking-widest font-sans pb-1 hover:text-neutral-500 hover:border-neutral-500 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Address
+            </button>
+          </div>
         )}
       </div>
 
       {isEditing ? (
-        <form onSubmit={handleFormSubmit} className="border border-zinc-200 p-6 bg-zinc-50 space-y-6">
-          <h3 className="text-sm font-semibold text-zinc-900 uppercase tracking-wider font-mono">
-            {editingAddress ? 'Edit Address' : 'New Address'}
-          </h3>
+        <form onSubmit={handleFormSubmit} className="max-w-2xl mx-auto space-y-12">
+          <div className="text-center border-b border-neutral-100 pb-4">
+            <h3 className="font-serif text-xl text-[#1C1C1B]">
+              {editingAddress ? 'Edit Address' : 'New Delivery Address'}
+            </h3>
+          </div>
 
           {serverError && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-mono">
+            <div className="p-4 text-xs font-sans text-center text-rose-700 bg-rose-50/50">
               {serverError}
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Full Name */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Full Name *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Full Name</label>
               <input
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.fullName && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.fullName}</p>}
+              {validationErrors.fullName && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.fullName}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Phone Number *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Phone Number</label>
               <input
                 type="text"
                 placeholder={formData.country === 'IN' ? '10-digit number' : 'Include country code'}
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none font-mono"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.phone && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.phone}</p>}
+              {validationErrors.phone && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.phone}</p>}
             </div>
 
             {/* Company */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Company (Optional)</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Company (Optional)</label>
               <input
                 type="text"
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
             </div>
 
             {/* Type */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Address Type</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Address Type</label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors appearance-none"
               >
                 <option value="HOME">Home</option>
                 <option value="WORK">Work</option>
@@ -273,34 +281,34 @@ export const AddressBook: React.FC = () => {
 
             {/* Line 1 */}
             <div className="md:col-span-2">
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Street Address Line 1 *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Street Address</label>
               <input
                 type="text"
                 value={formData.line1}
                 onChange={(e) => setFormData({ ...formData, line1: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.line1 && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.line1}</p>}
+              {validationErrors.line1 && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.line1}</p>}
             </div>
 
             {/* Line 2 */}
             <div className="md:col-span-2">
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Apartment, Suite, Unit, etc. (Optional)</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Apartment, Suite (Optional)</label>
               <input
                 type="text"
                 value={formData.line2}
                 onChange={(e) => setFormData({ ...formData, line2: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
             </div>
 
             {/* Country */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Country *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Country</label>
               <select
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors appearance-none"
               >
                 <option value="IN">India</option>
                 <option value="US">United States</option>
@@ -311,191 +319,190 @@ export const AddressBook: React.FC = () => {
 
             {/* Postal Code */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Postal / ZIP Code *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Postal Code</label>
               <input
                 type="text"
                 value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none font-mono"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.postalCode && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.postalCode}</p>}
+              {validationErrors.postalCode && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.postalCode}</p>}
             </div>
 
             {/* City */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">City / Town *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">City</label>
               <input
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.city && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.city}</p>}
-            </div>
-
-            {/* District */}
-            <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">District (Optional)</label>
-              <input
-                type="text"
-                value={formData.district}
-                onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
-              />
+              {validationErrors.city && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.city}</p>}
             </div>
 
             {/* State */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">State / Province *</label>
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">State / Province</label>
               <input
                 type="text"
                 value={formData.state}
                 onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
-              {validationErrors.state && <p className="text-red-500 text-xs font-mono mt-1">{validationErrors.state}</p>}
+              {validationErrors.state && <p className="text-red-500 text-xs font-sans mt-2">{validationErrors.state}</p>}
             </div>
-
+            
             {/* Landmark */}
-            <div>
-              <label className="block text-xs uppercase tracking-wider font-mono text-zinc-500 mb-1">Landmark (Optional)</label>
+            <div className="md:col-span-2">
+              <label className="block font-sans text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Landmark (Optional)</label>
               <input
                 type="text"
                 value={formData.landmark}
                 onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
-                className="w-full border border-zinc-200 p-2 text-sm bg-white focus:border-black focus:outline-none"
+                className="w-full bg-transparent border-b border-neutral-200 py-2 font-serif text-lg text-[#1C1C1B] focus:border-[#1C1C1B] outline-none transition-colors"
               />
             </div>
           </div>
 
           {/* Default switches */}
-          <div className="space-y-3 pt-2">
-            <label className="flex items-center gap-3 cursor-pointer">
+          <div className="space-y-6 pt-8">
+            <label className="flex items-start gap-4 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.isDefaultShipping}
                 onChange={(e) => setFormData({ ...formData, isDefaultShipping: e.target.checked })}
-                className="w-4 h-4 accent-black"
+                className="sr-only"
               />
-              <span className="text-xs uppercase tracking-wider font-mono text-zinc-700">Set as default shipping address</span>
+              <div className={`w-5 h-5 mt-0.5 flex items-center justify-center border transition-colors ${
+                formData.isDefaultShipping 
+                  ? 'bg-[#1C1C1B] border-[#1C1C1B] text-white' 
+                  : 'border-neutral-300 bg-transparent group-hover:border-[#1C1C1B]'
+              }`}>
+                {formData.isDefaultShipping && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+              <span className="font-sans text-sm text-neutral-600 leading-relaxed pt-0.5">Set as default shipping address</span>
             </label>
 
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex items-start gap-4 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.isDefaultBilling}
                 onChange={(e) => setFormData({ ...formData, isDefaultBilling: e.target.checked })}
-                className="w-4 h-4 accent-black"
+                className="sr-only"
               />
-              <span className="text-xs uppercase tracking-wider font-mono text-zinc-700">Set as default billing address</span>
+              <div className={`w-5 h-5 mt-0.5 flex items-center justify-center border transition-colors ${
+                formData.isDefaultBilling 
+                  ? 'bg-[#1C1C1B] border-[#1C1C1B] text-white' 
+                  : 'border-neutral-300 bg-transparent group-hover:border-[#1C1C1B]'
+              }`}>
+                {formData.isDefaultBilling && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+              </div>
+              <span className="font-sans text-sm text-neutral-600 leading-relaxed pt-0.5">Set as default billing address</span>
             </label>
           </div>
 
-          <div className="flex gap-4 pt-4 border-t border-zinc-200">
+          <div className="flex justify-center gap-6 pt-12">
             <button
               type="submit"
               disabled={createAddressMutation.isPending || updateAddressMutation.isPending}
-              className="bg-zinc-950 text-white text-xs px-6 py-2.5 hover:bg-zinc-800 transition-colors uppercase tracking-widest font-mono"
+              className="px-8 py-3 bg-[#1C1C1B] border border-[#1C1C1B] text-[10px] font-sans uppercase tracking-widest text-white hover:bg-neutral-800 transition-all duration-300 disabled:opacity-50"
             >
-              {createAddressMutation.isPending || updateAddressMutation.isPending ? 'Saving...' : 'Save Address'}
+              {createAddressMutation.isPending || updateAddressMutation.isPending ? 'Saving...' : 'Save Location'}
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="border border-zinc-300 text-zinc-700 text-xs px-6 py-2.5 hover:bg-zinc-100 transition-colors uppercase tracking-widest font-mono"
+              className="px-8 py-3 border border-neutral-300 text-[10px] font-sans uppercase tracking-widest text-[#1C1C1B] hover:border-[#1C1C1B] transition-all duration-300"
             >
               Cancel
             </button>
           </div>
         </form>
       ) : addresses && addresses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {addresses.map((address: Address) => (
             <div
               key={address.id}
-              className={`border p-6 flex flex-col justify-between ${
-                address.isDefaultShipping || address.isDefaultBilling ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-200 bg-white'
-              }`}
+              className="bg-neutral-50/50 p-8 flex flex-col justify-between"
             >
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-zinc-400" />
-                    <span className="text-xs font-mono tracking-widest uppercase bg-zinc-200 text-zinc-700 px-2 py-0.5">
-                      {address.type}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end gap-1.5">
+              <div className="space-y-6">
+                <div className="flex justify-between items-start border-b border-neutral-200 pb-4">
+                  <span className="font-sans text-[10px] uppercase tracking-widest text-neutral-500">
+                    {address.type}
+                  </span>
+                  
+                  <div className="flex flex-col items-end gap-2">
                     {address.isDefaultShipping && (
-                      <span className="text-[10px] uppercase tracking-wider font-mono bg-zinc-950 text-white px-2 py-0.5">
+                      <span className="text-[9px] uppercase tracking-widest font-sans text-[#1C1C1B]">
                         Default Shipping
                       </span>
                     )}
                     {address.isDefaultBilling && (
-                      <span className="text-[10px] uppercase tracking-wider font-mono border border-zinc-900 text-zinc-900 px-2 py-0.5">
+                      <span className="text-[9px] uppercase tracking-widest font-sans text-neutral-500">
                         Default Billing
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <h4 className="text-sm font-medium text-zinc-900">{address.fullName}</h4>
-                  {address.company && <p className="text-xs text-zinc-500">{address.company}</p>}
-                  <p className="text-xs text-zinc-600 font-sans leading-relaxed">
-                    {address.line1}
-                    {address.line2 && `, ${address.line2}`}
-                  </p>
-                  <p className="text-xs text-zinc-600 font-sans leading-relaxed">
-                    {address.city}
-                    {address.district && `, ${address.district}`}
-                    {`, ${address.state}`}
-                  </p>
-                  <p className="text-xs text-zinc-600 font-mono">
-                    {address.postalCode}, {address.country}
-                  </p>
+                <div className="space-y-2">
+                  <h4 className="font-serif text-xl text-[#1C1C1B]">{address.fullName}</h4>
+                  {address.company && <p className="font-sans text-xs text-neutral-500">{address.company}</p>}
+                  
+                  <div className="font-sans text-sm text-neutral-600 leading-relaxed pt-2">
+                    <p>{address.line1}</p>
+                    {address.line2 && <p>{address.line2}</p>}
+                    <p>
+                      {address.city}
+                      {address.district && `, ${address.district}`}
+                      {`, ${address.state}`}
+                    </p>
+                    <p className="mt-1 text-neutral-400">
+                      {address.postalCode}, {address.country}
+                    </p>
+                  </div>
+
                   {address.landmark && (
-                    <p className="text-[11px] text-zinc-400 italic">Landmark: {address.landmark}</p>
+                    <p className="font-sans text-[11px] text-neutral-400 italic pt-2">Near {address.landmark}</p>
                   )}
-                  <p className="text-xs text-zinc-500 font-mono mt-1">Phone: {address.phone}</p>
+                  <p className="font-sans text-xs text-neutral-500 pt-2">T: {address.phone}</p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 pt-6 border-t border-zinc-100 mt-6">
+              <div className="flex flex-col gap-4 pt-8">
                 {/* Actions */}
-                <div className="flex gap-4">
+                <div className="flex gap-6">
                   <button
                     onClick={() => handleEditClick(address)}
-                    className="flex items-center gap-1.5 text-zinc-600 hover:text-black text-xs uppercase tracking-wider font-mono"
+                    className="border-b border-transparent hover:border-[#1C1C1B] text-[10px] font-sans uppercase tracking-widest text-neutral-500 hover:text-[#1C1C1B] transition-colors pb-0.5"
                   >
-                    <Edit2 className="w-3.5 h-3.5" />
                     Edit
                   </button>
                   <button
                     onClick={() => handleDeleteClick(address.id)}
-                    className="flex items-center gap-1.5 text-zinc-500 hover:text-red-600 text-xs uppercase tracking-wider font-mono"
+                    className="border-b border-transparent hover:border-red-600 text-[10px] font-sans uppercase tracking-widest text-neutral-500 hover:text-red-600 transition-colors pb-0.5"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Delete
+                    Remove
                   </button>
                 </div>
 
                 {/* Default actions */}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-4 mt-2">
                   {!address.isDefaultShipping && (
                     <button
                       onClick={() => handleSetDefault(address.id, 'shipping')}
-                      className="text-[10px] text-zinc-500 hover:text-black uppercase tracking-wider font-mono border border-zinc-200 px-2 py-1 hover:border-black transition-colors"
+                      className="border-b border-neutral-300 hover:border-[#1C1C1B] text-[9px] font-sans uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] transition-colors pb-0.5"
                     >
-                      Set Shipping Default
+                      Make Shipping Default
                     </button>
                   )}
                   {!address.isDefaultBilling && (
                     <button
                       onClick={() => handleSetDefault(address.id, 'billing')}
-                      className="text-[10px] text-zinc-500 hover:text-black uppercase tracking-wider font-mono border border-zinc-200 px-2 py-1 hover:border-black transition-colors"
+                      className="border-b border-neutral-300 hover:border-[#1C1C1B] text-[9px] font-sans uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] transition-colors pb-0.5"
                     >
-                      Set Billing Default
+                      Make Billing Default
                     </button>
                   )}
                 </div>
@@ -504,16 +511,13 @@ export const AddressBook: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="border border-zinc-200 p-12 text-center bg-zinc-50/50">
-          <MapPin className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
-          <p className="text-zinc-600 text-sm">No saved addresses found.</p>
-          <p className="text-zinc-400 text-xs mt-1">Add a new delivery address to expedite your checkout process.</p>
+        <div className="text-center py-24 space-y-6">
+          <p className="font-serif text-xl italic text-neutral-400">You haven't added any addresses yet.</p>
           <button
             onClick={() => setIsEditing(true)}
-            className="mt-6 inline-flex items-center gap-2 bg-zinc-950 text-white text-xs px-4 py-2 hover:bg-zinc-800 transition-colors uppercase tracking-widest font-mono"
+            className="inline-block border-b border-[#1C1C1B] text-[#1C1C1B] text-[10px] uppercase tracking-widest font-sans pb-1 hover:text-neutral-500 hover:border-neutral-500 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" />
-            Add Address
+            Add a New Location
           </button>
         </div>
       )}
