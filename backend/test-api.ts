@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 async function main() {
   const slug = 'midnight-bloom-hand-embroidery-kit-test-demo';
   const url = `http://localhost:5000/api/v1/products/${slug}`;
