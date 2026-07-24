@@ -50,11 +50,15 @@ export const getProductById = catchAsync(async (req: Request, res: Response) => 
 });
 
 export const createProduct = catchAsync(async (req: Request, res: Response) => {
+  console.log('--- CREATE PRODUCT REQ.BODY.IMAGES ---');
+  console.log(JSON.stringify(req.body.images, null, 2));
   const product = await productService.createProduct(req.body);
   return successResponse(res, { product }, MESSAGES.CREATED, HTTP_STATUS.CREATED);
 });
 
 export const updateProduct = catchAsync(async (req: Request, res: Response) => {
+  console.log('--- UPDATE PRODUCT REQ.BODY.IMAGES ---');
+  console.log(JSON.stringify(req.body.images, null, 2));
   const product = await productService.updateProduct(String(req.params.id), req.body);
   return successResponse(res, { product }, MESSAGES.UPDATED);
 });
