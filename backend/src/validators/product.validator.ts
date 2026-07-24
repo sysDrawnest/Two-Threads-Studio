@@ -159,7 +159,12 @@ const productBaseSchema = z.object({
 
   allowCod: z.boolean().default(true),
 
-  // Relations
+  // Relations & Gallery
+  images: z.array(z.object({
+    url: z.string(),
+    isPrimary: z.boolean().optional(),
+    sortOrder: z.coerce.number().optional(),
+  })).optional().default([]),
   tagIds: z.array(z.string().cuid()).optional().default([]),
   secondaryCategoryIds: z.array(z.string().cuid()).optional().default([]),
   additionalCollectionIds: z.array(z.string().cuid()).optional().default([]),

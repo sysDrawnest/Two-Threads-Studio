@@ -41,7 +41,12 @@ export function mapApiProductToFrontend(apiProd: any): Product {
   // Map images from relational tables (images, media) and fallback fields (ogImageUrl, imageUrl, primaryImage)
   let images: string[] = [];
   if (Array.isArray(apiProd.images) && apiProd.images.length > 0) {
-    images = apiProd.images.map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
+    const sorted = [...apiProd.images].sort((a: any, b: any) => {
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+    });
+    images = sorted.map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
   }
   if (images.length === 0 && Array.isArray(apiProd.media) && apiProd.media.length > 0) {
     images = apiProd.media.map((m: any) => (typeof m === 'string' ? m : m.url)).filter(Boolean);

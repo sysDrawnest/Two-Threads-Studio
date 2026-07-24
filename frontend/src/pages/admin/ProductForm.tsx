@@ -373,6 +373,11 @@ export const ProductForm: React.FC = () => {
         sku: product.sku?.trim() ? product.sku : undefined,
         ogImageUrl: cleanUrl(galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl),
         canonicalUrl: cleanUrl(product.canonicalUrl),
+        images: galleryImages.map((g, idx) => ({
+          url: g.url,
+          isPrimary: Boolean(g.isPrimary),
+          sortOrder: idx,
+        })),
       };
 
       // Strip null and empty string values so Zod optional schema validation passes

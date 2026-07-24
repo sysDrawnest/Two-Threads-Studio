@@ -208,7 +208,17 @@ export const productRepository = {
         shippingClass: dto.shippingClass, isFreeShipping: dto.isFreeShipping ?? false, isFragile: dto.isFragile ?? false, packageSize: dto.packageSize,
         allowCod: dto.allowCod ?? true,
 
-        images: dto.ogImageUrl ? { create: [{ url: dto.ogImageUrl, isPrimary: true, sortOrder: 0 }] } : undefined,
+        images: (dto.images && dto.images.length > 0)
+          ? {
+              create: dto.images.map((img: any, idx: number) => ({
+                url: typeof img === 'string' ? img : img.url,
+                isPrimary: typeof img === 'object' && img.isPrimary !== undefined ? Boolean(img.isPrimary) : idx === 0,
+                sortOrder: typeof img === 'object' && img.sortOrder !== undefined ? Number(img.sortOrder) : idx,
+              })),
+            }
+          : dto.ogImageUrl
+          ? { create: [{ url: dto.ogImageUrl, isPrimary: true, sortOrder: 0 }] }
+          : undefined,
         tags: { create: (dto.tagIds ?? []).map(tagId => ({ tagId })) },
         secondaryCategories: { create: (dto.secondaryCategoryIds ?? []).map(id => ({ categoryId: id })) },
         additionalCollections: { create: (dto.additionalCollectionIds ?? []).map(id => ({ collectionId: id })) },
@@ -299,7 +309,18 @@ export const productRepository = {
 
     const updatedProduct = await prisma.product.update({ where: { id }, data, include: detailInclude });
 
-    if (dto.ogImageUrl && updatedProduct.images.length === 0) {
+    if (dto.images && Array.isArray(dto.images) && dto.images.length > 0) {
+      await prisma.productImage.deleteMany({ where: { productId: id } });
+      await prisma.productImage.createMany({
+        data: dto.images.map((img: any, idx: number) => ({
+          productId: id,
+          url: typeof img === 'string' ? img : img.url,
+          isPrimary: typeof img === 'object' && img.isPrimary !== undefined ? Boolean(img.isPrimary) : idx === 0,
+          sortOrder: typeof img === 'object' && img.sortOrder !== undefined ? Number(img.sortOrder) : idx,
+        })),
+      });
+      return prisma.product.findUnique({ where: { id }, include: detailInclude }) as any;
+    } else if (dto.ogImageUrl && updatedProduct.images.length === 0) {
       await prisma.productImage.create({
         data: {
           productId: id,

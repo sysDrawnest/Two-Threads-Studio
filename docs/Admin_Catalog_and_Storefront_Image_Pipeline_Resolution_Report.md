@@ -9,9 +9,9 @@
 
 ## Executive Summary
 
-During the implementation and testing of the E-Commerce platform’s Phase 6A Admin Commerce Platform and Catalog Management, several interrelated issues affected product listing, editing, validation, API routing, and storefront image rendering. 
+During the implementation and testing of the E-Commerce platform’s Phase 6A Admin Commerce Platform and Catalog Management, several interrelated issues affected product listing, editing, validation, API routing, storefront image rendering, and multi-image gallery synchronization. 
 
-This document details the **architectural root causes**, **empirical investigation trails**, **code changes**, and **verification results** for all 6 issues resolved today.
+This document details the **architectural root causes**, **empirical investigation trails**, **code changes**, and **verification results** for all 7 issues resolved today.
 
 ---
 
@@ -25,6 +25,7 @@ This document details the **architectural root causes**, **empirical investigati
 | 4 | **Database Null Handling** | Updating product threw `AppError: Invalid input: expected string, received null`. | PostgreSQL/Prisma returns `null` for empty optional fields. Zod `.optional()` schema rejected `null` values. | Preprocessed body in `updateProductSchema` to strip `null` keys & sanitized payload in `ProductForm.tsx`. | **VERIFIED (0 Errors)** |
 | 5 | **Prisma Decimal Serialization** | Updating product threw `AppError: Invalid input: expected number, received string`. | Prisma serializes Decimal columns (`comparePrice`, `weight`, `costPrice`) as strings. Zod `.number()` rejected string values. | Converted numeric schemas to `z.coerce.number()` in `product.validator.ts` & coerced numeric values in `ProductForm.tsx`. | **VERIFIED (0 Errors)** |
 | 6 | **Storefront Image Pipeline** | Cloudinary product images saved to DB did not render on storefront cards/detail pages. | Frontend mapper `mapApiProductToFrontend` checked `apiProd.imageUrl` instead of `apiProd.ogImageUrl`, defaulting to Unsplash placeholders; DB `product_images` table relation was unsynced. | Updated `mapApiProductToFrontend` to check `ogImageUrl`/`media`/`images`, auto-synced `ProductImage` rows in `productRepository`, and backfilled DB records. | **VERIFIED (0 Errors)** |
+| 7 | **Multi-Image Gallery** | Detailed product page showed only 1 image instead of all associated gallery images. | Admin form (`ProductForm.tsx`) only transmitted `ogImageUrl` (1 single image string) and omitted `images` array; backend repository did not sync multi-image array in update. | Added `images` array schema to `productBaseSchema`, passed `images` array in `ProductForm.tsx`, updated `productRepository` to create/replace `ProductImage` rows, and sorted images by `isPrimary` in `productService.ts`. | **VERIFIED (0 Errors)** |
 
 ---
 
@@ -84,22 +85,7 @@ This document details the **architectural root causes**, **empirical investigati
 - **Symptom**: Saving an existing product threw backend `400 Bad Request`: `AppError: Invalid input: expected string, received null`.
 - **Root Cause**: PostgreSQL/Prisma returns `null` for unpopulated optional columns (`shortDescription`, `collectionId`, `sku`, `ogImageUrl`). Form submission sent `{ collectionId: null, ... }`. Zod `.optional()` expects `string | undefined` and rejects `null`.
 - **Resolution**:
-  - Preprocessed update request body in [product.validator.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/validators/product.validator.ts#L174-L188) to filter out `null` key-value pairs before running schema validation:
-    ```typescript
-    body: z.preprocess(
-      (obj: any) => {
-        if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
-          const cleaned: any = {};
-          for (const [k, v] of Object.entries(obj)) {
-            if (v !== null) cleaned[k] = v;
-          }
-          return cleaned;
-        }
-        return obj;
-      },
-      productBaseSchema.partial()
-    ),
-    ```
+  - Preprocessed update request body in [product.validator.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/validators/product.validator.ts#L174-L188) to filter out `null` key-value pairs before running schema validation.
   - Added client-side null-stripping logic in [ProductForm.tsx](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/pages/admin/ProductForm.tsx#L372-L377).
 
 ---
@@ -109,21 +95,35 @@ This document details the **architectural root causes**, **empirical investigati
 - **Symptom**: Saving an existing product threw backend `400 Bad Request`: `AppError: Invalid input: expected number, received string`.
 - **Root Cause**: Prisma returns Decimal columns (`comparePrice`, `weight`, `costPrice`, `gstPercent`) as string representations (e.g. `"2499.00"`, `"0.45"`). Zod's `z.number()` schema rejected string values.
 - **Resolution**:
-  - Upgraded all numeric fields in [product.validator.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/validators/product.validator.ts#L68-L155) to `z.coerce.number()` (e.g. `price: z.coerce.number().positive()`, `weight: z.coerce.number().positive().optional()`).
+  - Upgraded all numeric fields in [product.validator.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/validators/product.validator.ts#L68-L155) to `z.coerce.number()`.
   - Added numeric coercion (`num()`) in [ProductForm.tsx](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/pages/admin/ProductForm.tsx#L355-L369).
 
 ---
 
 ### 6. Storefront Product Image Pipeline Fix
 
-- **Symptom**: Products created with Cloudinary images (e.g. *"Midnight Bloom Hand Embroidery Kit Test Demo"*) stored Cloudinary URLs in `ogImageUrl`, but storefront product cards and detail pages failed to render the Cloudinary images.
+- **Symptom**: Products created with Cloudinary images stored Cloudinary URLs in `ogImageUrl`, but storefront product cards and detail pages failed to render the Cloudinary images.
 - **Root Cause**:
   1. Frontend API adapter `mapApiProductToFrontend()` in [productService.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/services/productService.ts#L47) checked `apiProd.imageUrl`. Since backend returns `ogImageUrl`, `apiProd.imageUrl` was `undefined`, setting `images = []` and defaulting to a generic Unsplash placeholder.
   2. Relational table `product_images` (`images`) had 0 rows for products created with `ogImageUrl`.
 - **Resolution**:
   - Updated `mapApiProductToFrontend` in [productService.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/services/productService.ts#L41-L55) to check `apiProd.images`, `apiProd.media`, `apiProd.ogImageUrl`, `apiProd.imageUrl`, and `apiProd.primaryImage`.
   - Updated `productRepository.create` and `productRepository.update` in [product.repository.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/repositories/product.repository.ts#L208-L308) to automatically create/sync primary `ProductImage` database rows whenever `ogImageUrl` is provided.
-  - Executed migration script to backfill `ProductImage` records for all existing products with Cloudinary URLs.
+
+---
+
+### 7. Multi-Image Gallery Synchronization
+
+- **Symptom**: Detailed Product Page rendered only 1 main image instead of the full gallery of images associated with a product.
+- **Root Cause**:
+  1. When submitting `ProductForm.tsx`, `handleSaveProduct` only set `ogImageUrl` (a single string) in `payload` and omitted the `galleryImages` array (`images`).
+  2. The backend validator schema `productBaseSchema` did not define the `images` relation array.
+  3. The backend repository `productRepository.update` did not persist or replace `ProductImage` rows when updating product images.
+- **Resolution**:
+  - Added `images: z.array(z.object({ url: z.string(), isPrimary: z.boolean().optional(), sortOrder: z.coerce.number().optional() }))` to `productBaseSchema` in [product.validator.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/validators/product.validator.ts#L162-L167).
+  - Updated `handleSaveProduct` in [ProductForm.tsx](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/pages/admin/ProductForm.tsx#L373-L378) to include `images: galleryImages.map(...)`.
+  - Updated `productRepository.create` and `productRepository.update` in [product.repository.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/backend/src/repositories/product.repository.ts#L208-L320) to insert/replace all `ProductImage` database rows.
+  - Updated `mapApiProductToFrontend` in [productService.ts](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/services/productService.ts#L41-L49) to sort images by `isPrimary` first and `sortOrder` second, returning the full array of gallery image URLs for [ProductDetail.tsx](file:///d:/WEB%20Dev/Moti/Two%20Threads%20Studio/frontend/src/pages/ProductDetail.tsx#L110-L130).
 
 ---
 
@@ -131,7 +131,7 @@ This document details the **architectural root causes**, **empirical investigati
 
 - **Backend Type Check**: `npx tsc --noEmit` — **0 Errors**
 - **Frontend Type Check**: `npx tsc --noEmit` — **0 Errors**
-- **API Response Verification**: Direct HTTP calls confirmed `/api/v1/products` returns valid image data arrays.
+- **API Response Verification**: Direct HTTP calls confirmed `/api/v1/products` returns full multi-image arrays.
 - **Database Consistency**: Direct queries confirmed PostgreSQL `products.ogImageUrl` and `product_images` rows are 100% in sync.
 
 ---
