@@ -30,7 +30,7 @@ const ProductDetail: React.FC = () => {
       .then(data => {
         setProduct(data);
         setActiveImage(0);
-        
+
         // Fetch related products (e.g. from the same category)
         productService.getProducts({ limit: 20 })
           .then(res => {
@@ -105,21 +105,21 @@ const ProductDetail: React.FC = () => {
       {/* Product Hero Section */}
       <section className="bg-inverse-on-surface py-12 px-6 md:px-16 mt-16">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          
+
           {/* Image Gallery */}
           <div className="flex flex-col gap-4">
             <div className="w-full aspect-[4/5] bg-surface-container overflow-hidden rounded-sm shadow-sm">
-              <img 
-                src={product.images[activeImage]} 
-                alt={product.name} 
+              <img
+                src={product.images[activeImage]}
+                alt={product.name}
                 className="w-full h-full object-cover transition-opacity duration-500"
               />
             </div>
             {product.images.length > 1 && (
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {product.images.map((img, i) => (
-                  <button 
-                    key={i} 
+                  <button
+                    key={i}
                     onClick={() => setActiveImage(i)}
                     className={`w-20 h-24 flex-shrink-0 bg-surface-container overflow-hidden border-2 transition-colors rounded-sm ${activeImage === i ? 'border-[#A34A38]' : 'border-transparent'}`}
                   >
@@ -145,11 +145,10 @@ const ProductDetail: React.FC = () => {
             <div className="flex flex-col gap-4 border-y border-neutral-200 py-6 mb-6">
               <div className="flex justify-between items-center">
                 <span className="font-sans text-xs uppercase tracking-wider text-neutral-500">Difficulty</span>
-                <span className={`font-sans text-[10px] tracking-[0.15em] uppercase px-3 py-1 font-semibold ${
-                  product.difficulty === 'Beginner' ? 'bg-green-50 text-green-700' : 
-                  product.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700' : 
-                  'bg-rose-50 text-rose-700'
-                }`}>
+                <span className={`font-sans text-[10px] tracking-[0.15em] uppercase px-3 py-1 font-semibold ${product.difficulty === 'Beginner' ? 'bg-green-50 text-green-700' :
+                    product.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700' :
+                      'bg-rose-50 text-rose-700'
+                  }`}>
                   {product.difficulty}
                 </span>
               </div>
@@ -164,28 +163,26 @@ const ProductDetail: React.FC = () => {
             {/* Customization Options Panel */}
             <div className="bg-[#FAF9F7] p-5 md:p-6 border border-neutral-200/60 rounded-sm mb-6 flex flex-col gap-5">
               <h3 className="font-serif text-lg text-[#1C1C1B] border-b border-neutral-200 pb-2">Bespoke Customizations</h3>
-              
+
               {/* Wood Finish Selector */}
               <div>
                 <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">Hoop Finish Selection</label>
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
+                  <button
                     onClick={() => setHoopFinish('bamboo')}
-                    className={`py-2.5 px-4 font-sans text-xs tracking-wider uppercase border transition-all ${
-                      hoopFinish === 'bamboo' 
-                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
+                    className={`py-2.5 px-4 font-sans text-xs tracking-wider uppercase border transition-all ${hoopFinish === 'bamboo'
+                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
                         : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                    }`}
+                      }`}
                   >
                     Bamboo Hoop (Included)
                   </button>
-                  <button 
+                  <button
                     onClick={() => setHoopFinish('walnut')}
-                    className={`py-2.5 px-4 font-sans text-xs tracking-wider uppercase border transition-all ${
-                      hoopFinish === 'walnut' 
-                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
+                    className={`py-2.5 px-4 font-sans text-xs tracking-wider uppercase border transition-all ${hoopFinish === 'walnut'
+                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
                         : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                    }`}
+                      }`}
                   >
                     Walnut Hoop (+ ₹500)
                   </button>
@@ -195,8 +192,8 @@ const ProductDetail: React.FC = () => {
               {/* Custom Brass Plate Engraving */}
               <div>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={hasEngraving}
                     onChange={(e) => setHasEngraving(e.target.checked)}
                     className="rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38]"
@@ -208,8 +205,8 @@ const ProductDetail: React.FC = () => {
                   <div className="mt-4 p-4 bg-white border border-neutral-200/50 rounded-sm flex flex-col gap-3">
                     <div>
                       <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">Engraving text (max 25 characters)</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         maxLength={25}
                         value={engravingText}
                         onChange={(e) => setEngravingText(e.target.value)}
@@ -219,8 +216,8 @@ const ProductDetail: React.FC = () => {
                     </div>
                     <div>
                       <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">Typography Font</label>
-                      <select 
-                        value={engravingFont} 
+                      <select
+                        value={engravingFont}
                         onChange={(e) => setEngravingFont(e.target.value as any)}
                         className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38]"
                       >
@@ -236,8 +233,8 @@ const ProductDetail: React.FC = () => {
               {/* Luxury Gift Packaging */}
               <div>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={hasGiftWrap}
                     onChange={(e) => setHasGiftWrap(e.target.checked)}
                     className="rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38]"
@@ -248,7 +245,7 @@ const ProductDetail: React.FC = () => {
                 {hasGiftWrap && (
                   <div className="mt-4 p-4 bg-white border border-neutral-200/50 rounded-sm">
                     <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">Handwritten Gift Message</label>
-                    <textarea 
+                    <textarea
                       value={giftMessage}
                       onChange={(e) => setGiftMessage(e.target.value)}
                       placeholder="Write your note to be written on fine linen cardstock..."
@@ -290,7 +287,7 @@ const ProductDetail: React.FC = () => {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={handleAddToBag}
               className="bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] py-4 font-sans text-xs tracking-[0.2em] uppercase cursor-pointer hover:bg-neutral-800 transition-colors w-full mb-4 shadow-sm"
             >
@@ -380,15 +377,15 @@ const ProductDetail: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
               {relatedProducts.map((p) => (
-                <Link 
-                  key={p.id} 
+                <Link
+                  key={p.id}
                   to={`/shop/${p.id}`}
                   className="group no-underline bg-white cursor-pointer shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-500 flex flex-col h-full rounded-sm"
                 >
                   <div className="relative h-72 overflow-hidden bg-[#FAF9F7] rounded-t-sm">
-                    <img 
-                      src={p.images[0]} 
-                      alt={p.name} 
+                    <img
+                      src={p.images[0]}
+                      alt={p.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   </div>
