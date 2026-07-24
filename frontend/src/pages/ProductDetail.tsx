@@ -103,12 +103,12 @@ const ProductDetail: React.FC = () => {
   return (
     <PageContainer disablePadding>
       {/* Product Hero Section */}
-      <section className="bg-inverse-on-surface pt-4 md:pt-6 pb-12 md:pb-20 px-4 sm:px-6 md:px-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20">
+      <section className="bg-inverse-on-surface pt-4 md:pt-6 pb-12 px-6 md:px-16">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
 
           {/* Image Gallery */}
           <div className="flex flex-col gap-4">
-            <div className="w-full aspect-square md:aspect-[4/5] max-h-[70vh] md:max-h-none bg-surface-container overflow-hidden rounded-sm shadow-sm">
+            <div className="w-full aspect-[4/5] bg-surface-container overflow-hidden rounded-sm shadow-sm">
               <img
                 src={product.images[activeImage]}
                 alt={product.name}
@@ -135,10 +135,10 @@ const ProductDetail: React.FC = () => {
             <p className="font-sans text-xs tracking-[0.25em] text-[#A34A38] uppercase mb-2 font-medium">
               {product.collection} Collection
             </p>
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-light text-[#1C1C1B] mb-3 leading-tight">
+            <h1 className="font-serif text-4xl md:text-5xl font-light text-[#1C1C1B] mb-3 leading-tight">
               {product.name}
             </h1>
-            <p className="font-sans text-xl md:text-2xl font-semibold text-[#1C1C1B] mb-6">
+            <p className="font-sans text-2xl font-semibold text-[#1C1C1B] mb-6">
               ₹{product.price.toLocaleString('en-IN')}
             </p>
 
@@ -167,7 +167,7 @@ const ProductDetail: React.FC = () => {
               {/* Wood Finish Selector */}
               <div>
                 <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">Hoop Finish Selection</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setHoopFinish('bamboo')}
                     className={`py-2.5 px-4 font-sans text-xs tracking-wider uppercase border transition-all ${hoopFinish === 'bamboo'
@@ -298,7 +298,7 @@ const ProductDetail: React.FC = () => {
       </section>
 
       {/* Editorial Story Section */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-16 bg-[#ede6de]">
+      <section className="py-24 px-6 md:px-16 bg-[#ede6de]">
         <div className="max-w-3xl mx-auto text-center">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">
             The Story
@@ -310,8 +310,8 @@ const ProductDetail: React.FC = () => {
       </section>
 
       {/* Materials & Details */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 md:px-16 bg-inverse-on-surface">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+      <section className="py-24 px-6 md:px-16 bg-inverse-on-surface">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
           <div>
             <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-8 border-b border-neutral-200 pb-4">
               What's Included
@@ -341,7 +341,7 @@ const ProductDetail: React.FC = () => {
 
       {/* Reviews Section */}
       {product.reviews && product.reviews.length > 0 && (
-        <section className="py-16 md:py-24 px-4 sm:px-6 md:px-16 bg-[#f8f3ee]">
+        <section className="py-24 px-6 md:px-16 bg-[#f8f3ee]">
           <div className="max-w-5xl mx-auto">
             <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-12 text-center">
               Notes from our Makers
@@ -370,7 +370,7 @@ const ProductDetail: React.FC = () => {
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="py-16 md:py-24 px-4 sm:px-6 md:px-16 bg-inverse-on-surface border-t border-neutral-200">
+        <section className="py-24 px-6 md:px-16 bg-inverse-on-surface border-t border-neutral-200">
           <div className="max-w-7xl mx-auto">
             <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-12 text-center">
               You May Also Like
