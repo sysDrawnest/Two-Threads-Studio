@@ -10,6 +10,8 @@ import {
   getRefreshTokenExpiry,
 } from '../lib/jwt';
 import type { RegisterDto, LoginDto, ChangePasswordDto } from '../validators/auth.validator';
+import { emailService } from '../email/email.service';
+import logger from '../lib/logger';
 
 // ─── Shared token pair helper ──────────────────────────────────────────────────
 const issueTokenPair = (user: SafeUser) => {
@@ -38,6 +40,14 @@ export const authService = {
       lastName: dto.lastName,
       email: dto.email,
       passwordHash,
+    });
+
+    // Send Welcome Email asynchronously (non-blocking: failures must never crash registration)
+    emailService.sendWelcomeEmail({
+      email: user.email,
+      firstName: user.firstName,
+    }).catch((err) => {
+      logger.error({ err, email: user.email }, '[AuthService] Failed to send welcome email');
     });
 
     return user;

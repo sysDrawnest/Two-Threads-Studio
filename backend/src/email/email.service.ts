@@ -9,6 +9,7 @@
  */
 
 import { Resend } from 'resend';
+import { generateWelcomeEmail } from './templates/welcome';
 import logger from '../lib/logger';
 
 export interface SendEmailParams {
@@ -98,4 +99,26 @@ export const emailService = {
       return { success: false, error: err };
     }
   },
+
+  /**
+   * Helper to send Welcome Email to a newly registered customer.
+   */
+  sendWelcomeEmail: async (params: {
+    email: string;
+    firstName: string;
+    verificationUrl?: string;
+  }): Promise<SendEmailResult> => {
+    const { subject, html } = generateWelcomeEmail({
+      email: params.email,
+      firstName: params.firstName,
+      verificationUrl: params.verificationUrl,
+    });
+
+    return emailService.send({
+      to: params.email,
+      subject,
+      html,
+    });
+  },
 };
+
