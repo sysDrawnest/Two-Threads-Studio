@@ -15,7 +15,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
 
   if (isAuthenticated) {
-    if (user?.role === 'admin') {
+    // If there's a specific storefront redirect (e.g. /checkout), honour it for all roles
+    const isStorefrontRedirect = redirectPath !== '/account' && !redirectPath.startsWith('/admin') && !redirectPath.startsWith('/auth');
+    if (user?.role === 'admin' && !isStorefrontRedirect) {
       return <Navigate to="/admin" replace />;
     }
     return <Navigate to={redirectPath} replace />;
@@ -32,11 +34,13 @@ const Login: React.FC = () => {
 
     const result = await login(email, password);
     if (result.success) {
-      if (email === 'admin@twothreads.com') {
-        navigate('/admin');
-      } else {
-        navigate(redirectPath);
-      }
+      // After login, user is set in context. Use role from the result, not email.
+      // But since login() updates state asynchronously, we read redirectPath from params.
+      // For admins arriving without a specific storefront redirect, go to /admin.
+      const isStorefrontRedirect = redirectPath !== '/account' && !redirectPath.startsWith('/admin') && !redirectPath.startsWith('/auth');
+      // We can't read user.role here reliably yet (state update is async),
+      // so we redirect to the saved path; the isAuthenticated guard above handles admin redirect on next render.
+      navigate(isStorefrontRedirect ? redirectPath : redirectPath);
     } else {
       setError(result.error || 'Login failed.');
     }

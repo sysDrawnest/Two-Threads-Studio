@@ -15,7 +15,7 @@ import { riskService, CodEligibilityResponse } from '../services/riskService';
 
 
 const Checkout: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
   
   // Cart State
@@ -60,6 +60,18 @@ const Checkout: React.FC = () => {
       navigate('/shop');
     }
   }, [cartItems, isCartLoading, navigate, currentStep]);
+
+  // While auth is initialising, show nothing to prevent a false redirect
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F7] flex flex-col items-center justify-center">
+        <div className="relative w-10 h-10">
+          <div className="absolute inset-0 rounded-full border border-neutral-200" />
+          <div className="absolute inset-0 rounded-full border border-transparent border-t-[#A34A38] animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login?redirect=/checkout" replace />;
