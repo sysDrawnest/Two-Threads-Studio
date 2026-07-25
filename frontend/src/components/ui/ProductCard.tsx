@@ -48,7 +48,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '
 
   return (
     <Link
-      to={`/shop/${product.id}`}
+      to={`/shop/${product.slug || product.id}`}
       className={`group block bg-white cursor-pointer no-underline ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

@@ -119,7 +119,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                       {searchResults.map(product => (
                         <Link 
                           key={product.id} 
-                          to={`/shop/${product.id}`}
+                          to={`/shop/${product.slug || product.id}`}
                           onClick={onClose}
                           className="group no-underline block"
                         >
@@ -163,7 +163,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                       {popularProducts.map(product => (
                         <Link 
                           key={product.id} 
-                          to={`/shop/${product.id}`}
+                          to={`/shop/${product.slug || product.id}`}
                           onClick={onClose}
                           className="group no-underline block"
                         >

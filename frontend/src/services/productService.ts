@@ -87,7 +87,8 @@ export function mapApiProductToFrontend(apiProd: any): Product {
   const categoryName = apiProd.category?.name || 'Kit';
   
   return {
-    id: apiProd.slug || apiProd.id,
+    id: apiProd.id,
+    slug: apiProd.slug,
     name: apiProd.name,
     price,
     mrp,

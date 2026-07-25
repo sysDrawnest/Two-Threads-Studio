@@ -375,7 +375,7 @@ export default function Shop() {
                     }`}
                   >
                     <Link 
-                      to={`/shop/${product.id}`}
+                      to={`/shop/${product.slug || product.id}`}
                       className="group no-underline flex flex-col h-full"
                     >
                       {/* Image Container with 4:5 Aspect Ratio */}

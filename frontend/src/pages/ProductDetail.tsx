@@ -413,7 +413,7 @@ const ProductDetail: React.FC = () => {
               {relatedProducts.map((p) => (
                 <Link
                   key={p.id}
-                  to={`/shop/${p.id}`}
+                  to={`/shop/${p.slug || p.id}`}
                   className="group no-underline bg-white cursor-pointer shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-500 flex flex-col h-full rounded-sm"
                 >
                   <div className="relative h-64 sm:h-72 overflow-hidden bg-[#FAF9F7] rounded-t-sm">
