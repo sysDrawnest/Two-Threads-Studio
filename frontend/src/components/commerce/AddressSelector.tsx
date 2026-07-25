@@ -19,6 +19,13 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
 
+  // Automatically expand address creation form when user has no saved addresses
+  React.useEffect(() => {
+    if (!isLoading && addresses && addresses.length === 0) {
+      setShowAddForm(true);
+    }
+  }, [addresses, isLoading]);
+
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -64,10 +71,8 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
     e.preventDefault();
     setServerError(null);
 
-    if (!validateForm()) return;
-
     try {
-      const newAddress = await createAddressMutation.mutateAsync({
+      const response: any = await createAddressMutation.mutateAsync({
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
         company: formData.company.trim() || null,
@@ -84,7 +89,12 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
         isDefaultBilling: type === 'billing',
       } as any);
 
-      onSelect(newAddress as any);
+      // Support both unwrapped object and { success: true, address: {...} } backend format
+      const createdAddress = response?.address || response?.data?.address || response;
+
+      if (createdAddress && createdAddress.id) {
+        onSelect(createdAddress);
+      }
       setShowAddForm(false);
       setFormData({
         fullName: '',
