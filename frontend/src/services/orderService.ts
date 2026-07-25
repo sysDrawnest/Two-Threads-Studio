@@ -29,6 +29,21 @@ export interface OrderStatusHistory {
   createdAt: string;
 }
 
+export interface Shipment {
+  id: string;
+  orderId: string;
+  provider: string;
+  trackingNumber: string | null;
+  carrier: string | null;
+  shippingMethod: string | null;
+  estimatedDelivery: string | null;
+  labelUrl: string | null;
+  status: string;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+  createdAt: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -74,6 +89,14 @@ export const orderService = {
 
   cancelOrder: async (id: string, reason?: string): Promise<{ success: boolean; order: Order }> => {
     return apiClient.post(`/orders/${id}/cancel`, { reason });
+  },
+
+  requestReturn: async (id: string, reason: string): Promise<{ success: boolean; order: Order }> => {
+    return apiClient.post(`/orders/${id}/return`, { reason });
+  },
+
+  getShipmentTracking: async (id: string): Promise<{ success: boolean; shipment: Shipment | null }> => {
+    return apiClient.get(`/orders/${id}/shipment`);
   },
 
   downloadInvoice: async (id: string, orderNumber: string): Promise<void> => {

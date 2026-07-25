@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { orderService } from '../services/order.service';
+import { shipmentService } from '../services/shipment.service';
 import { invoiceService } from '../services/invoice.service';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import { AppError } from '../utils/AppError';
@@ -107,7 +108,42 @@ export const downloadInvoice = async (req: Request, res: Response, next: NextFun
   }
 };
 
-// --- Admin Controllers ---
+export const requestReturn = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const id = req.params.id as string;
+    const { reason } = req.body;
+    if (!userId) {
+      throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+    }
+    const order = await orderService.requestReturn(id, userId, reason || 'Return requested by customer');
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: 'Return request submitted successfully.',
+      order,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getShipmentTracking = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const id = req.params.id as string;
+    if (!userId) {
+      throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
+    }
+    const shipment = await shipmentService.getShipmentForOrder(id, userId);
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      shipment,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 
 export const adminListOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {

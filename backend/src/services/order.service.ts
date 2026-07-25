@@ -587,6 +587,7 @@ export const orderService = {
     return updated;
   },
 
+
   /**
    * Admin: Update internal order note
    */
@@ -596,5 +597,61 @@ export const orderService = {
       throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
     }
     return orderRepository.updateNote(orderId, note);
+  },
+
+  /**
+   * Customer: Request a return for a delivered order
+   */
+  requestReturn: async (orderId: string, userId: string, reason: string) => {
+    const order = await orderRepository.findById(orderId, userId);
+    if (!order) {
+      throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (order.orderStatus !== OrderStatus.DELIVERED) {
+      throw new AppError(
+        'Returns can only be requested for delivered orders.',
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
+
+    const previousStatus = order.orderStatus;
+
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const updated = await tx.order.update({
+        where: { id: orderId },
+        data: { orderStatus: OrderStatus.RETURN_REQUESTED },
+        include: {
+          items: true,
+          statusHistory: { orderBy: { createdAt: 'asc' } },
+          shippingAddress: true,
+          billingAddress: true,
+        },
+      });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId,
+          previousStatus,
+          newStatus: OrderStatus.RETURN_REQUESTED,
+          changedBy: 'CUSTOMER',
+          note: reason || 'Return requested by customer',
+        },
+      });
+
+      await tx.orderAuditLog.create({
+        data: {
+          orderId,
+          action: AuditAction.STATUS_CHANGED,
+          actorType: AuditActorType.CUSTOMER,
+          actorId: userId,
+          details: { previousStatus, newStatus: 'RETURN_REQUESTED', reason },
+        },
+      });
+
+      return updated;
+    });
+
+    return updatedOrder;
   },
 };

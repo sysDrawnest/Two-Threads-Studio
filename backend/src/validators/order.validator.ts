@@ -20,6 +20,12 @@ export const cancelOrderSchema = z.object({
   }),
 });
 
+export const returnOrderSchema = z.object({
+  body: z.object({
+    reason: z.string().min(1, 'Return reason is required').max(500, 'Reason is too long'),
+  }),
+});
+
 export const adminUpdateOrderStatusSchema = z.object({
   body: z.object({
     status: z.nativeEnum(OrderStatus),
@@ -35,5 +41,6 @@ export const adminUpdateOrderNoteSchema = z.object({
 
 export type CreateOrderDto = z.infer<typeof createOrderSchema>['body'];
 export type CancelOrderDto = z.infer<typeof cancelOrderSchema>['body'];
+export type ReturnOrderDto = z.infer<typeof returnOrderSchema>['body'];
 export type AdminUpdateOrderStatusDto = z.infer<typeof adminUpdateOrderStatusSchema>['body'];
 export type AdminUpdateOrderNoteDto = z.infer<typeof adminUpdateOrderNoteSchema>['body'];
