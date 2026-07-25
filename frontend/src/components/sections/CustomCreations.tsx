@@ -9,15 +9,15 @@ import imgThread from '../../assets/stitch/an_artistic_flat_lay_of_embroidery_ma
 import imgHeirloom from '../../assets/stitch/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an.png';
 
 const Annotation = ({ step, title, desc, className = '' }: { step: string, title: string, desc: string, className?: string }) => (
-  <div className={`max-w-[200px] flex flex-col ${className}`}>
+  <div className={`max-w-[200px] flex flex-col bg-white/80 backdrop-blur-md p-4 shadow-lg border border-white/60 ${className}`}>
     <div className="w-8 h-px bg-[#1C1C1B]/30 mb-3" />
     <p className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#A34A38] font-semibold mb-1">
       {step}
     </p>
-    <h3 className="font-serif text-lg text-[#1C1C1B] mb-2">
+    <h3 className="font-serif text-lg text-[#1C1C1B] mb-2 font-medium drop-shadow-sm">
       {title}
     </h3>
-    <p className="font-sans text-xs text-[#5a4a3f] leading-relaxed">
+    <p className="font-sans text-xs text-[#5a4a3f] leading-relaxed font-medium">
       {desc}
     </p>
   </div>
@@ -37,50 +37,58 @@ export default function CustomCreations() {
         </ScrollReveal>
 
         {/* The Reference */}
-        <div className="relative w-[80%] max-w-[300px] z-10 -rotate-3 self-start ml-4">
+        <div className="relative w-[80%] max-w-[300px] z-10 -rotate-3 self-start ml-4 group">
           <ScrollReveal direction="up">
             <div className="bg-white p-3 pb-8 shadow-md border border-[#1C1C1B]/5">
               <img src={imgPhoto} alt="Reference photo" className="w-full aspect-[3/4] object-cover grayscale-[30%]" loading="lazy" />
             </div>
-            <Annotation step="01" title="The Reference" desc="Your cherished photograph, the foundation of the piece." className="mt-6 ml-4" />
+            <div className="absolute -bottom-6 -right-6 z-20">
+              <Annotation step="01" title="The Reference" desc="Your cherished photograph, the foundation of the piece." />
+            </div>
           </ScrollReveal>
         </div>
 
         {/* The Pattern */}
-        <div className="relative w-[85%] max-w-[320px] z-20 rotate-2 -mt-12 self-end mr-2">
+        <div className="relative w-[85%] max-w-[320px] z-20 rotate-2 -mt-12 self-end mr-2 group">
           <ScrollReveal direction="up" delay={0.1}>
             <div className="bg-[#f4ebd9]/80 p-2 shadow-sm border border-[#1C1C1B]/5">
               <img src={imgSketch} alt="Hand sketch" className="w-full aspect-square object-cover opacity-90 mix-blend-multiply" loading="lazy" />
             </div>
-            <Annotation step="02" title="The Pattern" desc="Delicately traced onto paper to capture the essence." className="mt-4 mr-4 items-end text-right [&>div]:self-end" />
+            <div className="absolute -bottom-10 -left-4 z-20">
+              <Annotation step="02" title="The Pattern" desc="Delicately traced onto paper to capture the essence." />
+            </div>
           </ScrollReveal>
         </div>
 
         {/* The Palette */}
-        <div className="relative w-[75%] max-w-[280px] z-30 -rotate-2 -mt-8 self-start ml-2">
+        <div className="relative w-[75%] max-w-[280px] z-30 -rotate-2 -mt-8 self-start ml-2 group">
           <ScrollReveal direction="up" delay={0.2}>
             <div className="shadow-lg border border-[#1C1C1B]/10">
               <img src={imgThread} alt="Thread selection" className="w-full aspect-[4/5] object-cover" loading="lazy" />
             </div>
-            <Annotation step="03" title="The Palette" desc="Organic cotton threads curated to match your story." className="mt-4 ml-2" />
+            <div className="absolute top-1/4 -right-12 z-20">
+              <Annotation step="03" title="The Palette" desc="Organic cotton threads curated to match your story." />
+            </div>
           </ScrollReveal>
         </div>
 
         {/* The Heirloom */}
-        <div className="relative w-[90%] max-w-[340px] z-40 rotate-3 -mt-16 self-center">
+        <div className="relative w-[90%] max-w-[340px] z-40 rotate-3 -mt-16 self-center group">
           <ScrollReveal direction="up" delay={0.3}>
             <div className="shadow-2xl border border-white/40">
               <img src={imgHeirloom} alt="Finished heirloom" className="w-full aspect-square object-cover" loading="lazy" />
             </div>
-            <Annotation step="04" title="The Heirloom" desc="A tactile piece of art, framed and ready for your home." className="mt-6 items-center text-center [&>div]:self-center mx-auto" />
+            <div className="absolute -bottom-8 -left-2 z-20">
+              <Annotation step="04" title="The Heirloom" desc="A tactile piece of art, framed and ready for your home." />
+            </div>
           </ScrollReveal>
         </div>
 
-        {/* Solid CTA */}
+        {/* Stamped CTA */}
         <ScrollReveal direction="up" delay={0.4} className="mt-20 relative z-50">
           <Link 
             to="/shop?type=custom"
-            className="font-sans text-[10px] tracking-[0.2em] uppercase text-white bg-[#1C1C1B] px-10 py-4 hover:bg-[#A34A38] transition-colors shadow-lg"
+            className="font-sans text-[10px] tracking-[0.2em] uppercase bg-[#1C1C1B] text-white px-8 py-3.5 shadow-xl hover:bg-[#A34A38] transition-colors inline-block"
           >
             Commission Yours
           </Link>
@@ -145,14 +153,19 @@ export default function CustomCreations() {
           </ScrollReveal>
         </div>
 
-        {/* Solid CTA */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50">
+        {/* Stamped CTA */}
+        <div className="absolute bottom-16 left-12 lg:left-16 z-50">
           <ScrollReveal direction="up" delay={0.4}>
             <Link 
               to="/shop?type=custom"
-              className="font-sans text-[11px] tracking-[0.2em] uppercase text-white bg-[#1C1C1B] px-12 py-4 hover:bg-[#A34A38] transition-colors shadow-xl"
+              className="flex flex-col items-center gap-2 group cursor-pointer"
             >
-              Commission Yours
+              <div className="w-16 h-16 rounded-full bg-[#1C1C1B] shadow-xl flex items-center justify-center group-hover:bg-[#A34A38] transition-colors duration-300">
+                <span className="font-serif italic text-sm text-white transition-colors duration-300">RSVP</span>
+              </div>
+              <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#1C1C1B] font-bold group-hover:text-[#A34A38] transition-colors">
+                Begin Yours
+              </span>
             </Link>
           </ScrollReveal>
         </div>
