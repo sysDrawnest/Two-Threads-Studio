@@ -192,15 +192,15 @@ export const AddressBook: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center border-b border-zinc-200 pb-4">
+      <div className="flex justify-between items-center border-b border-[#e8e3dc] pb-4">
         <div>
-          <h2 className="text-xl font-medium tracking-tight text-zinc-950 font-sans">Saved Addresses</h2>
-          <p className="text-zinc-500 text-xs mt-1">Manage your default and secondary delivery addresses</p>
+          <h2 className="text-3xl font-light text-[#1C1C1B] font-serif">Saved Addresses</h2>
+          <p className="text-[#5a4a3f] text-sm mt-1">Manage your default and secondary delivery addresses</p>
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 bg-zinc-950 text-white text-xs px-4 py-2 hover:bg-zinc-800 transition-colors uppercase tracking-widest font-mono"
+            className="flex items-center gap-2 bg-transparent text-[#1C1C1B] border-b border-[#1C1C1B] pb-1 text-[10px] hover:text-[#A34A38] hover:border-[#A34A38] transition-colors uppercase tracking-widest font-sans"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Address

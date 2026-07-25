@@ -396,92 +396,86 @@ export const OrdersTab: React.FC = () => {
         </motion.div>
       ) : (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-neutral-900">My Orders</h2>
-            <span className="text-sm text-neutral-500 bg-neutral-100 px-3 py-1 rounded-full font-medium">
-              {orders.length} orders
-            </span>
+          <div className="text-center mb-16">
+            <h2 className="font-serif text-3xl font-light text-[#1C1C1B]">Your Collection</h2>
+            <p className="font-sans text-sm text-[#5a4a3f] mt-4">A curated record of your handcrafted pieces.</p>
           </div>
 
           {orders.length === 0 ? (
-            <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
-              <Package className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-neutral-800">No Orders Found</h3>
-              <p className="text-sm text-neutral-500 max-w-sm mx-auto mt-2">
-                You haven't placed any orders yet. Visit our shop and explore premium crafting kits.
+            <div className="text-center py-24">
+              <h3 className="font-serif text-xl text-[#1C1C1B]">Your collection is empty</h3>
+              <p className="font-sans text-sm text-[#5a4a3f] mt-4 max-w-sm mx-auto">
+                You haven't commissioned any pieces yet. Visit our studio to begin your journey.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {orders.map(order => (
                 <div
                   key={order.id}
-                  className="bg-white border border-neutral-150 hover:border-neutral-300 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
+                  className="group flex flex-col no-underline cursor-pointer"
+                  onClick={() => handleSelectOrder(order.id)}
                 >
-                  <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-neutral-900">{order.orderNumber}</span>
-                        <span className={`inline-flex items-center gap-1 border px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusBadgeStyles(order.orderStatus)}`}>
-                          {getStatusIcon(order.orderStatus)}
-                          {order.orderStatus}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            day: '2-digit', month: 'short', year: 'numeric'
-                          })}
-                        </span>
-                        <span>•</span>
-                        <span>{order.items?.length || 0} Products</span>
-                      </div>
+                  <div className="aspect-[4/5] bg-[#FAF9F7] overflow-hidden mb-6">
+                    <img 
+                      src={order.items[0]?.productImage || "https://images.unsplash.com/photo-1612423215286-9a2c3fbcc977?auto=format&fit=crop&q=80&w=800"} 
+                      alt={order.items[0]?.productName || 'Commission'} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col space-y-2">
+                    <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#8c7a6b]">
+                      {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <h4 className="font-serif text-xl text-[#1C1C1B] group-hover:text-[#A34A38] transition-colors line-clamp-1">
+                      {order.items[0]?.productName || 'Studio Commission'}
+                    </h4>
+                    
+                    <div className="flex justify-between items-center mt-2 pt-4 border-t border-[#e8e3dc]">
+                      <span className="font-sans text-xs uppercase tracking-wider text-[#1C1C1B]">
+                        {order.orderStatus}
+                      </span>
+                      <span className="font-sans text-xs text-[#1C1C1B]">
+                        ₹{Number(order.grandTotal).toFixed(0)}
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-4 md:pt-0 border-neutral-100">
-                      <div className="text-left md:text-right">
-                        <p className="text-[10px] text-neutral-400 uppercase tracking-wide font-semibold">Total Amount</p>
-                        <p className="text-md font-bold text-neutral-900">Rs. {Number(order.grandTotal).toFixed(2)}</p>
-                      </div>
-                      <button
-                        onClick={() => handleSelectOrder(order.id)}
-                        className="flex items-center gap-1.5 px-4 py-2 border border-neutral-200 text-neutral-700 hover:bg-neutral-50 text-sm font-semibold rounded-lg transition-colors"
-                      >
-                        Manage
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
+                    <div className="mt-4">
+                      <span className="font-sans text-[10px] tracking-widest uppercase border-b border-transparent group-hover:border-[#A34A38] group-hover:text-[#A34A38] text-[#5a4a3f] transition-all pb-1">
+                        View Details
+                      </span>
                     </div>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
 
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-8 pt-4">
-                  <button
-                    onClick={() => {
-                      if (page > 1) fetchOrders(page - 1);
-                    }}
-                    disabled={page === 1}
-                    className="p-2 border border-neutral-250 rounded-lg hover:bg-neutral-50 disabled:opacity-50"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <span className="text-sm font-medium text-neutral-700">
-                    Page {page} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => {
-                      if (page < totalPages) fetchOrders(page + 1);
-                    }}
-                    disabled={page === totalPages}
-                    className="p-2 border border-neutral-250 rounded-lg hover:bg-neutral-50 disabled:opacity-50"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-8 mt-16 pt-8 border-t border-[#e8e3dc]">
+              <button
+                onClick={() => {
+                  if (page > 1) fetchOrders(page - 1);
+                }}
+                disabled={page === 1}
+                className="font-sans text-xs uppercase tracking-widest hover:text-[#A34A38] disabled:opacity-30 transition-colors"
+              >
+                Previous
+              </button>
+              <span className="font-sans text-xs text-[#5a4a3f]">
+                {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => {
+                  if (page < totalPages) fetchOrders(page + 1);
+                }}
+                disabled={page === totalPages}
+                className="font-sans text-xs uppercase tracking-widest hover:text-[#A34A38] disabled:opacity-30 transition-colors"
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
