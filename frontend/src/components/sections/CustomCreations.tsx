@@ -76,11 +76,11 @@ export default function CustomCreations() {
           </ScrollReveal>
         </div>
 
-        {/* Stamped CTA */}
-        <ScrollReveal direction="up" delay={0.4} className="mt-20">
+        {/* Solid CTA */}
+        <ScrollReveal direction="up" delay={0.4} className="mt-20 relative z-50">
           <Link 
             to="/shop?type=custom"
-            className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#1C1C1B] border border-[#1C1C1B]/20 px-8 py-3 rounded-full hover:bg-[#1C1C1B]/5 transition-colors"
+            className="font-sans text-[10px] tracking-[0.2em] uppercase text-white bg-[#1C1C1B] px-10 py-4 hover:bg-[#A34A38] transition-colors shadow-lg"
           >
             Commission Yours
           </Link>
@@ -145,19 +145,14 @@ export default function CustomCreations() {
           </ScrollReveal>
         </div>
 
-        {/* Stamped CTA */}
-        <div className="absolute bottom-16 left-12 lg:left-16 z-50">
+        {/* Solid CTA */}
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-50">
           <ScrollReveal direction="up" delay={0.4}>
             <Link 
               to="/shop?type=custom"
-              className="flex flex-col items-center gap-2 group cursor-pointer"
+              className="font-sans text-[11px] tracking-[0.2em] uppercase text-white bg-[#1C1C1B] px-12 py-4 hover:bg-[#A34A38] transition-colors shadow-xl"
             >
-              <div className="w-12 h-12 rounded-full border border-[#1C1C1B]/20 flex items-center justify-center group-hover:bg-[#A34A38] group-hover:border-[#A34A38] transition-colors duration-300">
-                <span className="font-serif italic text-xs text-[#1C1C1B]/60 group-hover:text-white transition-colors duration-300">RSVP</span>
-              </div>
-              <span className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#1C1C1B]/80 group-hover:text-[#A34A38] transition-colors">
-                Begin Yours
-              </span>
+              Commission Yours
             </Link>
           </ScrollReveal>
         </div>
