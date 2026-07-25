@@ -66,6 +66,20 @@ export const useUpdateCustomerStatus = () => {
   });
 };
 
+export const useDeleteCustomer = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminService.deleteCustomer(id),
+    onSuccess: () => {
+      toast.success('Customer account permanently deleted');
+      queryClient.invalidateQueries({ queryKey: adminKeys.customers() });
+    },
+    onError: (err: any) => {
+      toast.error(err.message || 'Failed to delete customer account');
+    },
+  });
+};
+
 // ── Orders ────────────────────────────────────────────────────────────────
 
 export const useAdminOrders = (params: any) => {

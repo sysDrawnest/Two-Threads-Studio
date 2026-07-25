@@ -8,7 +8,7 @@ import prisma from '../prisma';
 import { successResponse } from '../utils/response';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
-import { OrderStatus, PaymentStatus } from '@prisma/client';
+import { OrderStatus, PaymentStatus, Role } from '@prisma/client';
 
 export const adminController = {
   // ── Dashboard ─────────────────────────────────────────────────────────────
@@ -318,6 +318,72 @@ export const adminController = {
         res,
         customer,
         isActive ? 'Customer account activated' : 'Customer account deactivated'
+      );
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  deleteCustomer: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.params['userId'] as string;
+      const adminId = req.user?.id;
+
+      // Prevent admin from accidentally deleting their own account
+      if (userId === adminId) {
+        throw new AppError('You cannot delete your own admin account', HTTP_STATUS.BAD_REQUEST);
+      }
+
+      // Check if target user exists
+      const targetUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, role: true, firstName: true, lastName: true, email: true },
+      });
+
+      if (!targetUser) {
+        throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
+      }
+
+      // Prevent deleting other ADMIN users through this endpoint
+      if (targetUser.role === Role.ADMIN) {
+        throw new AppError('Admin users cannot be deleted through customer management', HTTP_STATUS.FORBIDDEN);
+      }
+
+      // Permanently delete user from database in a transaction (cascading relations)
+      await prisma.$transaction(async (tx) => {
+        // Delete related dependent models that don't auto-cascade on Delete
+        await tx.refreshToken.deleteMany({ where: { userId } });
+        await tx.address.deleteMany({ where: { userId } });
+        await tx.review.deleteMany({ where: { userId } });
+        await tx.wishlist.deleteMany({ where: { userId } });
+        await tx.customerRisk.deleteMany({ where: { userId } });
+        await tx.otpVerification.deleteMany({ where: { userId } });
+        
+        // Disconnect cart items and cart if present
+        const cart = await tx.cart.findUnique({ where: { userId } });
+        if (cart) {
+          await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+          await tx.cart.delete({ where: { id: cart.id } });
+        }
+
+        // Delete orders and order items
+        const userOrders = await tx.order.findMany({ where: { userId }, select: { id: true } });
+        const orderIds = userOrders.map(o => o.id);
+        if (orderIds.length > 0) {
+          await tx.payment.deleteMany({ where: { orderId: { in: orderIds } } });
+          await tx.orderStatusHistory.deleteMany({ where: { orderId: { in: orderIds } } });
+          await tx.orderItem.deleteMany({ where: { orderId: { in: orderIds } } });
+          await tx.order.deleteMany({ where: { userId } });
+        }
+
+        // Finally delete the user record permanently
+        await tx.user.delete({ where: { id: userId } });
+      });
+
+      return successResponse(
+        res,
+        { id: userId, email: targetUser.email },
+        `User ${targetUser.firstName} ${targetUser.lastName} (${targetUser.email}) permanently deleted.`
       );
     } catch (err) {
       next(err);

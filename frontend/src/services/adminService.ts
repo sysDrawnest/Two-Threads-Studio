@@ -96,6 +96,11 @@ export const adminService = {
     const response = await apiClient.patch(`/admin/customers/${id}/status`, { isActive });
     return response;
   },
+
+  deleteCustomer: async (id: string) => {
+    const response = await apiClient.delete(`/admin/customers/${id}`);
+    return response;
+  },
   
   // ── PIM / Products ────────────────────────────────────────────────────────
   listProducts: async (params?: any): Promise<PaginatedProductsResponse> => {

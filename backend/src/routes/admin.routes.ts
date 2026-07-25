@@ -24,6 +24,7 @@ router.get('/dashboard', adminController.getDashboard);
 router.get('/customers', adminController.listCustomers);
 router.get('/customers/:userId', adminController.getCustomer);
 router.patch('/customers/:userId/status', adminController.updateCustomerStatus);
+router.delete('/customers/:userId', adminController.deleteCustomer);
 
 // ── Analytics ─────────────────────────────────────────────────────────────
 router.get('/analytics/revenue', analyticsController.getRevenue);

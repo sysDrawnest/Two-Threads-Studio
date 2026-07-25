@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Eye, MoreVertical } from 'lucide-react';
-import { useAdminCustomers, useUpdateCustomerStatus } from '../../hooks/useAdminData';
+import { Users, Eye, Trash2 } from 'lucide-react';
+import { useAdminCustomers, useUpdateCustomerStatus, useDeleteCustomer } from '../../hooks/useAdminData';
 import { 
   AdminTable,
   AdminTableBody,
@@ -14,13 +14,17 @@ import {
   AdminSearchBar,
   AdminFilterBar,
   AdminSkeleton,
-  AdminEmptyState
+  AdminEmptyState,
+  AdminConfirmDialog
 } from '../../components/admin/ui';
 
 export const CustomersManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+
+  // Delete modal state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; email: string } | null>(null);
 
   const { data: response, isLoading } = useAdminCustomers({
     page,
@@ -30,9 +34,17 @@ export const CustomersManagement: React.FC = () => {
   });
 
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateCustomerStatus();
+  const { mutate: deleteCustomer, isPending: isDeleting } = useDeleteCustomer();
 
   const handleToggleStatus = (id: string, currentStatus: boolean) => {
     updateStatus({ id, isActive: !currentStatus });
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteCustomer(deleteTarget.id, {
+      onSettled: () => setDeleteTarget(null)
+    });
   };
 
   const statusOptions = [
@@ -135,10 +147,25 @@ export const CustomersManagement: React.FC = () => {
                         </button>
                         <Link 
                           to={`/admin/customers/${user.id}`}
+                          title="View Profile"
                           className="inline-flex items-center justify-center p-2 text-on-secondary-container hover:bg-surface-container rounded-md transition-colors"
                         >
                           <Eye className="h-4 w-4" />
                         </Link>
+                        {user.role !== 'ADMIN' && (
+                          <button
+                            onClick={() => setDeleteTarget({
+                              id: user.id,
+                              name: `${user.firstName} ${user.lastName}`,
+                              email: user.email
+                            })}
+                            disabled={isDeleting}
+                            title="Delete User Permanently"
+                            className="inline-flex items-center justify-center p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-md transition-colors disabled:opacity-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </AdminTableCell>
                   </AdminTableRow>
@@ -155,6 +182,18 @@ export const CustomersManagement: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AdminConfirmDialog
+        isOpen={!!deleteTarget}
+        title="Permanently Delete User"
+        description={`Are you sure you want to permanently delete ${deleteTarget?.name} (${deleteTarget?.email})? This action cannot be undone and will erase all associated account data from the database.`}
+        confirmText="Permanently Delete"
+        isDestructive={true}
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 };
