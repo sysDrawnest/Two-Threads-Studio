@@ -556,6 +556,8 @@ model Wishlist {
 enum AddressType {
   HOME
   WORK
+  STUDIO
+  PARENTS
   OTHER
 }
 
@@ -574,6 +576,7 @@ model Address {
   postalCode        String
   landmark          String?
   type              AddressType @default(HOME)
+  label             String?     // Custom label display name
   isDefaultBilling  Boolean     @default(false)
   isDefaultShipping Boolean     @default(false)
   deletedAt         DateTime?
@@ -1053,4 +1056,96 @@ model StudioSettings {
   updatedAt  DateTime @updatedAt
 
   @@map("studio_settings")
+}
+
+// ─────────────────────────────────────────────
+// Phase 7.1 — Checkout Engine & Shipping Models
+// ─────────────────────────────────────────────
+
+enum CheckoutSessionStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  ABANDONED
+}
+
+enum CheckoutStep {
+  INFORMATION
+  SHIPPING
+  PAYMENT
+  CONFIRMATION
+}
+
+model ShippingZone {
+  id        String   @id @default(cuid())
+  name      String
+  country   String   @default("IN")
+  states    String[]
+  pincodes  String[]
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shippingMethods ShippingMethod[]
+
+  @@map("shipping_zones")
+}
+
+model ShippingMethod {
+  id               String        @id @default(cuid())
+  shippingZoneId   String?
+  name             String
+  code             String        @unique // e.g. STANDARD, EXPRESS, STORE_PICKUP
+  description      String?
+  basePrice        Decimal       @db.Decimal(10, 2)
+  minOrderForFree  Decimal?      @db.Decimal(10, 2)
+  estDispatchDays  Int           @default(1)
+  estDeliveryDays  Int           @default(4)
+  cutoffTime       String        @default("14:00")
+  shipWeekends     Boolean       @default(false)
+  maxWeightKg      Decimal?      @db.Decimal(8, 2)
+  priority         Int           @default(0)
+  isEnabled        Boolean       @default(true)
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  shippingZone     ShippingZone? @relation(fields: [shippingZoneId], references: [id], onDelete: SetNull)
+  checkoutSessions CheckoutSession[]
+
+  @@index([isEnabled, priority(sort: Desc)])
+  @@map("shipping_methods")
+}
+
+model CheckoutSession {
+  id                String                @id @default(cuid())
+  sessionToken      String                @unique
+  userId            String?
+  isGuest           Boolean               @default(false)
+  customerEmail     String?
+  customerPhone     String?
+  customerName      String?
+
+  shippingAddressId String?
+  billingAddressId  String?
+  shippingMethodId  String?
+  paymentMethod     PaymentMethod?        @default(ONLINE)
+
+  step              CheckoutStep          @default(INFORMATION)
+  pricingSnapshot   Json?
+  status            CheckoutSessionStatus @default(ACTIVE)
+
+  expiresAt         DateTime
+  abandonedAt       DateTime?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  shippingMethod    ShippingMethod?       @relation(fields: [shippingMethodId], references: [id], onDelete: SetNull)
+
+  @@index([sessionToken])
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("checkout_sessions")
 }

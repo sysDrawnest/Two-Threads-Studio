@@ -60,5 +60,12 @@ router.use('/admin',  adminRoutes);
 router.use('/dev',    devRoutes);
 router.use('/upload', uploadRoutes);
 
+// Phase 7.1 — Checkout Engine
+import checkoutRoutes from './checkout.routes';
+
+router.use('/checkout', checkoutRoutes);
+
 export default router;
+
+
 

@@ -38,8 +38,9 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
     country: 'IN',
     postalCode: '',
     landmark: '',
-    addressType: 'HOME' as 'HOME' | 'WORK' | 'OTHER',
+    addressType: 'HOME' as 'HOME' | 'WORK' | 'STUDIO' | 'PARENTS' | 'OTHER',
   });
+
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -262,11 +263,14 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
                 className="w-full border border-zinc-200 p-2 text-xs focus:border-black focus:outline-none bg-white"
               >
                 <option value="HOME">Home</option>
-                <option value="WORK">Work</option>
+                <option value="WORK">Work / Office</option>
+                <option value="STUDIO">Studio</option>
+                <option value="PARENTS">Parents</option>
                 <option value="OTHER">Other</option>
               </select>
             </div>
           </div>
+
 
           <div className="flex gap-2">
             <button
