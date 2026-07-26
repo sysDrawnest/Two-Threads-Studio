@@ -1,16 +1,14 @@
 /**
- * Risk Engine — Phase 5C Orchestrator
+ * Risk Engine — Phase 5C / COD Policy 2.0 Orchestrator
  *
  * Central point for all risk decisions at checkout time.
- * Runs: CodEligibilityEngine + FraudDetector + address validation.
- * Returns a single RiskDecision that the order service acts upon.
- *
- * NEVER imported by frontend — all decisions are made server-side.
+ * Integrates CustomerTierService, CodEligibilityEngine, and FraudDetector.
  */
 
 import { RiskDecision } from '@prisma/client';
-import { evaluateCodEligibility, CodEligibilityInput } from './CodEligibilityEngine';
+import { evaluateCodEligibility } from './CodEligibilityEngine';
 import { runFraudDetection, FraudFlagDetected } from './FraudDetector';
+import { evaluateCustomerTier, CustomerTierInfo } from '../services/CustomerTierService';
 import logger from '../lib/logger';
 
 export interface RiskEvaluationInput {
@@ -22,10 +20,35 @@ export interface RiskEvaluationInput {
     isBlocked: boolean;
     trustScore: number;
     ordersPlaced: number;
+    ordersDelivered: number;
     rtoCount: number;
     cancelledOrders: number;
     chargebackCount: number;
     failedPayments: number;
+    totalLifetimeSpend?: number;
+    forceCodAllowed?: boolean;
+    forcePrepaidOnly?: boolean;
+    tierOverride?: string | null;
+  };
+
+  // Dynamic StudioSettings from DB
+  settings: {
+    codEnabled: boolean;
+    codMaxOrderValue: number;
+    prepaidDiscountPercent: number;
+    firstOrderCodLimit: number;
+    trustedCustomerCodLimit: number;
+    loyalCustomerCodLimit: number;
+    vipCustomerCodLimit: number;
+    tier1TrustScore: number;
+    tier2TrustScore: number;
+    tier3TrustScore: number;
+    tier2LifetimeSpendINR: number;
+    tier3LifetimeSpendINR: number;
+    allowFirstOrderCod: boolean;
+    requirePhoneVerification: boolean;
+    requireEmailVerification: boolean;
+    codOtpRequired: boolean;
   };
 
   // Phone status
@@ -41,7 +64,7 @@ export interface RiskEvaluationInput {
   postalCode?: string;
   phone?: string;
 
-  // Fraud check counts (pre-queried by service)
+  // Fraud check counts
   failedPaymentsLast24h: number;
   ordersLast24h: number;
   accountsWithSamePhone: number;
@@ -51,26 +74,47 @@ export interface RiskEvaluationInput {
 export interface RiskEvaluationResult {
   decision: RiskDecision;
   trustScore: number;
+  customerTier: CustomerTierInfo;
   codEligible: boolean;
   codIneligibleReason: string | null;
   fraudFlags: FraudFlagDetected[];
   requiresOtp: boolean;
   requiresManualReview: boolean;
-  /** Human-readable reason for PREPAID_ONLY or BLOCKED decisions */
   userMessage: string | null;
-  /** Internal audit detail */
   auditDetail: string;
-  /** Backend-calculated prepaid discount percentage */
   prepaidDiscountPct: number;
 }
 
-// Manual review triggers
 const MANUAL_REVIEW_ORDER_THRESHOLD = Number(process.env.MANUAL_REVIEW_THRESHOLD_INR || 10000);
 const MANUAL_REVIEW_TRUST_THRESHOLD = Number(process.env.MANUAL_REVIEW_TRUST_THRESHOLD || 35);
-const PREPAID_DISCOUNT_PCT = Number(process.env.PREPAID_DISCOUNT_PERCENT || 0);
 
 export function evaluateRisk(input: RiskEvaluationInput): RiskEvaluationResult {
-  const { risk, orderTotal, paymentMethod, phoneVerified } = input;
+  const { risk, orderTotal, paymentMethod, phoneVerified, settings } = input;
+  const prepaidDiscountPct = Number(settings.prepaidDiscountPercent || 0);
+
+  // ── 0. Evaluate Customer Tier via CustomerTierService ─────────────────────
+  const customerTier = evaluateCustomerTier(
+    {
+      ordersDelivered: risk.ordersDelivered || 0,
+      rtoCount: risk.rtoCount || 0,
+      trustScore: risk.trustScore,
+      totalLifetimeSpend: risk.totalLifetimeSpend || 0,
+      tierOverride: risk.tierOverride,
+      forcePrepaidOnly: risk.forcePrepaidOnly,
+      forceCodAllowed: risk.forceCodAllowed,
+    },
+    {
+      tier1TrustScore: settings.tier1TrustScore,
+      tier2TrustScore: settings.tier2TrustScore,
+      tier3TrustScore: settings.tier3TrustScore,
+      tier2LifetimeSpendINR: Number(settings.tier2LifetimeSpendINR),
+      tier3LifetimeSpendINR: Number(settings.tier3LifetimeSpendINR),
+      firstOrderCodLimit: Number(settings.firstOrderCodLimit),
+      trustedCustomerCodLimit: Number(settings.trustedCustomerCodLimit),
+      loyalCustomerCodLimit: Number(settings.loyalCustomerCodLimit),
+      vipCustomerCodLimit: Number(settings.vipCustomerCodLimit),
+    }
+  );
 
   // ── 1. Fraud detection ────────────────────────────────────────────────────
   const fraudFlags = runFraudDetection({
@@ -86,31 +130,44 @@ export function evaluateRisk(input: RiskEvaluationInput): RiskEvaluationResult {
 
   const highSeverityFlags = fraudFlags.filter((f) => f.severity === 'HIGH');
 
-  // ── 2. Hard block ─────────────────────────────────────────────────────────
+  // ── 2. Hard blocks & Admin Overrides ──────────────────────────────────────
+  if (risk.forcePrepaidOnly) {
+    return result('PREPAID_ONLY', 'COD is unavailable for this account.', input, customerTier, fraudFlags, prepaidDiscountPct);
+  }
+
   if (risk.isBlocked) {
-    return result('BLOCKED', 'Your account has been temporarily restricted. Please contact support.', input, fraudFlags);
+    return result('BLOCKED', 'Your account has been temporarily restricted. Please contact support.', input, customerTier, fraudFlags, prepaidDiscountPct);
   }
 
   if (risk.chargebackCount >= 1 || highSeverityFlags.length >= 2) {
-    return result('BLOCKED', 'We cannot process this order. Please contact support.', input, fraudFlags);
+    return result('BLOCKED', 'We cannot process this order. Please contact support.', input, customerTier, fraudFlags, prepaidDiscountPct);
   }
 
-  // ── 3. COD evaluation (only if customer chose COD) ────────────────────────
+  // ── 3. COD evaluation ─────────────────────────────────────────────────────
   let codEligible = true;
   let codIneligibleReason: string | null = null;
 
   if (paymentMethod === 'COD') {
     const codResult = evaluateCodEligibility({
       isBlocked: risk.isBlocked,
+      forceCodAllowed: risk.forceCodAllowed,
+      forcePrepaidOnly: risk.forcePrepaidOnly,
       trustScore: risk.trustScore,
       ordersPlaced: risk.ordersPlaced,
       rtoCount: risk.rtoCount,
       cancelledOrders: risk.cancelledOrders,
       phoneVerified,
+      customerTier,
       orderTotal,
       hasPersonalizedItems: input.hasPersonalizedItems,
       hasCodDisabledProducts: input.hasCodDisabledProducts,
-    } as CodEligibilityInput);
+      settings: {
+        codEnabled: settings.codEnabled,
+        allowFirstOrderCod: settings.allowFirstOrderCod,
+        requirePhoneVerification: settings.requirePhoneVerification,
+        codMaxOrderValue: Number(settings.codMaxOrderValue),
+      },
+    });
 
     codEligible = codResult.eligible;
     codIneligibleReason = codResult.reason;
@@ -120,6 +177,7 @@ export function evaluateRisk(input: RiskEvaluationInput): RiskEvaluationResult {
       return {
         decision: RiskDecision.PREPAID_ONLY,
         trustScore: risk.trustScore,
+        customerTier,
         codEligible: false,
         codIneligibleReason: codResult.reason,
         fraudFlags,
@@ -127,17 +185,16 @@ export function evaluateRisk(input: RiskEvaluationInput): RiskEvaluationResult {
         requiresManualReview: false,
         userMessage: codResult.reason,
         auditDetail: codResult.internalReason,
-        prepaidDiscountPct: PREPAID_DISCOUNT_PCT,
+        prepaidDiscountPct,
       };
     }
   }
 
   // ── 4. OTP requirement ────────────────────────────────────────────────────
-  // OTP required for: first order, COD orders, high-value (> ₹5000), low trust + COD
   const requiresOtp =
-    risk.ordersPlaced === 0 ||
-    (paymentMethod === 'COD' && !phoneVerified) ||
-    (paymentMethod === 'COD' && risk.trustScore < 60) ||
+    (settings.codOtpRequired && paymentMethod === 'COD' && !phoneVerified) ||
+    (risk.ordersPlaced === 0 && settings.requirePhoneVerification && !phoneVerified) ||
+    (paymentMethod === 'COD' && risk.trustScore < settings.tier1TrustScore) ||
     (orderTotal > 5000 && !phoneVerified);
 
   // ── 5. Manual review ──────────────────────────────────────────────────────
@@ -157,19 +214,23 @@ export function evaluateRisk(input: RiskEvaluationInput): RiskEvaluationResult {
     decision = RiskDecision.APPROVED;
   }
 
-  logger.info({ userId: input.userId, decision, trustScore: risk.trustScore }, '[RiskEngine] Evaluation complete');
+  logger.info(
+    { userId: input.userId, decision, tier: customerTier.tier, trustScore: risk.trustScore },
+    '[RiskEngine] Evaluation complete'
+  );
 
   return {
     decision,
     trustScore: risk.trustScore,
+    customerTier,
     codEligible,
     codIneligibleReason,
     fraudFlags,
     requiresOtp,
     requiresManualReview,
     userMessage: null,
-    auditDetail: `decision=${decision} trustScore=${risk.trustScore} flags=${fraudFlags.length}`,
-    prepaidDiscountPct: paymentMethod === 'ONLINE' ? PREPAID_DISCOUNT_PCT : 0,
+    auditDetail: `decision=${decision} tier=${customerTier.tier} trustScore=${risk.trustScore} flags=${fraudFlags.length}`,
+    prepaidDiscountPct: paymentMethod === 'ONLINE' ? prepaidDiscountPct : 0,
   };
 }
 
@@ -177,11 +238,14 @@ function result(
   decision: RiskDecision,
   userMessage: string,
   input: RiskEvaluationInput,
-  fraudFlags: FraudFlagDetected[]
+  customerTier: CustomerTierInfo,
+  fraudFlags: FraudFlagDetected[],
+  prepaidDiscountPct: number
 ): RiskEvaluationResult {
   return {
     decision,
     trustScore: input.risk.trustScore,
+    customerTier,
     codEligible: false,
     codIneligibleReason: userMessage,
     fraudFlags,

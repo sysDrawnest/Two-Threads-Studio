@@ -1,9 +1,8 @@
 /**
- * Risk Service — Phase 5C
+ * Risk Service — Phase 5C / COD Policy 2.0
  *
- * Provides the full risk evaluation workflow used by order.service.ts before
- * creating any order. Also exposes trust score recalculation, fraud flag persistence,
- * and review queue management.
+ * Provides full risk evaluation workflow used by order.service.ts before
+ * creating any order. Fetches dynamic StudioSettings and evaluates customer tiers.
  */
 
 import { OtpPurpose, RiskDecision } from '@prisma/client';
@@ -13,12 +12,39 @@ import { reviewQueueRepository } from '../repositories/review-queue.repository';
 import { evaluateRisk, RiskEvaluationInput } from '../engines/RiskEngine';
 import { calculateTrustScore } from '../engines/TrustScoreEngine';
 import { evaluateCodEligibility } from '../engines/CodEligibilityEngine';
+import { evaluateCustomerTier } from './CustomerTierService';
 import { validatePinCode } from '../utils/pinValidator';
 import prisma from '../prisma';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import logger from '../lib/logger';
 
+async function getStudioSettings() {
+  const settings = await prisma.studioSettings.findUnique({
+    where: { singleton: true },
+  });
+  if (settings) return settings;
+
+  // Fallback defaults if table is empty
+  return {
+    codEnabled: true,
+    codMaxOrderValue: 5000 as any,
+    prepaidDiscountPercent: 5 as any,
+    firstOrderCodLimit: 2000 as any,
+    trustedCustomerCodLimit: 5000 as any,
+    loyalCustomerCodLimit: 10000 as any,
+    vipCustomerCodLimit: 25000 as any,
+    tier1TrustScore: 50,
+    tier2TrustScore: 70,
+    tier3TrustScore: 85,
+    tier2LifetimeSpendINR: 15000 as any,
+    tier3LifetimeSpendINR: 40000 as any,
+    allowFirstOrderCod: true,
+    requirePhoneVerification: true,
+    requireEmailVerification: false,
+    codOtpRequired: true,
+  };
+}
 
 export const riskService = {
   /**
@@ -38,10 +64,11 @@ export const riskService = {
       shippingAddressId: string;
     }
   ) => {
-    // Fetch user + risk profile
-    const [user, riskProfile] = await Promise.all([
+    // Fetch user + risk profile + settings
+    const [user, riskProfile, settings] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { email: true, phone: true, phoneVerified: true, memberSince: true } }),
       customerRiskRepository.getOrCreate(userId),
+      getStudioSettings(),
     ]);
 
     if (!user) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
@@ -113,7 +140,7 @@ export const riskService = {
     // Persist updated trust score
     await customerRiskRepository.updateTrustScore(userId, freshTrustScore);
 
-    // Run risk evaluation
+    // Run risk evaluation with dynamic StudioSettings
     const riskInput: RiskEvaluationInput = {
       userId,
       email: user.email,
@@ -121,10 +148,33 @@ export const riskService = {
         isBlocked: riskProfile.isBlocked,
         trustScore: freshTrustScore,
         ordersPlaced: riskProfile.ordersPlaced,
+        ordersDelivered: riskProfile.ordersDelivered,
         rtoCount: riskProfile.rtoCount,
         cancelledOrders: riskProfile.cancelledOrders,
         chargebackCount: riskProfile.chargebackCount,
         failedPayments: riskProfile.failedPayments,
+        totalLifetimeSpend: Number(riskProfile.totalLifetimeSpend || 0),
+        forceCodAllowed: riskProfile.forceCodAllowed,
+        forcePrepaidOnly: riskProfile.forcePrepaidOnly,
+        tierOverride: riskProfile.tierOverride,
+      },
+      settings: {
+        codEnabled: settings.codEnabled,
+        codMaxOrderValue: Number(settings.codMaxOrderValue),
+        prepaidDiscountPercent: Number(settings.prepaidDiscountPercent),
+        firstOrderCodLimit: Number(settings.firstOrderCodLimit),
+        trustedCustomerCodLimit: Number(settings.trustedCustomerCodLimit),
+        loyalCustomerCodLimit: Number(settings.loyalCustomerCodLimit),
+        vipCustomerCodLimit: Number(settings.vipCustomerCodLimit),
+        tier1TrustScore: settings.tier1TrustScore,
+        tier2TrustScore: settings.tier2TrustScore,
+        tier3TrustScore: settings.tier3TrustScore,
+        tier2LifetimeSpendINR: Number(settings.tier2LifetimeSpendINR),
+        tier3LifetimeSpendINR: Number(settings.tier3LifetimeSpendINR),
+        allowFirstOrderCod: settings.allowFirstOrderCod,
+        requirePhoneVerification: settings.requirePhoneVerification,
+        requireEmailVerification: settings.requireEmailVerification,
+        codOtpRequired: settings.codOtpRequired,
       },
       phoneVerified: user.phoneVerified,
       orderTotal: input.orderTotal,
@@ -165,7 +215,7 @@ export const riskService = {
             });
           }
         })
-        .catch(() => {}); // graceful — never blocks
+        .catch(() => {});
     }
 
     return {
@@ -175,8 +225,7 @@ export const riskService = {
   },
 
   /**
-   * Get COD eligibility for the checkout screen (before cart is finalized).
-   * Lighter than evaluateCheckout — no order created yet.
+   * Get COD eligibility for the checkout screen.
    */
   getCodEligibility: async (
     userId: string,
@@ -184,7 +233,7 @@ export const riskService = {
     productIds: string[]
   ) => {
     const validProductIds = (productIds || []).filter((id): id is string => Boolean(id) && id !== 'null');
-    const [user, riskProfile, products] = await Promise.all([
+    const [user, riskProfile, products, settings] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
         select: { phoneVerified: true, memberSince: true, phone: true },
@@ -196,6 +245,7 @@ export const riskService = {
             select: { id: true, allowCod: true, isPersonalizable: true, madeToOrder: true },
           })
         : Promise.resolve([]),
+      getStudioSettings(),
     ]);
 
     if (!user) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
@@ -222,24 +272,58 @@ export const riskService = {
       (p: { isPersonalizable: boolean; madeToOrder: boolean }) => p.isPersonalizable || p.madeToOrder
     );
 
+    const customerTier = evaluateCustomerTier(
+      {
+        ordersDelivered: riskProfile.ordersDelivered,
+        rtoCount: riskProfile.rtoCount,
+        trustScore,
+        totalLifetimeSpend: Number(riskProfile.totalLifetimeSpend || 0),
+        tierOverride: riskProfile.tierOverride,
+        forcePrepaidOnly: riskProfile.forcePrepaidOnly,
+        forceCodAllowed: riskProfile.forceCodAllowed,
+      },
+      {
+        tier1TrustScore: settings.tier1TrustScore,
+        tier2TrustScore: settings.tier2TrustScore,
+        tier3TrustScore: settings.tier3TrustScore,
+        tier2LifetimeSpendINR: Number(settings.tier2LifetimeSpendINR),
+        tier3LifetimeSpendINR: Number(settings.tier3LifetimeSpendINR),
+        firstOrderCodLimit: Number(settings.firstOrderCodLimit),
+        trustedCustomerCodLimit: Number(settings.trustedCustomerCodLimit),
+        loyalCustomerCodLimit: Number(settings.loyalCustomerCodLimit),
+        vipCustomerCodLimit: Number(settings.vipCustomerCodLimit),
+      }
+    );
+
     const result = evaluateCodEligibility({
       isBlocked: riskProfile.isBlocked,
+      forceCodAllowed: riskProfile.forceCodAllowed,
+      forcePrepaidOnly: riskProfile.forcePrepaidOnly,
       trustScore,
       ordersPlaced: riskProfile.ordersPlaced,
       rtoCount: riskProfile.rtoCount,
       cancelledOrders: riskProfile.cancelledOrders,
       phoneVerified: user.phoneVerified,
+      customerTier,
       orderTotal,
       hasPersonalizedItems,
       hasCodDisabledProducts,
+      settings: {
+        codEnabled: settings.codEnabled,
+        allowFirstOrderCod: settings.allowFirstOrderCod,
+        requirePhoneVerification: settings.requirePhoneVerification,
+        codMaxOrderValue: Number(settings.codMaxOrderValue),
+      },
     });
 
-    const prepaidDiscountPct = Number(process.env.PREPAID_DISCOUNT_PERCENT || 0);
+    const prepaidDiscountPct = Number(settings.prepaidDiscountPercent || 0);
 
     return {
       codEligible: result.eligible,
       reason: result.reason,
       trustScore,
+      customerTier,
+      firstOrderLimit: Number(settings.firstOrderCodLimit),
       prepaidDiscountPct,
       prepaidDiscountAmount:
         prepaidDiscountPct > 0
@@ -248,10 +332,6 @@ export const riskService = {
     };
   },
 
-  /**
-   * Recalculate and persist trust score for a user.
-   * Called by risk event listeners after every order outcome event.
-   */
   recalculateTrustScore: async (userId: string): Promise<number> => {
     const [riskProfile, user] = await Promise.all([
       customerRiskRepository.getOrCreate(userId),
@@ -285,7 +365,6 @@ export const riskService = {
     return score;
   },
 
-  /** Admin: get risk dashboard summary */
   getDashboardSummary: async () => {
     const [
       totalOrders,

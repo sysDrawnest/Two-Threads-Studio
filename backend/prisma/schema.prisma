@@ -861,11 +861,18 @@ model CustomerRisk {
   /// Computed from counters by TrustScoreEngine (0–100). Default 50 for new users.
   trustScore Int @default(50)
 
-  // Restrictions
-  isBlocked     Boolean  @default(false)
-  blockReason   String?
+  /// Lifetime monetary spend in INR (Refinement #4)
+  totalLifetimeSpend Decimal @default(0) @db.Decimal(12, 2)
+
+  // Restrictions & Admin Overrides (Refinement #3)
+  isBlocked            Boolean  @default(false)
+  blockReason          String?
+  forceCodAllowed      Boolean  @default(false)
+  forcePrepaidOnly     Boolean  @default(false)
+  tierOverride         String?
+  adminOverrideReason  String?
   /// If set, orders above this value require MANUAL_REVIEW
-  maxOrderValue Decimal? @db.Decimal(10, 2)
+  maxOrderValue        Decimal? @db.Decimal(10, 2)
 
   // Timestamps
   lastRiskEvaluation DateTime?
@@ -1001,11 +1008,32 @@ model StudioSettings {
   shippingEnabled        Boolean  @default(true)
   shippingNote           String?
 
-  // ── COD Rules ─────────────────────────────
+  // ── COD Rules & Feature Flags (COD Policy 2.0) ─────────
   codEnabled             Boolean  @default(true)
   codMaxOrderValue       Decimal  @default(5000) @db.Decimal(10, 2)
   codExtraCharge         Decimal  @default(0)    @db.Decimal(10, 2)
   prepaidDiscountPercent Decimal  @default(5)    @db.Decimal(5, 2)
+
+  // Dynamic Tier Limits
+  firstOrderCodLimit      Decimal @default(2000)  @db.Decimal(10, 2)
+  trustedCustomerCodLimit Decimal @default(5000)  @db.Decimal(10, 2)
+  loyalCustomerCodLimit   Decimal @default(10000) @db.Decimal(10, 2)
+  vipCustomerCodLimit     Decimal @default(25000) @db.Decimal(10, 2)
+
+  // Dynamic Trust Score Thresholds
+  tier1TrustScore        Int      @default(50)
+  tier2TrustScore        Int      @default(70)
+  tier3TrustScore        Int      @default(85)
+
+  // Dynamic Spend Thresholds
+  tier2LifetimeSpendINR  Decimal  @default(15000) @db.Decimal(10, 2)
+  tier3LifetimeSpendINR  Decimal  @default(40000) @db.Decimal(10, 2)
+
+  // Feature Flags
+  allowFirstOrderCod       Boolean @default(true)
+  requirePhoneVerification Boolean @default(true)
+  requireEmailVerification Boolean @default(false)
+  codOtpRequired           Boolean @default(true)
 
   // ── Return Policy (Global Default) ───────
   returnWindowDays       Int      @default(7)
