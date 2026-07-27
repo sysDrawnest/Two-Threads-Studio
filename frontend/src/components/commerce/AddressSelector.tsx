@@ -68,9 +68,14 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleAddSubmit = async (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setServerError(null);
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       const response: any = await createAddressMutation.mutateAsync({
@@ -91,26 +96,28 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
       } as any);
 
       // Support both unwrapped object and { success: true, address: {...} } backend format
-      const createdAddress = response?.address || response?.data?.address || response;
+      const createdAddress = response?.address || response?.data?.address || response?.data || response;
 
       if (createdAddress && createdAddress.id) {
         onSelect(createdAddress);
+        setShowAddForm(false);
+        setFormData({
+          fullName: '',
+          phone: '',
+          company: '',
+          line1: '',
+          line2: '',
+          city: '',
+          district: '',
+          state: '',
+          country: 'IN',
+          postalCode: '',
+          landmark: '',
+          addressType: 'HOME',
+        });
+      } else {
+        setServerError('Failed to save address. Please try again.');
       }
-      setShowAddForm(false);
-      setFormData({
-        fullName: '',
-        phone: '',
-        company: '',
-        line1: '',
-        line2: '',
-        city: '',
-        district: '',
-        state: '',
-        country: 'IN',
-        postalCode: '',
-        landmark: '',
-        addressType: 'HOME',
-      });
     } catch (err: any) {
       setServerError(err.message || 'Failed to create address.');
     }
@@ -174,10 +181,10 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
       )}
 
       {showAddForm ? (
-        <form onSubmit={handleAddSubmit} className="border border-zinc-200 p-4 bg-zinc-50 space-y-4">
+        <div className="border border-zinc-200 p-4 bg-zinc-50 space-y-4">
           <p className="text-xs font-mono uppercase tracking-wider text-zinc-700">Add New Address</p>
           
-          {serverError && <p className="text-red-500 text-xs font-mono">{serverError}</p>}
+          {serverError && <p className="text-red-500 text-xs font-mono bg-red-50 p-2 border border-red-200">{serverError}</p>}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
@@ -271,10 +278,10 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
             </div>
           </div>
 
-
           <div className="flex gap-2">
             <button
-              type="submit"
+              type="button"
+              onClick={handleAddSubmit}
               disabled={createAddressMutation.isPending}
               className="bg-zinc-950 text-white text-[11px] px-4 py-2 hover:bg-zinc-800 transition-colors uppercase tracking-widest font-mono"
             >
@@ -288,7 +295,7 @@ export const AddressSelector: React.FC<AddressSelectorProps> = ({
               Cancel
             </button>
           </div>
-        </form>
+        </div>
       ) : (
         <button
           onClick={() => setShowAddForm(true)}
