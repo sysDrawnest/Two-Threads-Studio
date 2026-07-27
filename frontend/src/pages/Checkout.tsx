@@ -163,7 +163,18 @@ const Checkout: React.FC = () => {
       setProcessingMessage('Initiating payment…');
       const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
 
-      // Step 2: Open Razorpay popup — result comes in handler callbacks
+      // Handle mock/development key mode
+      if (!razorpayOrder.keyId || razorpayOrder.keyId.includes('dummy') || razorpayOrder.razorpayOrderId.startsWith('order_mock_')) {
+        setProcessingMessage('Completing payment…');
+        await paymentService.verifyPayment(order.id, {
+          razorpay_order_id: razorpayOrder.razorpayOrderId,
+          razorpay_payment_id: `pay_mock_${Date.now()}`,
+          razorpay_signature: 'mock_signature',
+        });
+        await clearCartMutation.mutateAsync();
+        navigate(`/checkout/success?order=${order.orderNumber}`);
+        return;
+      }
       openRazorpayPopup({
         key: razorpayOrder.keyId,
         amount: razorpayOrder.amount,
@@ -248,6 +259,19 @@ const Checkout: React.FC = () => {
 
       setProcessingMessage('Initiating payment…');
       const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
+
+      // Handle mock/development key mode
+      if (!razorpayOrder.keyId || razorpayOrder.keyId.includes('dummy') || razorpayOrder.razorpayOrderId.startsWith('order_mock_')) {
+        setProcessingMessage('Completing payment…');
+        await paymentService.verifyPayment(order.id, {
+          razorpay_order_id: razorpayOrder.razorpayOrderId,
+          razorpay_payment_id: `pay_mock_${Date.now()}`,
+          razorpay_signature: 'mock_signature',
+        });
+        await clearCartMutation.mutateAsync();
+        navigate(`/checkout/success?order=${order.orderNumber}`);
+        return;
+      }
       openRazorpayPopup({
         key: razorpayOrder.keyId,
         amount: razorpayOrder.amount,
