@@ -359,4 +359,46 @@ export const adminService = {
     const response = await apiClient.patch('/admin/settings/company', data);
     return response;
   },
+
+  // ── Promotions & Coupons (Phase 7.3) ───────────────────────────────────────
+  listCouponsAdmin: async (params?: any): Promise<any> => {
+    const response = await apiClient.get('/admin/coupons', { params });
+    return response.data;
+  },
+
+  getCouponAdmin: async (id: string): Promise<any> => {
+    const response = await apiClient.get(`/admin/coupons/${id}`);
+    return response.data;
+  },
+
+  createCouponAdmin: async (data: any): Promise<any> => {
+    const response = await apiClient.post('/admin/coupons', data);
+    return response.data;
+  },
+
+  updateCouponAdmin: async (id: string, data: any): Promise<any> => {
+    const response = await apiClient.put(`/admin/coupons/${id}`, data);
+    return response.data;
+  },
+
+  deleteCouponAdmin: async (id: string): Promise<any> => {
+    const response = await apiClient.delete(`/admin/coupons/${id}`);
+    return response.data;
+  },
+
+  cloneCouponAdmin: async (id: string): Promise<any> => {
+    const response = await apiClient.post(`/admin/coupons/${id}/clone`);
+    return response.data;
+  },
+
+  toggleCouponActiveAdmin: async (id: string): Promise<any> => {
+    const response = await apiClient.patch(`/admin/coupons/${id}/toggle`);
+    return response.data;
+  },
+
+  getCouponAnalyticsAdmin: async (): Promise<any> => {
+    const response = await apiClient.get('/admin/coupons/analytics/summary');
+    return response.data;
+  },
 };
+

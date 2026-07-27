@@ -11,11 +11,25 @@ import { analyticsController } from '../controllers/analytics.controller';
 import { inventoryController } from '../controllers/inventory.controller';
 import { reviewController } from '../controllers/review.controller';
 import { settingsController } from '../controllers/settings.controller';
+import { adminPromotionController } from '../controllers/admin-promotion.controller';
+import { validate } from '../middleware/validate';
+import { createCouponAdminSchema, updateCouponAdminSchema } from '../validators/admin-promotion.validator';
 
 const router = Router();
 
 // All admin routes require authentication + ADMIN role
 router.use(requireAuth, requireRole(Role.ADMIN));
+
+// ── Coupon / Promotions Management ─────────────────────────────────────────
+router.get('/coupons/analytics/summary', adminPromotionController.getPromotionAnalytics);
+router.get('/coupons', adminPromotionController.listCoupons);
+router.get('/coupons/:id', adminPromotionController.getCoupon);
+router.post('/coupons', validate(createCouponAdminSchema), adminPromotionController.createCoupon);
+router.put('/coupons/:id', validate(updateCouponAdminSchema), adminPromotionController.updateCoupon);
+router.delete('/coupons/:id', adminPromotionController.deleteCoupon);
+router.post('/coupons/:id/clone', adminPromotionController.cloneCoupon);
+router.patch('/coupons/:id/toggle', adminPromotionController.toggleCouponActive);
+
 
 // ── Dashboard ──────────────────────────────────────────────────────────────
 router.get('/dashboard', adminController.getDashboard);

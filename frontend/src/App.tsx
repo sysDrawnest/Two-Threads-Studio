@@ -87,6 +87,9 @@ const ReviewsManagement = lazy(() => import('./pages/admin/ReviewsManagement').t
 const RiskCenter = lazy(() => import('./pages/admin/RiskCenter').then(module => ({ default: module.RiskCenter })));
 const AnalyticsDashboard = lazy(() => import('./pages/admin/AnalyticsDashboard').then(module => ({ default: module.AnalyticsDashboard })));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings').then(module => ({ default: module.AdminSettings })));
+const CouponsManagement = lazy(() => import('./pages/admin/CouponsManagement').then(module => ({ default: module.CouponsManagement })));
+const CouponForm = lazy(() => import('./pages/admin/CouponForm').then(module => ({ default: module.CouponForm })));
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storefront wrapper (with Navbar, Footer, page transitions)
@@ -183,7 +186,11 @@ const AdminRoutes: React.FC = () => (
         <Route path="risk" element={<RiskCenter />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="coupons" element={<CouponsManagement />} />
+        <Route path="coupons/new" element={<CouponForm />} />
+        <Route path="coupons/edit/:id" element={<CouponForm />} />
       </Route>
+
     </Route>
   </Routes>
 );
