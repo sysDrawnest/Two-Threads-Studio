@@ -8,17 +8,25 @@ export const validate =
   (schema: ZodSchema) =>
   async (req: Request, _res: Response, next: NextFunction) => {
     try {
-      const parsed: any = await schema.parseAsync({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
-      if (parsed.body !== undefined) req.body = parsed.body;
-      if (parsed.query !== undefined) {
-        Object.defineProperty(req, 'query', { value: parsed.query, writable: true, configurable: true });
-      }
-      if (parsed.params !== undefined) {
-        Object.defineProperty(req, 'params', { value: parsed.params, writable: true, configurable: true });
+      const shape = (schema as any).shape;
+      const isWrapped = shape && ('body' in shape || 'query' in shape || 'params' in shape);
+
+      if (isWrapped) {
+        const parsed: any = await schema.parseAsync({
+          body: req.body,
+          query: req.query,
+          params: req.params,
+        });
+        if (parsed.body !== undefined) req.body = parsed.body;
+        if (parsed.query !== undefined) {
+          Object.defineProperty(req, 'query', { value: parsed.query, writable: true, configurable: true });
+        }
+        if (parsed.params !== undefined) {
+          Object.defineProperty(req, 'params', { value: parsed.params, writable: true, configurable: true });
+        }
+      } else {
+        const parsedBody = await schema.parseAsync(req.body);
+        if (parsedBody !== undefined) req.body = parsedBody;
       }
       return next();
     } catch (error) {

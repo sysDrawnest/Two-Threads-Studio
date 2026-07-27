@@ -44,7 +44,7 @@ const sendCustomerOrderConfirmation = async (order: any, attachments?: any[]) =>
 };
 
 const sendAdminOrderNotification = async (order: any, attachments?: any[]) => {
-  const adminEmailsStr = process.env.ADMIN_NOTIFICATION_EMAILS || 'sethysaiyangyadatta@gmail.com,shreyasisahoo116@gmail.com';
+  const adminEmailsStr = process.env.ADMIN_NOTIFICATION_EMAILS || 'shreyasisahoo116@gmail.com';
   const adminEmails = adminEmailsStr.split(',').map(e => e.trim()).filter(Boolean);
   
   const highValueThreshold = parseInt(process.env.HIGH_VALUE_ORDER_THRESHOLD_INR || '5000', 10);

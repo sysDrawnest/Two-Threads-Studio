@@ -20,7 +20,7 @@ import type {
 } from './PaymentProvider.interface';
 
 const keyId = process.env.RAZORPAY_KEY_ID;
-const keySecret = process.env.RAZORPAY_KEY_SECRET;
+const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET;
 
 if (!keyId || !keySecret) {
   // Warn at module load — not a hard crash so dev can still start without Razorpay

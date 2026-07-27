@@ -590,10 +590,15 @@ const Checkout: React.FC = () => {
               <span>-₹{totals.discount.toLocaleString()}</span>
             </div>
           )}
-          {totals.tax > 0 && (
+          {totals.tax > 0 ? (
             <div className="flex justify-between">
-              <span className="font-sans">Tax</span>
+              <span className="font-sans">Tax (GST)</span>
               <span>₹{totals.tax.toLocaleString()}</span>
+            </div>
+          ) : (
+            <div className="flex justify-between text-neutral-400 text-[10px]">
+              <span className="font-sans">GST</span>
+              <span>Inclusive</span>
             </div>
           )}
           <div className="flex justify-between">
