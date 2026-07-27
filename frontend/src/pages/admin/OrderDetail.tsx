@@ -135,27 +135,24 @@ export const OrderDetail: React.FC = () => {
             </button>
           )}
 
-          {/* Status Actions based on current status */}
-          {order.orderStatus === 'PENDING' && (
-            <button onClick={() => handleStatusChange('PROCESSING')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
-              Mark as Processing
-            </button>
-          )}
-          {order.orderStatus === 'PROCESSING' && (
-            <button onClick={() => handleStatusChange('SHIPPED')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-primary-container text-white hover:bg-primary-container/90 transition-colors disabled:opacity-50">
-              Mark as Shipped
-            </button>
-          )}
-          {order.orderStatus === 'SHIPPED' && (
-            <button onClick={() => handleStatusChange('DELIVERED')} disabled={isUpdating} className="px-4 py-2 text-sm font-medium rounded-md bg-[#137333] text-white hover:bg-[#137333]/90 transition-colors disabled:opacity-50">
-              Mark as Delivered
-            </button>
-          )}
-          {order.orderStatus !== 'CANCELLED' && order.orderStatus !== 'DELIVERED' && order.orderStatus !== 'RETURNED' && (
-             <button onClick={() => handleStatusChange('CANCELLED')} disabled={isUpdating} className="px-4 py-2 text-sm rounded-md border border-[#c5221f] text-[#c5221f] hover:bg-[#fce8e6] transition-colors disabled:opacity-50">
-               Cancel Order
-             </button>
-          )}
+          {/* Status Select Dropdown */}
+          <div className="flex items-center gap-2 bg-white dark:bg-[#1a1411] border border-outline-variant rounded-md px-3 py-1.5 shadow-xs">
+            <span className="text-xs font-mono text-on-secondary-container uppercase tracking-wider font-semibold">Status:</span>
+            <select
+              value={order.orderStatus}
+              disabled={isUpdating}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="bg-transparent text-sm font-semibold text-primary-container dark:text-white focus:outline-none cursor-pointer disabled:opacity-50"
+            >
+              <option value="PENDING" className="dark:bg-[#1a1411]">🟡 PENDING</option>
+              <option value="PROCESSING" className="dark:bg-[#1a1411]">⚙️ PROCESSING</option>
+              <option value="HANDCRAFTING" className="dark:bg-[#1a1411]">🎨 HANDCRAFTING / PACKING</option>
+              <option value="SHIPPED" className="dark:bg-[#1a1411]">🚚 SHIPPED</option>
+              <option value="DELIVERED" className="dark:bg-[#1a1411]">✅ DELIVERED</option>
+              <option value="CANCELLED" className="dark:bg-[#1a1411]">❌ CANCELLED</option>
+              <option value="RETURNED" className="dark:bg-[#1a1411]">↩️ RETURNED</option>
+            </select>
+          </div>
         </div>
       </div>
 
