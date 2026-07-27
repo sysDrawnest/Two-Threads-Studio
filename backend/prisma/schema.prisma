@@ -1258,3 +1258,45 @@ model CouponUsage {
   @@map("coupon_usages")
 }
 
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  provider  String   @default("razorpay")
+  eventId   String   @unique
+  eventType String
+  createdAt DateTime @default(now())
+
+  @@map("webhook_events")
+}
+
+model PaymentWebhookLog {
+  id          String   @id @default(cuid())
+  provider    String   @default("razorpay")
+  eventId     String?
+  eventType   String
+  payload     Json
+  status      String   @default("SUCCESS")
+  error       String?
+  receivedAt  DateTime @default(now())
+  processedAt DateTime @default(now())
+
+  @@index([eventId])
+  @@index([eventType])
+  @@map("payment_webhook_logs")
+}
+
+model PaymentAuditLog {
+  id          String   @id @default(cuid())
+  paymentId   String
+  oldStatus   String?
+  newStatus   String
+  reason      String?
+  actorType   String   @default("SYSTEM")
+  actorId     String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([paymentId])
+  @@map("payment_audit_logs")
+}
+
+

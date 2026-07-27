@@ -38,12 +38,13 @@ import adminOrderRoutes from './admin-order.routes';
 router.use('/orders',       orderRoutes);
 router.use('/admin/orders', adminOrderRoutes);
 
-// Payment & Fulfillment (Phase 5B)
-import paymentRoutes from './payment.routes';
+// Payment & Fulfillment (Phase 5B & 7.4)
+import paymentRoutes from '../payment/payment.routes';
 import adminPaymentRoutes from './admin-payment.routes';
 
 router.use('/payments',       paymentRoutes);
 router.use('/admin/payments', adminPaymentRoutes);
+
 
 // Trust & Risk Management (Phase 5C)
 import { riskRoutes, adminRiskRoutes } from './risk.routes';

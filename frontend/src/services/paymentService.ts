@@ -41,6 +41,14 @@ export interface PaymentVerifyPayload {
 
 export const paymentService = {
   /**
+   * Get public payment configuration (Razorpay keyId, environment mode, and currency)
+   */
+  getPaymentConfig: async (): Promise<{ keyId: string; isLive: boolean; currency: string }> => {
+    const { data } = await api.get('/payments/config');
+    return data.data;
+  },
+
+  /**
    * Step 1: Create a Razorpay order on the backend before opening popup
    */
   createRazorpayOrder: async (orderId: string): Promise<RazorpayOrderResponse> => {

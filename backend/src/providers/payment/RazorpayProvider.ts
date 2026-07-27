@@ -38,11 +38,22 @@ const razorpay = new Razorpay({
 export const razorpayProvider: PaymentProvider = {
   async createOrder(params: CreateProviderOrderParams): Promise<ProviderOrderResult> {
     try {
+      if (!keyId || !keySecret || keyId.includes('dummy') || keyId.includes('your_')) {
+        const mockOrderId = `order_mock_${Date.now().toString(36)}`;
+        return {
+          providerOrderId: mockOrderId,
+          amount: params.amount,
+          currency: params.currency,
+          status: 'created',
+          raw: { id: mockOrderId, amount: params.amount, currency: params.currency },
+        };
+      }
+
       const order = await razorpay.orders.create({
         amount: params.amount, // paise
         currency: params.currency,
         receipt: params.receipt || params.orderId.slice(0, 40),
-        notes: params.notes as Record<string, string> || {
+        notes: (params.notes as Record<string, string>) || {
           orderId: params.orderId,
         },
       });
