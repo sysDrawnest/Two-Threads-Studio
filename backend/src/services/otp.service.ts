@@ -71,17 +71,26 @@ export const otpService = {
       return { verified: false, reason: result.reason };
     }
 
-    // If verifying phone number, mark it as verified in the user record
-    if (
-      purpose === OtpPurpose.PHONE_REGISTRATION ||
-      purpose === OtpPurpose.PHONE_CHANGE
-    ) {
+    // Mark phone as verified in the user record for all phone-related OTP purposes
+    const isPhonePurpose = [
+      OtpPurpose.PHONE_REGISTRATION,
+      OtpPurpose.PHONE_CHANGE,
+      OtpPurpose.FIRST_ORDER_VERIFICATION,
+      OtpPurpose.COD_VERIFICATION,
+      OtpPurpose.HIGH_VALUE_ORDER,
+    ].includes(purpose);
+
+    if (isPhonePurpose) {
       const client = prismaClient || prisma;
+      const isPhoneNumber = /^[0-9+\-\s()]{7,20}$/.test(recipient);
       await client.user.update({
         where: { id: userId },
-        data: { phone: recipient, phoneVerified: true },
+        data: {
+          phoneVerified: true,
+          ...(isPhoneNumber ? { phone: recipient } : {}),
+        },
       });
-      logger.info({ userId, phone: recipient }, '[OtpService] Phone verified and updated');
+      logger.info({ userId, phone: recipient, purpose }, '[OtpService] User phone verified and updated');
     }
 
     logger.info({ userId, recipient, purpose }, '[OtpService] OTP verified successfully');
