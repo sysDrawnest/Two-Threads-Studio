@@ -16,8 +16,7 @@ import {
   Sun,
   FolderKanban,
   Tags,
-  Percent,
-  PanelLeftClose
+  Percent
 } from 'lucide-react';
 import { cn } from '../ui/AdminBadge';
 import { useAuth } from '../../../context/AuthContext';
@@ -27,10 +26,9 @@ interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isCollapsed = false }) => {
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -65,53 +63,53 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
     }
   ];
 
-  const sidebarContent = (
-    <div className="flex h-full flex-col bg-[#fef8f3] dark:bg-[#171311] border-r border-[#c8b5aa]/60 dark:border-[#3d332b] transition-colors duration-200">
-      <div className="flex h-16 shrink-0 items-center px-6 justify-between">
-        <h1 className="font-serif text-xl font-medium tracking-tight text-[#1f1610] dark:text-[#ffffff]">
-          TWO THREADS <span className="font-sans text-[11px] uppercase tracking-widest text-[#786455] dark:text-[#ccb08a] block mt-0.5 font-medium">Admin OS</span>
-        </h1>
-        <div className="flex items-center">
-          <button onClick={onClose} aria-label="Close menu" className="md:hidden text-[#1f1610] dark:text-[#ffffff] p-1">
-            <X className="h-5 w-5" />
-          </button>
-          {onToggleCollapse && (
-            <button 
-              onClick={onToggleCollapse} 
-              aria-label="Hide sidebar" 
-              className="hidden md:flex text-[#786455] dark:text-[#ccb08a] hover:text-[#1f1610] dark:hover:text-[#ffffff] p-1 transition-colors"
-              title="Hide sidebar"
-            >
-              <PanelLeftClose className="h-5 w-5" />
-            </button>
-          )}
-        </div>
+  const renderSidebarContent = (collapsed: boolean) => (
+    <div className="flex h-full flex-col bg-[#fef8f3] dark:bg-[#171311] border-r border-[#c8b5aa]/60 dark:border-[#3d332b] transition-colors duration-200 overflow-x-hidden">
+      <div className={cn("flex h-16 shrink-0 items-center", collapsed ? "justify-center px-0" : "px-6")}>
+        {!collapsed ? (
+          <h1 className="font-serif text-xl font-medium tracking-tight text-[#1f1610] dark:text-[#ffffff] whitespace-nowrap">
+            TWO THREADS <span className="font-sans text-[11px] uppercase tracking-widest text-[#786455] dark:text-[#ccb08a] block mt-0.5 font-medium">Admin OS</span>
+          </h1>
+        ) : (
+          <h1 className="font-serif text-xl font-bold tracking-tight text-[#1f1610] dark:text-[#ffffff]">
+            TT
+          </h1>
+        )}
+        <button onClick={onClose} aria-label="Close menu" className="ml-auto md:hidden text-[#1f1610] dark:text-[#ffffff]">
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-6">
         {navGroups.map((group, i) => (
           <div key={group.label} className={cn("mb-6", i !== 0 && "mt-2")}>
-            <h2 className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-[#786455] dark:text-[#ccb08a]/90">
-              {group.label}
-            </h2>
+            {!collapsed ? (
+              <h2 className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-[#786455] dark:text-[#ccb08a]/90 whitespace-nowrap">
+                {group.label}
+              </h2>
+            ) : (
+              <div className="h-4" /> // Spacer for alignment
+            )}
             <nav className="space-y-1" aria-label={group.label}>
               {group.items.map((item) => (
                 <NavLink
                   key={item.name}
                   to={item.href}
                   end={item.exact}
+                  title={collapsed ? item.name : undefined}
                   onClick={() => {
                     if (window.innerWidth < 768) onClose();
                   }}
                   className={({ isActive }) => cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all border",
+                    "flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-all border",
+                    collapsed ? "justify-center px-0" : "px-3",
                     isActive
                       ? "bg-[#d1c4bd]/40 dark:bg-[#2c231c] text-[#120a05] dark:text-[#ffffff] border-[#a89990] dark:border-[#52443a] shadow-xs"
                       : "text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] border-transparent"
                   )}
                 >
                   <item.icon className="h-4.5 w-4.5 shrink-0" />
-                  {item.name}
+                  {!collapsed && <span className="whitespace-nowrap">{item.name}</span>}
                 </NavLink>
               ))}
             </nav>
@@ -119,27 +117,37 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
         ))}
       </div>
 
-      <div className="p-4 border-t border-[#c8b5aa]/60 dark:border-[#3d332b] space-y-2">
+      <div className={cn("p-4 border-t border-[#c8b5aa]/60 dark:border-[#3d332b] space-y-2", collapsed ? "px-2" : "px-4")}>
         <button
           onClick={toggleTheme}
+          title={collapsed ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : undefined}
           aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
-          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] transition-colors"
+          className={cn(
+            "flex w-full items-center rounded-md py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#1a110a] dark:hover:text-[#ffffff] transition-colors",
+            collapsed ? "justify-center px-0" : "justify-between px-3"
+          )}
         >
           <div className="flex items-center gap-3">
-            {theme === 'dark' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5" />}
-            {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+            {theme === 'dark' ? <Moon className="h-4.5 w-4.5 shrink-0" /> : <Sun className="h-4.5 w-4.5 shrink-0" />}
+            {!collapsed && <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>}
           </div>
-          <div className="relative inline-flex h-4 w-8 items-center rounded-full bg-[#d2c4bc]/40 dark:bg-[#3d332b] transition-colors">
-            <span className={cn("inline-block h-3 w-3 transform rounded-full bg-[#4e3c30] dark:bg-[#ccb08a] transition-transform", theme === 'dark' ? "translate-x-4" : "translate-x-1")} />
-          </div>
+          {!collapsed && (
+            <div className="relative inline-flex h-4 w-8 items-center rounded-full bg-[#d2c4bc]/40 dark:bg-[#3d332b] transition-colors shrink-0">
+              <span className={cn("inline-block h-3 w-3 transform rounded-full bg-[#4e3c30] dark:bg-[#ccb08a] transition-transform", theme === 'dark' ? "translate-x-4" : "translate-x-1")} />
+            </div>
+          )}
         </button>
         <button
           onClick={() => logout()}
+          title={collapsed ? "Sign out" : undefined}
           aria-label="Sign out of admin"
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#b14833] dark:hover:text-[#f28b82] transition-colors"
+          className={cn(
+            "flex w-full items-center gap-3 rounded-md py-2 text-sm font-medium text-[#3c2b1e] dark:text-[#e2deda] hover:bg-[#d1c4bd]/20 dark:hover:bg-[#211c18]/80 hover:text-[#b14833] dark:hover:text-[#f28b82] transition-colors",
+            collapsed ? "justify-center px-0" : "px-3"
+          )}
         >
-          <LogOut className="h-4.5 w-4.5" />
-          Sign out
+          <LogOut className="h-4.5 w-4.5 shrink-0" />
+          {!collapsed && <span>Sign out</span>}
         </button>
       </div>
     </div>
@@ -165,7 +173,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed inset-y-0 left-0 z-50 w-64 md:hidden"
             >
-              {sidebarContent}
+              {renderSidebarContent(false)}
             </motion.div>
           </>
         )}
@@ -174,10 +182,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
       {/* Desktop Sidebar */}
       <div className={cn(
         "hidden md:fixed md:inset-y-0 md:flex md:flex-col z-20 transition-all duration-300",
-        isCollapsed ? "md:w-0 md:-translate-x-full" : "md:w-64"
+        isCollapsed ? "md:w-20" : "md:w-64"
       )}>
-        <div className="h-full w-64 flex flex-col">
-          {sidebarContent}
+        <div className="h-full w-full flex flex-col">
+          {renderSidebarContent(isCollapsed)}
         </div>
       </div>
     </>

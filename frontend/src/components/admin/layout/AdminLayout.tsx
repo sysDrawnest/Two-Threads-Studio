@@ -21,13 +21,12 @@ export const AdminLayout: React.FC = () => {
         isOpen={isMobileMenuOpen} 
         onClose={() => setIsMobileMenuOpen(false)} 
         isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Main Content Wrapper */}
       <div className={cn(
         "flex flex-1 flex-col transition-all duration-300",
-        isSidebarCollapsed ? "md:pl-0" : "md:pl-64"
+        isSidebarCollapsed ? "md:pl-20" : "md:pl-64"
       )}>
         <AdminTopBar 
           onMenuClick={() => setIsMobileMenuOpen(true)} 
