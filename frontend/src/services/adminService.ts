@@ -363,7 +363,7 @@ export const adminService = {
   // ── Promotions & Coupons (Phase 7.3) ───────────────────────────────────────
   listCouponsAdmin: async (params?: any): Promise<any> => {
     const response = await apiClient.get('/admin/coupons', { params });
-    return response.data;
+    return response;
   },
 
   getCouponAdmin: async (id: string): Promise<any> => {
