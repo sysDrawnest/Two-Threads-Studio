@@ -47,7 +47,7 @@ const Login: React.FC = () => {
   };
 
   const handleGuest = () => {
-    navigate('/');
+    navigate('/shop');
   };
 
   return (
@@ -80,6 +80,7 @@ const Login: React.FC = () => {
           {/* Tag Body */}
           <div 
             onClick={handleGuest}
+            title={redirectPath.includes('/checkout') ? "Checkout requires an account" : "Browse without an account"}
             className="guest-tag-ripple w-[160px] bg-[#FAF8F5] border border-[#d2c4bc] rounded-b-md rounded-t-sm shadow-lg flex flex-col items-center pt-3 pb-6 px-4 cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative before:absolute before:content-[''] before:w-full before:h-full before:top-0 before:left-0 before:bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] before:opacity-40 before:pointer-events-none"
             style={{ transform: 'rotate(-4deg)' }}
           >
@@ -91,9 +92,15 @@ const Login: React.FC = () => {
               GUEST<br/>ACCESS<br/>PASS
             </h3>
             
-            <p className="font-sans text-[#5c544d] text-center text-[11px] uppercase tracking-widest leading-tight">
+            <p className="font-sans text-[#5c544d] text-center text-[11px] uppercase tracking-widest leading-tight mb-2">
               explore the<br/>collections
             </p>
+
+            {redirectPath.includes('/checkout') && (
+              <span className="text-[9px] text-[#A34A38] text-center uppercase tracking-wider font-semibold font-mono">
+                Checkout requires account
+              </span>
+            )}
           </div>
         </div>
 
@@ -126,9 +133,23 @@ const Login: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-4 sm:mb-8 relative z-10">
-            <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm">
+            <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm mb-4">
               Log In to<br/>Artisanal Creations
             </h2>
+
+            {/* Secure Checkout Context Alert */}
+            {redirectPath.includes('/checkout') && (
+              <div className="bg-[#FAF9F7]/95 border border-[#E8E4DF] p-4 text-left text-xs text-[#5C544D] font-sans flex gap-3 items-start shadow-sm rounded-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="flex-shrink-0 mt-0.5">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <div>
+                  <span className="font-semibold text-[#1C1C1B] block mb-0.5">🔒 Secure Checkout</span>
+                  <span className="leading-relaxed">You're signing in to securely save your order, track deliveries, access invoices, and enjoy faster future purchases.</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Form */}
@@ -217,7 +238,7 @@ const Login: React.FC = () => {
              onClick={handleGuest}
              className="font-serif italic text-[15px] text-[#fef8f3] drop-shadow-md underline decoration-[#d4af37]/50 underline-offset-4 hover:text-[#d4af37] transition-colors bg-transparent border-none"
            >
-             Continue as a Guest
+             {redirectPath.includes('/checkout') ? 'Browse Products' : 'Continue as a Guest'}
            </button>
         </div>
       </div>

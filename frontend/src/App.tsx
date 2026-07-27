@@ -91,6 +91,8 @@ const CouponsManagement = lazy(() => import('./pages/admin/CouponsManagement').t
 const CouponForm = lazy(() => import('./pages/admin/CouponForm').then(module => ({ default: module.CouponForm })));
 
 
+import RequireAuth from './components/auth/RequireAuth';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Storefront wrapper (with Navbar, Footer, page transitions)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -113,11 +115,16 @@ const StorefrontRoutes = () => {
         <Route path="/artisans" element={<Artisans />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/checkout/success" element={<CheckoutSuccess />} />
-        <Route path="/checkout/failed" element={<CheckoutFailed />} />
+
+        {/* Protected Customer Routes */}
+        <Route element={<RequireAuth />}>
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
+          <Route path="/checkout/failed" element={<CheckoutFailed />} />
+        </Route>
+
         <Route path="/membership" element={<Membership />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/legal" element={<Legal />} />

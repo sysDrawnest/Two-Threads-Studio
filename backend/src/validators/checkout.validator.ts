@@ -1,11 +1,7 @@
 import { z } from 'zod';
 
 export const createCheckoutSessionSchema = z.object({
-  cartId: z.string().optional(),
-  isGuest: z.boolean().optional().default(false),
-  customerEmail: z.string().email().optional(),
-  customerPhone: z.string().optional(),
-  customerName: z.string().optional(),
+  sessionToken: z.string().optional(),
 });
 
 export const updateCheckoutCustomerSchema = z.object({

@@ -12,12 +12,12 @@ import {
   updateCheckoutAddressSchema,
   updateCheckoutShippingSchema,
 } from '../validators/checkout.validator';
-import { optionalAuth } from '../middleware/auth.middleware';
+import { requireAuth } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Allow optional auth (works seamlessly for both Guest & Registered checkout)
-router.use(optionalAuth);
+// Protect all checkout endpoints — guests must authenticate
+router.use(requireAuth);
 
 // Session management & summaries
 router.post('/session', validate(createCheckoutSessionSchema), checkoutController.createOrResumeSession);

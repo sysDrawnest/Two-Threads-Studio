@@ -37,7 +37,6 @@ const Checkout: React.FC = () => {
 
   // Selected Address State
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [contactEmail, setContactEmail] = useState(user?.email || '');
 
   const [paymentOption, setPaymentOption] = useState<'online' | 'cod'>('online');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -87,7 +86,7 @@ const Checkout: React.FC = () => {
     // Set shipping info in checkout store for step 2 & summary
     setShippingInfo({
       fullName: selectedAddress.fullName,
-      email: contactEmail,
+      email: user?.email || '',
       addressLine1: selectedAddress.line1,
       addressLine2: selectedAddress.line2 || '',
       city: selectedAddress.city,
@@ -173,8 +172,8 @@ const Checkout: React.FC = () => {
         description: `Order ${order.orderNumber}`,
         order_id: razorpayOrder.razorpayOrderId,
         prefill: {
-          name: (user as any)?.firstName ? (user as any).firstName + ' ' + ((user as any).lastName || '') : user?.name || '',
-          email: user?.email || contactEmail,
+          name: user?.name || '',
+          email: user?.email || '',
         },
         theme: { color: '#1C1C1B' },
         handler: async (response) => {
@@ -206,7 +205,7 @@ const Checkout: React.FC = () => {
       if (errorMsg.includes('OTP_REQUIRED')) {
         setShowOtpModal(true);
         // Send OTP automatically when modal opens
-        riskService.sendOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION').catch(console.error);
+        riskService.sendOtp(user?.phone || user?.email || '', 'FIRST_ORDER_VERIFICATION').catch(console.error);
         return; // Pause checkout process
       }
 
@@ -224,7 +223,7 @@ const Checkout: React.FC = () => {
     setIsVerifyingOtp(true);
     setOtpError('');
     try {
-      await riskService.verifyOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION', otpValue);
+      await riskService.verifyOtp(user?.phone || user?.email || '', 'FIRST_ORDER_VERIFICATION', otpValue);
       setShowOtpModal(false);
       
       // Resume place order directly without showing the modal again
@@ -257,8 +256,8 @@ const Checkout: React.FC = () => {
         description: `Order ${order.orderNumber}`,
         order_id: razorpayOrder.razorpayOrderId,
         prefill: {
-          name: (user as any)?.firstName ? (user as any).firstName + ' ' + ((user as any).lastName || '') : user?.name || '',
-          email: user?.email || contactEmail,
+          name: user?.name || '',
+          email: user?.email || '',
         },
         theme: { color: '#1C1C1B' },
         handler: async (response) => {
@@ -375,18 +374,28 @@ const Checkout: React.FC = () => {
             {/* Step 1: Information */}
             {stepNumber === 1 && (
               <div className="flex flex-col gap-6">
-                <div>
-                  <h2 className="font-serif text-xl text-[#1C1C1B] mb-4">Contact Information</h2>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-sans text-[10px] tracking-widest uppercase text-neutral-400">Email Address</label>
-                    <input 
-                      type="email" 
-                      value={contactEmail} 
-                      onChange={e => setContactEmail(e.target.value)} 
-                      placeholder="julia@example.com" 
-                      required 
-                      className="w-full p-3 border border-neutral-200 focus:border-[#A34A38] focus:ring-0 focus:outline-none bg-[#FBFBFA] text-sm text-[#1C1C1B] rounded-sm transition-colors font-mono" 
-                    />
+                {/* 🔒 Secure Checkout Banner */}
+                <div className="bg-[#FAF9F7] border border-[#E8E4DF] p-5 rounded-sm flex gap-3 items-start text-xs text-[#5C544D] font-sans">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="flex-shrink-0 mt-0.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <div>
+                    <span className="font-semibold text-[#1C1C1B] block mb-1">🔒 Secure Checkout</span>
+                    <span>You're signing in to securely save your order, track deliveries, access invoices, and enjoy faster future purchases.</span>
+                  </div>
+                </div>
+
+                {/* Read-Only Account Details */}
+                <div className="border border-neutral-200 rounded-sm p-5 bg-[#FAF9F7] font-sans">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xs uppercase tracking-widest text-neutral-400 font-semibold m-0">Logged In Account</h3>
+                    <Link to="/account" className="text-[10px] uppercase tracking-widest text-[#A34A38] hover:text-[#83382a] font-semibold underline decoration-[#A34A38]/30 underline-offset-4">Edit Profile</Link>
+                  </div>
+                  <div className="flex flex-col gap-1 text-sm text-[#1C1C1B]">
+                    <div className="font-medium">{user?.name}</div>
+                    <div className="text-neutral-500 text-xs font-mono">{user?.email}</div>
+                    {user?.phone && <div className="text-neutral-500 text-xs font-mono">{user?.phone}</div>}
                   </div>
                 </div>
                 
@@ -638,7 +647,7 @@ const Checkout: React.FC = () => {
 
             <h3 className="font-serif text-2xl text-[#1C1C1B] mb-2 text-center">Verify Your Account</h3>
             <p className="text-sm text-neutral-500 text-center mb-8 font-sans">
-              To ensure the security of your high-value or COD order, we've sent a verification code to <span className="font-semibold text-[#1C1C1B]">{(user as any)?.phone || contactEmail}</span>.
+              To ensure the security of your high-value or COD order, we've sent a verification code to <span className="font-semibold text-[#1C1C1B]">{user?.phone || user?.email}</span>.
             </p>
 
             {otpError && (
@@ -668,7 +677,7 @@ const Checkout: React.FC = () => {
             
             <button 
               type="button" 
-              onClick={() => riskService.sendOtp((user as any)?.phone || contactEmail, 'FIRST_ORDER_VERIFICATION')}
+              onClick={() => riskService.sendOtp(user?.phone || user?.email || '', 'FIRST_ORDER_VERIFICATION')}
               className="mt-6 text-xs font-sans uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] underline underline-offset-4 bg-transparent border-none cursor-pointer"
             >
               Resend Code

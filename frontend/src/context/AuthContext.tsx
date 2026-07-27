@@ -10,6 +10,7 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   avatar?: string;
+  phone?: string;
   membershipTier?: 'none' | 'artisan' | 'master';
 }
 
@@ -33,6 +34,7 @@ const mapBackendUserToAuthUser = (backendUser: any): AuthUser => {
     email: backendUser.email,
     role: backendUser.role.toLowerCase() as UserRole,
     avatar: backendUser.avatarUrl || undefined,
+    phone: backendUser.phone || undefined,
     membershipTier: 'none',
   };
 };

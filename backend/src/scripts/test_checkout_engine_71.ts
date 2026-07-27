@@ -54,37 +54,52 @@ async function runVerification() {
   console.log(`   Cutoff Passed: ${eta.isCutoffPassed}`);
   console.log('  ✅ Delivery ETA Engine functioning accurately!');
 
-  // 5. Test Guest Checkout Session Creation
-  console.log('\n--- 3. Guest Checkout Session Creation ---');
-  // Create guest cart first
-  const guestId = `guest_test_${Date.now()}`;
-  const cart = await prisma.cart.create({
-    data: {
-      guestId,
-      items: {
-        create: {
-          productId: product.id,
-          quantity: 1,
-          unitPrice: product.price,
-          productName: product.name,
-          primaryImage: '',
-
-        },
+  // 5. Test User Checkout Session Creation
+  console.log('\n--- 3. User Checkout Session Creation ---');
+  let user = await prisma.user.findFirst();
+  if (!user) {
+    // Create test user if none exists
+    const bcrypt = require('bcrypt');
+    const passwordHash = await bcrypt.hash('Test@12345', 10);
+    user = await prisma.user.create({
+      data: {
+        email: `verification.test.${Date.now()}@test.com`,
+        passwordHash,
+        firstName: 'Verification',
+        lastName: 'Tester',
+        role: 'CUSTOMER',
+        phone: '1111111111',
       },
+    });
+  }
+
+  // Create or retrieve user cart
+  let cart = await prisma.cart.findUnique({ where: { userId: user.id } });
+  if (!cart) {
+    cart = await prisma.cart.create({ data: { userId: user.id } });
+  }
+
+  // Add item to cart
+  const cartItem = await prisma.cartItem.create({
+    data: {
+      cartId: cart.id,
+      productId: product.id,
+      quantity: 1,
+      unitPrice: product.price,
+      productName: product.name,
+      primaryImage: '',
     },
-    include: { items: true },
   });
 
-  const guestSession = await checkoutService.getOrCreateSession(undefined, guestId);
-  console.log(`   Session Token: ${guestSession.sessionToken}`);
-  console.log(`   Is Guest: ${guestSession.isGuest}`);
-  console.log(`   Status: ${guestSession.status}`);
-  console.log('  ✅ Guest Checkout Session created successfully!');
+  const userSession = await checkoutService.getOrCreateSession(user.id);
+  console.log(`   Session Token: ${userSession.sessionToken}`);
+  console.log(`   Is Guest: ${userSession.isGuest}`);
+  console.log(`   Status: ${userSession.status}`);
+  console.log('  ✅ User Checkout Session created successfully!');
 
-  // Clean up test cart and session
+  // Clean up test cart items and session
   await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
-  await prisma.cart.delete({ where: { id: cart.id } });
-  await prisma.checkoutSession.delete({ where: { id: guestSession.id } });
+  await prisma.checkoutSession.delete({ where: { id: userSession.id } });
   console.log('\n✅ Test data cleaned up cleanly.');
 
   console.log('\n======================================================');

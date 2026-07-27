@@ -82,7 +82,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   Shipping and taxes calculated at checkout.
                 </p>
                 <Link 
-                  to={isAuthenticated ? "/checkout" : "/auth/signup?redirect=/checkout"}
+                  to={isAuthenticated ? "/checkout" : "/auth/login?redirect=/checkout"}
                   onClick={onClose}
                   className="block w-full text-center bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] px-9 py-4 font-sans text-xs tracking-[0.15em] uppercase cursor-pointer hover:bg-neutral-800 transition-colors no-underline rounded-sm shadow-sm"
                 >

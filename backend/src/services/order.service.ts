@@ -225,7 +225,7 @@ export const orderService = {
           orderId: order.id,
           reason: riskEval.auditDetail || 'Manual review required',
           riskScore: riskEval.trustScore,
-        });
+        }, tx);
       }
 
       // Create Order Items

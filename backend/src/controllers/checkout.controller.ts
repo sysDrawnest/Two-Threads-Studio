@@ -18,11 +18,10 @@ export const checkoutController = {
    */
   createOrResumeSession: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id;
-      const guestId = req.headers['x-guest-id'] as string;
+      const userId = req.user!.id;
       const sessionToken = (req.body?.sessionToken || req.query?.sessionToken) as string;
 
-      const session = await checkoutService.getOrCreateSession(userId, guestId, sessionToken);
+      const session = await checkoutService.getOrCreateSession(userId, sessionToken);
       return successResponse(res, { session }, 'Checkout session active', HTTP_STATUS.OK);
     } catch (err) {
       next(err);
@@ -35,11 +34,10 @@ export const checkoutController = {
    */
   getSummary: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id;
-      const guestId = req.headers['x-guest-id'] as string;
+      const userId = req.user!.id;
       const sessionToken = (req.query?.sessionToken || req.headers['x-session-token']) as string;
 
-      const summary = await checkoutService.getCheckoutSummary(sessionToken, userId, guestId);
+      const summary = await checkoutService.getCheckoutSummary(sessionToken, userId);
       return successResponse(res, summary, 'Checkout summary retrieved');
     } catch (err) {
       next(err);

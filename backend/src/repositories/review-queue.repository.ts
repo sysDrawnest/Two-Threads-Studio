@@ -6,12 +6,16 @@ import { ManualReviewQueue, ReviewStatus } from '@prisma/client';
 import prisma from '../prisma';
 
 export const reviewQueueRepository = {
-  enqueue: async (data: {
-    orderId: string;
-    reason: string;
-    riskScore: number;
-  }): Promise<ManualReviewQueue> => {
-    return prisma.manualReviewQueue.upsert({
+  enqueue: async (
+    data: {
+      orderId: string;
+      reason: string;
+      riskScore: number;
+    },
+    tx?: any
+  ): Promise<ManualReviewQueue> => {
+    const client = tx || prisma;
+    return client.manualReviewQueue.upsert({
       where: { orderId: data.orderId },
       create: data,
       update: { reason: data.reason, riskScore: data.riskScore, status: ReviewStatus.PENDING },

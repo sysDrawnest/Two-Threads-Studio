@@ -412,7 +412,7 @@ export const cartService = {
           },
         });
 
-        const targetQty = (existingUserItem?.quantity || 0) + guestItem.quantity;
+        let targetQty = (existingUserItem?.quantity || 0) + guestItem.quantity;
 
         // Verify stock for target qty
         const product = await tx.product.findUnique({
@@ -431,6 +431,7 @@ export const cartService = {
           if (availableStock < targetQty) {
             // Adjust to max available stock instead of hard crash, or skip if completely zero
             if (availableStock <= 0) continue;
+            targetQty = availableStock;
           }
         }
 
@@ -452,7 +453,7 @@ export const cartService = {
               cartId: userCart.id,
               productId: guestItem.productId,
               variantId: guestItem.variantId,
-              quantity: guestItem.quantity,
+              quantity: targetQty,
               unitPrice: guestItem.unitPrice,
               productName: guestItem.productName,
               primaryImage: guestItem.primaryImage,

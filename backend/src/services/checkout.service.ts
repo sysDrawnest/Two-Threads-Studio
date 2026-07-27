@@ -68,8 +68,7 @@ export const checkoutService = {
    * Creates or resumes an active CheckoutSession.
    */
   getOrCreateSession: async (
-    userId?: string,
-    guestId?: string,
+    userId: string,
     sessionTokenInput?: string
   ) => {
     await checkoutService.ensureDefaultShippingMethods();
@@ -87,11 +86,10 @@ export const checkoutService = {
     }
 
     // 2. Fetch user's cart items
-    const cart = userId
-      ? await prisma.cart.findUnique({ where: { userId }, include: { items: true } })
-      : guestId
-      ? await prisma.cart.findUnique({ where: { guestId }, include: { items: true } })
-      : null;
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { items: true },
+    });
 
     if (!cart || cart.items.length === 0) {
       throw new AppError('Cart is empty. Add items before proceeding to checkout.', HTTP_STATUS.BAD_REQUEST);
@@ -117,36 +115,32 @@ export const checkoutService = {
     const sessionToken = `chk_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
 
-    // Fetch user details if registered
-    let userEmail: string | undefined;
-    let userPhone: string | undefined;
-    let userName: string | undefined;
+    // Fetch user details
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { addresses: { where: { deletedAt: null } } },
+    });
+
+    if (!user) {
+      throw new AppError('User account not found.', HTTP_STATUS.NOT_FOUND);
+    }
+
+    const userEmail = user.email;
+    const userPhone = user.phone || undefined;
+    const userName = `${user.firstName} ${user.lastName}`.trim();
     let defaultShippingAddressId: string | undefined;
 
-    if (userId) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: { addresses: { where: { deletedAt: null } } },
-      });
-
-      if (user) {
-        userEmail = user.email;
-        userPhone = user.phone || undefined;
-        userName = `${user.firstName} ${user.lastName}`;
-
-        const defaultAddr = user.addresses.find((a) => a.isDefaultShipping) || user.addresses[0];
-        if (defaultAddr) {
-          defaultShippingAddressId = defaultAddr.id;
-        }
-      }
+    const defaultAddr = user.addresses.find((a) => a.isDefaultShipping) || user.addresses[0];
+    if (defaultAddr) {
+      defaultShippingAddressId = defaultAddr.id;
     }
 
     const session = await prisma.checkoutSession.create({
       data: {
         sessionToken,
-        userId: userId || null,
-        isGuest: !userId,
-        customerEmail: userEmail || null,
+        userId,
+        isGuest: false,
+        customerEmail: userEmail,
         customerPhone: userPhone || null,
         customerName: userName || null,
         shippingAddressId: defaultShippingAddressId || null,
@@ -378,15 +372,14 @@ export const checkoutService = {
   /**
    * Gets live server-authoritative checkout summary (items, prices, ETAs, shipping methods).
    */
-  getCheckoutSummary: async (sessionToken: string, userId?: string, guestId?: string) => {
-    const session = await checkoutService.getOrCreateSession(userId, guestId, sessionToken);
+  getCheckoutSummary: async (sessionToken: string, userId: string) => {
+    const session = await checkoutService.getOrCreateSession(userId, sessionToken);
 
     // Fetch active cart items
-    const cart = session.userId
-      ? await prisma.cart.findUnique({ where: { userId: session.userId }, include: { items: true } })
-      : guestId
-      ? await prisma.cart.findUnique({ where: { guestId }, include: { items: true } })
-      : null;
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { items: true },
+    });
 
     const cartItems = cart?.items || [];
 
