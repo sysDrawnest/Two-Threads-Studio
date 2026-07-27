@@ -12,6 +12,13 @@ export class MockOtpProvider implements OtpProvider {
   readonly name = 'MOCK';
 
   async sendOtp(recipient: string, otp: string, purpose: string): Promise<OtpSendResult> {
+    console.log('\n==================================================');
+    console.log(`📱 [DEV OTP GENERATED]`);
+    console.log(`Phone/Recipient : ${recipient}`);
+    console.log(`Purpose         : ${purpose}`);
+    console.log(`🔑 OTP CODE     : ${otp}`);
+    console.log('==================================================\n');
+
     logger.info(
       { recipient, purpose, otp },
       '[MockOtpProvider] 📱 OTP (dev only — never log in production)'

@@ -47,7 +47,12 @@ export const otpService = {
     }
 
     logger.info({ userId, recipient, purpose, provider: otpProvider.name }, '[OtpService] OTP sent');
-    return { sent: true, provider: otpProvider.name };
+    const isDev = process.env.NODE_ENV !== 'production';
+    return { 
+      sent: true, 
+      provider: otpProvider.name,
+      ...(isDev ? { developmentOtp: rawOtp } : {}) 
+    };
   },
 
   /**
