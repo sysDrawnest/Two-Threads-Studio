@@ -8,6 +8,8 @@ import prisma from '../prisma';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
 
+import { promotionsEngine } from './PromotionsEngine';
+
 export interface CartItemCalculationInput {
   productId: string;
   variantId?: string | null;
@@ -24,6 +26,9 @@ export interface PricingCalculationResult {
     productName: string;
   }>;
   subtotal: number;
+  discount: number;
+  couponCode?: string | null;
+  couponTitle?: string | null;
   shipping: number;
   shippingMethodId?: string | null;
   shippingMethodName?: string;
@@ -37,14 +42,16 @@ export interface PricingCalculationResult {
 
 export const pricingEngine = {
   /**
-   * Calculates current authoritative cart/checkout totals based on DB studio settings
-   * and selected shipping/payment methods.
+   * Calculates current authoritative cart/checkout totals based on DB studio settings,
+   * selected shipping/payment methods, and applied coupons/promotions.
    */
   calculateTotals: async (params: {
     items: CartItemCalculationInput[];
     shippingMethodId?: string | null;
     paymentMethod?: 'ONLINE' | 'COD' | 'BANK_TRANSFER' | null;
     shippingState?: string | null;
+    couponCode?: string | null;
+    userId?: string | null;
   }): Promise<PricingCalculationResult> => {
     // 1. Fetch Business Settings (Singleton)
     const settings = await prisma.studioSettings.findUnique({
@@ -66,6 +73,8 @@ export const pricingEngine = {
         name: true,
         price: true,
         status: true,
+        categoryId: true,
+        collectionId: true,
         variants: {
           select: { id: true, value: true, priceAdjustment: true },
         },
@@ -95,7 +104,6 @@ export const pricingEngine = {
         }
       }
 
-
       const lineTotal = Number((unitPrice * item.quantity).toFixed(2));
       subtotal += lineTotal;
 
@@ -106,16 +114,41 @@ export const pricingEngine = {
         unitPrice,
         lineTotal,
         productName: product.name,
+        categoryId: product.categoryId,
+        collectionId: product.collectionId,
       };
     });
 
     subtotal = Number(subtotal.toFixed(2));
 
-    // 4. Calculate Shipping Charge
+    // 4. Evaluate Coupon & Promotion Discount
+    let discount = 0;
+    let couponTitle: string | undefined;
+    let isCouponFreeShipping = false;
+
+    if (params.couponCode) {
+      const couponEval = await promotionsEngine.evaluateCoupon({
+        code: params.couponCode,
+        userId: params.userId,
+        items: calculatedItems,
+        subtotal,
+      });
+
+      discount = couponEval.discountAmount;
+      couponTitle = couponEval.coupon.title;
+      isCouponFreeShipping = couponEval.freeShipping;
+    }
+
+    const discountedSubtotal = Math.max(0, subtotal - discount);
+
+    // 5. Calculate Shipping Charge
     let shipping = 0;
     let selectedShippingMethodName = 'Standard Shipping';
 
-    if (params.shippingMethodId) {
+    if (isCouponFreeShipping) {
+      shipping = 0;
+      selectedShippingMethodName = 'Free Coupon Shipping';
+    } else if (params.shippingMethodId) {
       const method = await prisma.shippingMethod.findUnique({
         where: { id: params.shippingMethodId },
       });
@@ -123,44 +156,47 @@ export const pricingEngine = {
       if (method && method.isEnabled) {
         selectedShippingMethodName = method.name;
         const minForFree = method.minOrderForFree ? Number(method.minOrderForFree) : freeShippingThreshold;
-        if (subtotal >= minForFree) {
+        if (discountedSubtotal >= minForFree) {
           shipping = 0;
         } else {
           shipping = Number(method.basePrice);
         }
       } else {
-        // Fallback standard shipping calculation
-        shipping = subtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
+        shipping = discountedSubtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
       }
     } else {
-      // Default rule from StudioSettings
-      shipping = subtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
+      shipping = discountedSubtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
     }
 
     shipping = Number(shipping.toFixed(2));
 
-    // 5. Calculate GST Tax
+    // 6. Calculate GST Tax on discounted subtotal
     let tax = 0;
     if (gstPercent > 0) {
       if (gstMode === 'exclusive') {
-        tax = Number(((subtotal * gstPercent) / 100).toFixed(2));
+        tax = Number(((discountedSubtotal * gstPercent) / 100).toFixed(2));
       } else {
-        // GST Inclusive: portion of subtotal that is tax
-        tax = Number((subtotal - subtotal / (1 + gstPercent / 100)).toFixed(2));
+        tax = Number((discountedSubtotal - discountedSubtotal / (1 + gstPercent / 100)).toFixed(2));
       }
     }
 
-    // 6. Calculate COD Fee
+    // 7. Calculate COD Fee
     const codFee = params.paymentMethod === 'COD' ? Number(codExtraCharge.toFixed(2)) : 0;
 
-    // 7. Calculate Grand Total
+    // 8. Calculate Grand Total
     const grandTotal = Number(
-      (gstMode === 'exclusive' ? subtotal + shipping + tax + codFee : subtotal + shipping + codFee).toFixed(2)
+      (gstMode === 'exclusive'
+        ? discountedSubtotal + shipping + tax + codFee
+        : discountedSubtotal + shipping + codFee
+      ).toFixed(2)
     );
 
     return {
       items: calculatedItems,
       subtotal,
+      discount,
+      couponCode: params.couponCode || null,
+      couponTitle: couponTitle || null,
       shipping,
       shippingMethodId: params.shippingMethodId,
       shippingMethodName: selectedShippingMethodName,
@@ -173,3 +209,4 @@ export const pricingEngine = {
     };
   },
 };
+

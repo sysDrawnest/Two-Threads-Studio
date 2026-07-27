@@ -65,7 +65,13 @@ import checkoutRoutes from './checkout.routes';
 
 router.use('/checkout', checkoutRoutes);
 
+// Phase 7.2 — Promotions & Coupon Engine
+import couponRoutes from './coupon.routes';
+
+router.use('/coupons', couponRoutes);
+
 export default router;
+
 
 
 

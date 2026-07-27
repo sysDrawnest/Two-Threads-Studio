@@ -1130,6 +1130,7 @@ model CheckoutSession {
   shippingAddressId String?
   billingAddressId  String?
   shippingMethodId  String?
+  couponCode        String?
   paymentMethod     PaymentMethod?        @default(ONLINE)
 
   step              CheckoutStep          @default(INFORMATION)
@@ -1149,3 +1150,111 @@ model CheckoutSession {
   @@index([expiresAt])
   @@map("checkout_sessions")
 }
+
+// ─────────────────────────────────────────────
+// Phase 7.2 — Promotions & Coupon Engine Models
+// ─────────────────────────────────────────────
+
+enum PromotionType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+  BUY_X_GET_Y
+  CATEGORY_DISCOUNT
+  COLLECTION_DISCOUNT
+  PRODUCT_DISCOUNT
+  FIRST_ORDER
+  BIRTHDAY
+  VIP
+  FLASH_SALE
+}
+
+model Coupon {
+  id                     String        @id @default(cuid())
+  code                   String        @unique // Uppercase coupon code, e.g. WELCOME10
+  title                  String
+  description            String?
+  type                   PromotionType @default(PERCENTAGE)
+  discountValue          Decimal       @db.Decimal(10, 2) // Percentage or fixed amount
+  maxDiscountAmount      Decimal?      @db.Decimal(10, 2) // Cap for percentage discounts
+  minCartSubtotal        Decimal       @default(0) @db.Decimal(10, 2)
+  
+  usageLimit             Int?          // Global max redemptions
+  perUserLimit           Int           @default(1)
+  usedCount              Int           @default(0)
+
+  startDate              DateTime
+  endDate                DateTime?
+
+  isStackable            Boolean       @default(false)
+  isExclusive            Boolean       @default(false)
+  isActive               Boolean       @default(true)
+
+  eligibleCategories     String[]
+  eligibleCollections    String[]
+  eligibleProducts       String[]
+  eligibleCustomerTiers  String[]
+
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  deletedAt              DateTime?
+
+  usages                 CouponUsage[]
+
+  @@index([code])
+  @@index([isActive, startDate, endDate])
+  @@map("coupons")
+}
+
+model Promotion {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  type        PromotionType
+  priority    Int             @default(0)
+  isActive    Boolean         @default(true)
+  isAutomatic Boolean         @default(true)
+  startDate   DateTime
+  endDate     DateTime?
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  rules       PromotionRule[]
+
+  @@index([isActive, isAutomatic, priority(sort: Desc)])
+  @@map("promotions")
+}
+
+model PromotionRule {
+  id          String    @id @default(cuid())
+  promotionId String
+  ruleName    String
+  conditions  Json
+  actions     Json
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+
+  @@map("promotion_rules")
+}
+
+model CouponUsage {
+  id             String   @id @default(cuid())
+  couponId       String
+  userId         String?
+  orderId        String?
+  cartId         String?
+  discountAmount Decimal  @db.Decimal(10, 2)
+  usedAt         DateTime @default(now())
+
+  coupon         Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@index([couponId])
+  @@index([userId])
+  @@index([orderId])
+  @@map("coupon_usages")
+}
+

@@ -289,6 +289,93 @@ export const checkoutService = {
   },
 
   /**
+   * Applies coupon to active checkout session and updates server pricing snapshot.
+   */
+  applyCoupon: async (sessionToken: string, code: string) => {
+    const session = await prisma.checkoutSession.findUnique({
+      where: { sessionToken },
+    });
+
+    if (!session || session.status !== 'ACTIVE') {
+      throw new AppError('Checkout session expired or invalid.', HTTP_STATUS.NOT_FOUND);
+    }
+
+    const cart = session.userId
+      ? await prisma.cart.findUnique({ where: { userId: session.userId }, include: { items: true } })
+      : null;
+
+    const cartItems = cart?.items || [];
+    if (cartItems.length === 0) {
+      throw new AppError('Cart is empty. Add items before applying coupons.', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    // Verify coupon validity and calculate new pricing
+    const pricing = await pricingEngine.calculateTotals({
+      items: cartItems.map((i) => ({
+        productId: i.productId,
+        variantId: i.variantId,
+        quantity: i.quantity,
+      })),
+      shippingMethodId: session.shippingMethodId,
+      paymentMethod: session.paymentMethod as any,
+      couponCode: code,
+      userId: session.userId,
+    });
+
+    const updated = await prisma.checkoutSession.update({
+      where: { sessionToken },
+      data: {
+        couponCode: code.trim().toUpperCase(),
+        pricingSnapshot: pricing as any,
+      },
+      include: { shippingMethod: true },
+    });
+
+    return { session: updated, pricing };
+  },
+
+  /**
+   * Removes applied coupon from checkout session.
+   */
+  removeCoupon: async (sessionToken: string) => {
+    const session = await prisma.checkoutSession.findUnique({
+      where: { sessionToken },
+    });
+
+    if (!session || session.status !== 'ACTIVE') {
+      throw new AppError('Checkout session expired or invalid.', HTTP_STATUS.NOT_FOUND);
+    }
+
+    const cart = session.userId
+      ? await prisma.cart.findUnique({ where: { userId: session.userId }, include: { items: true } })
+      : null;
+
+    const cartItems = cart?.items || [];
+    const pricing = await pricingEngine.calculateTotals({
+      items: cartItems.map((i) => ({
+        productId: i.productId,
+        variantId: i.variantId,
+        quantity: i.quantity,
+      })),
+      shippingMethodId: session.shippingMethodId,
+      paymentMethod: session.paymentMethod as any,
+      couponCode: null,
+      userId: session.userId,
+    });
+
+    const updated = await prisma.checkoutSession.update({
+      where: { sessionToken },
+      data: {
+        couponCode: null,
+        pricingSnapshot: pricing as any,
+      },
+      include: { shippingMethod: true },
+    });
+
+    return { session: updated, pricing };
+  },
+
+  /**
    * Gets live server-authoritative checkout summary (items, prices, ETAs, shipping methods).
    */
   getCheckoutSummary: async (sessionToken: string, userId?: string, guestId?: string) => {
@@ -303,7 +390,7 @@ export const checkoutService = {
 
     const cartItems = cart?.items || [];
 
-    // 1. Calculate live server pricing
+    // 1. Calculate live server pricing including coupon
     const pricing = await pricingEngine.calculateTotals({
       items: cartItems.map((i) => ({
         productId: i.productId,
@@ -312,6 +399,8 @@ export const checkoutService = {
       })),
       shippingMethodId: session.shippingMethodId,
       paymentMethod: session.paymentMethod as any,
+      couponCode: session.couponCode,
+      userId: session.userId,
     });
 
     // 2. Calculate live delivery ETAs
@@ -345,6 +434,7 @@ export const checkoutService = {
         shippingAddressId: session.shippingAddressId,
         billingAddressId: session.billingAddressId,
         shippingMethodId: session.shippingMethodId,
+        couponCode: session.couponCode,
         paymentMethod: session.paymentMethod,
         expiresAt: session.expiresAt,
       },
@@ -356,3 +446,4 @@ export const checkoutService = {
     };
   },
 };
+

@@ -67,7 +67,8 @@ async function runVerification() {
           quantity: 1,
           unitPrice: product.price,
           productName: product.name,
-          primaryImage: product.primaryImage || '',
+          primaryImage: '',
+
         },
       },
     },
