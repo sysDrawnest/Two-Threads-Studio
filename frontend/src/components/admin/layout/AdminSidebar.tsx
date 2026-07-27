@@ -16,7 +16,8 @@ import {
   Sun,
   FolderKanban,
   Tags,
-  Percent
+  Percent,
+  PanelLeftClose
 } from 'lucide-react';
 import { cn } from '../ui/AdminBadge';
 import { useAuth } from '../../../context/AuthContext';
@@ -26,9 +27,10 @@ interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isCollapsed = false }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse }) => {
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -65,13 +67,25 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose, isC
 
   const sidebarContent = (
     <div className="flex h-full flex-col bg-[#fef8f3] dark:bg-[#171311] border-r border-[#c8b5aa]/60 dark:border-[#3d332b] transition-colors duration-200">
-      <div className="flex h-16 shrink-0 items-center px-6">
+      <div className="flex h-16 shrink-0 items-center px-6 justify-between">
         <h1 className="font-serif text-xl font-medium tracking-tight text-[#1f1610] dark:text-[#ffffff]">
           TWO THREADS <span className="font-sans text-[11px] uppercase tracking-widest text-[#786455] dark:text-[#ccb08a] block mt-0.5 font-medium">Admin OS</span>
         </h1>
-        <button onClick={onClose} aria-label="Close menu" className="ml-auto md:hidden text-[#1f1610] dark:text-[#ffffff]">
-          <X className="h-5 w-5" />
-        </button>
+        <div className="flex items-center">
+          <button onClick={onClose} aria-label="Close menu" className="md:hidden text-[#1f1610] dark:text-[#ffffff] p-1">
+            <X className="h-5 w-5" />
+          </button>
+          {onToggleCollapse && (
+            <button 
+              onClick={onToggleCollapse} 
+              aria-label="Hide sidebar" 
+              className="hidden md:flex text-[#786455] dark:text-[#ccb08a] hover:text-[#1f1610] dark:hover:text-[#ffffff] p-1 transition-colors"
+              title="Hide sidebar"
+            >
+              <PanelLeftClose className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-6">
