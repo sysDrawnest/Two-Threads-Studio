@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PromotionType } from '@prisma/client';
 
-export const createCouponAdminSchema = z.object({
+const couponBodySchema = z.object({
   code: z
     .string()
     .min(3, 'Code must be at least 3 characters')
@@ -31,7 +31,13 @@ export const createCouponAdminSchema = z.object({
   eligibleCustomerTiers: z.array(z.string()).default([]),
 });
 
-export const updateCouponAdminSchema = createCouponAdminSchema.partial().omit({ code: true });
+export const createCouponAdminSchema = z.object({
+  body: couponBodySchema
+});
 
-export type CreateCouponAdminDto = z.infer<typeof createCouponAdminSchema>;
-export type UpdateCouponAdminDto = z.infer<typeof updateCouponAdminSchema>;
+export const updateCouponAdminSchema = z.object({
+  body: couponBodySchema.partial().omit({ code: true })
+});
+
+export type CreateCouponAdminDto = z.infer<typeof createCouponAdminSchema>['body'];
+export type UpdateCouponAdminDto = z.infer<typeof updateCouponAdminSchema>['body'];
