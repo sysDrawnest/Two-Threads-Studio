@@ -7,6 +7,9 @@ import {
   useUpdateCoupon,
 } from '../../hooks/useAdminPromotions';
 import { toast } from 'react-hot-toast';
+import Select from 'react-select';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 export const CouponForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,10 +37,34 @@ export const CouponForm: React.FC = () => {
   const [isStackable, setIsStackable] = useState(false);
   const [isExclusive, setIsExclusive] = useState(true);
 
-  // Rule Targeting inputs (comma separated strings converted to arrays)
-  const [eligibleCategories, setEligibleCategories] = useState('');
-  const [eligibleCollections, setEligibleCollections] = useState('');
-  const [eligibleProducts, setEligibleProducts] = useState('');
+  // Rule Targeting inputs
+  const [eligibleCategories, setEligibleCategories] = useState<string[]>([]);
+  const [eligibleCollections, setEligibleCollections] = useState<string[]>([]);
+  const [eligibleProducts, setEligibleProducts] = useState<string[]>([]);
+
+  // Fetch catalog options for multiselects
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+  const { data: categoryOptions = [] } = useQuery({
+    queryKey: ['adminCategoryOptions'],
+    queryFn: async () => {
+      const res = await axios.get(`${API_URL}/categories`);
+      return res.data.data.categories.map((c: any) => ({ value: c.id, label: c.name }));
+    }
+  });
+  const { data: collectionOptions = [] } = useQuery({
+    queryKey: ['adminCollectionOptions'],
+    queryFn: async () => {
+      const res = await axios.get(`${API_URL}/collections`);
+      return res.data.data.collections.map((c: any) => ({ value: c.id, label: c.name }));
+    }
+  });
+  const { data: productOptions = [] } = useQuery({
+    queryKey: ['adminProductOptions'],
+    queryFn: async () => {
+      const res = await axios.get(`${API_URL}/products?limit=1000`);
+      return res.data.data.products.map((p: any) => ({ value: p.id, label: p.name }));
+    }
+  });
 
   // Populate data in edit mode
   useEffect(() => {
@@ -64,9 +91,9 @@ export const CouponForm: React.FC = () => {
         setEndDate(new Date(c.endDate).toISOString().slice(0, 16));
       }
 
-      setEligibleCategories(c.eligibleCategories?.join(', ') || '');
-      setEligibleCollections(c.eligibleCollections?.join(', ') || '');
-      setEligibleProducts(c.eligibleProducts?.join(', ') || '');
+      setEligibleCategories(c.eligibleCategories || []);
+      setEligibleCollections(c.eligibleCollections || []);
+      setEligibleProducts(c.eligibleProducts || []);
     }
   }, [isEdit, detail]);
 
@@ -102,9 +129,9 @@ export const CouponForm: React.FC = () => {
       isActive,
       isStackable,
       isExclusive,
-      eligibleCategories: eligibleCategories ? eligibleCategories.split(',').map((s) => s.trim()) : [],
-      eligibleCollections: eligibleCollections ? eligibleCollections.split(',').map((s) => s.trim()) : [],
-      eligibleProducts: eligibleProducts ? eligibleProducts.split(',').map((s) => s.trim()) : [],
+      eligibleCategories,
+      eligibleCollections,
+      eligibleProducts,
     };
 
     try {
@@ -281,39 +308,45 @@ export const CouponForm: React.FC = () => {
               <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">
                 Eligible Target Criteria
               </h2>
-              <p className="text-[10px] text-zinc-400 font-mono">List target IDs separated by commas. Leave empty for storewide application.</p>
+              <p className="text-[10px] text-zinc-400 font-mono">Select specific targets. Leave empty for storewide application.</p>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-[10px] uppercase font-mono tracking-wider text-zinc-500 mb-1">Eligible Categories</label>
-                  <input
-                    type="text"
-                    placeholder="cat-1, cat-2, cat-3"
-                    value={eligibleCategories}
-                    onChange={(e) => setEligibleCategories(e.target.value)}
-                    className="w-full border border-zinc-200 p-2.5 text-xs font-mono focus:border-zinc-950 focus:outline-none bg-white"
+                  <Select
+                    isMulti
+                    options={categoryOptions}
+                    value={categoryOptions.filter((o: any) => eligibleCategories.includes(o.value))}
+                    onChange={(selected) => setEligibleCategories(selected.map((s: any) => s.value))}
+                    placeholder="Select categories..."
+                    className="text-xs"
+                    styles={{ control: (base) => ({ ...base, borderColor: '#e4e4e7', padding: '2px', borderRadius: 0 }) }}
                   />
                 </div>
 
                 <div>
                   <label className="block text-[10px] uppercase font-mono tracking-wider text-zinc-500 mb-1">Eligible Collections</label>
-                  <input
-                    type="text"
-                    placeholder="coll-summer, coll-premium"
-                    value={eligibleCollections}
-                    onChange={(e) => setEligibleCollections(e.target.value)}
-                    className="w-full border border-zinc-200 p-2.5 text-xs font-mono focus:border-zinc-950 focus:outline-none bg-white"
+                  <Select
+                    isMulti
+                    options={collectionOptions}
+                    value={collectionOptions.filter((o: any) => eligibleCollections.includes(o.value))}
+                    onChange={(selected) => setEligibleCollections(selected.map((s: any) => s.value))}
+                    placeholder="Select collections..."
+                    className="text-xs"
+                    styles={{ control: (base) => ({ ...base, borderColor: '#e4e4e7', padding: '2px', borderRadius: 0 }) }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase font-mono tracking-wider text-zinc-500 mb-1">Eligible Products (IDs)</label>
-                  <input
-                    type="text"
-                    placeholder="prod-p1, prod-p2"
-                    value={eligibleProducts}
-                    onChange={(e) => setEligibleProducts(e.target.value)}
-                    className="w-full border border-zinc-200 p-2.5 text-xs font-mono focus:border-zinc-950 focus:outline-none bg-white"
+                  <label className="block text-[10px] uppercase font-mono tracking-wider text-zinc-500 mb-1">Eligible Products</label>
+                  <Select
+                    isMulti
+                    options={productOptions}
+                    value={productOptions.filter((o: any) => eligibleProducts.includes(o.value))}
+                    onChange={(selected) => setEligibleProducts(selected.map((s: any) => s.value))}
+                    placeholder="Select specific products..."
+                    className="text-xs"
+                    styles={{ control: (base) => ({ ...base, borderColor: '#e4e4e7', padding: '2px', borderRadius: 0 }) }}
                   />
                 </div>
               </div>
