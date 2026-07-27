@@ -61,7 +61,7 @@ export const CouponForm: React.FC = () => {
   const { data: productOptions = [] } = useQuery({
     queryKey: ['adminProductOptions'],
     queryFn: async () => {
-      const res = await axios.get(`${API_URL}/products?limit=1000`);
+      const res = await axios.get(`${API_URL}/products?limit=100`);
       return res.data.data.products.map((p: any) => ({ value: p.id, label: p.name }));
     }
   });
