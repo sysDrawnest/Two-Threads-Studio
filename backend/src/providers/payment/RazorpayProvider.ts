@@ -66,8 +66,13 @@ export const razorpayProvider: PaymentProvider = {
         raw: order as unknown as Record<string, unknown>,
       };
     } catch (err: any) {
+      const errorMessage =
+        err?.error?.description ||
+        err?.description ||
+        err?.message ||
+        (typeof err === 'string' ? err : 'Unknown Razorpay error');
       throw new AppError(
-        `Razorpay order creation failed: ${err?.error?.description || err.message}`,
+        `Razorpay order creation failed: ${errorMessage}`,
         HTTP_STATUS.BAD_GATEWAY
       );
     }
