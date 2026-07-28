@@ -274,26 +274,41 @@ export const orderService = {
         });
       }
 
-      return tx.order.findUnique({
-        where: { id: order.id },
-        include: {
-          items: true,
-          statusHistory: {
-            orderBy: { createdAt: 'asc' },
-          },
-          shippingAddress: true,
-          billingAddress: true,
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-              email: true,
-              phone: true,
-              customerRisk: true,
-            },
-          },
+      const dbUser = await tx.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          customerRisk: true,
         },
       });
+
+      return {
+        ...order,
+        items: itemsToCreate.map((item) => ({ ...item, id: `item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}` })),
+        statusHistory: [{
+          id: `hist_${Date.now()}`,
+          orderId: order.id,
+          previousStatus: null,
+          newStatus: OrderStatus.PENDING,
+          changedBy: 'SYSTEM',
+          note: 'Order created successfully',
+          createdAt: new Date(),
+        }],
+        shippingAddress,
+        billingAddress,
+        user: dbUser || {
+          id: userId,
+          firstName: 'Customer',
+          lastName: '',
+          email: '',
+          phone: null,
+          customerRisk: null,
+        },
+      };
     }, { timeout: 20000 });
 
     if (resultOrder) {
