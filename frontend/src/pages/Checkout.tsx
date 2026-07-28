@@ -11,8 +11,24 @@ import {
   openRazorpayPopup,
 } from '../services/paymentService';
 import { riskService, CodEligibilityResponse } from '../services/riskService';
-
-
+import { 
+  ShieldCheck, 
+  ChevronRight, 
+  ChevronDown, 
+  ChevronUp, 
+  Check, 
+  Lock, 
+  Truck, 
+  CreditCard, 
+  Banknote, 
+  Sparkles, 
+  ArrowLeft,
+  ShoppingBag,
+  Info,
+  Clock,
+  UserCheck,
+  AlertCircle
+} from 'lucide-react';
 
 const Checkout: React.FC = () => {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
@@ -52,6 +68,9 @@ const Checkout: React.FC = () => {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState('');
 
+  // Mobile Order Summary Bottom Drawer State
+  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false);
+
 
   useEffect(() => {
     // If cart is empty, redirect to shop
@@ -63,9 +82,9 @@ const Checkout: React.FC = () => {
   // While auth is initialising, show nothing to prevent a false redirect
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-[#FAF9F7] flex flex-col items-center justify-center">
-        <div className="relative w-10 h-10">
-          <div className="absolute inset-0 rounded-full border border-neutral-200" />
+      <div className="min-h-screen bg-[#F7F4F0] flex flex-col items-center justify-center">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border border-[#E3DACF]" />
           <div className="absolute inset-0 rounded-full border border-transparent border-t-[#A34A38] animate-spin" />
         </div>
       </div>
@@ -126,7 +145,7 @@ const Checkout: React.FC = () => {
   };
 
   const initiateRazorpayPayment = async (order: any) => {
-    setProcessingMessage('Loading secure payment…');
+    setProcessingMessage('Loading secure payment gateway…');
     const scriptLoaded = await loadRazorpayScript();
     if (!scriptLoaded) {
       throw new Error('Failed to load Razorpay. Please check your internet connection.');
@@ -158,6 +177,7 @@ const Checkout: React.FC = () => {
       prefill: {
         name: user?.name || '',
         email: user?.email || '',
+        contact: user?.phone || '',
       },
       theme: { color: '#1C1C1B' },
       handler: async (response) => {
@@ -199,20 +219,16 @@ const Checkout: React.FC = () => {
         notes: undefined,
       });
       const order = orderRes.data || orderRes.order || orderRes;
-
       setPlacedOrderId(order.orderNumber);
 
       if (paymentOption === 'cod') {
-        // COD: confirm directly
-        setProcessingMessage('Confirming COD order…');
+        setProcessingMessage('Confirming COD order...');
         await paymentService.confirmCodOrder(order.id);
         await clearCartMutation.mutateAsync();
         navigate(`/checkout/success?order=${order.orderNumber}`);
-        return;
+      } else {
+        await initiateRazorpayPayment(order);
       }
-
-      // ONLINE: Razorpay flow
-      await initiateRazorpayPayment(order);
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || err.message || '';
       
@@ -266,39 +282,33 @@ const Checkout: React.FC = () => {
       setOtpError(e.response?.data?.message || 'Invalid OTP');
     } finally {
       setIsVerifyingOtp(false);
+      setIsProcessing(false);
+      setProcessingMessage('');
     }
   };
 
 
   if (currentStep === 'confirmation') {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-6 bg-[#FBFBFA]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E")`
-        }}
-      >
-        <div className="relative w-full max-w-[500px] bg-white p-8 md:p-12 border border-[#1C1C1B] shadow-sm before:absolute before:inset-0 before:border before:border-[#A34A38] before:translate-x-2 before:translate-y-2 before:-z-10 rounded-sm text-center">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.2" className="mx-auto mb-6">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M22 4L12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          
-          <h1 className="font-serif text-3xl font-light text-[#1C1C1B] mb-4">Order Confirmed</h1>
-          <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-neutral-400 mb-6">Thank You for Supporting Slow Craft</p>
-          
-          <p className="font-serif text-lg leading-relaxed text-[#1C1C1B] mb-6 italic">
-            "Your order is received with gratitude. Our artisans are preparing your custom embroidery canvas with the highest standard of details."
+      <div className="min-h-screen bg-[#F7F4F0] flex flex-col justify-center items-center p-6 text-center">
+        <div className="max-w-md w-full bg-white border border-[#E3DACF] p-8 md:p-12 rounded-2xl shadow-[0_12px_40px_rgba(28,28,27,0.06)]">
+          <div className="w-16 h-16 bg-[#F9ECE9] text-[#A34A38] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check className="w-8 h-8 stroke-[2.5]" />
+          </div>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-[#A34A38] font-bold block mb-2">Artisan Order Confirmed</span>
+          <h1 className="font-serif text-2xl md:text-3xl text-[#1C1C1B] mb-3">Thank You for Supporting Slow Craft</h1>
+          <p className="text-xs text-[#6E665E] leading-relaxed mb-8">
+            Your order is received with gratitude. Our master artisans are preparing your custom embroidery canvas with meticulous attention to detail.
           </p>
 
-          <div className="bg-[#FAF9F7] border border-neutral-200/60 p-4 rounded-sm mb-8 text-left text-xs font-sans text-neutral-600 flex flex-col gap-2 font-mono">
+          <div className="bg-[#FAF8F5] border border-[#EBE5DF] rounded-xl p-4 mb-8 text-xs text-left space-y-2 font-mono">
             <div className="flex justify-between">
-              <span className="font-semibold text-[#1C1C1B] font-sans">Order Reference:</span>
-              <span className="font-mono text-[#A34A38] font-bold">{placedOrderId}</span>
+              <span className="text-[#8C827A] font-sans">Order Reference:</span>
+              <span className="font-semibold text-[#1C1C1B]">{placedOrderId || 'TTS-PROD'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="font-semibold text-[#1C1C1B] font-sans">Delivery Estimate:</span>
-              <span>3-5 business days</span>
+              <span className="text-[#8C827A] font-sans">Estimated Delivery:</span>
+              <span className="text-[#1C1C1B] font-sans">3–5 Business Days</span>
             </div>
           </div>
 
@@ -306,16 +316,16 @@ const Checkout: React.FC = () => {
             <Link 
               to="/account" 
               onClick={() => resetCheckout()}
-              className="bg-[#1C1C1B] text-[#FAF9F7] py-3.5 font-sans text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors rounded-sm no-underline shadow-sm font-semibold block"
+              className="bg-[#1C1C1B] text-[#FBFBFA] py-3.5 px-6 font-mono text-xs tracking-widest uppercase hover:bg-[#333331] transition-colors rounded-xl no-underline font-semibold block text-center shadow-sm"
             >
-              View Dashboard
+              View Order Dashboard
             </Link>
             <Link 
               to="/shop" 
               onClick={() => resetCheckout()}
-              className="font-sans text-xs tracking-wider uppercase text-neutral-500 hover:text-[#1C1C1B] transition-colors underline underline-offset-4 decoration-neutral-300 block"
+              className="font-mono text-xs tracking-wider uppercase text-[#7A7067] hover:text-[#1C1C1B] transition-colors underline underline-offset-4 decoration-[#D1C7BD] block text-center"
             >
-              Continue Shopping
+              Continue Browsing Collection
             </Link>
           </div>
         </div>
@@ -324,360 +334,479 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1C1B] flex flex-col font-sans selection:bg-[#F9ECE9] selection:text-[#A34A38]">
       
-      {/* Left Column: Form & Steps */}
-      <div className="w-full md:w-3/5 lg:w-2/3 p-6 md:p-12 lg:p-20 bg-white border-r border-neutral-200 min-h-screen flex flex-col">
-        <div className="max-w-2xl mx-auto w-full flex-grow flex flex-col justify-center">
-          
-          <Link to="/" className="font-serif text-2xl tracking-widest text-[#1C1C1B] hover:text-neutral-500 no-underline font-light block mb-12 border-b border-neutral-100 pb-4">
-            TwoThreads Studio
-          </Link>
-
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest font-semibold mb-12 text-neutral-400">
-            <button 
-              type="button" 
-              onClick={() => stepNumber > 1 && goToStep(1)}
-              className={`border-none bg-transparent p-0 uppercase tracking-widest font-semibold cursor-pointer ${stepNumber >= 1 ? "text-[#A34A38]" : "text-neutral-400"}`}
-            >
-              Information
-            </button>
-            <span className="text-neutral-300">/</span>
-            <button 
-              type="button" 
-              onClick={() => stepNumber > 2 && goToStep(2)}
-              className={`border-none bg-transparent p-0 uppercase tracking-widest font-semibold cursor-pointer ${stepNumber >= 2 ? "text-[#A34A38]" : "text-neutral-400"}`}
-            >
-              Shipping
-            </button>
-            <span className="text-neutral-300">/</span>
-            <span className={stepNumber >= 3 ? "text-[#A34A38]" : "text-neutral-400"}>Payment</span>
-          </div>
-
-          <form onSubmit={stepNumber === 1 ? handleShippingSubmit : (e) => { e.preventDefault(); goToStep(stepNumber + 1); }}>
-            
-            {/* Step 1: Information */}
-            {stepNumber === 1 && (
-              <div className="flex flex-col gap-6">
-                {/* 🔒 Secure Checkout Banner */}
-                <div className="bg-[#FAF9F7] border border-[#E8E4DF] p-5 rounded-sm flex gap-3 items-start text-xs text-[#5C544D] font-sans">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="flex-shrink-0 mt-0.5">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                  <div>
-                    <span className="font-semibold text-[#1C1C1B] block mb-1">🔒 Secure Checkout</span>
-                    <span>You're signing in to securely save your order, track deliveries, access invoices, and enjoy faster future purchases.</span>
-                  </div>
-                </div>
-
-                {/* Read-Only Account Details */}
-                <div className="border border-neutral-200 rounded-sm p-5 bg-[#FAF9F7] font-sans">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-xs uppercase tracking-widest text-neutral-400 font-semibold m-0">Logged In Account</h3>
-                    <Link to="/account" className="text-[10px] uppercase tracking-widest text-[#A34A38] hover:text-[#83382a] font-semibold underline decoration-[#A34A38]/30 underline-offset-4">Edit Profile</Link>
-                  </div>
-                  <div className="flex flex-col gap-1 text-sm text-[#1C1C1B]">
-                    <div className="font-medium">{user?.name}</div>
-                    <div className="text-neutral-500 text-xs font-mono">{user?.email}</div>
-                    {user?.phone && <div className="text-neutral-500 text-xs font-mono">{user?.phone}</div>}
-                  </div>
-                </div>
-                
-                <div>
-                  <h2 className="font-serif text-xl text-[#1C1C1B] mb-4">Delivery Address</h2>
-                  <AddressSelector
-                    selectedId={selectedAddress?.id}
-                    onSelect={(addr) => setSelectedAddress(addr)}
-                    type="shipping"
-                  />
-                </div>
-                
-                <div className="flex justify-between items-center mt-6 border-t border-neutral-100 pt-6">
-                  <Link to="/shop" className="text-xs uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] transition-colors no-underline">
-                    &lt; Return to Shop
-                  </Link>
-                  <button type="submit" className="bg-[#1C1C1B] text-[#FAF9F7] px-8 py-4 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors border-none cursor-pointer rounded-sm shadow-sm font-semibold font-mono">
-                    Continue to Shipping
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Shipping */}
-            {stepNumber === 2 && (
-              <div>
-                <div className="border border-neutral-200 rounded-sm p-5 mb-8 flex flex-col gap-4 text-xs text-neutral-600 bg-[#FAF9F7]">
-                  <div className="flex justify-between border-b border-neutral-200 pb-4 font-mono">
-                    <span className="text-neutral-400 w-24 uppercase tracking-wider font-sans">Contact</span>
-                    <span className="flex-1 text-[#1C1C1B]">{shippingInfo?.email}</span>
-                    <button type="button" onClick={() => goToStep(1)} className="text-[10px] uppercase tracking-widest text-[#A34A38] hover:text-[#83382a] underline bg-transparent border-none cursor-pointer font-sans">Change</button>
-                  </div>
-                  <div className="flex justify-between font-sans">
-                    <span className="text-neutral-400 w-24 uppercase tracking-wider">Ship to</span>
-                    <span className="flex-1 text-[#1C1C1B]">{shippingInfo?.addressLine1}, {shippingInfo?.city} {shippingInfo?.state} - <span className="font-mono">{shippingInfo?.zipCode}</span></span>
-                    <button type="button" onClick={() => goToStep(1)} className="text-[10px] uppercase tracking-widest text-[#A34A38] hover:text-[#83382a] underline bg-transparent border-none cursor-pointer">Change</button>
-                  </div>
-                </div>
-
-                <h2 className="font-serif text-xl text-[#1C1C1B] mb-6">Shipping Method</h2>
-                <div className="border border-[#1C1C1B] rounded-sm p-5 mb-8 flex justify-between items-center bg-[#FBFBFA]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full border-4 border-[#A34A38] bg-white"></div>
-                    <span className="text-[#1C1C1B] text-sm font-medium">Standard Courier (3-5 business days)</span>
-                  </div>
-                  <span className="text-[#1C1C1B] font-semibold font-mono">₹{totals.shipping}</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-6 border-t border-neutral-100 pt-6">
-                  <button type="button" onClick={() => goToStep(1)} className="text-xs uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] transition-colors bg-transparent border-none cursor-pointer">
-                    &lt; Return to Information
-                  </button>
-                  <button type="submit" className="bg-[#1C1C1B] text-[#FAF9F7] px-8 py-4 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors border-none cursor-pointer rounded-sm shadow-sm font-semibold font-mono">
-                    Continue to Payment
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Payment */}
-            {stepNumber === 3 && (
-              <div>
-                <h2 className="font-serif text-xl text-[#1C1C1B] mb-2">Payment Methods</h2>
-                <p className="text-xs text-neutral-400 mb-6">All transactions are simulated and secure.</p>
-                
-                {/* Method selector tabs */}
-                <div className="grid grid-cols-2 border border-neutral-200 rounded-t-sm bg-[#FAF9F7]">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentOption('online')}
-                    className={`py-3 font-sans text-xs uppercase tracking-wider border-none transition-all ${
-                      paymentOption === 'online' 
-                        ? 'bg-white font-semibold text-[#1C1C1B] border-r border-neutral-200' 
-                        : 'bg-transparent text-neutral-400 hover:text-[#1C1C1B]'
-                    }`}
-                  >
-                    Pay Online
-                    {codData && codData.prepaidDiscountPct > 0 && (
-                      <span className="ml-2 bg-[#1C1C1B] text-white text-[9px] px-1.5 py-0.5 rounded-sm">-{codData.prepaidDiscountPct}% OFF</span>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={codData?.codEligible === false}
-                    onClick={() => codData?.codEligible !== false && setPaymentOption('cod')}
-                    className={`py-3 flex flex-col items-center justify-center font-sans text-xs uppercase tracking-wider border-none transition-all ${
-                      paymentOption === 'cod' 
-                        ? 'bg-white font-semibold text-[#1C1C1B] border-l border-neutral-200' 
-                        : codData?.codEligible === false
-                        ? 'bg-neutral-100 text-neutral-300 cursor-not-allowed border-l border-neutral-200'
-                        : 'bg-transparent text-neutral-400 hover:text-[#1C1C1B]'
-                    }`}
-                  >
-                    <span>Cash on Delivery</span>
-                  </button>
-                </div>
-                
-                {/* Reason for COD disabled */}
-                {codData && codData.codEligible === false && (
-                  <div className="bg-red-50 text-red-700 text-xs p-3 mt-4 border border-red-100 rounded-sm font-sans flex gap-2">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <span>{codData.reason || 'COD is not available for this order.'}</span>
-                  </div>
-                )}
-
-                {/* Method fields */}
-                <div className="border border-t-0 border-neutral-200 p-6 bg-white rounded-b-sm mb-8 flex flex-col gap-4">
-                  {paymentOption === 'online' ? (
-                    <div className="flex flex-col gap-4 items-center justify-center p-6 text-center text-neutral-500 font-sans text-xs">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mb-2">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                      </svg>
-                      <p>You will be redirected to Razorpay securely to complete your online payment using UPI, Credit/Debit Card, Netbanking, or Wallets.</p>
-                      {codData && codData.prepaidDiscountAmount > 0 && (
-                        <p className="text-[#A34A38] font-semibold text-sm">
-                          Save ₹{codData.prepaidDiscountAmount} by paying online today!
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-4 items-center justify-center p-6 text-center text-neutral-500 font-sans text-xs">
-                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mb-2">
-                         <line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                       </svg>
-                       <p>You can pay via Cash or UPI when the package is delivered to your door.</p>
-                       <p className="italic text-neutral-400">Please keep the exact change ready.</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-between items-center mt-6 border-t border-neutral-100 pt-6">
-                  <button type="button" onClick={() => goToStep(2)} className="text-xs uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] transition-colors bg-transparent border-none cursor-pointer">
-                    &lt; Return to Shipping
-                  </button>
-                  <button type="button" onClick={handlePlaceOrder} className="bg-[#A34A38] text-[#FAF9F7] px-8 py-4 text-xs tracking-widest uppercase hover:bg-[#83382a] transition-colors border-none cursor-pointer rounded-sm shadow-sm font-semibold font-mono">
-                    Complete Order
-                  </button>
-                </div>
-              </div>
-            )}
-
-          </form>
-        </div>
-      </div>
-
-      {/* Right Column: Order Summary */}
-      <div className="w-full md:w-2/5 lg:w-1/3 bg-[#FAF9F7] p-6 md:p-12 lg:p-16 text-sm flex flex-col justify-start">
-        <h2 className="font-serif text-lg text-[#1C1C1B] mb-8 pb-3 border-b border-neutral-200">Order Summary</h2>
-        
-        {isCartLoading ? (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-16 bg-zinc-200" />
-            <div className="h-16 bg-zinc-200" />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-6 mb-8 border-b border-neutral-200 pb-8 flex-grow overflow-y-auto max-h-[350px]">
-            {cartItems.map((item: CartItemType) => (
-              <div key={item.id} className="flex gap-4 items-center text-xs">
-                <div className="relative w-14 h-18 bg-white border border-neutral-200 flex-shrink-0 rounded-sm overflow-hidden">
-                  <img src={item.primaryImage || '/placeholder.png'} alt={item.productName} className="w-full h-full object-cover" />
-                  <span className="absolute -top-1.5 -right-1.5 bg-[#A34A38] text-white w-4.5 h-4.5 flex items-center justify-center rounded-full text-[9px] font-bold z-10 font-mono">{item.quantity}</span>
-                </div>
-                <div className="flex-grow flex flex-col gap-0.5">
-                  <span className="text-[#1C1C1B] font-medium">{item.productName}</span>
-                  {item.variantName && (
-                    <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-mono">Variant: {item.variantName}</span>
-                  )}
-                  {item.customization?.hoopFinish && (
-                    <span className="text-[10px] text-neutral-400 capitalize">Hoop: {item.customization.hoopFinish}</span>
-                  )}
-                  {item.engravingText && (
-                    <span className="text-[10px] text-neutral-400">Engraved: "{item.engravingText}"</span>
-                  )}
-                  {item.giftWrap && (
-                    <span className="text-[10px] text-[#A34A38] font-medium">Bespoke Gift Wrap</span>
-                  )}
-                </div>
-                <span className="text-[#1C1C1B] font-semibold font-mono">₹{item.totalPrice.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-3 mb-6 border-b border-neutral-200 pb-6 text-xs text-neutral-600 font-mono">
-          <div className="flex justify-between">
-            <span className="font-sans">Subtotal</span>
-            <span className="text-[#1C1C1B] font-semibold">₹{totals.subtotal.toLocaleString()}</span>
-          </div>
-          {totals.discount > 0 && (
-            <div className="flex justify-between text-green-600">
-              <span className="font-sans">Discount</span>
-              <span>-₹{totals.discount.toLocaleString()}</span>
-            </div>
-          )}
-          {totals.tax > 0 ? (
-            <div className="flex justify-between">
-              <span className="font-sans">Tax (GST)</span>
-              <span>₹{totals.tax.toLocaleString()}</span>
-            </div>
-          ) : (
-            <div className="flex justify-between text-neutral-400 text-[10px]">
-              <span className="font-sans">GST</span>
-              <span>Inclusive</span>
-            </div>
-          )}
-          <div className="flex justify-between">
-            <span className="font-sans">Shipping Cost</span>
-            <span className="text-[#1C1C1B] font-semibold font-mono">
-              {stepNumber >= 2 ? `₹${totals.shipping}` : 'Calculated at shipping step'}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center text-[#1C1C1B]">
-          <span className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">Total Price</span>
-          <span className="font-sans text-2xl font-bold">
-            <span className="text-xs text-neutral-400 mr-2 font-normal font-mono">INR</span>
-            <span className="font-mono">
-              ₹{(paymentOption === 'online' && codData && codData.prepaidDiscountAmount > 0 
-                  ? (stepNumber >= 2 ? totals.grandTotal : totals.subtotal) - codData.prepaidDiscountAmount 
-                  : (stepNumber >= 2 ? totals.grandTotal : totals.subtotal)
-                ).toLocaleString()}
-            </span>
-          </span>
-        </div>
-      </div>
-
-      {/* Processing Overlay */}
+      {/* Processing Modal Overlay */}
       {isProcessing && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-          <div className="w-12 h-12 border-2 border-neutral-200 border-t-[#A34A38] rounded-full animate-spin mb-6"></div>
-          <p className="font-sans text-sm tracking-widest uppercase text-[#1C1C1B] font-semibold">{processingMessage}</p>
+        <div className="fixed inset-0 z-50 bg-[#1C1C1B]/40 backdrop-blur-md flex flex-col items-center justify-center p-4">
+          <div className="bg-white border border-[#E3DACF] p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-xs w-full text-center space-y-4 animate-fadeIn">
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-2 border-[#EAE4DC]" />
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[#A34A38] animate-spin" />
+            </div>
+            <div>
+              <p className="font-serif text-lg text-[#1C1C1B]">{processingMessage || 'Securing Checkout...'}</p>
+              <p className="text-[11px] font-mono text-[#7A7067] tracking-wider mt-1 uppercase">Please do not close window</p>
+            </div>
+          </div>
         </div>
       )}
 
       {/* OTP Verification Modal */}
       {showOtpModal && (
-        <div className="fixed inset-0 bg-[#1C1C1B]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-w-md w-full p-8 rounded-sm shadow-xl flex flex-col items-center relative">
-            <button 
-              type="button" 
-              onClick={() => {
-                setShowOtpModal(false);
-                setIsProcessing(false);
-              }}
-              className="absolute top-4 right-4 bg-transparent border-none text-neutral-400 hover:text-[#1C1C1B] cursor-pointer"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="mb-4">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-            </svg>
-
-            <h3 className="font-serif text-2xl text-[#1C1C1B] mb-2 text-center">Verify Your Account</h3>
-            <p className="text-sm text-neutral-500 text-center mb-8 font-sans">
-              To ensure the security of your high-value or COD order, we've sent a verification code to <span className="font-semibold text-[#1C1C1B]">{user?.phone || user?.email}</span>.
-            </p>
+        <div className="fixed inset-0 z-50 bg-[#1C1C1B]/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E3DACF] p-6 md:p-8 rounded-2xl shadow-2xl max-w-md w-full space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-[#F9ECE9] text-[#A34A38] rounded-full flex items-center justify-center mx-auto mb-2">
+                <ShieldCheck className="w-6 h-6 stroke-[2]" />
+              </div>
+              <h3 className="font-serif text-xl text-[#1C1C1B]">Security Verification</h3>
+              <p className="text-xs text-[#6E665E] leading-relaxed">
+                To protect your order, a 6-digit verification code has been sent to your phone/email ({user?.phone || user?.email}).
+              </p>
+            </div>
 
             {otpError && (
-              <div className="w-full bg-red-50 text-red-700 text-xs p-3 mb-6 border border-red-100 rounded-sm font-sans text-center">
+              <div className="p-3 bg-[#FDF2F0] border border-[#F5C6CB] text-[#9A2C1D] text-xs font-mono rounded-lg">
                 {otpError}
               </div>
             )}
 
-            <div className="w-full flex flex-col gap-6">
-              <input 
-                type="text" 
+            <div className="space-y-3">
+              <input
+                type="text"
+                maxLength={6}
+                placeholder="6-digit OTP code"
                 value={otpValue}
-                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="Enter 6-digit code"
-                className="w-full p-4 border border-neutral-300 focus:border-[#A34A38] text-center tracking-[0.5em] text-lg font-mono rounded-sm outline-none"
+                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
+                className="w-full text-center font-mono text-lg tracking-[0.4em] py-3 border border-[#E2DBD1] rounded-xl bg-[#FAF8F5] focus:bg-white focus:border-[#1C1C1B] focus:outline-none"
               />
-
               <button
                 type="button"
                 onClick={handleVerifyOtp}
-                disabled={otpValue.length !== 6 || isVerifyingOtp}
-                className="w-full bg-[#1C1C1B] text-white py-4 font-sans text-xs uppercase tracking-widest font-semibold disabled:bg-neutral-300 disabled:cursor-not-allowed transition-colors rounded-sm"
+                disabled={isVerifyingOtp || otpValue.length !== 6}
+                className="w-full py-3 bg-[#1C1C1B] text-white font-mono text-xs uppercase tracking-widest rounded-xl disabled:opacity-50 hover:bg-[#333331] transition-all cursor-pointer font-semibold"
               >
-                {isVerifyingOtp ? 'Verifying...' : 'Verify & Continue'}
+                {isVerifyingOtp ? 'Verifying Code...' : 'Verify & Place Order'}
               </button>
             </div>
-            
-            <button 
-              type="button" 
-              onClick={() => riskService.sendOtp(user?.phone || user?.email || '', 'FIRST_ORDER_VERIFICATION')}
-              className="mt-6 text-xs font-sans uppercase tracking-widest text-neutral-400 hover:text-[#1C1C1B] underline underline-offset-4 bg-transparent border-none cursor-pointer"
-            >
-              Resend Code
-            </button>
           </div>
         </div>
       )}
 
+      {/* Persistent Mobile Bottom Summary Bar (Trigger for Drawer) */}
+      <div className="md:hidden sticky top-0 z-30 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EBE5DF] px-4 py-3 flex items-center justify-between shadow-sm">
+        <button 
+          onClick={() => setIsMobileSummaryOpen(!isMobileSummaryOpen)}
+          className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-[#1C1C1B] bg-transparent border-none cursor-pointer"
+        >
+          <ShoppingBag className="w-4 h-4 text-[#A34A38]" />
+          <span>{isMobileSummaryOpen ? 'Hide Summary' : 'Show Order Summary'}</span>
+          {isMobileSummaryOpen ? <ChevronUp className="w-3.5 h-3.5 text-[#7A7067]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#7A7067]" />}
+        </button>
+        <span className="font-serif text-base font-semibold text-[#1C1C1B]">
+          ₹{totals.grandTotal.toLocaleString()}
+        </span>
+      </div>
 
+      {/* Expandable Mobile Order Summary Drawer */}
+      {isMobileSummaryOpen && (
+        <div className="md:hidden bg-[#F4EFEA] border-b border-[#E3DACF] p-4 space-y-4 animate-fadeIn">
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+            {cartItems.map((item: CartItemType) => (
+              <div key={item.id} className="flex items-center gap-3 text-xs">
+                <div className="relative w-12 h-14 bg-white border border-[#E3DACF] rounded-lg overflow-hidden flex-shrink-0">
+                  <img src={item.primaryImage || '/placeholder.png'} alt={item.productName} className="w-full h-full object-cover" />
+                  <span className="absolute top-0 right-0 bg-[#A34A38] text-white text-[9px] font-mono px-1 rounded-bl-md font-bold">{item.quantity}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-[#1C1C1B] truncate">{item.productName}</p>
+                  {item.variantName && <p className="text-[10px] text-[#7A7067] font-mono uppercase">{item.variantName}</p>}
+                </div>
+                <span className="font-mono text-xs font-semibold text-[#1C1C1B]">₹{item.totalPrice.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-3 border-t border-[#E3DACF] space-y-1.5 font-mono text-xs text-[#5C544D]">
+            <div className="flex justify-between"><span>Subtotal</span><span>₹{totals.subtotal.toLocaleString()}</span></div>
+            {totals.discount > 0 && <div className="flex justify-between text-[#A34A38]"><span>Discount</span><span>-₹{totals.discount.toLocaleString()}</span></div>}
+            <div className="flex justify-between text-[11px] text-[#7A7067]"><span>GST</span><span>Inclusive</span></div>
+            <div className="flex justify-between"><span>Shipping</span><span>{totals.shipping > 0 ? `₹${totals.shipping}` : 'Free'}</span></div>
+          </div>
+        </div>
+      )}
+
+      {/* Atelier Main Layout */}
+      <div className="flex-1 flex flex-col md:flex-row max-w-[1440px] w-full mx-auto">
+        
+        {/* Left Form Area (60% Desktop) */}
+        <main className="w-full md:w-3/5 lg:w-7/12 p-5 sm:p-8 md:p-12 lg:p-16 bg-[#FAF8F5] flex flex-col justify-between">
+          <div className="max-w-xl mx-auto w-full space-y-8">
+            
+            {/* Header Brand Link */}
+            <div className="border-b border-[#EBE5DF] pb-6 flex items-center justify-between">
+              <Link to="/" className="font-serif text-2xl md:text-3xl tracking-widest text-[#1C1C1B] hover:text-[#A34A38] transition-colors no-underline font-light">
+                TwoThreads Studio
+              </Link>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#7A7067] bg-[#EAE4DC]/60 px-2.5 py-1 rounded-full flex items-center gap-1">
+                <Lock className="w-2.5 h-2.5 text-[#A34A38]" /> Atelier Checkout
+              </span>
+            </div>
+
+            {/* Visual Step Progress Indicator */}
+            <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest pt-2 pb-4 border-b border-[#EBE5DF]">
+              <button 
+                type="button" 
+                onClick={() => stepNumber > 1 && goToStep(1)}
+                className={`flex items-center gap-2 bg-transparent border-none cursor-pointer transition-all ${
+                  stepNumber >= 1 ? "text-[#1C1C1B] font-bold" : "text-[#9E948A]"
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  stepNumber > 1 ? "bg-[#A34A38] text-white" : stepNumber === 1 ? "bg-[#1C1C1B] text-white" : "bg-[#EAE4DC] text-[#7A7067]"
+                }`}>
+                  {stepNumber > 1 ? <Check className="w-3 h-3 stroke-[3]" /> : '1'}
+                </span>
+                <span className="hidden sm:inline">Address</span>
+              </button>
+              
+              <div className={`h-px flex-1 mx-3 ${stepNumber >= 2 ? "bg-[#A34A38]" : "bg-[#EAE4DC]"}`} />
+
+              <button 
+                type="button" 
+                onClick={() => stepNumber > 2 && goToStep(2)}
+                className={`flex items-center gap-2 bg-transparent border-none cursor-pointer transition-all ${
+                  stepNumber >= 2 ? "text-[#1C1C1B] font-bold" : "text-[#9E948A]"
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  stepNumber > 2 ? "bg-[#A34A38] text-white" : stepNumber === 2 ? "bg-[#1C1C1B] text-white" : "bg-[#EAE4DC] text-[#7A7067]"
+                }`}>
+                  {stepNumber > 2 ? <Check className="w-3 h-3 stroke-[3]" /> : '2'}
+                </span>
+                <span className="hidden sm:inline">Courier</span>
+              </button>
+
+              <div className={`h-px flex-1 mx-3 ${stepNumber >= 3 ? "bg-[#A34A38]" : "bg-[#EAE4DC]"}`} />
+
+              <div className={`flex items-center gap-2 ${stepNumber >= 3 ? "text-[#1C1C1B] font-bold" : "text-[#9E948A]"}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                  stepNumber === 3 ? "bg-[#1C1C1B] text-white" : "bg-[#EAE4DC] text-[#7A7067]"
+                }`}>
+                  3
+                </span>
+                <span className="hidden sm:inline">Payment</span>
+              </div>
+            </div>
+
+            {/* Form & Step Handler */}
+            <form onSubmit={stepNumber === 1 ? handleShippingSubmit : (e) => { e.preventDefault(); goToStep(stepNumber + 1); }}>
+              
+              {/* STEP 1: INFORMATION & DELIVERY ADDRESS */}
+              {stepNumber === 1 && (
+                <div className="space-y-6">
+                  
+                  {/* Account Summary Banner */}
+                  <div className="bg-white border border-[#E3DACF] rounded-2xl p-5 shadow-[0_4px_20px_rgba(28,28,27,0.02)] space-y-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="w-4 h-4 text-[#A34A38]" />
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-[#7A7067] font-semibold">Account Verified</span>
+                      </div>
+                      <Link to="/account" className="text-[10px] font-mono tracking-widest text-[#A34A38] hover:underline uppercase">Edit Profile</Link>
+                    </div>
+                    <div className="text-xs text-[#1C1C1B]">
+                      <p className="font-semibold">{user?.name}</p>
+                      <p className="text-[#7A7067] font-mono text-[11px]">{user?.email} {user?.phone && `• ${user.phone}`}</p>
+                    </div>
+                  </div>
+
+                  {/* Delivery Address Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-serif text-xl text-[#1C1C1B]">Select Delivery Destination</h2>
+                    </div>
+                    
+                    <AddressSelector
+                      selectedId={selectedAddress?.id}
+                      onSelect={(addr) => setSelectedAddress(addr)}
+                      type="shipping"
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center pt-6 border-t border-[#EBE5DF]">
+                    <Link to="/shop" className="text-xs font-mono uppercase tracking-widest text-[#7A7067] hover:text-[#1C1C1B] transition-colors no-underline flex items-center gap-1.5">
+                      <ArrowLeft className="w-3.5 h-3.5" /> Return to Shop
+                    </Link>
+                    <button 
+                      type="submit" 
+                      className="bg-[#1C1C1B] text-[#FBFBFA] px-8 py-3.5 text-xs font-mono tracking-widest uppercase hover:bg-[#333331] transition-all cursor-pointer rounded-xl font-semibold shadow-sm"
+                    >
+                      Continue to Courier
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: SHIPPING METHOD SELECTION */}
+              {stepNumber === 2 && (
+                <div className="space-y-6">
+                  
+                  {/* Read-Only Information Summary */}
+                  <div className="bg-white border border-[#E3DACF] rounded-2xl p-5 space-y-3 font-mono text-xs shadow-[0_4px_20px_rgba(28,28,27,0.02)]">
+                    <div className="flex justify-between items-center pb-2 border-b border-[#EBE5DF]">
+                      <span className="text-[#7A7067] text-[10px] uppercase tracking-wider font-sans w-20">Contact</span>
+                      <span className="flex-1 text-[#1C1C1B] font-medium">{shippingInfo?.email}</span>
+                      <button type="button" onClick={() => goToStep(1)} className="text-[10px] text-[#A34A38] uppercase underline tracking-wider bg-transparent border-none cursor-pointer">Change</button>
+                    </div>
+                    <div className="flex justify-between items-center font-sans">
+                      <span className="text-[#7A7067] text-[10px] uppercase font-mono tracking-wider w-20">Ship To</span>
+                      <span className="flex-1 text-[#1C1C1B] leading-relaxed">
+                        {shippingInfo?.addressLine1}, {shippingInfo?.city} {shippingInfo?.state} — <span className="font-mono text-[#1C1C1B] font-semibold">{shippingInfo?.zipCode}</span>
+                      </span>
+                      <button type="button" onClick={() => goToStep(1)} className="text-[10px] text-[#A34A38] uppercase underline font-mono tracking-wider bg-transparent border-none cursor-pointer">Change</button>
+                    </div>
+                  </div>
+
+                  {/* Courier Option Cards */}
+                  <div className="space-y-3">
+                    <h2 className="font-serif text-xl text-[#1C1C1B]">Select Delivery Option</h2>
+                    
+                    <div className="border-2 border-[#1C1C1B] bg-white rounded-2xl p-5 flex justify-between items-center shadow-[0_4px_20px_rgba(28,28,27,0.04)]">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-5 h-5 rounded-full border-4 border-[#A34A38] bg-white flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-[#1C1C1B]">Standard Artisan Courier</p>
+                          <p className="text-[11px] text-[#7A7067]">Dispatched in protective linen wrap • 3–5 Business Days</p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-sm font-semibold text-[#1C1C1B]">
+                        {totals.shipping > 0 ? `₹${totals.shipping}` : 'FREE'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-6 border-t border-[#EBE5DF]">
+                    <button type="button" onClick={() => goToStep(1)} className="text-xs font-mono uppercase tracking-widest text-[#7A7067] hover:text-[#1C1C1B] transition-colors bg-transparent border-none cursor-pointer flex items-center gap-1.5">
+                      <ArrowLeft className="w-3.5 h-3.5" /> Return to Address
+                    </button>
+                    <button type="submit" className="bg-[#1C1C1B] text-[#FBFBFA] px-8 py-3.5 text-xs font-mono tracking-widest uppercase hover:bg-[#333331] transition-all cursor-pointer rounded-xl font-semibold shadow-sm">
+                      Continue to Payment
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3: PAYMENT METHOD & RISK ENGINE */}
+              {stepNumber === 3 && (
+                <div className="space-y-6">
+                  
+                  <div>
+                    <h2 className="font-serif text-xl text-[#1C1C1B]">Select Payment Method</h2>
+                    <p className="text-xs text-[#7A7067] mt-1 font-mono">All transactions are encrypted with 256-bit SSL protection.</p>
+                  </div>
+
+                  {/* Payment Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    {/* Pay Online Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentOption('online')}
+                      className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer outline-none ${
+                        paymentOption === 'online'
+                          ? 'border-[#1C1C1B] bg-white ring-1 ring-[#1C1C1B] shadow-[0_4px_25px_rgba(28,28,27,0.06)]'
+                          : 'border-[#E3DACF] bg-[#FAF8F5] hover:border-[#C4B9AD]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-8 h-8 rounded-full bg-[#F9ECE9] text-[#A34A38] flex items-center justify-center">
+                          <CreditCard className="w-4 h-4 stroke-[2]" />
+                        </div>
+                        {codData && codData.prepaidDiscountPct > 0 && (
+                          <span className="bg-[#1C1C1B] text-[#FBFBFA] text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            -{codData.prepaidDiscountPct}% Prepaid Discount
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-semibold text-[#1C1C1B]">Pay Online (Razorpay)</p>
+                      <p className="text-[11px] text-[#7A7067] mt-1 leading-relaxed">UPI (Google Pay, PhonePe, Paytm), Cards & Netbanking</p>
+                    </button>
+
+                    {/* Cash on Delivery Option */}
+                    <button
+                      type="button"
+                      disabled={codData?.codEligible === false}
+                      onClick={() => codData?.codEligible !== false && setPaymentOption('cod')}
+                      className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 outline-none ${
+                        paymentOption === 'cod'
+                          ? 'border-[#1C1C1B] bg-white ring-1 ring-[#1C1C1B] shadow-[0_4px_25px_rgba(28,28,27,0.06)]'
+                          : codData?.codEligible === false
+                          ? 'border-[#EAE4DC] bg-[#EAE4DC]/40 opacity-60 cursor-not-allowed'
+                          : 'border-[#E3DACF] bg-[#FAF8F5] hover:border-[#C4B9AD] cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-8 h-8 rounded-full bg-[#EAE4DC] text-[#5C544D] flex items-center justify-center">
+                          <Banknote className="w-4 h-4 stroke-[2]" />
+                        </div>
+                        {codData?.codEligible === false && (
+                          <span className="bg-red-100 text-red-700 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            Unavailable
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs font-semibold text-[#1C1C1B]">Cash on Delivery (COD)</p>
+                      <p className="text-[11px] text-[#7A7067] mt-1 leading-relaxed">Pay via Cash or UPI at doorstep upon courier arrival</p>
+                    </button>
+                  </div>
+
+                  {/* COD Restriction Explanation Banner */}
+                  {codData && codData.codEligible === false && (
+                    <div className="p-4 bg-[#FDF2F0] border border-[#F5C6CB] rounded-xl text-xs text-[#9A2C1D] flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold mb-0.5">COD Unavailable for this Order</p>
+                        <p className="text-[11px] leading-relaxed">{codData.reason || 'Please select Pay Online to proceed with your order.'}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Selected Payment Detail Panel */}
+                  <div className="bg-white border border-[#E3DACF] rounded-2xl p-6 space-y-3 text-center">
+                    {paymentOption === 'online' ? (
+                      <div className="space-y-2">
+                        <div className="w-10 h-10 bg-[#F9ECE9] text-[#A34A38] rounded-full flex items-center justify-center mx-auto">
+                          <Lock className="w-5 h-5 stroke-[2]" />
+                        </div>
+                        <p className="text-xs text-[#5C544D]">You will be redirected to Razorpay's encrypted modal to complete payment.</p>
+                        {codData && codData.prepaidDiscountAmount > 0 && (
+                          <p className="text-[#A34A38] text-xs font-mono font-semibold">
+                            You save ₹{codData.prepaidDiscountAmount} on this order by paying online!
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-1 text-xs text-[#5C544D]">
+                        <p className="font-medium text-[#1C1C1B]">Pay upon courier delivery.</p>
+                        <p className="text-[11px] text-[#7A7067]">Please ensure exact amount is available at doorstep.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-between items-center pt-6 border-t border-[#EBE5DF]">
+                    <button type="button" onClick={() => goToStep(2)} className="text-xs font-mono uppercase tracking-widest text-[#7A7067] hover:text-[#1C1C1B] transition-colors bg-transparent border-none cursor-pointer flex items-center gap-1.5">
+                      <ArrowLeft className="w-3.5 h-3.5" /> Return to Courier
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={handlePlaceOrder}
+                      className="bg-[#A34A38] text-[#FBFBFA] px-10 py-4 text-xs font-mono tracking-widest uppercase hover:bg-[#83382a] transition-all cursor-pointer rounded-xl font-semibold shadow-md"
+                    >
+                      Complete Order
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </form>
+          </div>
+        </main>
+
+        {/* Right Sticky Order Summary Column (40% Desktop) */}
+        <aside className="hidden md:block w-full md:w-2/5 lg:w-5/12 bg-[#F4EFEA] border-l border-[#E3DACF] p-8 md:p-12 lg:p-16 min-h-screen">
+          <div className="sticky top-12 space-y-6">
+            
+            <div className="border-b border-[#E3DACF] pb-4 flex justify-between items-baseline">
+              <h2 className="font-serif text-xl text-[#1C1C1B]">Order Summary</h2>
+              <span className="text-[11px] font-mono text-[#7A7067]">{totals.totalItems} {totals.totalItems === 1 ? 'Item' : 'Items'}</span>
+            </div>
+
+            {/* Cart Items List */}
+            {isCartLoading ? (
+              <div className="space-y-4 animate-pulse">
+                <div className="h-16 bg-[#EAE4DC] rounded-xl" />
+                <div className="h-16 bg-[#EAE4DC] rounded-xl" />
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[360px] overflow-y-auto pr-2">
+                {cartItems.map((item: CartItemType) => (
+                  <div key={item.id} className="flex gap-4 items-center text-xs pb-3 border-b border-[#E8E2DA]">
+                    <div className="relative w-14 h-16 bg-white border border-[#E3DACF] rounded-xl flex-shrink-0 overflow-hidden shadow-xs">
+                      <img src={item.primaryImage || '/placeholder.png'} alt={item.productName} className="w-full h-full object-cover" />
+                      <span className="absolute top-0 right-0 bg-[#A34A38] text-white w-4 h-4 flex items-center justify-center rounded-bl-md text-[9px] font-bold font-mono z-10">
+                        {item.quantity}
+                      </span>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0 space-y-0.5">
+                      <p className="text-[#1C1C1B] font-semibold truncate">{item.productName}</p>
+                      {item.variantName && (
+                        <p className="text-[10px] text-[#7A7067] font-mono uppercase tracking-wider">Variant: {item.variantName}</p>
+                      )}
+                      {item.customization?.hoopFinish && (
+                        <p className="text-[10px] text-[#7A7067]">Hoop: {item.customization.hoopFinish}</p>
+                      )}
+                      {item.engravingText && (
+                        <p className="text-[10px] text-[#A34A38] italic">"{item.engravingText}"</p>
+                      )}
+                    </div>
+                    
+                    <span className="text-[#1C1C1B] font-semibold font-mono text-xs">₹{item.totalPrice.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Cost Breakdown */}
+            <div className="space-y-2.5 pt-2 border-b border-[#E3DACF] pb-6 font-mono text-xs text-[#5C544D]">
+              <div className="flex justify-between">
+                <span className="font-sans">Subtotal</span>
+                <span className="text-[#1C1C1B] font-semibold">₹{totals.subtotal.toLocaleString()}</span>
+              </div>
+              
+              {totals.discount > 0 && (
+                <div className="flex justify-between text-[#A34A38]">
+                  <span className="font-sans">Prepaid Discount</span>
+                  <span>-₹{totals.discount.toLocaleString()}</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between text-[11px] text-[#7A7067]">
+                <span className="font-sans">GST Tax</span>
+                <span>Inclusive</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="font-sans">Standard Delivery</span>
+                <span className="text-[#1C1C1B] font-semibold font-mono">
+                  {stepNumber >= 2 ? (totals.shipping > 0 ? `₹${totals.shipping}` : 'FREE') : 'Calculated next step'}
+                </span>
+              </div>
+            </div>
+
+            {/* Total Display */}
+            <div className="flex justify-between items-baseline pt-2 text-[#1C1C1B]">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#7A7067] block">Total Payable</span>
+                <span className="text-[10px] font-mono text-[#8C827A]">Includes all taxes</span>
+              </div>
+              <span className="font-serif text-3xl font-bold tracking-tight">
+                ₹{totals.grandTotal.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Atelier Craft Promise */}
+            <div className="p-4 bg-white/60 border border-[#E3DACF] rounded-xl text-[11px] text-[#6E665E] leading-relaxed flex gap-2.5 items-start">
+              <Sparkles className="w-4 h-4 text-[#A34A38] flex-shrink-0 mt-0.5" />
+              <span>Handcrafted in small batches. Each piece is inspected by our senior embroiderer prior to dispatch.</span>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
     </div>
   );
 };
