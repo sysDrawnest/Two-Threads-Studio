@@ -26,13 +26,13 @@ router.post('/', async (req: Request, res: Response) => {
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
   if (!webhookSecret) {
     logger.error('[Webhook] RAZORPAY_WEBHOOK_SECRET not configured');
-    return res.status(500).send('Webhook secret not configured');
+    return res.status(500).json({ error: 'Webhook secret not configured' });
   }
 
   const signature = req.headers['x-razorpay-signature'] as string;
   if (!signature) {
     logger.warn('[Webhook] Missing X-Razorpay-Signature header');
-    return res.status(400).send('Missing signature');
+    return res.status(400).json({ error: 'Missing signature' });
   }
 
   const rawBody = req.body as Buffer;
@@ -40,14 +40,14 @@ router.post('/', async (req: Request, res: Response) => {
 
   if (!isValid) {
     logger.warn('[Webhook] Invalid HMAC signature — possible spoofing attempt');
-    return res.status(400).send('Invalid signature');
+    return res.status(400).json({ error: 'Invalid signature' });
   }
 
   let event: any;
   try {
     event = JSON.parse(rawBody.toString('utf8'));
   } catch {
-    return res.status(400).send('Invalid JSON payload');
+    return res.status(400).json({ error: 'Invalid JSON payload' });
   }
 
   const eventId = event.event_id || event.payload?.payment?.entity?.id || `evt_${Date.now()}`;
