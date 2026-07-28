@@ -125,6 +125,64 @@ const Checkout: React.FC = () => {
     }
   };
 
+  const initiateRazorpayPayment = async (order: any) => {
+    setProcessingMessage('Loading secure payment…');
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) {
+      throw new Error('Failed to load Razorpay. Please check your internet connection.');
+    }
+
+    setProcessingMessage('Initiating payment…');
+    const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
+
+    // Handle mock/development key mode
+    if (!razorpayOrder.keyId || razorpayOrder.keyId.includes('dummy') || razorpayOrder.razorpayOrderId.startsWith('order_mock_')) {
+      setProcessingMessage('Completing payment…');
+      await paymentService.verifyPayment(order.id, {
+        razorpay_order_id: razorpayOrder.razorpayOrderId,
+        razorpay_payment_id: `pay_mock_${Date.now()}`,
+        razorpay_signature: 'mock_signature',
+      });
+      await clearCartMutation.mutateAsync();
+      navigate(`/checkout/success?order=${order.orderNumber}`);
+      return;
+    }
+
+    openRazorpayPopup({
+      key: razorpayOrder.keyId,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      name: 'Two Threads Studio',
+      description: `Order ${order.orderNumber}`,
+      order_id: razorpayOrder.razorpayOrderId,
+      prefill: {
+        name: user?.name || '',
+        email: user?.email || '',
+      },
+      theme: { color: '#1C1C1B' },
+      handler: async (response) => {
+        try {
+          setProcessingMessage('Verifying payment…');
+          await paymentService.verifyPayment(order.id, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+          await clearCartMutation.mutateAsync();
+          navigate(`/checkout/success?order=${order.orderNumber}`);
+        } catch (err: any) {
+          navigate(`/checkout/failed?order=${order.orderNumber}`);
+        }
+      },
+      modal: {
+        ondismiss: () => {
+          setIsProcessing(false);
+          setProcessingMessage('');
+        },
+      },
+    });
+  };
+
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       alert('Please select a shipping address.');
@@ -154,61 +212,7 @@ const Checkout: React.FC = () => {
       }
 
       // ONLINE: Razorpay flow
-      setProcessingMessage('Loading secure payment…');
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        throw new Error('Failed to load Razorpay. Please check your internet connection.');
-      }
-
-      setProcessingMessage('Initiating payment…');
-      const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
-
-      // Handle mock/development key mode
-      if (!razorpayOrder.keyId || razorpayOrder.keyId.includes('dummy') || razorpayOrder.razorpayOrderId.startsWith('order_mock_')) {
-        setProcessingMessage('Completing payment…');
-        await paymentService.verifyPayment(order.id, {
-          razorpay_order_id: razorpayOrder.razorpayOrderId,
-          razorpay_payment_id: `pay_mock_${Date.now()}`,
-          razorpay_signature: 'mock_signature',
-        });
-        await clearCartMutation.mutateAsync();
-        navigate(`/checkout/success?order=${order.orderNumber}`);
-        return;
-      }
-      openRazorpayPopup({
-        key: razorpayOrder.keyId,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        name: 'Two Threads Studio',
-        description: `Order ${order.orderNumber}`,
-        order_id: razorpayOrder.razorpayOrderId,
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || '',
-        },
-        theme: { color: '#1C1C1B' },
-        handler: async (response) => {
-          try {
-            // Step 3: Verify signature server-side
-            setProcessingMessage('Verifying payment…');
-            await paymentService.verifyPayment(order.id, {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            await clearCartMutation.mutateAsync();
-            navigate(`/checkout/success?order=${order.orderNumber}`);
-          } catch (err: any) {
-            navigate(`/checkout/failed?order=${order.orderNumber}`);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setIsProcessing(false);
-            setProcessingMessage('');
-          },
-        },
-      });
+      await initiateRazorpayPayment(order);
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || err.message || '';
       
@@ -257,49 +261,7 @@ const Checkout: React.FC = () => {
         return;
       }
 
-      setProcessingMessage('Initiating payment…');
-      const razorpayOrder = await paymentService.createRazorpayOrder(order.id);
-
-      // Handle mock/development key mode
-      if (!razorpayOrder.keyId || razorpayOrder.keyId.includes('dummy') || razorpayOrder.razorpayOrderId.startsWith('order_mock_')) {
-        setProcessingMessage('Completing payment…');
-        await paymentService.verifyPayment(order.id, {
-          razorpay_order_id: razorpayOrder.razorpayOrderId,
-          razorpay_payment_id: `pay_mock_${Date.now()}`,
-          razorpay_signature: 'mock_signature',
-        });
-        await clearCartMutation.mutateAsync();
-        navigate(`/checkout/success?order=${order.orderNumber}`);
-        return;
-      }
-      openRazorpayPopup({
-        key: razorpayOrder.keyId,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        name: 'Two Threads Studio',
-        description: `Order ${order.orderNumber}`,
-        order_id: razorpayOrder.razorpayOrderId,
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || '',
-        },
-        theme: { color: '#1C1C1B' },
-        handler: async (response) => {
-          try {
-            setProcessingMessage('Verifying payment…');
-            await paymentService.verifyPayment(order.id, {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            await clearCartMutation.mutateAsync();
-            navigate(`/checkout/success?order=${order.orderNumber}`);
-          } catch (err: any) {
-            navigate(`/checkout/failed?order=${order.orderNumber}`);
-          }
-        },
-      });
-
+      await initiateRazorpayPayment(order);
     } catch (e: any) {
       setOtpError(e.response?.data?.message || 'Invalid OTP');
     } finally {
