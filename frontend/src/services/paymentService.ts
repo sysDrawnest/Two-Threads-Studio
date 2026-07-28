@@ -5,21 +5,7 @@
  * The frontend never decides payment status — it only calls the backend.
  */
 
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
-
-// Attach auth token from localStorage
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('tt_access_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { apiClient } from './apiClient';
 
 export interface RazorpayOrderResponse {
   razorpayOrderId: string;
@@ -44,7 +30,7 @@ export const paymentService = {
    * Get public payment configuration (Razorpay keyId, environment mode, and currency)
    */
   getPaymentConfig: async (): Promise<{ keyId: string; isLive: boolean; currency: string }> => {
-    const { data } = await api.get('/payments/config');
+    const data = await apiClient.get('/payments/config');
     return data.data;
   },
 
@@ -52,7 +38,7 @@ export const paymentService = {
    * Step 1: Create a Razorpay order on the backend before opening popup
    */
   createRazorpayOrder: async (orderId: string): Promise<RazorpayOrderResponse> => {
-    const { data } = await api.post(`/payments/orders/${orderId}/razorpay-order`);
+    const data = await apiClient.post(`/payments/orders/${orderId}/razorpay-order`);
     return data.data;
   },
 
@@ -64,21 +50,21 @@ export const paymentService = {
     orderId: string,
     payload: PaymentVerifyPayload
   ): Promise<void> => {
-    await api.post(`/payments/orders/${orderId}/verify`, payload);
+    await apiClient.post(`/payments/orders/${orderId}/verify`, payload);
   },
 
   /**
    * Confirm a COD order (no Razorpay popup)
    */
   confirmCodOrder: async (orderId: string): Promise<void> => {
-    await api.post(`/payments/orders/${orderId}/cod`);
+    await apiClient.post(`/payments/orders/${orderId}/cod`);
   },
 
   /**
    * Get payment status for a specific order
    */
   getPaymentStatus: async (orderId: string) => {
-    const { data } = await api.get(`/payments/orders/${orderId}`);
+    const data = await apiClient.get(`/payments/orders/${orderId}`);
     return data.data;
   },
 
@@ -86,7 +72,7 @@ export const paymentService = {
    * Get shipment tracking for an order
    */
   getShipment: async (orderId: string) => {
-    const { data } = await api.get(`/payments/orders/${orderId}/shipment`);
+    const data = await apiClient.get(`/payments/orders/${orderId}/shipment`);
     return data.data;
   },
 
@@ -94,7 +80,7 @@ export const paymentService = {
    * Get live tracking from shipping provider
    */
   getLiveTracking: async (orderId: string) => {
-    const { data } = await api.get(`/payments/orders/${orderId}/shipment/tracking`);
+    const data = await apiClient.get(`/payments/orders/${orderId}/shipment/tracking`);
     return data.data;
   },
 };

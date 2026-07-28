@@ -297,10 +297,9 @@ export const orderService = {
 
     if (resultOrder) {
       clearHomepageCache();
-      // Emit event post-commit
-      eventDispatcher.emit(OrderEvents.CREATED, resultOrder).catch((err) => {
-        logger.error({ err, orderId: resultOrder.id }, 'Failed to emit Order Created event');
-      });
+      // DO NOT emit OrderEvents.CREATED here.
+      // For online orders, it should be emitted after payment is verified.
+      // For COD orders, it's emitted after COD confirmation.
     }
 
     return resultOrder;

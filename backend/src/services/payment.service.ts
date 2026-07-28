@@ -203,6 +203,11 @@ export const paymentService = {
       payment: updatedPayment,
     }).catch((err) => logger.error({ err }, 'Failed to emit payment.captured event'));
 
+    // Emit Order Created now that payment is confirmed
+    eventDispatcher.emit(OrderEvents.CREATED, updatedOrder).catch((err) => {
+      logger.error({ err }, 'Failed to emit order created event');
+    });
+
     return { order: updatedOrder, payment: updatedPayment };
   },
 
