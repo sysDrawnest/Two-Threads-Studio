@@ -111,9 +111,10 @@ export const orderService = {
     }
 
     // 3. Complete Transaction
-    const resultOrder = await prisma.$transaction(async (tx) => {
-      const itemsToCreate = [];
-      let calculatedSubtotal = 0;
+    const resultOrder = await prisma.$transaction(
+      async (tx) => {
+        const itemsToCreate = [];
+        let calculatedSubtotal = 0;
 
       for (const item of cart.items) {
         const product = await tx.product.findUnique({
