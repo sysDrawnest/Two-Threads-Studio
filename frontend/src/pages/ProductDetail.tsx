@@ -3,8 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
+import { reviewService } from '../services/reviewService';
 import { useCartStore } from '../store/cartStore';
 import { useAddToCart } from '../hooks/useCommerce';
+import { ThumbsUp, ThumbsDown, CheckCircle, Star, Image, MessageSquare, Play } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +26,27 @@ const ProductDetail: React.FC = () => {
   const [hasGiftWrap, setHasGiftWrap] = useState(false);
   const [giftMessage, setGiftMessage] = useState('');
 
+  // Reviews state
+  const [reviewsData, setReviewsData] = useState<any>(null);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const [reviewsSort, setReviewsSort] = useState('helpful');
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [filterHasMedia, setFilterHasMedia] = useState(false);
+
+  const fetchReviews = async (pId: string, pageNum = 1, sortBy = 'helpful', hasMedia = false) => {
+    try {
+      setReviewsLoading(true);
+      const res = await reviewService.getProductReviews(pId, { page: pageNum, sort: sortBy, hasMedia, limit: 6 });
+      if (res.success) {
+        setReviewsData(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load reviews:', err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
     setLoading(true);
@@ -30,6 +54,9 @@ const ProductDetail: React.FC = () => {
       .then(data => {
         setProduct(data);
         setActiveImage(0);
+
+        // Fetch reviews
+        fetchReviews(data.id, 1, 'helpful', false);
 
         productService.getProducts({ limit: 20 })
           .then(res => {
@@ -45,6 +72,24 @@ const ProductDetail: React.FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+  useEffect(() => {
+    if (product?.id) {
+      fetchReviews(product.id, reviewsPage, reviewsSort, filterHasMedia);
+    }
+  }, [reviewsPage, reviewsSort, filterHasMedia, product?.id]);
+
+  const handleVoteHelpful = async (reviewId: string, isHelpful: boolean) => {
+    try {
+      const res = await reviewService.voteHelpful(reviewId, isHelpful);
+      if (res.success && product) {
+        toast.success('Thank you for your feedback!');
+        fetchReviews(product.id, reviewsPage, reviewsSort, filterHasMedia);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Authentication required to vote on reviews');
+    }
+  };
 
   if (loading) {
     return (
@@ -373,34 +418,291 @@ const ProductDetail: React.FC = () => {
         </div>
       </section>
 
-      {/* Reviews Section - Mobile Optimized */}
-      {product.reviews && product.reviews.length > 0 && (
-        <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-[#f8f3ee]">
-          <div className="max-w-5xl mx-auto">
-            <h3 className="font-serif text-2xl md:text-3xl font-light text-[#1C1C1B] mb-8 md:mb-12 text-center">
-              Notes from our Makers
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              {product.reviews.map(review => (
-                <div key={review.id} className="bg-white p-6 md:p-8 shadow-sm rounded-sm">
-                  <div className="flex gap-1 mb-3 md:mb-4">
-                    {Array(review.rating).fill(0).map((_, i) => (
-                      <span key={i} className="text-[#A34A38] text-sm">★</span>
+      {/* Reviews Section - Hermès/Aesop premium styling */}
+      <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-[#f8f3ee] border-t border-neutral-200">
+        <div className="max-w-5xl mx-auto">
+          <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-12 text-center tracking-wide">
+            Notes from our Makers
+          </h3>
+
+          {reviewsLoading && !reviewsData ? (
+            <div className="flex justify-center py-12">
+              <div className="relative w-10 h-10">
+                <div className="absolute inset-0 rounded-full border border-neutral-200" />
+                <div className="absolute inset-0 rounded-full border border-transparent border-t-[#A34A38] animate-spin" />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {/* Summary Stats Grid */}
+              {reviewsData?.summary && reviewsData.summary.totalReviews > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-neutral-200 pb-10">
+                  {/* Rating Score */}
+                  <div className="flex flex-col items-center justify-center text-center bg-white p-6 rounded-lg shadow-sm border border-neutral-100">
+                    <span className="text-5xl font-serif font-light text-[#1C1C1B]">
+                      {reviewsData.summary.averageRating}
+                    </span>
+                    <div className="flex gap-0.5 my-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`h-5 w-5 ${i < Math.round(reviewsData.summary.averageRating) ? 'fill-[#A34A38] text-[#A34A38]' : 'text-neutral-300'}`} />
+                      ))}
+                    </div>
+                    <span className="text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                      Based on {reviewsData.summary.totalReviews} Maker Reviews
+                    </span>
+                    {reviewsData.summary.recommendPercentage > 0 && (
+                      <span className="mt-3 text-xs bg-[#e8f5e9] text-[#0f9d58] px-2.5 py-1 rounded-full font-semibold">
+                        {reviewsData.summary.recommendPercentage}% Recommend this Kit
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Rating Distribution Bars */}
+                  <div className="flex flex-col justify-center space-y-2 bg-white p-6 rounded-lg shadow-sm border border-neutral-100">
+                    <h4 className="text-xs uppercase tracking-wider font-semibold text-neutral-500 mb-1">Rating Breakdown</h4>
+                    {reviewsData.summary.ratingDistribution.map((dist: any) => (
+                      <div key={dist.stars} className="flex items-center text-xs text-neutral-600 gap-2">
+                        <span className="w-12 font-medium">{dist.stars} Star</span>
+                        <div className="flex-1 bg-neutral-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-[#A34A38] h-full rounded-full" style={{ width: `${dist.percentage}%` }} />
+                        </div>
+                        <span className="w-8 text-right text-neutral-400 font-mono">{dist.percentage}%</span>
+                      </div>
                     ))}
                   </div>
-                  <p className="font-serif text-base md:text-lg leading-relaxed text-[#1C1C1B] mb-4 md:mb-6 italic">
-                    "{review.text}"
-                  </p>
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-center font-sans text-xs tracking-wider uppercase text-neutral-400 gap-1 md:gap-0">
-                    <span>{review.author}</span>
-                    <span>{review.date}</span>
+
+                  {/* Attribute Averages */}
+                  <div className="flex flex-col justify-center space-y-3 bg-white p-6 rounded-lg shadow-sm border border-neutral-100">
+                    <h4 className="text-xs uppercase tracking-wider font-semibold text-neutral-500 mb-1">Craft Attributes</h4>
+                    {Object.entries(reviewsData.summary.attributes).map(([key, val]: [string, any]) => {
+                      if (!val) return null;
+                      const labelMap: Record<string, string> = {
+                        quality: 'Material Quality',
+                        packaging: 'Packaging Care',
+                        value: 'Value for Money',
+                        easeOfUse: 'Ease of Learning',
+                      };
+                      return (
+                        <div key={key}>
+                          <div className="flex justify-between text-xs font-medium text-neutral-600 mb-1">
+                            <span>{labelMap[key]}</span>
+                            <span className="font-bold">{val}/5</span>
+                          </div>
+                          <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
+                            <div className="bg-[#A34A38] h-full rounded-full" style={{ width: `${(val / 5) * 100}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              ))}
+              ) : null}
+
+              {/* Photos Gallery */}
+              {reviewsData?.mediaGallery && reviewsData.mediaGallery.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-xs uppercase tracking-wider font-semibold text-neutral-500 flex items-center gap-1">
+                    <Image className="h-4 w-4" /> Photos & Videos from Makers
+                  </h4>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {reviewsData.mediaGallery.map((med: any) => (
+                      <div key={med.id} className="relative h-20 w-20 rounded-lg overflow-hidden border border-neutral-200 flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity group">
+                        {med.type === 'IMAGE' ? (
+                          <img src={med.url} alt="Maker upload" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full bg-black/80 flex items-center justify-center">
+                            <Play className="h-5 w-5 text-white fill-white" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Toolbar: Filter & Sorting */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-neutral-600 cursor-pointer font-sans">
+                    <input 
+                      type="checkbox" 
+                      checked={filterHasMedia} 
+                      onChange={(e) => {
+                        setFilterHasMedia(e.target.checked);
+                        setReviewsPage(1);
+                      }}
+                      className="accent-[#A34A38] h-4 w-4" 
+                    />
+                    Only show reviews with photos / videos
+                  </label>
+                </div>
+                <div className="flex items-center gap-2 font-sans">
+                  <span className="text-xs text-neutral-400 font-medium font-sans">Sort by</span>
+                  <select
+                    value={reviewsSort}
+                    onChange={(e) => {
+                      setReviewsSort(e.target.value);
+                      setReviewsPage(1);
+                    }}
+                    className="bg-transparent text-xs font-semibold text-[#1C1C1B] border-b border-[#1C1C1B] pb-0.5 focus:outline-none cursor-pointer"
+                  >
+                    <option value="helpful">Most Helpful</option>
+                    <option value="newest">Newest</option>
+                    <option value="highest">Highest Rated</option>
+                    <option value="lowest">Lowest Rated</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              {reviewsData?.reviews && reviewsData.reviews.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                  {reviewsData.reviews.map((review: any) => (
+                    <div key={review.id} className="bg-white p-6 md:p-8 shadow-sm rounded-lg border border-neutral-100 flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 bg-neutral-100 rounded-full flex items-center justify-center text-sm font-medium text-neutral-600 border border-neutral-200">
+                              {review.user?.firstName?.charAt(0)}{review.user?.lastName?.charAt(0)}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-sm text-neutral-800">
+                                  {review.user?.firstName} {review.user?.lastName}
+                                </span>
+                                {review.isVerified && (
+                                  <span className="inline-flex items-center gap-0.5 text-[8px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-1 py-0.2 rounded font-bold uppercase tracking-wider">
+                                    ✓ Verified Purchase
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-neutral-400 font-sans block mt-0.5">
+                                {new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-0.5">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i} className={`text-sm ${i < review.rating ? 'text-[#A34A38]' : 'text-neutral-200'}`}>★</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Title & Comment */}
+                        {review.title && <h4 className="font-serif font-bold text-neutral-900 mt-4">"{review.title}"</h4>}
+                        <p className="font-sans text-sm leading-relaxed text-[#5a4a3f] mt-2 italic">
+                          "{review.comment}"
+                        </p>
+
+                        {/* Attribute Badges */}
+                        <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-dashed border-neutral-100">
+                          {review.qualityRating && (
+                            <span className="text-[9px] bg-neutral-50 border border-neutral-200 text-neutral-600 px-1.5 py-0.5 rounded font-sans">
+                              Quality: {review.qualityRating}/5
+                            </span>
+                          )}
+                          {review.packagingRating && (
+                            <span className="text-[9px] bg-neutral-50 border border-neutral-200 text-neutral-600 px-1.5 py-0.5 rounded font-sans">
+                              Packaging: {review.packagingRating}/5
+                            </span>
+                          )}
+                          {review.valueRating && (
+                            <span className="text-[9px] bg-neutral-50 border border-neutral-200 text-neutral-600 px-1.5 py-0.5 rounded font-sans">
+                              Value: {review.valueRating}/5
+                            </span>
+                          )}
+                          {review.easeOfUseRating && (
+                            <span className="text-[9px] bg-neutral-50 border border-neutral-200 text-neutral-600 px-1.5 py-0.5 rounded font-sans">
+                              Easy: {review.easeOfUseRating}/5
+                            </span>
+                          )}
+                          {review.wouldRecommend !== null && (
+                            <span className={`text-[9px] border px-1.5 py-0.5 rounded font-sans ${
+                              review.wouldRecommend 
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                : 'bg-red-50 border-red-200 text-red-700'
+                            }`}>
+                              {review.wouldRecommend ? '✔ Recommend' : '✘ No'}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Maker Photos/Videos */}
+                        {review.media && review.media.length > 0 && (
+                          <div className="flex gap-2 mt-4 overflow-x-auto pb-1">
+                            {review.media.map((med: any) => (
+                              <div key={med.id} className="relative h-16 w-16 rounded-lg overflow-hidden border border-neutral-200 flex-shrink-0 cursor-pointer">
+                                {med.type === 'IMAGE' ? (
+                                  <img src={med.url} alt="Maker review photo" className="h-full w-full object-cover" />
+                                ) : (
+                                  <div className="h-full w-full bg-black/80 flex items-center justify-center">
+                                    <Play className="h-4 w-4 text-white fill-white" />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Vote helpful row */}
+                      <div className="flex items-center gap-4 mt-6 pt-4 border-t border-neutral-100 text-xs text-neutral-400 font-sans">
+                        <span>Was this review helpful?</span>
+                        <div className="flex gap-2.5">
+                          <button
+                            onClick={() => handleVoteHelpful(review.id, true)}
+                            className="flex items-center gap-1 hover:text-[#A34A38] transition-colors font-semibold"
+                          >
+                            <ThumbsUp className="h-3.5 w-3.5" />
+                            <span>({review.helpfulCount || 0})</span>
+                          </button>
+                          <button
+                            onClick={() => handleVoteHelpful(review.id, false)}
+                            className="flex items-center gap-1 hover:text-[#A34A38] transition-colors font-semibold"
+                          >
+                            <ThumbsDown className="h-3.5 w-3.5" />
+                            <span>({review.unhelpfulCount || 0})</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-xl border border-neutral-100 shadow-sm">
+                  <MessageSquare className="mx-auto h-8 w-8 text-neutral-300 mb-3" />
+                  <p className="text-sm font-medium text-neutral-500">No maker reviews yet.</p>
+                  <p className="text-xs text-neutral-400 mt-1">Be the first to share your crafting experience after placing an order!</p>
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {reviewsData?.pagination && reviewsData.pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 pt-6 font-sans">
+                  <button
+                    disabled={reviewsPage === 1}
+                    onClick={() => setReviewsPage(prev => Math.max(1, prev - 1))}
+                    className="px-3 py-1.5 border border-neutral-200 rounded-md text-xs font-semibold text-neutral-600 hover:bg-neutral-50 transition-colors disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-medium text-neutral-500">
+                    Page {reviewsPage} of {reviewsData.pagination.totalPages}
+                  </span>
+                  <button
+                    disabled={reviewsPage === reviewsData.pagination.totalPages}
+                    onClick={() => setReviewsPage(prev => prev + 1)}
+                    className="px-3 py-1.5 border border-neutral-200 rounded-md text-xs font-semibold text-neutral-600 hover:bg-neutral-50 transition-colors disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
 
       {/* Related Products - Mobile Optimized */}
       {relatedProducts.length > 0 && (

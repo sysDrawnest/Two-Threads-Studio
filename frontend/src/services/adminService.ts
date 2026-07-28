@@ -198,6 +198,11 @@ export const adminService = {
     const response = await apiClient.delete(`/admin/reviews/${id}`);
     return response;
   },
+
+  moderateReview: async (id: string, data: { status?: string; isFeatured?: boolean; isPinned?: boolean; rejectionReason?: string }) => {
+    const response = await apiClient.patch(`/admin/reviews/${id}/moderate`, data);
+    return response;
+  },
   
   // ── Risk & Fraud ──────────────────────────────────────────────────────────
   getRiskDashboard: async () => {

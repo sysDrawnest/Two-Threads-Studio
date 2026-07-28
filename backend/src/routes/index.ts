@@ -68,8 +68,10 @@ router.use('/checkout', checkoutRoutes);
 
 // Phase 7.2 — Promotions & Coupon Engine
 import couponRoutes from './coupon.routes';
+import reviewRoutes from './review.routes';
 
 router.use('/coupons', couponRoutes);
+router.use('/reviews', reviewRoutes);
 
 export default router;
 

@@ -81,9 +81,8 @@ const router = Router();
 // ── Public status check — no auth required ──────────────────────────────────
 router.get('/status', getUploadStatus);
 
-// ── Protected admin upload routes ───────────────────────────────────────────
+// ── Protected upload routes ───────────────────────────────────────────
 router.use(requireAuth);
-router.use(requireRole('ADMIN'));
 
 router.post(
   '/single',

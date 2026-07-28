@@ -265,6 +265,8 @@ export const adminController = {
           marketingConsent: true,
           newsletterSubscribed: true,
           preferredLanguage: true,
+          lastLogin: true,
+          role: true,
           addresses: {
             where: { deletedAt: null },
             orderBy: { isDefaultShipping: 'desc' },
@@ -284,15 +286,70 @@ export const adminController = {
 
       if (!customer) throw new AppError('Customer not found', HTTP_STATUS.NOT_FOUND);
 
-      // Compute total spend
-      const totalSpend = await prisma.order.aggregate({
-        where: { userId, paymentStatus: PaymentStatus.CAPTURED },
-        _sum: { grandTotal: true },
+      // Compute detailed statistics
+      const orders = await prisma.order.findMany({
+        where: { userId },
+        select: {
+          grandTotal: true,
+          orderStatus: true,
+          paymentStatus: true,
+          couponCode: true,
+        },
+      });
+
+      const totalOrdersCount = orders.length;
+      const deliveredCount = orders.filter(o => o.orderStatus === 'DELIVERED').length;
+      const cancelledCount = orders.filter(o => o.orderStatus === 'CANCELLED').length;
+      const refundedCount = orders.filter(o => o.orderStatus === 'REFUNDED' || o.paymentStatus === 'REFUNDED').length;
+      const couponsCount = orders.filter(o => o.couponCode !== null).length;
+
+      const totalSpend = orders
+        .filter(o => o.paymentStatus === 'CAPTURED')
+        .reduce((sum, o) => sum + Number(o.grandTotal), 0);
+
+      const averageOrderValue = deliveredCount > 0 ? totalSpend / deliveredCount : (totalOrdersCount > 0 ? totalSpend / totalOrdersCount : 0);
+
+      const [wishlistCount, reviewsCount] = await Promise.all([
+        prisma.wishlist.count({ where: { userId } }),
+        prisma.review.count({ where: { userId } }),
+      ]);
+
+      // Calculate customer tier
+      let tier = 'Bronze';
+      if (totalSpend >= 50000) {
+        tier = 'VIP';
+      } else if (totalSpend >= 20000) {
+        tier = 'Gold';
+      } else if (totalSpend >= 10000) {
+        tier = 'Silver';
+      }
+
+      // Get review timeline for the customer
+      const reviewTimeline = await prisma.review.findMany({
+        where: { userId },
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          product: { select: { id: true, name: true, slug: true } },
+          media: true,
+        },
       });
 
       return successResponse(res, {
         customer,
-        totalSpend: Number(totalSpend?._sum?.grandTotal || 0),
+        totalSpend,
+        stats: {
+          totalOrders: totalOrdersCount,
+          delivered: deliveredCount,
+          cancelled: cancelledCount,
+          refunded: refundedCount,
+          wishlistCount,
+          reviewsCount,
+          couponsUsed: couponsCount,
+          averageOrderValue: Math.round(averageOrderValue),
+          tier,
+        },
+        reviewTimeline,
       });
     } catch (err) {
       next(err);

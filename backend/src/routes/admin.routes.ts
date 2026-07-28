@@ -55,6 +55,7 @@ router.patch('/inventory/:productId', inventoryController.adjustStock);
 router.get('/reviews', reviewController.listReviews);
 router.patch('/reviews/:reviewId/approve', reviewController.approveReview);
 router.patch('/reviews/:reviewId/reject', reviewController.rejectReview);
+router.patch('/reviews/:reviewId/moderate', reviewController.moderateReview);
 router.delete('/reviews/:reviewId', reviewController.deleteReview);
 
 // ── Studio Settings ────────────────────────────────────────────────────────

@@ -18,6 +18,8 @@ import {
   Info
 } from 'lucide-react';
 import { orderService, Order, Shipment } from '../../services/orderService';
+import { reviewService } from '../../services/reviewService';
+import { ReviewModal } from '../../components/reviews/ReviewModal';
 import LoadingSkeleton from './LoadingSkeleton';
 
 const ORDER_STATUS_STEPS = [
@@ -64,6 +66,11 @@ export const OrdersTab: React.FC = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Reviews state
+  const [userReviews, setUserReviews] = useState<any[]>([]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [activeReviewProduct, setActiveReviewProduct] = useState<{ id: string; name: string; image?: string } | null>(null);
+
   const fetchOrders = async (targetPage = 1) => {
     try {
       setLoading(true);
@@ -81,8 +88,20 @@ export const OrdersTab: React.FC = () => {
     }
   };
 
+  const fetchUserReviews = async () => {
+    try {
+      const res = await reviewService.getMyReviews();
+      if (res.success && Array.isArray(res.data)) {
+        setUserReviews(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch user reviews', err);
+    }
+  };
+
   useEffect(() => {
     fetchOrders(1);
+    fetchUserReviews();
   }, []);
 
   const handleSelectOrder = async (orderId: string) => {
@@ -560,6 +579,23 @@ export const OrdersTab: React.FC = () => {
                           🎁 Gift Wrapped
                         </span>
                       )}
+                      {selectedOrder.orderStatus === 'DELIVERED' && (
+                        <div className="mt-2">
+                          <button
+                            onClick={() => {
+                              setActiveReviewProduct({
+                                id: item.productId,
+                                name: item.productName,
+                                image: item.productImage || undefined
+                              });
+                              setShowReviewModal(true);
+                            }}
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded bg-[#fff8e1] text-[#f57f17] border border-[#ffe082] hover:bg-[#fff3e0] transition-colors"
+                          >
+                            {userReviews.some(r => r.productId === item.productId) ? 'Edit Review' : 'Write a Review'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div className="text-right flex-shrink-0 space-y-1">
                       <p className="text-sm font-bold text-neutral-800">Rs. {Number(item.lineTotal).toFixed(2)}</p>
@@ -837,6 +873,23 @@ export const OrdersTab: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {activeReviewProduct && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => {
+            setShowReviewModal(false);
+            setActiveReviewProduct(null);
+          }}
+          productId={activeReviewProduct.id}
+          productName={activeReviewProduct.name}
+          productImage={activeReviewProduct.image}
+          initialReview={userReviews.find(r => r.productId === activeReviewProduct.id)}
+          onSubmitSuccess={() => {
+            fetchUserReviews();
+          }}
+        />
+      )}
     </div>
   );
 };

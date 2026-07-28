@@ -153,14 +153,21 @@ export const useAdminReviews = (params: any) => {
 export const useModerateReview = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, action }: { id: string; action: 'approve' | 'reject' | 'delete' }) => {
+    mutationFn: ({ id, action, data }: { id: string; action: 'approve' | 'reject' | 'delete' | 'moderate'; data?: any }) => {
       if (action === 'approve') return adminService.approveReview(id);
       if (action === 'reject') return adminService.rejectReview(id);
-      return adminService.deleteReview(id);
+      if (action === 'delete') return adminService.deleteReview(id);
+      return adminService.moderateReview(id, data);
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.reviews() });
-      const msg = variables.action === 'approve' ? 'Review approved' : variables.action === 'reject' ? 'Review rejected' : 'Review deleted';
+      const msg = variables.action === 'approve' 
+        ? 'Review approved' 
+        : variables.action === 'reject' 
+          ? 'Review rejected' 
+          : variables.action === 'delete' 
+            ? 'Review deleted' 
+            : 'Review settings updated';
       toast.success(msg);
     },
     onError: (err: any) => {
