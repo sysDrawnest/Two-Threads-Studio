@@ -19,24 +19,11 @@ import type {
   RefundResult,
 } from './PaymentProvider.interface';
 
-const keyId = process.env.RAZORPAY_KEY_ID;
-const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET;
-
-if (!keyId || !keySecret) {
-  // Warn at module load — not a hard crash so dev can still start without Razorpay
-  console.warn(
-    '[RazorpayProvider] RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set. ' +
-      'Razorpay calls will fail at runtime.'
-  );
-}
-
-const razorpay = new Razorpay({
-  key_id: keyId || '',
-  key_secret: keySecret || '',
-});
-
 export const razorpayProvider: PaymentProvider = {
   async createOrder(params: CreateProviderOrderParams): Promise<ProviderOrderResult> {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET;
+
     try {
       if (!keyId || !keySecret || keyId.includes('dummy') || keyId.includes('your_')) {
         const mockOrderId = `order_mock_${Date.now().toString(36)}`;
@@ -49,28 +36,46 @@ export const razorpayProvider: PaymentProvider = {
         };
       }
 
-      const order = await razorpay.orders.create({
-        amount: params.amount, // paise
-        currency: params.currency,
-        receipt: params.receipt || params.orderId.slice(0, 40),
+      const razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret,
+      });
+
+      const order: any = await razorpay.orders.create({
+        amount: Math.round(params.amount), // ensure integer paise
+        currency: params.currency || 'INR',
+        receipt: (params.receipt || params.orderId).slice(0, 40),
         notes: (params.notes as Record<string, string>) || {
           orderId: params.orderId,
         },
       });
 
+      if (!order || typeof order !== 'object' || !order.id) {
+        throw new AppError('Razorpay API returned an invalid order object', HTTP_STATUS.BAD_GATEWAY);
+      }
+
       return {
         providerOrderId: order.id,
-        amount: order.amount as number,
-        currency: order.currency,
-        status: order.status,
-        raw: order as unknown as Record<string, unknown>,
+        amount: Number(order.amount || params.amount),
+        currency: order.currency || params.currency,
+        status: order.status || 'created',
+        raw: (order as Record<string, unknown>) || {},
       };
     } catch (err: any) {
+      if (err instanceof AppError) throw err;
+
+      console.error('[RazorpayProvider ERROR]: Name:', err?.name);
+      console.error('[RazorpayProvider ERROR]: Message:', err?.message);
+      console.error('[RazorpayProvider ERROR]: Status Code:', err?.statusCode);
+      console.error('[RazorpayProvider ERROR]: Description:', err?.error?.description || err?.description);
+      console.error('[RazorpayProvider ERROR]: Full JSON:', JSON.stringify(err, null, 2));
+
       const errorMessage =
         err?.error?.description ||
         err?.description ||
         err?.message ||
-        (typeof err === 'string' ? err : 'Unknown Razorpay error');
+        (typeof err === 'string' ? err : 'Razorpay API failure');
+
       throw new AppError(
         `Razorpay order creation failed: ${errorMessage}`,
         HTTP_STATUS.BAD_GATEWAY
@@ -79,6 +84,9 @@ export const razorpayProvider: PaymentProvider = {
   },
 
   verifySignature(params: VerifySignatureParams): boolean {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET;
+
     if (!keyId || keyId.includes('dummy') || keyId.includes('your_') || params.providerOrderId?.startsWith('order_mock_')) {
       return true;
     }
@@ -95,10 +103,14 @@ export const razorpayProvider: PaymentProvider = {
       .update(body)
       .digest('hex');
 
-    return crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, 'hex'),
-      Buffer.from(providerSignature, 'hex')
-    );
+    const expectedBuf = Buffer.from(expectedSignature, 'utf8');
+    const providedBuf = Buffer.from(providerSignature, 'utf8');
+
+    if (expectedBuf.length !== providedBuf.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(expectedBuf, providedBuf);
   },
 
   async processRefund(params: RefundParams): Promise<RefundResult> {
