@@ -40,6 +40,18 @@ export const emailService = {
     }
 
     try {
+      const isTestEmail = Array.isArray(params.to)
+        ? params.to.some((e) => e.includes('@twothreadsstudio.com') || e.includes('@example.com'))
+        : params.to.includes('@twothreadsstudio.com') || params.to.includes('@example.com');
+
+      if (process.env.NODE_ENV === 'development' && isTestEmail) {
+        logger.info(
+          { recipient: params.to, subject: params.subject },
+          '[Email] Mocking email dispatch in development for test address'
+        );
+        return { success: true, id: 'mock_email_id_' + Date.now() };
+      }
+
       const resend = new Resend(apiKey);
       const payload: any = {
         from: fromAddress,
