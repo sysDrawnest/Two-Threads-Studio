@@ -3,6 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -368,6 +369,126 @@ async function runTests() {
       }
     } else {
       throw new Error(`Order placement failed: ${JSON.stringify(orderData)}`);
+    }
+
+    // ----------------------------------------------------
+    // Scenario 10: Razorpay Order Creation (Provider Order)
+    // ----------------------------------------------------
+    console.log('\n--- Scenario 10: Create Razorpay Order via Provider ---');
+    const orderId = orderData.order.id;
+    const rzpOrderRes = await fetch(`${API_URL}/payments/orders/${orderId}/razorpay-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    const rzpOrderData = await rzpOrderRes.json();
+    console.log('Razorpay Order Creation API Response status:', rzpOrderRes.status);
+    console.log('Razorpay Order Creation API Response body:', JSON.stringify(rzpOrderData, null, 2));
+
+    if (rzpOrderRes.status === 201 && rzpOrderData.success) {
+      console.log(`✅ Razorpay order created successfully. Provider Order ID: ${rzpOrderData.data.razorpayOrderId}`);
+      if (rzpOrderData.data.razorpayOrderId && rzpOrderData.data.amount) {
+        console.log(`✅ Returned amount: ${rzpOrderData.data.amount} paise, currency: ${rzpOrderData.data.currency}`);
+      } else {
+        throw new Error('Razorpay order response missing providerOrderId or amount');
+      }
+    } else {
+      throw new Error(`Razorpay order creation failed: ${JSON.stringify(rzpOrderData)}`);
+    }
+
+    // ----------------------------------------------------
+    // Scenario 11: Payment Signature Verification & Capture
+    // ----------------------------------------------------
+    console.log('\n--- Scenario 11: Verify Razorpay Payment Signature ---');
+    const mockPaymentId = `pay_test_${Date.now()}`;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || '';
+    const bodyStr = `${rzpOrderData.data.razorpayOrderId}|${mockPaymentId}`;
+    const validSignature = crypto.createHmac('sha256', keySecret).update(bodyStr).digest('hex');
+
+    const verifyRes = await fetch(`${API_URL}/payments/orders/${orderId}/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        razorpay_order_id: rzpOrderData.data.razorpayOrderId,
+        razorpay_payment_id: mockPaymentId,
+        razorpay_signature: validSignature,
+      }),
+    });
+    const verifyData = await verifyRes.json();
+    console.log('Payment Verification API Response status:', verifyRes.status);
+    console.log('Payment Verification API Response body:', JSON.stringify(verifyData, null, 2));
+
+    // ----------------------------------------------------
+    // Scenario 12: Webhook Asynchronous Payment Capture Simulation
+    // ----------------------------------------------------
+    console.log('\n--- Scenario 12: Webhook payment.captured Simulation ---');
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || 'whsec_test_secret_12345';
+    process.env.RAZORPAY_WEBHOOK_SECRET = webhookSecret;
+
+    const webhookEventId = `evt_test_${Date.now()}`;
+    const webhookPayload = {
+      event: 'payment.captured',
+      event_id: webhookEventId,
+      payload: {
+        payment: {
+          entity: {
+            id: `pay_wh_${Date.now()}`,
+            order_id: rzpOrderData.data.razorpayOrderId,
+            amount: rzpOrderData.data.amount,
+            status: 'captured',
+          },
+        },
+      },
+    };
+
+    const webhookBody = Buffer.from(JSON.stringify(webhookPayload), 'utf8');
+    const webhookSignature = crypto.createHmac('sha256', webhookSecret).update(webhookBody).digest('hex');
+
+    const webhookRes = await fetch(`http://localhost:${PORT}/webhooks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': webhookSignature,
+      },
+      body: webhookBody,
+    });
+
+    const webhookData = await webhookRes.json();
+    console.log('Webhook API Response status:', webhookRes.status);
+    console.log('Webhook API Response body:', JSON.stringify(webhookData, null, 2));
+
+    if (webhookRes.ok && webhookData.status === 'ok') {
+      console.log('✅ Webhook payment.captured received and acknowledged with 200 OK');
+    } else {
+      throw new Error(`Webhook simulation failed: ${JSON.stringify(webhookData)}`);
+    }
+
+    // ----------------------------------------------------
+    // Scenario 13: Duplicate Webhook Event Idempotency Check
+    // ----------------------------------------------------
+    console.log('\n--- Scenario 13: Duplicate Webhook Event Idempotency Check ---');
+    const dupWebhookRes = await fetch(`http://localhost:${PORT}/webhooks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-razorpay-signature': webhookSignature,
+      },
+      body: webhookBody,
+    });
+
+    const dupWebhookData = await dupWebhookRes.json();
+    console.log('Duplicate Webhook API Response status:', dupWebhookRes.status);
+    console.log('Duplicate Webhook API Response body:', JSON.stringify(dupWebhookData, null, 2));
+
+    if (dupWebhookRes.ok && dupWebhookData.status === 'already_processed') {
+      console.log('✅ Duplicate webhook correctly identified and skipped (Idempotent 200 OK)');
+    } else {
+      throw new Error(`Duplicate webhook idempotency check failed: ${JSON.stringify(dupWebhookData)}`);
     }
 
     console.log('\n🎉 ALL ARCHITECTURE INTEGRATION TESTS PASSED SUCCESSFULLY! 🎉');
