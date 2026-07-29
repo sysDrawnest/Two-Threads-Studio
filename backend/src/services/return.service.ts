@@ -417,6 +417,8 @@ export const returnService = {
       inspectionFailed,
       fraudFlagged,
       totalRefundedAmount: Number(totalRefunded._sum.finalRefundAmount ?? 0),
+      averageRefundedAmount: Number(avgStats._avg.finalRefundAmount ?? 0),
+      averageRequestedAmount: Number(avgStats._avg.requestedAmount ?? 0),
       byReason: byReason.map(r => ({ reason: r.reason, count: r._count })),
       byStatus: byStatus.map(s => ({ status: s.status, count: s._count })),
     };
