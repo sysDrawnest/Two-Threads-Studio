@@ -161,6 +161,14 @@ const Navbar: React.FC = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-[#A34A38] animate-pulse" />
             </Link>
 
+            {/* Learning Hub */}
+            <Link 
+              to="/learning" 
+              className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium"
+            >
+              Learning
+            </Link>
+
             {/* Our Story */}
             <Link 
               to="/our-story" 
@@ -320,6 +328,12 @@ const Navbar: React.FC = () => {
               className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Collections
+            </Link>
+            <Link 
+              to="/learning" 
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+            >
+              Learning
             </Link>
             <Link 
               to="/our-story#custom-creations" 
