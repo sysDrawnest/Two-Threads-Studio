@@ -141,21 +141,97 @@ export default function Legal() {
                   </article>
                 )}
 
-                {/* 4. RETURN POLICY */}
+                {/* 4. RETURN & REPLACEMENT POLICY */}
                 {activeTab === 'returns' && (
                   <article className="prose prose-neutral max-w-none">
-                    <h2 className="font-serif text-2xl font-normal text-[#1C1C1B] mb-6">Return & Refund Policy</h2>
+                    <h2 className="font-serif text-2xl font-normal text-[#1C1C1B] mb-4">Return & Replacement Policy</h2>
                     <p className="font-sans text-xs text-neutral-400 mb-6 uppercase tracking-wider">Last Updated: July 2026</p>
-                    <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-6">
-                      We want you to be fully satisfied with your purchase. Returns are processed under the business direction of <strong>SYS Pvt. Ltd.</strong> on behalf of <strong>Two Threads Studio</strong>.
+                    
+                    {/* Brand Philosophy Callout */}
+                    <div className="bg-[#FAF6F0] border-l-2 border-[#A34A38] p-5 my-6 rounded-r-sm">
+                      <p className="font-serif text-sm text-[#1C1C1B] italic leading-relaxed mb-0">
+                        "Because every item is handcrafted and produced in limited quantities, we carefully inspect all returns before issuing refunds or replacements. This helps us protect our customers, our makers, and the integrity of our products."
+                      </p>
+                    </div>
+
+                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">1. Return & Replacement Eligibility Matrix</h3>
+                    <div className="overflow-x-auto my-6">
+                      <table className="w-full text-left font-sans text-xs border-collapse border border-neutral-200">
+                        <thead>
+                          <tr className="bg-[#FAF9F7] border-b border-neutral-200 text-[#1C1C1B]">
+                            <th className="p-3 border-r border-neutral-200 font-semibold">Situation</th>
+                            <th className="p-3 border-r border-neutral-200 font-semibold">Policy & Resolution</th>
+                            <th className="p-3 font-semibold">Timeframe & Requirement</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-200 text-[#5a4a3f]">
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Damaged in Transit</td>
+                            <td className="p-3 border-r border-neutral-200">Free Replacement or Full Refund</td>
+                            <td className="p-3">Within 48 hours + Unboxing Video</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Wrong Item Sent</td>
+                            <td className="p-3 border-r border-neutral-200">Free Replacement</td>
+                            <td className="p-3">Within 48 hours + Unboxing Video</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Missing Item / Parts</td>
+                            <td className="p-3 border-r border-neutral-200">Free Item Replacement</td>
+                            <td className="p-3">Within 48 hours + Unboxing Video</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Manufacturing Defect</td>
+                            <td className="p-3 border-r border-neutral-200">Replacement or Refund post-inspection</td>
+                            <td className="p-3">Within 7 days of delivery</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Personalized / Custom Items</td>
+                            <td className="p-3 border-r border-neutral-200 text-[#A34A38] font-medium">No returns or cancellations once crafted</td>
+                            <td className="p-3">Except transit damage or defect</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 border-r border-neutral-200 font-medium text-[#1C1C1B]">Change of Mind / Used / Washed</td>
+                            <td className="p-3 border-r border-neutral-200 text-neutral-400">Not Eligible</td>
+                            <td className="p-3 text-neutral-400">N/A</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">2. Mandatory Unboxing Video Requirement</h3>
+                    <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-4">
+                      To protect our independent studio and ensure genuine claims are resolved swiftly, all claims for <strong>damaged items, wrong products, or missing items</strong> require a continuous, unedited unboxing video.
                     </p>
-                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">1. Physical Kits & Materials</h3>
-                    <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-6">
-                      We offer a 30-day return policy for any physical embroidery kits or materials, provided the product remains completely unopened, unused, and in its original premium packaging. Return shipping costs are covered by the customer.
+                    <ul className="list-disc pl-5 font-sans text-xs text-[#5a4a3f] space-y-2 mb-6">
+                      <li>The package must be clearly visible and sealed before opening begins.</li>
+                      <li>The shipping label and tracking number must be clearly shown on camera.</li>
+                      <li>The video must capture the complete unpacking process from initial cut to product inspection in one unbroken shot.</li>
+                      <li>Claims submitted without a valid unboxing video cannot be approved.</li>
+                    </ul>
+
+                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">3. Condition Requirements for Returns</h3>
+                    <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-4">
+                      All approved returns undergo physical studio inspection upon arrival. Returned items must strictly be:
                     </p>
-                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">2. Digital Downloads & Courses</h3>
+                    <ul className="list-disc pl-5 font-sans text-xs text-[#5a4a3f] space-y-2 mb-6">
+                      <li>Unused, unwashed, and unworked (no stitched threads or missing embroidery floss).</li>
+                      <li>In original packaging with all linen tags, thread cards, and needles intact.</li>
+                      <li>Completely free of stains, perfume, smoke, pet hair, or customer-induced damage.</li>
+                    </ul>
+
+                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">4. Step-by-Step Return & Refund Process</h3>
+                    <ol className="list-decimal pl-5 font-sans text-xs text-[#5a4a3f] space-y-3 mb-6">
+                      <li><strong>Submit Request:</strong> Log in to your account, navigate to Orders, select 'Request Return', choose your reason, and provide photos + unboxing video link.</li>
+                      <li><strong>Studio Review:</strong> Our studio team reviews your evidence within 24–48 business hours.</li>
+                      <li><strong>Courier Pickup:</strong> Once approved, a reverse pickup courier is dispatched to your address.</li>
+                      <li><strong>Physical Inspection:</strong> The item is carefully inspected upon reaching our studio.</li>
+                      <li><strong>Resolution:</strong> Upon passing inspection, your replacement is dispatched or your refund is issued to your original payment method.</li>
+                    </ol>
+
+                    <h3 className="font-serif text-lg text-[#1C1C1B] mb-3 mt-8">5. Digital Downloads & Custom Pieces</h3>
                     <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-6">
-                      Due to the instant nature of digital files, all downloadable patterns and online video tutorials are final sale and non-refundable.
+                      Downloadable PDF patterns and digital courses are instant delivery and strictly non-refundable. Custom engraved hoops, personalized name embroidery, and made-to-order colorways cannot be returned or cancelled once crafting has commenced.
                     </p>
                   </article>
                 )}

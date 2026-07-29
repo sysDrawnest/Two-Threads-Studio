@@ -901,20 +901,34 @@ export const OrdersTab: React.FC = () => {
                 />
               </div>
 
-              {/* Step 3: Evidence upload (text input for now, can be enhanced with Cloudinary) */}
-              {['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE'].includes(returnReason) && (
+              {/* Step 3: Evidence upload & Unboxing Video */}
+              {['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE', 'MISSING_PARTS'].includes(returnReason) && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">3. Upload evidence <span className="text-amber-600">(recommended)</span></h4>
-                  <p className="text-xs text-gray-500 mb-2">Please add photo URLs showing the issue (upload to any image host).</p>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">3. Evidence & Unboxing Video <span className="text-[#A34A38] font-bold">*</span></h4>
+                  
+                  {/* Unboxing Video Requirement Callout */}
+                  <div className="bg-[#FAF6F0] border-l-2 border-[#A34A38] p-3 mb-3 text-xs text-[#5a4a3f] rounded-r-md">
+                    <p className="font-semibold text-[#1C1C1B] mb-1">Mandatory Unboxing Video Requirement:</p>
+                    <p className="leading-relaxed">
+                      For damage or wrong product claims, please provide a link to a continuous, unedited unboxing video (showing sealed parcel, shipping label, and full unpacking shot).
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-gray-500 mb-2">Add photo or video URLs (Google Drive, Loom, Dropbox, Imgur, etc.):</p>
                   <div className="space-y-2">
                     {returnMediaUrls.map((url, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <input value={url} onChange={e => setReturnMediaUrls(prev => prev.map((u, i) => i === idx ? e.target.value : u))} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs" placeholder="https://..." />
-                        <button onClick={() => setReturnMediaUrls(prev => prev.filter((_, i) => i !== idx))} className="text-red-400"><XIcon className="w-4 h-4" /></button>
+                        <input 
+                          value={url} 
+                          onChange={e => setReturnMediaUrls(prev => prev.map((u, i) => i === idx ? e.target.value : u))} 
+                          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-[#A34A38] focus:outline-none" 
+                          placeholder={idx === 0 ? "Unboxing video URL (e.g., Drive / Loom)" : "Photo URL showing issue..."} 
+                        />
+                        <button onClick={() => setReturnMediaUrls(prev => prev.filter((_, i) => i !== idx))} className="text-red-400 p-1"><XIcon className="w-4 h-4" /></button>
                       </div>
                     ))}
                     {returnMediaUrls.length < 5 && (
-                      <button onClick={() => setReturnMediaUrls(prev => [...prev, ''])} className="text-xs text-amber-600 underline">+ Add photo URL</button>
+                      <button onClick={() => setReturnMediaUrls(prev => [...prev, ''])} className="text-xs text-[#A34A38] font-medium underline cursor-pointer">+ Add photo/video URL</button>
                     )}
                   </div>
                 </div>
@@ -922,7 +936,7 @@ export const OrdersTab: React.FC = () => {
 
               {/* Step 4: Refund type */}
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">{['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE'].includes(returnReason) ? '4.' : '3.'} Refund preference</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">{['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE', 'MISSING_PARTS'].includes(returnReason) ? '4.' : '3.'} Refund preference</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {[{ value: 'ORIGINAL_PAYMENT', label: 'Original payment' }, { value: 'STORE_CREDIT', label: 'Store credit' }].map(rt => (
                     <button
@@ -941,8 +955,8 @@ export const OrdersTab: React.FC = () => {
               </div>
 
               {/* Notice */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-                Returns are reviewed within 2–3 business days. Refund is processed after inspection.
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 leading-relaxed">
+                Returns are carefully reviewed within 24–48 business hours. Approved returns undergo physical studio inspection before refunds or replacements are issued.
               </div>
             </div>
 

@@ -7,7 +7,7 @@ const Contact: React.FC = () => {
 
   const faqs = [
     { q: "Do you ship internationally?", a: "Yes, we ship to over 50 countries worldwide. International shipping usually takes 7-14 business days. Please note that customs duties may apply depending on your location." },
-    { q: "What is your return policy?", a: "We accept returns on unopened kits within 30 days of delivery. Digital patterns and courses are non-refundable. Please contact our support team to initiate a return." },
+    { q: "What is your return & replacement policy?", a: "We offer replacements for damaged in transit, wrong item, or defective products. Claims for transit damage or missing parts must be submitted within 48 hours of delivery accompanied by an unedited unboxing video. Manufacturing defect claims are accepted within 7 days. Personalized and digital items are non-returnable. Please visit our Legal page for full details." },
     { q: "Do you offer wholesale accounts?", a: "We do partner with select independent boutiques and craft stores. If you're interested in carrying TwoThreads, please use the contact form below and select 'Wholesale Inquiry'." },
     { q: "My kit is missing a thread color. What should I do?", a: "We sincerely apologize! While we pack everything by hand with care, mistakes occasionally happen. Send us an email with your order number, and we will dispatch the missing thread immediately." }
   ];
