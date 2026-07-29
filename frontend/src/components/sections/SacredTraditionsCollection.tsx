@@ -4,7 +4,7 @@ import sacredTraditionsImg from '../../assets/Temple_relief_with_floral_mandalas
 
 export default function SacredTraditionsCollection() {
   return (
-    <section className="relative min-h-[400px] md:min-h-0 md:h-[540px] flex items-center justify-start overflow-hidden bg-[#ECE8E1] py-16 md:py-0">
+    <section className="relative min-h-[400px] md:min-h-0 md:h-[540px] flex items-center justify-start overflow-hidden bg-[#ECE8E1] py-8 md:py-0">
       {/* Background Image of spools of natural yarns and threads */}
       <div className="absolute inset-0">
         <img
@@ -19,7 +19,7 @@ export default function SacredTraditionsCollection() {
 
       {/* Floating Content Card */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-16">
-        <ScrollReveal direction="right" className="max-w-[90%] sm:max-w-[320px] md:max-w-md bg-[#FAF9F7]/85 md:bg-[#FAF9F7]/95 backdrop-blur-md p-5 md:p-10 shadow-xl border border-neutral-200/40 rounded-sm mx-auto md:mx-0 mt-16 md:mt-0">
+        <ScrollReveal direction="right" className="max-w-[90%] sm:max-w-[320px] md:max-w-md bg-[#FAF9F7]/85 md:bg-[#FAF9F7]/95 backdrop-blur-md p-5 md:p-10 shadow-xl border border-neutral-200/40 rounded-sm mx-auto md:mx-0 mt-4 md:mt-0">
           <p className="font-sans text-[10px] md:text-xs tracking-[0.25em] text-[#A34A38] uppercase font-semibold mb-3">
             Inspired by Timeless India
           </p>

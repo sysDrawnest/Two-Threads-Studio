@@ -30,7 +30,7 @@ export default function ShopByCategory() {
   const lastCategory = categories[7] || mockCategories[7];
 
   return (
-    <section className="relative bg-[#ede6de] pt-4 pb-24 px-4 sm:px-6 md:px-16">
+    <section className="relative bg-[#ede6de] pt-2 pb-6 md:pb-16 px-4 sm:px-6 md:px-16">
       {/* Top gradient to blend with the video banner's bottom gradient */}
       <div 
         className="absolute top-0 left-0 right-0 h-[140px] pointer-events-none z-10"
@@ -40,9 +40,9 @@ export default function ShopByCategory() {
       />
 
       {/* Floating editorial panel container */}
-      <div className="relative z-20 max-w-7xl mx-auto bg-[#FBFBFA] rounded-[24px] md:rounded-[36px] shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.15),_0_20px_40px_-15px_rgba(0,0,0,0.1)] -mt-20 md:-mt-28 py-16 sm:py-20 md:py-24 px-6 md:px-12">
+      <div className="relative z-20 max-w-7xl mx-auto bg-[#FBFBFA] rounded-[24px] md:rounded-[36px] shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.15),_0_20px_40px_-15px_rgba(0,0,0,0.1)] -mt-10 sm:-mt-16 md:-mt-24 py-6 sm:py-12 md:py-20 px-4 sm:px-8 md:px-12">
         {/* Heading */}
-        <ScrollReveal direction="up" className="text-center mb-10 md:mb-14">
+        <ScrollReveal direction="up" className="text-center mb-6 md:mb-12">
           <p className="font-sans text-[10px] sm:text-xs tracking-[0.3em] uppercase text-[#A34A38] mb-2 font-medium">
             Find Your Craft
           </p>

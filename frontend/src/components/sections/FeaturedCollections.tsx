@@ -27,51 +27,45 @@ const getProductCount = (slug: string): number => {
 
 export default function FeaturedCollections() {
   return (
-    <section id="featured-collections" className="py-24 px-6 md:px-16 bg-[#ede6de]">
+    <section id="featured-collections" className="py-8 sm:py-12 md:py-20 px-4 sm:px-6 md:px-16 bg-[#ede6de]">
       <div className="max-w-7xl mx-auto">
         
         {/* Section Header */}
-        <ScrollReveal direction="up" className="text-center mb-16">
-          <p className="font-sans text-xs tracking-[0.3em] uppercase text-neutral-500 mb-2">
+        <ScrollReveal direction="up" className="text-center mb-6 md:mb-12">
+          <p className="font-sans text-[10px] sm:text-xs tracking-[0.3em] uppercase text-neutral-500 mb-2">
             Signature Collections
           </p>
-          <h2 className="font-serif text-3xl md:text-5xl font-light text-primary-container mb-4">
+          <h2 className="font-serif text-3xl md:text-5xl font-light text-primary-container mb-3 md:mb-4">
             Featured Collections
           </h2>
-          <p className="font-sans text-sm text-[#5a4a3f] leading-relaxed max-w-xl mx-auto">
+          <p className="font-sans text-xs sm:text-sm text-[#5a4a3f] leading-relaxed max-w-xl mx-auto">
             Discover our signature collections, each thoughtfully curated around a unique story, crafted for modern makers and collectors.
           </p>
-          <div className="md:hidden border-t border-dotted border-outline-variant max-w-[80px] mx-auto mt-6" />
+          <div className="md:hidden border-t border-dotted border-outline-variant max-w-[80px] mx-auto mt-4" />
         </ScrollReveal>
 
         {/* Asymmetrical Editorial Grid / Mobile Swipe Gallery */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12 pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
+        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12 pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
           {featuredCollections.map((collection, index) => {
             const count = getProductCount(collection.slug);
             
             // Asymmetric grid column spans:
-            // Index 0: 2 cols on desktop/tablet
-            // Index 1: 1 col
-            // Index 2: 1 col
-            // Index 3: 2 cols on desktop/tablet
-            // Index 4: 2 cols on desktop/tablet
-            // Index 5: 1 col
             const isWide = index === 0 || index === 3 || index === 4;
             const gridSpanClass = isWide 
               ? "col-span-1 md:col-span-2 lg:col-span-2" 
               : "col-span-1 md:col-span-1 lg:col-span-1";
             
-            // Wide vs Tall aspect ratios for editorial feel
+            // On mobile (< md), force 3:4 aspect ratio. On desktop (>= md), wide items use 3:2/16:10 while narrow items use 4:5
             const imageAspectClass = isWide
-              ? "aspect-[4/3] md:aspect-[3/2] lg:aspect-[16/10]"
-              : "aspect-[4/5]";
+              ? "aspect-[3/4] md:aspect-[3/2] lg:aspect-[16/10]"
+              : "aspect-[3/4] md:aspect-[4/5]";
 
             return (
               <ScrollReveal 
                 key={collection.id} 
                 direction="up" 
                 delay={index * 0.05}
-                className={`group flex flex-col justify-between border border-[#c0b4a4]/40 bg-white/50 p-5 md:p-8 rounded-none transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 w-[85vw] flex-shrink-0 snap-center md:w-auto ${gridSpanClass}`}
+                className={`group flex flex-col justify-between border border-[#c0b4a4]/40 bg-white/50 p-4 md:p-8 rounded-none transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 w-[85vw] flex-shrink-0 snap-center md:w-auto ${gridSpanClass}`}
               >
                 <a 
                   href={`/shop?collection=${collection.slug}`}
@@ -79,11 +73,11 @@ export default function FeaturedCollections() {
                 >
                   <div>
                     {/* Image Container */}
-                    <div className={`relative overflow-hidden mb-6 rounded-none ${imageAspectClass}`}>
+                    <div className={`relative overflow-hidden mb-4 md:mb-6 rounded-none ${imageAspectClass}`}>
                       {/* Optional Badge */}
                       {collection.badge && (
-                        <div className="absolute top-4 left-4 z-10">
-                          <span className="bg-[#1C1C1B]/95 text-white font-sans text-[8px] tracking-[0.2em] uppercase px-3 py-1.5 rounded-none">
+                        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10">
+                          <span className="bg-[#1C1C1B]/95 text-white font-sans text-[8px] tracking-[0.2em] uppercase px-2.5 py-1 md:px-3 md:py-1.5 rounded-none">
                             {collection.badge}
                           </span>
                         </div>
@@ -98,8 +92,8 @@ export default function FeaturedCollections() {
                     </div>
 
                     {/* Metadata Header */}
-                    <div className="flex justify-between items-baseline mb-3">
-                      <h3 className="font-serif text-2xl font-light text-primary-container transition-colors duration-300 group-hover:text-[#A34A38]">
+                    <div className="flex justify-between items-baseline mb-2 md:mb-3">
+                      <h3 className="font-serif text-xl md:text-2xl font-light text-primary-container transition-colors duration-300 group-hover:text-[#A34A38]">
                         {collection.title}
                       </h3>
                       <span className="font-sans text-[10px] tracking-wider text-neutral-500 uppercase whitespace-nowrap">
@@ -108,21 +102,16 @@ export default function FeaturedCollections() {
                     </div>
 
                     {/* Divider */}
-                    <hr className="border-t border-neutral-300/40 my-3" />
+                    <hr className="border-t border-neutral-300/40 my-2 md:my-3" />
 
                     {/* Description */}
-                    <p className="font-sans text-sm leading-relaxed text-[#5a4a3f] mb-4">
+                    <p className="font-sans text-xs md:text-sm leading-relaxed text-[#5a4a3f] mb-4">
                       {collection.description}
-                    </p>
-                    
-                    {/* Curated Products List */}
-                    <p className="font-sans text-[11px] tracking-wider text-[#A34A38]/80 italic mb-6">
-                      Featuring: {collection.productsSummary}
                     </p>
                   </div>
 
                   {/* Luxury CTA */}
-                  <div className="inline-flex items-center font-sans text-xs tracking-[0.2em] uppercase text-primary-container font-medium mt-auto">
+                  <div className="inline-flex items-center font-sans text-xs tracking-[0.2em] uppercase text-primary-container font-medium mt-auto pt-2">
                     <span className="relative py-1">
                       View Collection
                       <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary-container transition-all duration-300 group-hover:w-full" />

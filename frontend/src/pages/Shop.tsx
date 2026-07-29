@@ -148,17 +148,17 @@ export default function Shop() {
 
   return (
     <PageContainer>
-      <div className="bg-[#FAF9F7] min-h-screen text-[#1C1C1B] pb-24">
+      <div className="bg-[#FAF9F7] min-h-screen text-[#1C1C1B] pb-12 md:pb-24">
         
         {/* Curated Storytelling Hero Banner */}
-        <section className="px-6 md:px-12 lg:px-16 pt-10 pb-16 max-w-[1400px] mx-auto w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+        <section className="px-4 sm:px-6 md:px-12 lg:px-16 pt-3 sm:pt-6 md:pt-10 pb-6 md:pb-16 max-w-[1400px] mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 items-center">
             {/* Left Column: Brand Typography */}
             <div>
               <p className="font-sans text-[10px] md:text-xs tracking-[0.25em] text-neutral-500 uppercase">
                 Shop / The Collections
               </p>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light text-[#1C1C1B] mt-3 mb-6 leading-tight">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-[#1C1C1B] mt-2 mb-3 md:mb-6 leading-tight">
                 Crafted to Endure.
               </h1>
               <p className="font-sans text-sm md:text-base text-neutral-600 leading-relaxed max-w-lg">

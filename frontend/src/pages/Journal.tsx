@@ -4,7 +4,7 @@ import PageContainer from '../components/layout/PageContainer';
 const Journal: React.FC = () => {
   return (
     <PageContainer>
-      <div className="flex-1 flex flex-col items-center justify-center py-32 px-6">
+      <div className="flex-1 flex flex-col items-center justify-center py-12 md:py-20 px-6">
         <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-4">
           Journal
         </p>

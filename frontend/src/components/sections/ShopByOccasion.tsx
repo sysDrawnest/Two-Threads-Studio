@@ -19,10 +19,10 @@ export default function ShopByOccasion() {
   };
 
   return (
-    <section className="py-16 sm:py-20 md:py-24 bg-[#ede6de]">
+    <section className="py-8 sm:py-12 md:py-16 bg-[#ede6de]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-16">
         {/* Heading */}
-        <ScrollReveal direction="up" className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10 md:mb-12 gap-4">
+        <ScrollReveal direction="up" className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-6 md:mb-10 gap-4">
           <div>
             <p className="font-sans text-[10px] sm:text-xs tracking-[0.3em] uppercase text-[#A34A38] mb-2 font-medium">
               Find the Perfect Gift

@@ -7,7 +7,7 @@ const Collections: React.FC = () => {
   return (
     <PageContainer>
       <div className="bg-background">
-        <div className="py-20 px-6 md:px-16 text-center max-w-4xl mx-auto">
+        <div className="pt-6 sm:pt-8 md:pt-12 pb-8 md:pb-16 px-6 md:px-16 text-center max-w-4xl mx-auto">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-4">
             Curations
           </p>

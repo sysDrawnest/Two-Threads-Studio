@@ -12,7 +12,7 @@ const OurStory: React.FC = () => {
   return (
     <PageContainer>
       {/* Mission Statement Hero (from About.tsx) */}
-      <section className="bg-primary-container text-inverse-on-surface pt-32 pb-24 px-6 md:px-16 text-center">
+      <section className="bg-primary-container text-inverse-on-surface pt-8 md:pt-16 pb-12 md:pb-20 px-6 md:px-16 text-center">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal direction="up" delay={0.15}>
             <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-8">

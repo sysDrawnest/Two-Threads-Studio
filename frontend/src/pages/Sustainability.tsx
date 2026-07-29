@@ -7,7 +7,7 @@ const Sustainability: React.FC = () => {
   return (
     <PageContainer>
       {/* Hero */}
-      <section className="bg-[#5a4a3f] text-[#f5f0eb] pt-24 pb-32 px-6 md:px-16 text-center">
+      <section className="bg-[#5a4a3f] text-[#f5f0eb] pt-8 md:pt-16 pb-16 md:pb-24 px-6 md:px-16 text-center">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal direction="up" delay={0.15}>
             <p className="font-sans text-xs tracking-[0.3em] uppercase text-[#d4c4b5] mb-6">
