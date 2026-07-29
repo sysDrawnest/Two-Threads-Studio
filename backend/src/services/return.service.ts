@@ -382,17 +382,11 @@ export const returnService = {
       if (endDate) where.requestedAt.lte = new Date(endDate);
     }
 
-    const [total, byStatus, byReason, fraudFlagged, avgResolution, totalRefunded] = await Promise.all([
+    const [total, byStatus, byReason, fraudFlagged, totalRefunded] = await Promise.all([
       prisma.returnRequest.count({ where }),
       prisma.returnRequest.groupBy({ by: ['status'], _count: true, where }),
       prisma.returnRequest.groupBy({ by: ['reason'], _count: true, where }),
       prisma.returnRequest.count({ where: { ...where, fraudFlagged: true } }),
-      prisma.returnRequest.aggregate({
-        _avg: {
-          // avg days to resolve: computed from requestedAt→resolvedAt
-        },
-        where: { ...where, resolvedAt: { not: null } },
-      }),
       prisma.returnRequest.aggregate({
         _sum: { finalRefundAmount: true },
         where: { ...where, status: ReturnStatus.REFUNDED },

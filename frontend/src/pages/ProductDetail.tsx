@@ -36,9 +36,9 @@ const ProductDetail: React.FC = () => {
   const fetchReviews = async (pId: string, pageNum = 1, sortBy = 'helpful', hasMedia = false) => {
     try {
       setReviewsLoading(true);
-      const res = await reviewService.getProductReviews(pId, { page: pageNum, sort: sortBy, hasMedia, limit: 6 });
+      const res: any = await reviewService.getProductReviews(pId, { page: pageNum, sort: sortBy, hasMedia, limit: 6 });
       if (res.success) {
-        setReviewsData(res.data);
+        setReviewsData(res.reviews ? res : res.data || res);
       }
     } catch (err) {
       console.error('Failed to load reviews:', err);

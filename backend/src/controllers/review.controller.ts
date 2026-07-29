@@ -207,13 +207,20 @@ export const reviewController = {
   // ── Get Public Reviews for Product ───────────────────────────────────────
   getProductReviews: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const productId = req.params['productId'] as string;
+      const paramId = req.params['productId'] as string;
       const page = Math.max(1, parseInt(req.query['page'] as string) || 1);
       const limit = Math.min(50, parseInt(req.query['limit'] as string) || 10);
       const filterMedia = req.query['hasMedia'] === 'true';
       const sort = req.query['sort'] as string || 'helpful'; // helpful, newest, highest, lowest
 
       const skip = (page - 1) * limit;
+
+      // Support lookup by either ID or slug
+      let productId = paramId;
+      if (!paramId.startsWith('c') && paramId.includes('-')) {
+        const product = await prisma.product.findUnique({ where: { slug: paramId }, select: { id: true } });
+        if (product) productId = product.id;
+      }
 
       const where: any = {
         productId,
