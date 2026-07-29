@@ -37,10 +37,13 @@ export default function OurStory() {
           <ScrollReveal direction="up" delay={0.2}>
             <div className="font-sans text-sm text-[#5a4a3f] leading-loose space-y-6 mb-12">
               <p>
-                TwoThreads Studio is the story of two people creating something meaningful together. One of us built the technology, platform, and brand experience, while the other brings each creation to life by hand—patiently crafting every piece with care, intention, and love.
+                TwoThreads Studio began with a simple belief: the most meaningful things are made slowly.
               </p>
               <p>
-                True luxury lies in patience. Every embroidery kit and textile is made individually—not by an assembly line, but by a single maker who believes that beautiful things deserve time and attention.
+                Every piece begins with an idea, is crafted patiently by hand, and finished with the same care we'd give something made for our own home. We don't chase volume or trends—we focus on creating thoughtful pieces that are meant to be kept, gifted, and remembered.
+              </p>
+              <p>
+                Each collection reflects a commitment to craftsmanship, timeless design, and the beauty of making something well.
               </p>
             </div>
           </ScrollReveal>
@@ -50,8 +53,8 @@ export default function OurStory() {
               to="/our-story"
               className="group inline-flex items-center gap-3 font-sans text-xs tracking-[0.2em] uppercase text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
-              <span className="border-b border-[#1C1C1B]/30 group-hover:border-[#A34A38] pb-1 transition-colors">
-                Discover Our Heritage
+              <span className="border-b border-[#1C1C1B]/30 group-hover:border-[#A34A38] pb-1 transition-colors font-semibold">
+                Discover Our Story
               </span>
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
