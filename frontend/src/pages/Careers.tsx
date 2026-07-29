@@ -50,16 +50,16 @@ export default function Careers() {
     },
     {
       id: 'job-3',
-      title: 'Artisan Partnerships Coordinator',
+      title: 'Sustainable Material Sourcing Specialist',
       department: 'Operations & Sustainability',
       location: 'New Delhi, India (Hybrid)',
       type: 'Full-time',
-      description: 'Two Threads Studio, a brand operated by SYS Pvt. Ltd., is seeking an Artisan Partnerships Coordinator. You will serve as our primary coordinator with traditional weavers, thread mills, and rural craft cooperatives in India and Belgium, ensuring sustainable sourcing and fair wage compliance.',
+      description: 'Two Threads Studio, a brand operated by SYS Pvt. Ltd., is seeking a Sustainable Material Sourcing Specialist. You will coordinate with certified eco-friendly linen mills, organic thread producers, and sustainable packaging partners in India and Europe, ensuring zero-waste compliance and ethical material sourcing.',
       requirements: [
-        'Degree in social work, textile conservation, or supply chain management.',
-        'Prior experience working directly with rural artisan communities or NGOs.',
+        'Degree in textile conservation, environmental science, or supply chain management.',
+        'Prior experience working with certified organic or zero-waste textile suppliers.',
         'Excellent communication and documentation skills.',
-        'Willingness to travel to artisan clusters for quality audits and relationship building.'
+        'Willingness to conduct quality audits and build long-term relationships with sustainable material partners.'
       ]
     }
   ];

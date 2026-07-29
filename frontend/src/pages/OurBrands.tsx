@@ -9,7 +9,7 @@ export default function OurBrands() {
     {
       name: 'Two Threads Studio',
       subtitle: 'Premium DIY Embroidery & Textiles',
-      description: 'A contemporary textile design brand specializing in premium, zero-waste Belgian linen embroidery kits, digital patterns, and mindful stitch courses. Designed to serve as a bridge between traditional artisan craftsmanship and modern mindfulness.',
+      description: 'An independent textile studio specializing in handcrafted embroidery kits, digital patterns, and mindful stitch guides. Designed to celebrate slow, intentional making and personal craftsmanship.',
       link: '/',
       linkLabel: 'Visit Storefront',
       icon: Sparkles,

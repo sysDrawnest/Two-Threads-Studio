@@ -433,7 +433,7 @@ export const OrdersTab: React.FC = () => {
               </div>
               <p className="text-sm text-orange-700">
                 {selectedOrder.orderStatus === 'RETURN_REQUESTED'
-                  ? 'Our team is reviewing your return request. You will hear from us within 2–3 business days. Refund is processed only after item inspection.'
+                  ? 'We are reviewing your return request. You will hear from us within 2–3 business days. Refund is processed only after item inspection.'
                   : 'Your return has been completed and refund processed.'}
               </p>
             </div>

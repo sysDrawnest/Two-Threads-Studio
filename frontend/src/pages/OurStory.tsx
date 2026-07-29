@@ -26,7 +26,7 @@ const OurStory: React.FC = () => {
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.45}>
             <p className="font-sans text-sm text-white/70 leading-loose max-w-2xl mx-auto">
-              At TwoThreads Studio, we source the finest natural materials and partner with master artisans to create embroidery kits that act as a bridge between traditional craft and modern mindfulness.
+              TwoThreads Studio is the story of two people creating something meaningful together. We build the technology, design the patterns, and handcraft every piece individually with patience, intention, and love.
             </p>
           </ScrollReveal>
         </div>
@@ -45,8 +45,8 @@ const OurStory: React.FC = () => {
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
               { num: "01", title: "Sourcing", img: aboutImg1, text: "We start with the fabric. Our unbleached linen is woven in a zero-waste facility in Belgium, ensuring perfect tension and a natural, earthy texture." },
-              { num: "02", title: "Design", img: aboutImg2, text: "Every pattern is hand-drawn by our global network of textile artists. We digitize these drawings carefully to retain the organic feel of the original sketch." },
-              { num: "03", title: "Curation", img: aboutImg3, text: "Threads are color-matched by eye, not by computer. We pack every box by hand in our studio, wrapping components in recycled paper." }
+              { num: "02", title: "Design", img: aboutImg2, text: "Every pattern is hand-drawn and designed right here in our studio. We digitize these drawings carefully to retain the organic feel of every original sketch." },
+              { num: "03", title: "Curation", img: aboutImg3, text: "Threads are color-matched by eye. Every box is assembled and packed individually by hand in our studio with recycled paper and care." }
             ].map((step, i) => (
               <ScrollReveal key={i} direction="up" className="flex flex-col group cursor-default">
                 <div className="relative aspect-[1/1] md:aspect-[4/5] overflow-hidden bg-surface-container mb-6">
@@ -89,16 +89,16 @@ const OurStory: React.FC = () => {
               A return to the slow craft.
             </h2>
             <p className="font-sans text-base text-[#5a4a3f] leading-loose mb-6">
-              TwoThreads was born out of a quiet frustration with the speed of modern life. Our founder, Elara Vance, spent years working in fast-paced design houses before realizing that the art of true creation was being lost to mass production.
+              TwoThreads Studio was born out of a quiet desire to slow down and build something meaningful together. I built the technology, the platform, and the brand experience, while she brings each creation to life by hand—patiently crafting every piece with care and intention.
             </p>
             <p className="font-sans text-base text-[#5a4a3f] leading-loose mb-10">
-              "I wanted to build something that forced you to sit down, take a breath, and make something beautiful with your own two hands," she says. What started as a small collection of hand-drawn patterns in a sketchbook has evolved into a global community of makers dedicated to the art of embroidery.
+              "Our goal isn't to become a giant factory or mass craft store," she says. "It's to create timeless pieces that people cherish while preserving the personal connection that inspired TwoThreads Studio from the very beginning."
             </p>
             <div className="flex items-center gap-6 pt-6 border-t border-outline-variant">
               <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" alt="Elara Vance Signature" className="h-12 w-12 rounded-full object-cover grayscale" />
               <div>
-                <p className="font-serif text-xl text-primary-container">Elara Vance</p>
-                <p className="font-sans text-xs uppercase tracking-wider text-on-surface-variant">Founder & Creative Director</p>
+                <p className="font-serif text-xl text-primary-container">Elara & Studio Team</p>
+                <p className="font-sans text-xs uppercase tracking-wider text-on-surface-variant">Co-Founders & Makers</p>
               </div>
             </div>
           </ScrollReveal>
@@ -106,7 +106,7 @@ const OurStory: React.FC = () => {
             <div className="aspect-[3/4] md:aspect-square lg:aspect-[3/4] overflow-hidden bg-surface-container">
               <img 
                 src="https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=1200&auto=format&fit=crop" 
-                alt="Elara Vance in studio" 
+                alt="Studio craft workspace" 
                 className="w-full h-full object-cover grayscale opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
               />
             </div>
@@ -123,7 +123,7 @@ const OurStory: React.FC = () => {
               Our Journey
             </h2>
             <p className="font-sans text-sm text-[#5a4a3f] leading-loose max-w-2xl mx-auto">
-              From a tiny studio apartment to a global platform, here is how the thread unravelled.
+              From a small sketchbook to a dedicated independent studio, here is how the story unspooled.
             </p>
           </ScrollReveal>
         </div>
@@ -136,9 +136,9 @@ const OurStory: React.FC = () => {
             {[
               { year: "2019", title: "The First Stitch", text: "Elara creates the first 'Botanical Meadow' pattern, sharing it on a small blog." },
               { year: "2020", title: "Sourcing Quality", text: "Partnered with a multi-generational mill in Belgium to secure the finest, sustainable unbleached linen." },
-              { year: "2022", title: "The Artisan Guild", text: "Launched our first collaborative kits, featuring designs from textile artists around the globe." },
-              { year: "2024", title: "Learning Hub Launch", text: "Introduced digital courses, allowing anyone to master advanced thread painting techniques from home." },
-              { year: "Today", title: "A Global Community", text: "Over 50,000 makers worldwide, united by a love for slow crafting and sustainable art." }
+              { year: "2022", title: "Handcrafted Kits", text: "Introduced our first limited-batch embroidery kits, designed and stitched entirely in-house." },
+              { year: "2024", title: "Digital Stitch Guides", text: "Introduced digital courses, allowing anyone to learn embroidery techniques from our studio." },
+              { year: "Today", title: "An Independent Studio", text: "Continuing to create timeless, handcrafted pieces with patience, intention, and love." }
             ].map((milestone, i) => (
               <ScrollReveal key={i} direction={i % 2 === 0 ? "left" : "right"} className={`flex flex-col md:flex-row relative z-10 ${i % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
                 <div className="hidden md:block md:w-1/2" />
@@ -198,7 +198,7 @@ const OurStory: React.FC = () => {
               About SYS Pvt. Ltd.
             </h2>
             <p className="font-sans text-xs text-[#5a4a3f]/80 leading-relaxed max-w-2xl mx-auto mb-8">
-              Two Threads Studio operates as a proud member of the SYS Pvt. Ltd. family. SYS Pvt. Ltd. is a creator of digital-first consumer brands focused on craftsmanship, technology, design, and building meaningful products. Under this umbrella, we leverage advanced operational platforms while ensuring our master artisans retain full creative independence and traditional design heritage.
+              Two Threads Studio operates as a proud member of the SYS Pvt. Ltd. family. SYS Pvt. Ltd. is a creator of digital-first consumer brands focused on craftsmanship, technology, design, and building meaningful products. Under this umbrella, we leverage advanced operational platforms while ensuring our studio retains full creative independence and traditional design heritage.
             </p>
             <div className="w-12 h-px bg-outline-variant/40 mx-auto" />
           </ScrollReveal>

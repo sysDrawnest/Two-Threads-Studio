@@ -372,7 +372,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           <div className="bg-[#fff9c4] p-3 rounded-lg border border-[#fff59d] flex gap-2 items-start text-xs text-[#f57f17]">
             <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
             <p>
-              To maintain our premium artisan standards, all reviews are moderated for profanity, duplicate content, and spam. Once approved by our team, your review will be published.
+              To maintain our quality standards, all reviews are moderated for profanity, duplicate content, and spam. Once reviewed, your story will be published.
             </p>
           </div>
         </form>

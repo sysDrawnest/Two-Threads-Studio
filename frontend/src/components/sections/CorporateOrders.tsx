@@ -12,7 +12,7 @@ const clientTypes = [
   {
     icon: <Palette size={22} strokeWidth={1.5} />,
     title: 'Interior Designers',
-    desc: 'Custom artisan pieces that elevate any residential or commercial project.',
+    desc: 'Custom handcrafted pieces that elevate any residential or commercial project.',
   },
   {
     icon: <Heart size={22} strokeWidth={1.5} />,
@@ -27,12 +27,12 @@ const clientTypes = [
   {
     icon: <Coffee size={22} strokeWidth={1.5} />,
     title: 'Cafés & Boutiques',
-    desc: 'Artisan wall art and decor that creates a distinctive visual identity.',
+    desc: 'Handcrafted wall art and decor that creates a distinctive visual identity.',
   },
   {
     icon: <ShoppingBag size={22} strokeWidth={1.5} />,
     title: 'Retail & Boutiques',
-    desc: 'Wholesale access to our full collection for curated retail environments.',
+    desc: 'Wholesale access to our collection for curated retail environments.',
   },
 ];
 
@@ -45,7 +45,7 @@ export default function CorporateBulkOrders() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <p className="font-sans text-[10px] sm:text-xs tracking-[0.3em] uppercase text-[#c4973a] mb-2 font-medium">
-                Crafted at Scale
+                Bespoke Commissions
               </p>
               <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-white leading-tight">
                 For Every Vision,<br className="hidden md:block" /> Every Occasion

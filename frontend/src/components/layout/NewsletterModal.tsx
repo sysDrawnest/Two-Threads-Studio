@@ -94,15 +94,19 @@ const NewsletterModal: React.FC = () => {
                   </div>
                   <h3 className="font-serif text-2xl text-primary-container mb-2">Welcome to the Guild</h3>
                   <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                    Thank you for joining. Our artisan updates and exclusive patterns will arrive in your inbox.
+                    Thank you for joining. Our studio updates and exclusive patterns will arrive in your inbox.
                   </p>
                 </motion.div>
               ) : (
-                <div>
-                  <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-on-surface-variant block mb-3">Artisan Updates</span>
-                  <h3 className="font-serif text-3xl font-light text-[#2d2520] mb-4">Join Our Community</h3>
+                <>
+                  <p className="font-sans text-xs tracking-[0.25em] uppercase text-on-secondary-container mb-3 font-medium">
+                    The Studio Journal
+                  </p>
+                  <h3 className="font-serif text-2xl md:text-3xl text-primary-container mb-3">
+                    Stitch with Intention
+                  </h3>
                   <p className="font-sans text-xs text-[#5a4a3f] leading-relaxed mb-6">
-                    Subscribe for seasonal botanical patterns, stories of local artisans, and premium embroidery masterclasses.
+                    Subscribe for seasonal botanical patterns, stories from our studio, and premium embroidery guides.
                   </p>
 
                   <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -128,7 +132,7 @@ const NewsletterModal: React.FC = () => {
                   >
                     No thanks, maybe later
                   </button>
-                </div>
+                </>
               )}
             </div>
           </motion.div>

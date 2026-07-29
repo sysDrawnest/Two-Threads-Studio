@@ -80,7 +80,7 @@ export default function Reviews() {
             Community Love
           </p>
           <h2 className="font-serif text-3xl md:text-5xl font-light text-primary-container">
-            What Our Makers Say
+            What Our Community Says
           </h2>
         </ScrollReveal>
       </div>

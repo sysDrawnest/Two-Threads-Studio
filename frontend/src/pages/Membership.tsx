@@ -9,7 +9,7 @@ const Membership: React.FC = () => {
       <section className="bg-primary-container text-inverse-on-surface pt-24 pb-32 px-6 md:px-16 text-center">
         <div className="max-w-4xl mx-auto">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">
-            The Artisan Guild
+            The Studio Collective
           </p>
           <h1 className="font-serif text-4xl md:text-6xl font-light mb-6 text-white">
             Join the inner circle of makers.
@@ -68,7 +68,7 @@ const Membership: React.FC = () => {
                 "3 new digital pattern downloads per month",
                 "20% off all physical kits and supplies",
                 "Free expedited shipping on all orders",
-                "Monthly live Q&A sessions with featured artists"
+                "Monthly live Q&A and stitch-along sessions with our lead maker"
               ].map((benefit, i) => (
                 <li key={i} className="flex items-start gap-4">
                   <svg className="flex-shrink-0 mt-1" width="16" height="16" fill="none" stroke="#f5f0eb" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20 6L9 17l-5-5" /></svg>

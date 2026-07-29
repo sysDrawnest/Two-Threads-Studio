@@ -37,10 +37,10 @@ export default function OurStory() {
           <ScrollReveal direction="up" delay={0.2}>
             <div className="font-sans text-sm text-[#5a4a3f] leading-loose space-y-6 mb-12">
               <p>
-                We partner with women artisans across India to bring heritage craft into modern homes. Our work is a celebration of the human touch—where every stitch is placed with purpose, preserving techniques that have been passed down for generations.
+                TwoThreads Studio is the story of two people creating something meaningful together. One of us built the technology, platform, and brand experience, while the other brings each creation to life by hand—patiently crafting every piece with care, intention, and love.
               </p>
               <p>
-                True luxury lies in patience. By choosing sustainable materials and supporting ethical livelihoods, we ensure that the art you bring into your home leaves a positive mark on the world.
+                True luxury lies in patience. Every embroidery kit and textile is made individually—not by an assembly line, but by a single maker who believes that beautiful things deserve time and attention.
               </p>
             </div>
           </ScrollReveal>

@@ -12,7 +12,7 @@ const Journal: React.FC = () => {
           Studio Notes
         </h1>
         <p className="font-sans text-sm text-[#5a4a3f] max-w-lg text-center leading-loose">
-          Our editorial journal is coming soon, featuring stories from our artisans and community.
+          Our editorial journal is coming soon, featuring stories from our studio, craft techniques, and community.
         </p>
       </div>
     </PageContainer>

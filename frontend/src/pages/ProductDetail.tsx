@@ -422,7 +422,7 @@ const ProductDetail: React.FC = () => {
       <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-[#f8f3ee] border-t border-neutral-200">
         <div className="max-w-5xl mx-auto">
           <h3 className="font-serif text-3xl font-light text-[#1C1C1B] mb-12 text-center tracking-wide">
-            Notes from our Makers
+            Notes from the Studio
           </h3>
 
           {reviewsLoading && !reviewsData ? (

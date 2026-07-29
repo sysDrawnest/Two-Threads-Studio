@@ -271,7 +271,7 @@ export const mockProducts: Product[] = [
       "https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=800&auto=format&fit=crop",
     ],
     description:
-      "Our comprehensive bundle for the dedicated artisan, featuring complex cottage core designs.",
+      "Our comprehensive bundle for dedicated makers, featuring complex cottage core designs.",
     story:
       "This bundle encapsulates the essence of a rambling English cottage garden. It challenges you with varied stitches and a dense, lush composition that feels like a labor of love.",
     materialsIncluded: [
@@ -417,7 +417,7 @@ export const mockProducts: Product[] = [
     description:
       "A meticulously hand-embroidered 8-inch hoop featuring a dense wildflower meadow. Over 40 hours of hand stitching.",
     story:
-      "Each Wildflower Sanctuary hoop is individually crafted by our master embroiderer. No two pieces are identical, making this a true heirloom.",
+      "Each Wildflower Sanctuary hoop is individually hand-stitched with care in our studio. No two pieces are identical, making this a true heirloom.",
     materialsIncluded: [
       '8" Walnut-stained hoop',
       "Hand-embroidered linen art piece",
@@ -480,7 +480,7 @@ export const mockProducts: Product[] = [
     ],
     description: "Handknotted cotton macramé wall art. Natural, organic, and endlessly elegant.",
     story:
-      "Inspired by the earthy textures of Rajasthan, each piece is hand-knotted by our artisan collective using sustainably sourced cotton rope.",
+      "Inspired by earthy textures, each piece is hand-knotted individually in our studio using sustainably sourced cotton rope.",
     materialsIncluded: ["Handknotted macramé piece", "Driftwood rod", "Hanging cord"],
     estimatedTime: "Ready to hang",
     reviews: [
@@ -607,7 +607,7 @@ export const mockProducts: Product[] = [
       "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop",
     ],
     description: "A premium handcrafted jute tote bag featuring beautiful floral embroidery details.",
-    story: "Woven from golden jute fibers and detailed with delicate chain stitching by our women artisans.",
+    story: "Woven from golden jute fibers and detailed with delicate hand stitching in our studio.",
     materialsIncluded: ["Handwoven Jute Tote", "Dust bag"],
     estimatedTime: "N/A",
     reviews: [],

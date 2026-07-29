@@ -7,7 +7,7 @@ const steps = [
   {
     icon: <Pencil size={22} strokeWidth={1.5} />,
     title: 'Design',
-    desc: 'Every piece begins with thoughtful sketches and colour studies by our in-house artisans.',
+    desc: 'Every piece begins with thoughtful sketches and color studies in our studio.',
     number: '01',
   },
   {

@@ -298,7 +298,7 @@ const Checkout: React.FC = () => {
           <span className="text-[10px] font-mono tracking-widest uppercase text-[#A34A38] font-bold block mb-2">Artisan Order Confirmed</span>
           <h1 className="font-serif text-2xl md:text-3xl text-[#1C1C1B] mb-3">Thank You for Supporting Slow Craft</h1>
           <p className="text-xs text-[#6E665E] leading-relaxed mb-8">
-            Your order is received with gratitude. Our master artisans are preparing your custom embroidery canvas with meticulous attention to detail.
+            Your order is received with gratitude. We are preparing your custom embroidery canvas in our studio with meticulous attention to detail.
           </p>
 
           <div className="bg-[#FAF8F5] border border-[#EBE5DF] rounded-xl p-4 mb-8 text-xs text-left space-y-2 font-mono">

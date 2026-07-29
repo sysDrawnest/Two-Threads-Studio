@@ -12,17 +12,17 @@ const Artisans: React.FC = () => {
         <div className="max-w-3xl mx-auto">
           <ScrollReveal direction="up" delay={0.15}>
             <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">
-              The Guild
+              Behind the Craft
             </p>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.3}>
             <h1 className="font-serif text-4xl md:text-6xl font-light text-primary-container mb-6">
-              Meet the Artisans.
+              Meet the Maker.
             </h1>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.45}>
             <p className="font-sans text-sm text-[#5a4a3f] leading-loose max-w-2xl mx-auto">
-              Our patterns and kits are designed in collaboration with independent textile artists from around the world. These makers bring their unique heritage, techniques, and artistic vision to the TwoThreads community.
+              Every embroidery kit, textile, or handcrafted item at TwoThreads Studio is created individually by hand—not by an assembly line, but by one maker who believes that beautiful things deserve time, patience, and attention.
             </p>
           </ScrollReveal>
         </div>
@@ -58,7 +58,7 @@ const Artisans: React.FC = () => {
                       to={`/instructor/${artisan.id}`} 
                       className="font-sans text-xs tracking-[0.15em] uppercase text-on-secondary-container hover:text-primary-container transition-colors no-underline font-semibold outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-on-secondary-container"
                     >
-                      View Courses →
+                      View Studio Guides →
                     </Link>
                   </div>
                 </div>
@@ -68,20 +68,20 @@ const Artisans: React.FC = () => {
         </div>
       </section>
       
-      {/* Join the Guild CTA */}
+      {/* Custom Creation CTA */}
       <section className="py-24 px-6 md:px-16 bg-primary-container text-center">
         <ScrollReveal direction="up">
           <h2 className="font-serif text-3xl md:text-5xl font-light text-inverse-on-surface mb-6">
-            Are you a textile artist?
+            Have a custom piece in mind?
           </h2>
           <p className="font-sans text-sm text-inverse-on-surface/75 leading-loose max-w-2xl mx-auto mb-10">
-            We are always looking to collaborate with passionate makers to design new kits and teach masterclasses. 
+            We love crafting bespoke commissions and personalized heirloom embroidery for special occasions.
           </p>
           <Link 
             to="/contact"
             className="inline-block bg-on-secondary-container text-inverse-on-surface px-9 py-4 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-white hover:text-primary-container transition-colors no-underline outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-on-secondary-container"
           >
-            Submit Portfolio
+            Request Bespoke Piece
           </Link>
         </ScrollReveal>
       </section>

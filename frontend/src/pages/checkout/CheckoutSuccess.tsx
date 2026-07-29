@@ -39,7 +39,7 @@ export default function CheckoutSuccess() {
         <h1 className="text-2xl font-serif text-[#1C1C1B] mb-3">Payment Successful</h1>
         <p className="text-sm text-[#6B6B6B] font-sans leading-relaxed mb-6">
           Thank you for choosing Two Threads Studio. Your handcrafted pieces are now being
-          prepared by our artisans with care and intention.
+          prepared in our studio with care and intention.
         </p>
 
         {orderNumber && (
