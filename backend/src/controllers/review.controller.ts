@@ -215,9 +215,10 @@ export const reviewController = {
 
       const skip = (page - 1) * limit;
 
-      // Support lookup by either ID or slug
+      // Support lookup by either ID or slug (CUIDs are 25 chars and start with 'c')
       let productId = paramId;
-      if (!paramId.startsWith('c') && paramId.includes('-')) {
+      const isCuid = paramId.startsWith('c') && paramId.length === 25;
+      if (!isCuid) {
         const product = await prisma.product.findUnique({ where: { slug: paramId }, select: { id: true } });
         if (product) productId = product.id;
       }
