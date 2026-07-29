@@ -621,6 +621,10 @@ model Review {
   @@index([productId])
   @@index([userId])
   @@index([rating])
+  // Composite indexes for filtered queries
+  @@index([productId, status])                        // getProductReviews where productId+status=APPROVED
+  @@index([status, createdAt(sort: Desc)])            // admin listReviews ordered by date
+  @@index([userId, updatedAt(sort: Desc)])            // getMyReviews ordered by updatedAt
   @@map("reviews")
 }
 
@@ -1475,6 +1479,9 @@ model ReturnRequest {
   @@index([userId])
   @@index([status])
   @@index([requestedAt(sort: Desc)])
+  // Composite indexes for admin filtered list
+  @@index([status, requestedAt(sort: Desc)])          // admin returns list filtered by status
+  @@index([fraudFlagged, requestedAt(sort: Desc)])    // admin fraud-flagged filter
   @@map("return_requests")
 }
 

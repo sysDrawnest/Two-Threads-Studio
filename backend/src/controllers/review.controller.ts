@@ -256,54 +256,54 @@ export const reviewController = {
         prisma.review.count({ where }),
       ]);
 
-      // Calculate rating breakdown and average stats
-      const allApprovedReviews = await prisma.review.findMany({
-        where: { productId, status: ReviewStatus.APPROVED },
-        select: {
-          rating: true,
-          qualityRating: true,
-          packagingRating: true,
-          valueRating: true,
-          easeOfUseRating: true,
-          wouldRecommend: true,
-        },
-      });
+      // Calculate rating breakdown and averages efficiently using DB aggregation
+      const approvedWhere = { productId, status: ReviewStatus.APPROVED };
 
-      const totalApproved = allApprovedReviews.length;
-      const ratingsCount = [0, 0, 0, 0, 0]; // 1 to 5 star counts
-      let sumRating = 0;
-      let sumQuality = 0; let countQuality = 0;
-      let sumPackaging = 0; let countPackaging = 0;
-      let sumValue = 0; let countValue = 0;
-      let sumEase = 0; let countEase = 0;
-      let recommendCount = 0;
+      const [ratingGroups, attrAgg, recommendCount, mediaGallery] = await Promise.all([
+        // Rating distribution via groupBy (DB-side bucketing — 1 row per star value)
+        prisma.review.groupBy({
+          by: ['rating'],
+          where: approvedWhere,
+          _count: { _all: true },
+        }),
+        // Attribute averages — _all gives total count; _avg gives means for nullable Int fields
+        prisma.review.aggregate({
+          where: approvedWhere,
+          _count: { _all: true },
+          _avg: {
+            rating: true,
+            qualityRating: true,
+            packagingRating: true,
+            valueRating: true,
+            easeOfUseRating: true,
+          },
+        }),
+        // wouldRecommend is a Boolean, so use count instead of sum
+        prisma.review.count({
+          where: { ...approvedWhere, wouldRecommend: true },
+        }),
+        // Media gallery — top 30 most recent images/videos
+        prisma.reviewMedia.findMany({
+          where: { review: approvedWhere },
+          take: 30,
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
 
-      allApprovedReviews.forEach((r) => {
-        sumRating += r.rating;
-        if (r.rating >= 1 && r.rating <= 5) {
-          ratingsCount[r.rating - 1]++;
-        }
-        if (r.qualityRating) { sumQuality += r.qualityRating; countQuality++; }
-        if (r.packagingRating) { sumPackaging += r.packagingRating; countPackaging++; }
-        if (r.valueRating) { sumValue += r.valueRating; countValue++; }
-        if (r.easeOfUseRating) { sumEase += r.easeOfUseRating; countEase++; }
-        if (r.wouldRecommend) recommendCount++;
-      });
-
-      const averageRating = totalApproved > 0 ? Number((sumRating / totalApproved).toFixed(1)) : 0;
+      const totalApproved = attrAgg._count._all;
+      const averageRating = attrAgg._avg.rating != null ? Number(Number(attrAgg._avg.rating).toFixed(1)) : 0;
       const recommendPercentage = totalApproved > 0 ? Math.round((recommendCount / totalApproved) * 100) : 0;
 
-      // Extract all media files for gallery
-      const mediaGallery = await prisma.reviewMedia.findMany({
-        where: {
-          review: {
-            productId,
-            status: ReviewStatus.APPROVED,
-          },
-        },
-        take: 30,
-        orderBy: { createdAt: 'desc' },
-      });
+      // Build the 5-star distribution array from groupBy results
+      const ratingsCount = [0, 0, 0, 0, 0];
+      for (const g of ratingGroups) {
+        if (g.rating >= 1 && g.rating <= 5) {
+          ratingsCount[g.rating - 1] = g._count._all;
+        }
+      }
+
+      const toFixed1OrNull = (val: number | null | undefined): number | null =>
+        val != null ? Number(Number(val).toFixed(1)) : null;
 
       return successResponse(res, {
         reviews,
@@ -317,10 +317,10 @@ export const reviewController = {
             percentage: totalApproved > 0 ? Math.round((count / totalApproved) * 100) : 0,
           })).reverse(),
           attributes: {
-            quality: countQuality > 0 ? Number((sumQuality / countQuality).toFixed(1)) : null,
-            packaging: countPackaging > 0 ? Number((sumPackaging / countPackaging).toFixed(1)) : null,
-            value: countValue > 0 ? Number((sumValue / countValue).toFixed(1)) : null,
-            easeOfUse: countEase > 0 ? Number((sumEase / countEase).toFixed(1)) : null,
+            quality: toFixed1OrNull(attrAgg._avg.qualityRating),
+            packaging: toFixed1OrNull(attrAgg._avg.packagingRating),
+            value: toFixed1OrNull(attrAgg._avg.valueRating),
+            easeOfUse: toFixed1OrNull(attrAgg._avg.easeOfUseRating),
           },
         },
         mediaGallery,

@@ -13,7 +13,7 @@ import {
   AuditAction,
   AuditActorType,
 } from '@prisma/client';
-import { eventDispatcher, OrderEvents } from '../events';
+import { eventDispatcher, OrderEvents, ReturnEvents } from '../events';
 import { riskService } from './risk.service';
 import { reviewQueueRepository } from '../repositories/review-queue.repository';
 import logger from '../lib/logger';
@@ -628,23 +628,28 @@ export const orderService = {
       items: Array<{ orderItemId: string; quantity: number; reason?: string }>;
     }
   ) => {
-    const order = await prisma.order.findFirst({
-      where: { id: orderId, userId },
-      include: {
-        items: {
-          include: {
-            order: { select: { couponDiscount: true, subtotal: true } },
+    // Fetch order and global settings in parallel for better latency
+    const [order, settings] = await Promise.all([
+      prisma.order.findFirst({
+        where: { id: orderId, userId },
+        include: {
+          items: {
+            include: {
+              order: { select: { couponDiscount: true, subtotal: true } },
+            },
+          },
+          payment: true,
+          user: {
+            select: {
+              id: true,
+              // `tier` does not exist on CustomerRisk — use `tierOverride` and derive tier from trustScore
+              customerRisk: { select: { trustScore: true, tierOverride: true } },
+            },
           },
         },
-        payment: true,
-        user: {
-          select: {
-            id: true,
-            customerRisk: { select: { trustScore: true, tier: true } },
-          },
-        },
-      },
-    });
+      }),
+      prisma.studioSettings.findFirst(),
+    ]);
 
     if (!order) throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
     if (order.orderStatus !== OrderStatus.DELIVERED) {
@@ -652,7 +657,6 @@ export const orderService = {
     }
 
     // ── 1. Return window check ─────────────────────────────
-    const settings = await prisma.studioSettings.findFirst();
     const windowDays = settings?.returnWindowDays ?? 7;
 
     if (order.deliveredAt) {
@@ -666,17 +670,33 @@ export const orderService = {
       }
     }
 
-    // ── 2. Per-item validation & policy checks ──────────────
+    // ── 2. Per-item validation & policy checks (batched) ────
+    // First pass: validate item existence and quantity
     for (const reqItem of data.items) {
       const orderItem = order.items.find(i => i.id === reqItem.orderItemId);
       if (!orderItem) throw new AppError(`Item ${reqItem.orderItemId} not found in order`, HTTP_STATUS.BAD_REQUEST);
       if (reqItem.quantity > orderItem.quantity) {
         throw new AppError(`Cannot return ${reqItem.quantity} units — order only has ${orderItem.quantity}`, HTTP_STATUS.BAD_REQUEST);
       }
+    }
 
-      // Check per-product return policy
+    // Batch-load all ReturnPolicies for the returned product IDs in one query
+    const returnedProductIds = data.items
+      .map(ri => order.items.find(i => i.id === ri.orderItemId)?.productId)
+      .filter((id): id is string => !!id);
+
+    const returnPolicies = returnedProductIds.length > 0
+      ? await prisma.returnPolicy.findMany({
+          where: { productId: { in: returnedProductIds } },
+        })
+      : [];
+    const policyMap = new Map(returnPolicies.map(p => [p.productId, p]));
+
+    // Second pass: enforce policies using the in-memory map
+    for (const reqItem of data.items) {
+      const orderItem = order.items.find(i => i.id === reqItem.orderItemId)!;
       if (orderItem.productId) {
-        const policy = await prisma.returnPolicy.findUnique({ where: { productId: orderItem.productId } });
+        const policy = policyMap.get(orderItem.productId);
         if (policy?.eligibility === 'NO_RETURN') {
           throw new AppError(
             `"${orderItem.productName}" is not eligible for return. ${policy.reason || ''}`.trim(),
@@ -754,13 +774,15 @@ export const orderService = {
     }
 
     // ── 5. Auto-approval logic ──────────────────────────────
-    const tier = (order.user as any)?.customerRisk?.tier;
+    // Derive VIP status from tierOverride (admin override) or trustScore threshold (>=85)
+    const tierOverride = (order.user as any)?.customerRisk?.tierOverride;
+    const isVip = tierOverride === 'VIP' || trustScore >= 85;
     let autoApproved = false;
     let autoApproveRule: string | undefined;
     let initialStatus = 'REQUESTED';
 
     if (!fraudFlagged) {
-      if (tier === 'VIP') {
+      if (isVip) {
         autoApproved = true; autoApproveRule = 'VIP'; initialStatus = 'APPROVED';
       } else if (trustScore > 95 && totalRequestedAmount < 500) {
         autoApproved = true; autoApproveRule = 'HIGH_TRUST_LOW_VALUE'; initialStatus = 'APPROVED';
@@ -858,6 +880,8 @@ export const orderService = {
 
       return rr;
     });
+
+    eventDispatcher.emit(ReturnEvents.REQUESTED, { returnRequest, userId }).catch(() => {});
 
     return returnRequest;
   },

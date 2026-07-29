@@ -5,6 +5,6 @@ import './listeners/shipment.listeners';
 import './listeners/risk.listeners';
 
 export { eventDispatcher } from './LocalEventDispatcher';
-export { OrderEvents, PaymentEvents, ShipmentEvents, RiskEvents } from './OrderEvents';
+export { OrderEvents, PaymentEvents, ShipmentEvents, RiskEvents, ReturnEvents } from './OrderEvents';
 export { EventDispatcher } from './EventDispatcher';
 

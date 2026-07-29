@@ -160,10 +160,12 @@ export const authService = {
   },
 
   /**
-   * Get the authenticated user's safe profile.
+   * Get the authenticated user's lean session profile.
+   * Only returns the fields the frontend needs for session hydration.
+   * Use userRepository.findById() if the full profile is needed (e.g. account page).
    */
-  getMe: async (userId: string): Promise<SafeUser> => {
-    const user = await userRepository.findById(userId);
+  getMe: async (userId: string) => {
+    const user = await userRepository.findByIdForAuth(userId);
     if (!user) {
       throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
     }

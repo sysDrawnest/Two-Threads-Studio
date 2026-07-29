@@ -23,6 +23,20 @@ export type SafeUser = {
   updatedAt: Date;
 };
 
+/**
+ * Lean session-restoration payload — only the fields the frontend
+ * `mapBackendUserToAuthUser` actually reads. Keeps /auth/me payload tight.
+ */
+export type AuthMeUser = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  role: Role;
+};
+
 // Fields to always exclude from returned user objects
 const safeUserSelect = {
   id: true,
@@ -46,6 +60,17 @@ const safeUserSelect = {
   updatedAt: true,
 } satisfies Prisma.UserSelect;
 
+/** Minimal select used exclusively by /auth/me for session hydration */
+const authMeSelect = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  phone: true,
+  avatarUrl: true,
+  role: true,
+} satisfies Prisma.UserSelect;
+
 export const userRepository = {
   findByEmail: async (email: string): Promise<SafeUser | null> => {
     return prisma.user.findUnique({
@@ -65,6 +90,14 @@ export const userRepository = {
     return prisma.user.findUnique({
       where: { id },
       select: safeUserSelect,
+    });
+  },
+
+  /** Used by /auth/me — returns only the session-critical fields */
+  findByIdForAuth: async (id: string): Promise<AuthMeUser | null> => {
+    return prisma.user.findUnique({
+      where: { id },
+      select: authMeSelect,
     });
   },
 

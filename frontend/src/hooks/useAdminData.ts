@@ -1,11 +1,15 @@
 /**
  * Admin React Query Hooks — Phase 6A
- * Custom hooks for data fetching and mutations in the admin panel
+ * Custom hooks for data fetching and mutations in the admin panel.
+ *
+ * SECURITY: Every useQuery hook here includes `enabled: isAdmin` so that
+ * CUSTOMER sessions never trigger admin-only backend requests, even if
+ * a component is momentarily mounted during route transitions.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../services/adminService';
-import { productService } from '../services/productService';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export const adminKeys = {
@@ -25,28 +29,33 @@ export const adminKeys = {
 // ── Dashboard ─────────────────────────────────────────────────────────────
 
 export const useAdminDashboard = () => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: adminKeys.dashboard(),
     queryFn: adminService.getDashboard,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAdmin,
   });
 };
 
 // ── Customers ─────────────────────────────────────────────────────────────
 
 export const useAdminCustomers = (params: any) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: [...adminKeys.customers(), params],
     queryFn: () => adminService.listCustomers(params),
     placeholderData: (prev) => prev, // keep previous data while fetching new page
+    enabled: isAdmin,
   });
 };
 
 export const useAdminCustomerDetail = (id: string) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: adminKeys.customerDetail(id),
     queryFn: () => adminService.getCustomer(id),
-    enabled: !!id,
+    enabled: isAdmin && !!id,
   });
 };
 
@@ -83,18 +92,21 @@ export const useDeleteCustomer = () => {
 // ── Orders ────────────────────────────────────────────────────────────────
 
 export const useAdminOrders = (params: any) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: [...adminKeys.orders(), params],
     queryFn: () => adminService.listOrders(params),
     placeholderData: (prev) => prev,
+    enabled: isAdmin,
   });
 };
 
 export const useAdminOrderDetail = (id: string) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: adminKeys.orderDetail(id),
     queryFn: () => adminService.getOrder(id),
-    enabled: !!id,
+    enabled: isAdmin && !!id,
   });
 };
 
@@ -118,10 +130,12 @@ export const useUpdateOrderStatus = () => {
 // ── Inventory ─────────────────────────────────────────────────────────────
 
 export const useAdminInventory = (params: any) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: [...adminKeys.inventory(), params],
     queryFn: () => adminService.listInventory(params),
     placeholderData: (prev) => prev,
+    enabled: isAdmin,
   });
 };
 
@@ -130,7 +144,7 @@ export const useAdjustStock = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: { adjustment: number; reason?: string; variantId?: string } }) => 
       adminService.adjustStock(id, data),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.inventory() });
       toast.success('Stock adjusted successfully');
     },
@@ -143,10 +157,12 @@ export const useAdjustStock = () => {
 // ── Reviews ───────────────────────────────────────────────────────────────
 
 export const useAdminReviews = (params: any) => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: [...adminKeys.reviews(), params],
     queryFn: () => adminService.listReviews(params),
     placeholderData: (prev) => prev,
+    enabled: isAdmin,
   });
 };
 
@@ -179,9 +195,11 @@ export const useModerateReview = () => {
 // ── Settings ──────────────────────────────────────────────────────────────
 
 export const useAdminSettings = () => {
+  const { isAdmin } = useAuth();
   return useQuery({
     queryKey: adminKeys.settings(),
     queryFn: adminService.getSettings,
+    enabled: isAdmin,
   });
 };
 

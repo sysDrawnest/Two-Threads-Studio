@@ -23,3 +23,14 @@ export const RiskEvents = {
   ORDER_FLAGGED: 'risk.order_flagged',
   COD_BLOCKED: 'risk.cod_blocked',
 };
+
+export const ReturnEvents = {
+  REQUESTED: 'return.requested',
+  APPROVED: 'return.approved',
+  PICKED_UP: 'return.picked_up',
+  RECEIVED: 'return.received',
+  INSPECTION_PASSED: 'return.inspection_passed',
+  INSPECTION_FAILED: 'return.inspection_failed',
+  REFUNDED: 'return.refunded',
+  REJECTED: 'return.rejected',
+};

@@ -59,3 +59,36 @@ eventDispatcher.on(OrderEvents.INVOICE_VIEWED, async ({ orderId, userId, actorTy
     logger.error({ err }, 'Failed to write invoice viewed audit log');
   }
 });
+
+// Listen to ReturnEvents
+eventDispatcher.on('return.requested', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.requested');
+});
+
+eventDispatcher.on('return.approved', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.approved — sending pickup instructions');
+});
+
+eventDispatcher.on('return.picked_up', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.picked_up — package in transit');
+});
+
+eventDispatcher.on('return.received', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.received — queued for inspection');
+});
+
+eventDispatcher.on('return.inspection_passed', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.inspection_passed — processing refund');
+});
+
+eventDispatcher.on('return.inspection_failed', ({ returnRequest }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.inspection_failed');
+});
+
+eventDispatcher.on('return.refunded', ({ returnRequest, finalRefund }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id, finalRefund }, 'Event Listener: return.refunded — return closed');
+});
+
+eventDispatcher.on('return.rejected', ({ returnRequest, note }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id, note }, 'Event Listener: return.rejected');
+});
