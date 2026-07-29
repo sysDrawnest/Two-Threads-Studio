@@ -165,6 +165,70 @@ enum ReturnEligibility {
   NO_RETURN
 }
 
+// ─────────────────────────────────────────────
+// Returns Engine Enums
+// ─────────────────────────────────────────────
+
+/// Full Amazon-style return lifecycle
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  IN_TRANSIT
+  RECEIVED
+  INSPECTION_PENDING
+  INSPECTION_PASSED
+  INSPECTION_FAILED
+  REFUND_PROCESSING
+  REFUNDED
+  REJECTED
+  CLOSED
+}
+
+/// Standardised return reasons — drives analytics
+enum ReturnReason {
+  DAMAGED
+  WRONG_PRODUCT
+  DEFECTIVE
+  NOT_AS_DESCRIBED
+  SIZE_ISSUE
+  COLOR_DIFFERENCE
+  QUALITY_ISSUE
+  MISSING_PARTS
+  CHANGED_MIND
+  OTHER
+}
+
+/// What happens to the physical item at the warehouse
+enum ReturnDisposition {
+  RESTOCK
+  DAMAGED
+  REPAIR
+  DISPOSE
+  QUALITY_CHECK
+}
+
+/// Type of refund issued to customer
+enum RefundType {
+  ORIGINAL_PAYMENT
+  STORE_CREDIT
+  WALLET_CREDIT
+  GIFT_CARD
+}
+
+/// Exchange request lifecycle
+enum ExchangeStatus {
+  PENDING
+  APPROVED
+  INVENTORY_RESERVED
+  AWAITING_RETURN
+  RETURN_RECEIVED
+  REPLACEMENT_SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
 enum StudioProductType {
   EMBROIDERY_KIT
   DIY_KIT
@@ -238,6 +302,7 @@ model User {
   orders         Order[]
   customerRisk   CustomerRisk?
   otpVerifications OtpVerification[]
+  returnRequests   ReturnRequest[]
 
   @@map("users")
 }
@@ -715,6 +780,7 @@ model Order {
   // Phase 5B: payment reference
   paymentReference String?
   paidAt           DateTime?
+  deliveredAt      DateTime?
 
   // Phase 5C: risk & trust
   riskDecision     RiskDecision?
@@ -739,6 +805,7 @@ model Order {
   shipment      Shipment?
   reviewQueue   ManualReviewQueue?
   fraudFlags    FraudFlag[]
+  returnRequests ReturnRequest[]
 
   @@index([userId])
   @@index([userId, createdAt(sort: Desc)])
@@ -773,6 +840,8 @@ model OrderItem {
   createdAt DateTime @default(now())
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  returnRequestItems ReturnRequestItem[]
 
   @@index([orderId])
   @@map("order_items")
@@ -1347,4 +1416,123 @@ model PaymentAuditLog {
   @@map("payment_audit_logs")
 }
 
+// ─────────────────────────────────────────────
+// Returns Engine Models
+// ─────────────────────────────────────────────
 
+/// Enterprise return request with full lifecycle tracking
+model ReturnRequest {
+  id      String       @id @default(cuid())
+  orderId String
+  userId  String
+  status  ReturnStatus @default(REQUESTED)
+
+  // Reason
+  reason ReturnReason
+  notes  String?
+
+  // Evidence — Cloudinary URLs
+  mediaUrls String[]
+
+  // Admin fields
+  adminNote     String?
+  inspectorNote String?
+  disposition   ReturnDisposition?
+  inspectedAt   DateTime?
+  inspectedBy   String?
+
+  // Refund fields
+  refundType        RefundType @default(ORIGINAL_PAYMENT)
+  requestedAmount   Decimal?   @db.Decimal(10, 2)
+  approvedAmount    Decimal?   @db.Decimal(10, 2)
+  restockingFee     Decimal    @default(0) @db.Decimal(10, 2)
+  finalRefundAmount Decimal?   @db.Decimal(10, 2)
+  refundId          String?
+  refundProcessedAt DateTime?
+
+  // Auto-approval metadata
+  autoApproved    Boolean @default(false)
+  autoApproveRule String?
+
+  // Fraud detection
+  fraudFlagged Boolean @default(false)
+  fraudReason  String?
+
+  // Timeline
+  requestedAt DateTime  @default(now())
+  approvedAt  DateTime?
+  receivedAt  DateTime?
+  resolvedAt  DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  items    ReturnRequestItem[]
+  timeline ReturnTimeline[]
+
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status])
+  @@index([requestedAt(sort: Desc)])
+  @@map("return_requests")
+}
+
+/// Item-level lines for a return request with prorated refund amounts
+model ReturnRequestItem {
+  id              String @id @default(cuid())
+  returnRequestId String
+  orderItemId     String
+  quantity        Int
+
+  // Snapshot values at time of request
+  unitPrice        Decimal @db.Decimal(10, 2)
+  proratedDiscount Decimal @default(0) @db.Decimal(10, 2)
+  refundableAmount Decimal @db.Decimal(10, 2)
+
+  reason String?
+
+  returnRequest ReturnRequest @relation(fields: [returnRequestId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem     @relation(fields: [orderItemId], references: [id])
+
+  @@map("return_request_items")
+}
+
+/// Customer-facing return lifecycle timeline (mirrors OrderStatusHistory)
+model ReturnTimeline {
+  id              String       @id @default(cuid())
+  returnRequestId String
+  status          ReturnStatus
+  note            String?
+  actorType       String
+  actorId         String?
+  createdAt       DateTime     @default(now())
+
+  returnRequest ReturnRequest @relation(fields: [returnRequestId], references: [id], onDelete: Cascade)
+
+  @@index([returnRequestId])
+  @@map("return_timelines")
+}
+
+/// Exchange request — schema-only, UI deferred to Phase 2
+model ExchangeRequest {
+  id              String         @id @default(cuid())
+  returnRequestId String         @unique
+  status          ExchangeStatus @default(PENDING)
+
+  replacementProductId String
+  replacementVariantId String?
+  replacementQuantity  Int
+
+  inventoryReservedAt DateTime?
+  replacementShippedAt DateTime?
+  trackingNumber       String?
+
+  notes     String?
+  adminNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("exchange_requests")
+}

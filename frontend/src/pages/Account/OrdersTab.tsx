@@ -15,7 +15,10 @@ import {
   RotateCcw,
   MapPin,
   ExternalLink,
-  Info
+  Info,
+  Upload,
+  X as XIcon,
+  CheckCircle
 } from 'lucide-react';
 import { orderService, Order, Shipment } from '../../services/orderService';
 import { reviewService } from '../../services/reviewService';
@@ -33,13 +36,17 @@ const ORDER_STATUS_STEPS = [
 ];
 
 const RETURN_REASONS = [
-  'Item arrived damaged',
-  'Item does not match description',
-  'Wrong item received',
-  'Quality not as expected',
-  'Changed my mind',
-  'Other',
-];
+  { value: 'DAMAGED', label: 'Item arrived damaged' },
+  { value: 'WRONG_PRODUCT', label: 'Wrong item received' },
+  { value: 'DEFECTIVE', label: 'Item is defective' },
+  { value: 'NOT_AS_DESCRIBED', label: 'Does not match description' },
+  { value: 'SIZE_ISSUE', label: 'Size issue' },
+  { value: 'COLOR_DIFFERENCE', label: 'Color difference' },
+  { value: 'QUALITY_ISSUE', label: 'Quality not as expected' },
+  { value: 'MISSING_PARTS', label: 'Missing parts or accessories' },
+  { value: 'CHANGED_MIND', label: 'Changed my mind' },
+  { value: 'OTHER', label: 'Other' },
+] as const;
 
 export const OrdersTab: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -55,7 +62,11 @@ export const OrdersTab: React.FC = () => {
   // Return modal
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [returnReason, setReturnReason] = useState('');
-  const [returnReasonOther, setReturnReasonOther] = useState('');
+  const [returnItems, setReturnItems] = useState<Array<{orderItemId: string; quantity: number; reason?: string}>>([]);
+  const [returnMediaUrls, setReturnMediaUrls] = useState<string[]>([]);
+  const [returnRefundType, setReturnRefundType] = useState('ORIGINAL_PAYMENT');
+  const [returnNotes, setReturnNotes] = useState('');
+  const [returnUploadLoading, setReturnUploadLoading] = useState(false);
 
   // Shipment tracking panel
   const [shipment, setShipment] = useState<Shipment | null>(null);
@@ -151,23 +162,33 @@ export const OrdersTab: React.FC = () => {
 
   const handleRequestReturn = async () => {
     if (!selectedOrder) return;
-    const finalReason = returnReason === 'Other' ? returnReasonOther : returnReason;
-    if (!finalReason.trim()) {
-      alert('Please provide a reason for the return.');
+    if (!returnReason) {
+      alert('Please select a return reason.');
+      return;
+    }
+    if (returnItems.length === 0) {
+      alert('Please select at least one item to return.');
       return;
     }
     try {
       setActionLoading(true);
-      const res = await orderService.requestReturn(selectedOrder.id, finalReason);
+      const res = await orderService.requestReturn(selectedOrder.id, {
+        reason: returnReason,
+        notes: returnNotes || undefined,
+        mediaUrls: returnMediaUrls,
+        refundType: returnRefundType,
+        items: returnItems,
+      });
       if (res.success) {
-        setSelectedOrder(res.order);
         setShowReturnModal(false);
         setReturnReason('');
-        setReturnReasonOther('');
+        setReturnItems([]);
+        setReturnMediaUrls([]);
+        setReturnNotes('');
         fetchOrders(page);
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to submit return request');
+      alert(err.response?.data?.message || err.message || 'Failed to submit return request');
     } finally {
       setActionLoading(false);
     }
@@ -403,18 +424,18 @@ export const OrdersTab: React.FC = () => {
 
           {/* Return Request Banner (when already requested) */}
           {(selectedOrder.orderStatus === 'RETURN_REQUESTED' || selectedOrder.orderStatus === 'RETURNED') && (
-            <div className="flex items-start gap-3 bg-orange-50 border border-orange-100 p-4 rounded-xl text-orange-800">
-              <RotateCcw className="w-5 h-5 flex-shrink-0 mt-0.5 text-orange-600" />
-              <div>
-                <h4 className="font-bold text-sm">
-                  {selectedOrder.orderStatus === 'RETURN_REQUESTED' ? 'Return Request Submitted' : 'Return Processed'}
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <RotateCcw className="w-4 h-4 text-orange-600" />
+                <h4 className="font-medium text-orange-800">
+                  {selectedOrder.orderStatus === 'RETURN_REQUESTED' ? 'Return Request Submitted' : 'Return Completed'}
                 </h4>
-                <p className="text-xs mt-1 text-orange-700">
-                  {selectedOrder.orderStatus === 'RETURN_REQUESTED'
-                    ? 'Our team is reviewing your return request. You will hear from us within 2–3 business days.'
-                    : 'Your return has been processed. Refund will be initiated within 5–7 business days.'}
-                </p>
               </div>
+              <p className="text-sm text-orange-700">
+                {selectedOrder.orderStatus === 'RETURN_REQUESTED'
+                  ? 'Our team is reviewing your return request. You will hear from us within 2–3 business days. Refund is processed only after item inspection.'
+                  : 'Your return has been completed and refund processed.'}
+              </p>
             </div>
           )}
 
@@ -800,79 +821,150 @@ export const OrdersTab: React.FC = () => {
       </AnimatePresence>
 
       {/* Return Request Modal */}
-      <AnimatePresence>
-        {showReturnModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl border border-neutral-100 max-w-md w-full p-6 shadow-2xl space-y-5"
-            >
-              <div className="flex items-start gap-3 text-orange-600">
-                <RotateCcw className="w-6 h-6 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="text-lg font-bold text-neutral-900 font-serif">Request a Return</h3>
-                  <p className="text-sm text-neutral-500 mt-1">
-                    Please select a reason for returning this order. Our team will review and respond within 2–3 business days.
-                  </p>
+      {showReturnModal && selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Request a Return</h3>
+                <p className="text-sm text-gray-500 mt-0.5">Order #{selectedOrder.orderNumber}</p>
+              </div>
+              <button
+                onClick={() => { setShowReturnModal(false); setReturnItems([]); setReturnReason(''); setReturnNotes(''); setReturnMediaUrls([]); }}
+                className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Step 1: Select Items */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">1. Select items to return</h4>
+                <div className="space-y-2">
+                  {selectedOrder.items?.map((item: any) => {
+                    const selected = returnItems.find(r => r.orderItemId === item.id);
+                    return (
+                      <div key={item.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                        selected ? 'border-amber-400 bg-amber-50' : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 accent-amber-500"
+                          checked={!!selected}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setReturnItems(prev => [...prev, { orderItemId: item.id, quantity: 1 }]);
+                            } else {
+                              setReturnItems(prev => prev.filter(r => r.orderItemId !== item.id));
+                            }
+                          }}
+                        />
+                        <img src={item.productImage} alt={item.productName} className="w-10 h-10 rounded-lg object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{item.productName}</p>
+                          <p className="text-xs text-gray-500">Qty ordered: {item.quantity}</p>
+                        </div>
+                        {selected && item.quantity > 1 && (
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => setReturnItems(prev => prev.map(r => r.orderItemId === item.id ? { ...r, quantity: Math.max(1, r.quantity - 1) } : r))} className="w-6 h-6 rounded border text-xs">-</button>
+                            <span className="text-sm w-6 text-center">{selected.quantity}</span>
+                            <button onClick={() => setReturnItems(prev => prev.map(r => r.orderItemId === item.id ? { ...r, quantity: Math.min(item.quantity, r.quantity + 1) } : r))} className="w-6 h-6 rounded border text-xs">+</button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-neutral-600">Reason for return *</label>
-                <div className="space-y-2">
+              {/* Step 2: Reason */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">2. Reason for return</h4>
+                <select
+                  value={returnReason}
+                  onChange={e => setReturnReason(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                  <option value="">Select a reason...</option>
                   {RETURN_REASONS.map(r => (
-                    <label key={r} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="returnReason"
-                        value={r}
-                        checked={returnReason === r}
-                        onChange={() => setReturnReason(r)}
-                        className="accent-[#A34A38]"
-                      />
-                      <span className={`text-sm transition-colors ${returnReason === r ? 'text-[#A34A38] font-medium' : 'text-neutral-700 group-hover:text-neutral-900'}`}>
-                        {r}
-                      </span>
-                    </label>
+                    <option key={r.value} value={r.value}>{r.label}</option>
+                  ))}
+                </select>
+                <textarea
+                  placeholder="Additional details (optional)"
+                  value={returnNotes}
+                  onChange={e => setReturnNotes(e.target.value)}
+                  rows={2}
+                  className="mt-2 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                />
+              </div>
+
+              {/* Step 3: Evidence upload (text input for now, can be enhanced with Cloudinary) */}
+              {['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE'].includes(returnReason) && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">3. Upload evidence <span className="text-amber-600">(recommended)</span></h4>
+                  <p className="text-xs text-gray-500 mb-2">Please add photo URLs showing the issue (upload to any image host).</p>
+                  <div className="space-y-2">
+                    {returnMediaUrls.map((url, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input value={url} onChange={e => setReturnMediaUrls(prev => prev.map((u, i) => i === idx ? e.target.value : u))} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs" placeholder="https://..." />
+                        <button onClick={() => setReturnMediaUrls(prev => prev.filter((_, i) => i !== idx))} className="text-red-400"><XIcon className="w-4 h-4" /></button>
+                      </div>
+                    ))}
+                    {returnMediaUrls.length < 5 && (
+                      <button onClick={() => setReturnMediaUrls(prev => [...prev, ''])} className="text-xs text-amber-600 underline">+ Add photo URL</button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Refund type */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">{['DAMAGED', 'DEFECTIVE', 'WRONG_PRODUCT', 'QUALITY_ISSUE'].includes(returnReason) ? '4.' : '3.'} Refund preference</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {[{ value: 'ORIGINAL_PAYMENT', label: 'Original payment' }, { value: 'STORE_CREDIT', label: 'Store credit' }].map(rt => (
+                    <button
+                      key={rt.value}
+                      onClick={() => setReturnRefundType(rt.value)}
+                      className={`py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                        returnRefundType === rt.value
+                          ? 'border-amber-500 bg-amber-50 text-amber-700'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      {rt.label}
+                    </button>
                   ))}
                 </div>
-
-                {returnReason === 'Other' && (
-                  <textarea
-                    value={returnReasonOther}
-                    onChange={(e) => setReturnReasonOther(e.target.value)}
-                    placeholder="Please describe your reason..."
-                    className="w-full text-sm border border-neutral-200 rounded-lg p-3 focus:outline-none focus:border-neutral-400 min-h-[80px] mt-2"
-                  />
-                )}
               </div>
 
-              <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 flex gap-2 text-xs text-amber-800">
-                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p>Returns are eligible within 7 days of delivery. Items must be in original condition and packaging.</p>
+              {/* Notice */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
+                Returns are reviewed within 2–3 business days. Refund is processed after inspection.
               </div>
+            </div>
 
-              <div className="flex justify-end gap-3 pt-1">
-                <button
-                  onClick={() => { setShowReturnModal(false); setReturnReason(''); setReturnReasonOther(''); }}
-                  className="px-4 py-2 border border-neutral-200 text-neutral-600 hover:bg-neutral-50 rounded-md text-sm font-semibold transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRequestReturn}
-                  disabled={actionLoading || !returnReason}
-                  className="px-4 py-2 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-sm font-semibold transition-colors disabled:opacity-50"
-                >
-                  {actionLoading ? 'Submitting...' : 'Submit Return Request'}
-                </button>
-              </div>
-            </motion.div>
+            {/* Footer */}
+            <div className="px-6 pb-6 flex gap-3">
+              <button
+                onClick={() => { setShowReturnModal(false); setReturnItems([]); setReturnReason(''); }}
+                className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRequestReturn}
+                disabled={actionLoading || returnItems.length === 0 || !returnReason}
+                className="flex-1 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-medium hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {actionLoading ? 'Submitting...' : 'Submit Return Request'}
+              </button>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {activeReviewProduct && (
         <ReviewModal

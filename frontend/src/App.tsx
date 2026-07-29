@@ -79,6 +79,7 @@ const CategoryManagement = lazy(() => import('./pages/admin/CategoryManagement')
 const CollectionsManagement = lazy(() => import('./pages/admin/CollectionsManagement').then(module => ({ default: module.CollectionsManagement })));
 const InventoryManagement = lazy(() => import('./pages/admin/InventoryManagement').then(module => ({ default: module.InventoryManagement })));
 const OrdersManagement = lazy(() => import('./pages/admin/OrdersManagement').then(module => ({ default: module.OrdersManagement })));
+const ReturnsManagement = lazy(() => import('./pages/admin/ReturnsManagement').then(module => ({ default: module.ReturnsManagement })));
 const OrderDetail = lazy(() => import('./pages/admin/OrderDetail').then(module => ({ default: module.OrderDetail })));
 const CustomersManagement = lazy(() => import('./pages/admin/CustomersManagement').then(module => ({ default: module.CustomersManagement })));
 const CustomerProfile = lazy(() => import('./pages/admin/CustomerProfile').then(module => ({ default: module.CustomerProfile })));
@@ -185,6 +186,7 @@ const AdminRoutes: React.FC = () => (
         <Route path="collections" element={<CollectionsManagement />} />
         <Route path="inventory" element={<InventoryManagement />} />
         <Route path="orders" element={<OrdersManagement />} />
+        <Route path="returns" element={<ReturnsManagement />} />
         <Route path="orders/:id" element={<OrderDetail />} />
         <Route path="customers" element={<CustomersManagement />} />
         <Route path="customers/:id" element={<CustomerProfile />} />

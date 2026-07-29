@@ -12,8 +12,15 @@ import { inventoryController } from '../controllers/inventory.controller';
 import { reviewController } from '../controllers/review.controller';
 import { settingsController } from '../controllers/settings.controller';
 import { adminPromotionController } from '../controllers/admin-promotion.controller';
+import { returnController } from '../controllers/return.controller';
 import { validate } from '../middleware/validate';
 import { createCouponAdminSchema, updateCouponAdminSchema } from '../validators/admin-promotion.validator';
+import {
+  adminApproveReturnSchema,
+  adminRejectReturnSchema,
+  adminInspectReturnSchema,
+} from '../validators/order.validator';
+
 
 const router = Router();
 
@@ -69,4 +76,15 @@ router.patch('/settings/invoice', settingsController.updateInvoice);
 router.patch('/settings/contact', settingsController.updateContact);
 router.patch('/settings/email-templates', settingsController.updateEmailTemplates);
 
+// ── Returns Management ─────────────────────────────────────────────────────
+router.get('/returns/analytics', returnController.adminReturnAnalytics);
+router.get('/returns', returnController.adminListReturns);
+router.get('/returns/:returnId', returnController.adminGetReturn);
+router.post('/returns/:returnId/approve', validate(adminApproveReturnSchema), returnController.adminApproveReturn);
+router.post('/returns/:returnId/reject', validate(adminRejectReturnSchema), returnController.adminRejectReturn);
+router.post('/returns/:returnId/picked-up', returnController.adminMarkPickedUp);
+router.post('/returns/:returnId/received', returnController.adminMarkReceived);
+router.post('/returns/:returnId/inspect', validate(adminInspectReturnSchema), returnController.adminRecordInspection);
+
 export default router;
+

@@ -405,5 +405,57 @@ export const adminService = {
     const response = await apiClient.get('/admin/coupons/analytics/summary');
     return response.data;
   },
+
+  // ── Returns Management ─────────────────────────────────────────────────
+  listReturnRequests: async (params?: {
+    status?: string;
+    fraudFlagged?: boolean;
+    autoApproved?: boolean;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.fraudFlagged !== undefined) query.set('fraudFlagged', String(params.fraudFlagged));
+    if (params?.autoApproved !== undefined) query.set('autoApproved', String(params.autoApproved));
+    if (params?.startDate) query.set('startDate', params.startDate);
+    if (params?.endDate) query.set('endDate', params.endDate);
+    if (params?.search) query.set('search', params.search);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.limit) query.set('limit', String(params.limit));
+    return apiClient.get(`/admin/returns?${query.toString()}`);
+  },
+  
+  getReturnRequest: async (returnId: string) =>
+    apiClient.get(`/admin/returns/${returnId}`),
+
+  getReturnAnalytics: async (startDate?: string, endDate?: string) => {
+    const query = new URLSearchParams();
+    if (startDate) query.set('startDate', startDate);
+    if (endDate) query.set('endDate', endDate);
+    return apiClient.get(`/admin/returns/analytics?${query.toString()}`);
+  },
+  
+  approveReturn: async (returnId: string, data?: { note?: string; approvedAmount?: number; refundType?: string }) =>
+    apiClient.post(`/admin/returns/${returnId}/approve`, data || {}),
+
+  rejectReturn: async (returnId: string, note: string) =>
+    apiClient.post(`/admin/returns/${returnId}/reject`, { note }),
+
+  markReturnPickedUp: async (returnId: string) =>
+    apiClient.post(`/admin/returns/${returnId}/picked-up`, {}),
+
+  markReturnReceived: async (returnId: string) =>
+    apiClient.post(`/admin/returns/${returnId}/received`, {}),
+
+  recordReturnInspection: async (returnId: string, data: {
+    passed: boolean;
+    disposition?: string;
+    note?: string;
+    adjustedAmount?: number;
+  }) => apiClient.post(`/admin/returns/${returnId}/inspect`, data),
 };
 

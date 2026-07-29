@@ -617,40 +617,224 @@ export const orderService = {
   /**
    * Customer: Request a return for a delivered order
    */
-  requestReturn: async (orderId: string, userId: string, reason: string) => {
-    const order = await orderRepository.findById(orderId, userId);
-    if (!order) {
-      throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
+  requestReturn: async (
+    orderId: string,
+    userId: string,
+    data: {
+      reason: string;
+      notes?: string;
+      mediaUrls?: string[];
+      refundType?: string;
+      items: Array<{ orderItemId: string; quantity: number; reason?: string }>;
     }
+  ) => {
+    const order = await prisma.order.findFirst({
+      where: { id: orderId, userId },
+      include: {
+        items: {
+          include: {
+            order: { select: { couponDiscount: true, subtotal: true } },
+          },
+        },
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            customerRisk: { select: { trustScore: true, tier: true } },
+          },
+        },
+      },
+    });
 
+    if (!order) throw new AppError('Order not found', HTTP_STATUS.NOT_FOUND);
     if (order.orderStatus !== OrderStatus.DELIVERED) {
-      throw new AppError(
-        'Returns can only be requested for delivered orders.',
-        HTTP_STATUS.BAD_REQUEST
-      );
+      throw new AppError('Returns can only be requested for delivered orders.', HTTP_STATUS.BAD_REQUEST);
     }
 
-    const previousStatus = order.orderStatus;
+    // ── 1. Return window check ─────────────────────────────
+    const settings = await prisma.studioSettings.findFirst();
+    const windowDays = settings?.returnWindowDays ?? 7;
 
-    const updatedOrder = await prisma.$transaction(async (tx) => {
-      const updated = await tx.order.update({
+    if (order.deliveredAt) {
+      const expiresAt = new Date(order.deliveredAt);
+      expiresAt.setDate(expiresAt.getDate() + windowDays);
+      if (new Date() > expiresAt) {
+        throw new AppError(
+          `Return window of ${windowDays} days has expired. Orders must be returned within ${windowDays} days of delivery.`,
+          HTTP_STATUS.BAD_REQUEST
+        );
+      }
+    }
+
+    // ── 2. Per-item validation & policy checks ──────────────
+    for (const reqItem of data.items) {
+      const orderItem = order.items.find(i => i.id === reqItem.orderItemId);
+      if (!orderItem) throw new AppError(`Item ${reqItem.orderItemId} not found in order`, HTTP_STATUS.BAD_REQUEST);
+      if (reqItem.quantity > orderItem.quantity) {
+        throw new AppError(`Cannot return ${reqItem.quantity} units — order only has ${orderItem.quantity}`, HTTP_STATUS.BAD_REQUEST);
+      }
+
+      // Check per-product return policy
+      if (orderItem.productId) {
+        const policy = await prisma.returnPolicy.findUnique({ where: { productId: orderItem.productId } });
+        if (policy?.eligibility === 'NO_RETURN') {
+          throw new AppError(
+            `"${orderItem.productName}" is not eligible for return. ${policy.reason || ''}`.trim(),
+            HTTP_STATUS.BAD_REQUEST
+          );
+        }
+        // Per-product window override
+        if (policy?.windowDays && order.deliveredAt) {
+          const productExpiry = new Date(order.deliveredAt);
+          productExpiry.setDate(productExpiry.getDate() + policy.windowDays);
+          if (new Date() > productExpiry) {
+            throw new AppError(
+              `Return window for "${orderItem.productName}" has expired (${policy.windowDays} days).`,
+              HTTP_STATUS.BAD_REQUEST
+            );
+          }
+        }
+      }
+    }
+
+    // ── 3. Fraud detection ──────────────────────────────────
+    const [totalDelivered, totalReturns] = await Promise.all([
+      prisma.order.count({ where: { userId, orderStatus: OrderStatus.DELIVERED } }),
+      prisma.returnRequest.count({ where: { userId } }),
+    ]);
+    const returnRate = totalDelivered > 0 ? totalReturns / totalDelivered : 0;
+
+    let fraudFlagged = false;
+    let fraudReason: string | undefined;
+
+    if (returnRate > 0.4) {
+      fraudFlagged = true;
+      fraudReason = `High return rate: ${Math.round(returnRate * 100)}% of delivered orders returned`;
+    }
+
+    const trustScore = (order.user as any)?.customerRisk?.trustScore ?? 100;
+    if (trustScore < 40) {
+      fraudFlagged = true;
+      fraudReason = (fraudReason ? fraudReason + '; ' : '') + 'Low trust score account';
+    }
+
+    // ── 4. Prorated refund calculation ──────────────────────
+    const orderSubtotal = Number(order.subtotal);
+    const couponDiscount = Number(order.couponDiscount);
+    const returnItems: Array<{
+      orderItemId: string;
+      quantity: number;
+      reason?: string;
+      unitPrice: number;
+      proratedDiscount: number;
+      refundableAmount: number;
+    }> = [];
+
+    let totalRequestedAmount = 0;
+
+    for (const reqItem of data.items) {
+      const orderItem = order.items.find(i => i.id === reqItem.orderItemId)!;
+      const unitPrice = Number(orderItem.unitPrice);
+      const itemSubtotal = unitPrice * reqItem.quantity;
+
+      // Prorate coupon: discount proportional to this item's share of order subtotal
+      const itemShare = orderSubtotal > 0 ? (unitPrice * reqItem.quantity) / orderSubtotal : 0;
+      const proratedDiscount = couponDiscount * itemShare;
+      const refundableAmount = Math.max(0, itemSubtotal - proratedDiscount);
+
+      totalRequestedAmount += refundableAmount;
+      returnItems.push({
+        orderItemId: reqItem.orderItemId,
+        quantity: reqItem.quantity,
+        reason: reqItem.reason,
+        unitPrice,
+        proratedDiscount,
+        refundableAmount,
+      });
+    }
+
+    // ── 5. Auto-approval logic ──────────────────────────────
+    const tier = (order.user as any)?.customerRisk?.tier;
+    let autoApproved = false;
+    let autoApproveRule: string | undefined;
+    let initialStatus = 'REQUESTED';
+
+    if (!fraudFlagged) {
+      if (tier === 'VIP') {
+        autoApproved = true; autoApproveRule = 'VIP'; initialStatus = 'APPROVED';
+      } else if (trustScore > 95 && totalRequestedAmount < 500) {
+        autoApproved = true; autoApproveRule = 'HIGH_TRUST_LOW_VALUE'; initialStatus = 'APPROVED';
+      } else if (totalRequestedAmount < 300) {
+        autoApproved = true; autoApproveRule = 'LOW_VALUE'; initialStatus = 'APPROVED';
+      }
+    }
+
+    // ── 6. Create ReturnRequest in transaction ──────────────
+    const returnRequest = await prisma.$transaction(async (tx) => {
+      const rr = await tx.returnRequest.create({
+        data: {
+          orderId,
+          userId,
+          status: initialStatus as any,
+          reason: data.reason as any,
+          notes: data.notes,
+          mediaUrls: data.mediaUrls ?? [],
+          refundType: (data.refundType as any) ?? 'ORIGINAL_PAYMENT',
+          requestedAmount: totalRequestedAmount,
+          approvedAmount: autoApproved ? totalRequestedAmount : undefined,
+          autoApproved,
+          autoApproveRule,
+          fraudFlagged,
+          fraudReason,
+          approvedAt: autoApproved ? new Date() : undefined,
+          items: {
+            create: returnItems.map(item => ({
+              orderItemId: item.orderItemId,
+              quantity: item.quantity,
+              reason: item.reason,
+              unitPrice: item.unitPrice,
+              proratedDiscount: item.proratedDiscount,
+              refundableAmount: item.refundableAmount,
+            })),
+          },
+        },
+      });
+
+      // Initial timeline entry
+      await tx.returnTimeline.create({
+        data: {
+          returnRequestId: rr.id,
+          status: 'REQUESTED' as any,
+          note: `Return request submitted by customer. Reason: ${data.reason}`,
+          actorType: 'CUSTOMER',
+          actorId: userId,
+        },
+      });
+
+      if (autoApproved) {
+        await tx.returnTimeline.create({
+          data: {
+            returnRequestId: rr.id,
+            status: 'APPROVED' as any,
+            note: `Auto-approved. Rule: ${autoApproveRule}`,
+            actorType: 'SYSTEM',
+          },
+        });
+      }
+
+      // Update order status
+      await tx.order.update({
         where: { id: orderId },
         data: { orderStatus: OrderStatus.RETURN_REQUESTED },
-        include: {
-          items: true,
-          statusHistory: { orderBy: { createdAt: 'asc' } },
-          shippingAddress: true,
-          billingAddress: true,
-        },
       });
 
       await tx.orderStatusHistory.create({
         data: {
           orderId,
-          previousStatus,
+          previousStatus: OrderStatus.DELIVERED,
           newStatus: OrderStatus.RETURN_REQUESTED,
           changedBy: 'CUSTOMER',
-          note: reason || 'Return requested by customer',
+          note: `Return requested. Reason: ${data.reason}`,
         },
       });
 
@@ -660,13 +844,21 @@ export const orderService = {
           action: AuditAction.STATUS_CHANGED,
           actorType: AuditActorType.CUSTOMER,
           actorId: userId,
-          details: { previousStatus, newStatus: 'RETURN_REQUESTED', reason },
+          details: {
+            previousStatus: 'DELIVERED',
+            newStatus: 'RETURN_REQUESTED',
+            returnRequestId: rr.id,
+            reason: data.reason,
+            fraudFlagged,
+            autoApproved,
+            requestedAmount: totalRequestedAmount,
+          },
         },
       });
 
-      return updated;
+      return rr;
     });
 
-    return updatedOrder;
+    return returnRequest;
   },
 };

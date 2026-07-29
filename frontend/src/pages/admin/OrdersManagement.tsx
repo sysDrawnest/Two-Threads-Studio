@@ -48,7 +48,9 @@ export const OrdersManagement: React.FC = () => {
     { label: 'Handcrafting', value: 'HANDCRAFTING' },
     { label: 'Shipped', value: 'SHIPPED' },
     { label: 'Delivered', value: 'DELIVERED' },
-    { label: 'Cancelled', value: 'CANCELLED' }
+    { label: 'Cancelled', value: 'CANCELLED' },
+    { label: 'Return Requested', value: 'RETURN_REQUESTED' },
+    { label: 'Returned', value: 'RETURNED' }
   ];
 
   return (

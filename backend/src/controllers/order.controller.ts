@@ -112,20 +112,27 @@ export const requestReturn = async (req: Request, res: Response, next: NextFunct
   try {
     const userId = req.user?.id;
     const id = req.params.id as string;
-    const { reason } = req.body;
+    const { reason, notes, mediaUrls, refundType, items } = req.body;
     if (!userId) {
       throw new AppError('Unauthorized', HTTP_STATUS.UNAUTHORIZED);
     }
-    const order = await orderService.requestReturn(id, userId, reason || 'Return requested by customer');
+    const returnRequest = await orderService.requestReturn(id, userId, {
+      reason,
+      notes,
+      mediaUrls,
+      refundType,
+      items,
+    });
     return res.status(HTTP_STATUS.OK).json({
       success: true,
       message: 'Return request submitted successfully.',
-      order,
+      returnRequest,
     });
   } catch (error) {
     return next(error);
   }
 };
+
 
 export const getShipmentTracking = async (req: Request, res: Response, next: NextFunction) => {
   try {

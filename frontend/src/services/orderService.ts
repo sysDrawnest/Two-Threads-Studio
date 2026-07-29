@@ -91,8 +91,17 @@ export const orderService = {
     return apiClient.post(`/orders/${id}/cancel`, { reason });
   },
 
-  requestReturn: async (id: string, reason: string): Promise<{ success: boolean; order: Order }> => {
-    return apiClient.post(`/orders/${id}/return`, { reason });
+  requestReturn: async (
+    id: string,
+    data: {
+      reason: string;
+      notes?: string;
+      mediaUrls?: string[];
+      refundType?: string;
+      items: Array<{ orderItemId: string; quantity: number; reason?: string }>;
+    }
+  ): Promise<{ success: boolean; returnRequest: any }> => {
+    return apiClient.post(`/orders/${id}/return`, data);
   },
 
   getShipmentTracking: async (id: string): Promise<{ success: boolean; shipment: Shipment | null }> => {
