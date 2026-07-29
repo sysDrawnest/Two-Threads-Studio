@@ -7,6 +7,7 @@ import { useCartStore } from '../store/cartStore';
 import { useAddToCart } from '../hooks/useCommerce';
 import { ScrollReveal } from '../components/ui/ScrollReveal';
 import { ChevronDown, SlidersHorizontal, X, RotateCcw, ShoppingBag, Check } from 'lucide-react';
+import shopBannerImg from '../assets/Handcrafted_embroidery_in_artisa…_2K_202607291522.jpeg';
 
 export default function Shop() {
   const location = useLocation();
@@ -169,8 +170,8 @@ export default function Shop() {
             {/* Right Column: Mini-Vignette */}
             <div className="overflow-hidden rounded-sm shadow-sm h-48 md:h-64 relative bg-[#f2ede4]">
               <img 
-                src="https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=1200&auto=format&fit=crop" 
-                alt="Tactile threads close up" 
+                src={shopBannerImg} 
+                alt="Handcrafted embroidery in artisan studio" 
                 className="w-full h-full object-cover object-center grayscale-[10%] opacity-90"
               />
               <div className="absolute inset-0 bg-[#A34A38]/5 mix-blend-multiply pointer-events-none" />
