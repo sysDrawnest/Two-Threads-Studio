@@ -29,7 +29,7 @@ const Wishlist: React.FC = () => {
 
   return (
     <PageContainer>
-      <div className="bg-[#FAF8F5] py-16 px-6 md:px-16 min-h-screen">
+      <div className="bg-[#FAF8F5] pt-6 sm:pt-8 md:pt-12 pb-16 px-6 md:px-16 min-h-screen">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end mb-12 border-b border-zinc-200 pb-8">
           <div>
             <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-zinc-500 mb-2 font-semibold">

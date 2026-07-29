@@ -8,7 +8,7 @@ const Artisans: React.FC = () => {
   return (
     <PageContainer>
       {/* Hero */}
-      <section className="pt-24 pb-16 px-6 md:px-16 text-center bg-background">
+      <section className="pt-6 sm:pt-8 md:pt-12 pb-16 px-6 md:px-16 text-center bg-background">
         <div className="max-w-3xl mx-auto">
           <ScrollReveal direction="up" delay={0.15}>
             <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">

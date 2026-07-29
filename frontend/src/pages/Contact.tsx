@@ -17,7 +17,7 @@ const Contact: React.FC = () => {
       <div className="flex flex-col lg:flex-row min-h-screen bg-background">
         
         {/* Left Side: Contact Info & Form */}
-        <ScrollReveal direction="left" className="w-full lg:w-1/2 p-8 md:p-16 lg:p-24 flex flex-col justify-center">
+        <ScrollReveal direction="left" className="w-full lg:w-1/2 p-6 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-center">
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-6">
             Get in Touch
           </p>

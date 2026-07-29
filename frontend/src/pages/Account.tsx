@@ -13,7 +13,7 @@ const Account: React.FC = () => {
 
   return (
     <PageContainer disablePadding={true}>
-      <div className="pt-[72px] bg-background">
+      <div className="pt-2 md:pt-6 bg-background">
         <AccountLayout />
       </div>
     </PageContainer>

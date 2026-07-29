@@ -32,7 +32,7 @@ export default function Legal() {
 
   return (
     <PageContainer>
-      <div className="min-h-screen bg-[#FBFBFA] pt-28 pb-20 px-6 md:px-16 font-sans text-[#1C1C1B]">
+      <div className="min-h-screen bg-[#FBFBFA] pt-6 sm:pt-10 md:pt-14 pb-20 px-6 md:px-16 font-sans text-[#1C1C1B]">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
