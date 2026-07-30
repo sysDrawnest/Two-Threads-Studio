@@ -1,257 +1,146 @@
-# PROJECT STATUS REPORT
+# PROJECT STATUS REPORT — TWO THREADS STUDIO
 
-**Date of Audit**: June 10, 2026
-**Project**: Two Threads Studio
+**Date of Audit**: July 29, 2026  
+**Project**: Two Threads Studio  
+**Parent Entity**: SYS Pvt. Ltd.
+
+---
 
 ## 1. Project Overview
 
 - **Project Name**: Two Threads Studio
-- **Purpose of the website**: A high-end digital storefront, portfolio, and educational platform for an artisanal embroidery brand.
-- **Short description**: Sells handcrafted physical goods (kits, hoops, patterns) and provides tutorials while showcasing the brand's heritage, craftsmanship, and community gallery.
-- **Tech stack**: React, TypeScript, TailwindCSS, Zustand, React Router.
-- **Overall architecture**: A purely frontend Single Page Application (SPA). Currently, it operates with client-side routing, global state management via Zustand (with localStorage persistence), and a mocked authentication context. There is no active backend or database connected.
+- **Purpose of the website**: A high-end digital storefront, portfolio, e-commerce engine, and educational platform for an artisanal embroidery brand.
+- **Short description**: Sells handcrafted physical goods (kits, hoops, patterns) and digital offerings (patterns, video tutorials) while showcasing the brand's heritage, craftsmanship, and community gallery.
+- **Tech Stack**: React 19, TypeScript, TailwindCSS, Zustand, TanStack React Query, React Router v7, Express.js, Prisma ORM, PostgreSQL, Razorpay Payment Gateway, PDFKit Invoice Engine.
+- **Overall Architecture**: Full-stack E-Commerce Web Application. Decoupled client-server architecture with REST API endpoints, JWT-based authentication with refresh token rotation, atomic PostgreSQL database transactions, server-side risk/trust score engine, and an operational back-office admin platform.
 
 ---
 
-## 2. Technology Stack
+## 2. Technology Stack & Infrastructure
 
-- **React** (v19.2) - UI Library
-- **TypeScript** - Static typing
-- **Vite / Webpack** - Handled via `react-scripts` (Create React App structure)
-- **TailwindCSS** (v3.4) - Utility-first styling
-- **Zustand** (v5.0) - Global state management (used for Cart and Checkout)
-- **React Router Dom** (v7.16) - Client-side routing
-- **Framer Motion** - Used for complex animations and transitions
-- **Lucide React** - Iconography
-- **Authentication**: Client-side mocked via `AuthContext`
-- **Image storage**: Local static assets (`src/assets`) mixed with external Unsplash URLs
-- **Payment Gateway**: None (Pending implementation)
-- **Email service**: None
-- **Shipping integration**: None
-- **Deployment**: Not configured for production CI/CD yet.
+- **Frontend**: React (v19.2), TypeScript, Vite, TailwindCSS (v3.4), Zustand (v5.0), TanStack React Query (v5.62), React Router Dom (v7.16), Framer Motion, Lucide React icons.
+- **Backend**: Node.js, Express.js, TypeScript, Prisma ORM (v7.8), PostgreSQL.
+- **Authentication**: JWT Access Tokens (Short-lived) + HttpOnly/Bearer Refresh Tokens (Rotated & Hashed), bcrypt password hashing, Role-Based Access Control (`CUSTOMER`, `ADMIN`).
+- **Payment Processing**: Razorpay Payment Gateway (Online) + COD Policy 2.0 Risk Engine (Cash on Delivery).
+- **Invoicing & Documents**: Server-side PDF invoice generation (`invoice.service.ts`).
+- **Risk & Trust Engine**: Dynamic customer tiers (`NEW_MAKER`, `ARTISAN_FRIEND`, `PATRON`, `ATELIER_COLLECTOR`), fraud velocity detectors, phone OTP verification (`OtpVerification`), single-row `StudioSettings` feature flags.
+- **Returns System**: Item-level return requests (`ReturnRequest`, `ReturnRequestItem`), physical studio inspection workflow, reverse pickup SOP (`docs/Studio Return Policy.md`).
+- **Bulk Product Import**: **Planned (0%)** — Spreadsheet CSV/Excel upload engine outlined in `docs/Bulk Import plan.md` is on the roadmap. Admin catalog batch actions (publishing, archiving, category updates for existing items) are active (`/admin/bulk-action`).
 
 ---
 
 ## 3. Folder Structure
 
 ```text
-src/
-├── assets/         # Static images, textures, backgrounds, and SVGs
-├── components/     # Reusable UI architecture
-│   ├── auth/       # Authentication specific layouts
-│   ├── cart/       # Cart drawer, cart items, checkout steps
-│   ├── dashboard/  # Admin and user dashboard specific widgets
-│   ├── layout/     # Structural wrappers (Navbar, Footer, PageContainer)
-│   ├── sections/   # Large composite blocks for pages (Hero, BestSellers)
-│   └── ui/         # Base UI elements (Modal, DataTable, Skeleton)
-├── context/        # React Context providers (AuthContext.tsx)
-├── data/           # Hardcoded mock data and content structures
-├── pages/          # Top-level route components (Home, Shop, Admin)
-│   ├── admin/      # Admin dashboard screens
-│   └── auth/       # Login, Signup, Reset Password screens
-└── store/          # Zustand global state (cartStore.ts, checkoutStore.ts)
+Two Threads Studio/
+├── backend/                # Express.js + Prisma + TypeScript API
+│   ├── prisma/             # Schema, migrations, client configuration
+│   └── src/
+│       ├── config/         # Environment & server config
+│       ├── constants/      # Status codes, HTTP constants
+│       ├── controllers/    # API Request Controllers (Auth, Product, Order, Admin, Risk, Return)
+│       ├── email/          # Email notification templates & handlers
+│       ├── engines/        # CodEligibilityEngine, RiskEngine, TrustScoreEngine, FraudDetector
+│       ├── events/         # Event Dispatcher for async order/payment hooks
+│       ├── middleware/     # Auth, Role, Validation, Idempotency, Rate Limiter
+│       ├── repositories/   # Database access layer
+│       ├── routes/         # Express router modules
+│       ├── services/       # Core business logic (Order, Payment, Risk, Return, CustomerTier, Invoice, Cart)
+│       └── utils/          # Logger, AppError, Response formatters
+├── frontend/               # React 19 + TypeScript Storefront & Admin Application
+│   └── src/
+│       ├── assets/         # High-resolution media, stitches, textures
+│       ├── components/     # UI Component Library (Auth, Cart, Commerce, Layout, Sections, UI)
+│       ├── context/        # React Context (AuthContext)
+│       ├── hooks/          # React Query custom hooks (useCommerce)
+│       ├── pages/          # Storefront views & Admin dashboard views
+│       ├── services/       # Axios API client integrations
+│       └── store/          # Zustand stores (cartStore, checkoutStore)
+└── docs/                   # Exhaustive project documentation & technical SOPs
 ```
 
-- **components/**: Holds reusable building blocks for the UI.
-- **pages/**: Contains the main views rendered by the React Router.
-- **store/** & **context/**: Handle the global state of the application.
+---
+
+## 4. Storefront & Admin Navigation Audit
+
+| Page / Route | Exists? | Status | Responsive? | Production Ready? | Backend Integration? |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Home (`/`)** | Yes | Fully Implemented | Yes | Yes | Yes (Connected to Product API) |
+| **Shop (`/shop`)** | Yes | Fully Implemented | Yes | Yes | Yes (Dynamic Filter & Search API) |
+| **Product Detail (`/shop/:slug`)** | Yes | Fully Implemented | Yes | Yes | Yes (Variants, Customization, Reviews) |
+| **Collections (`/collections`)** | Yes | Fully Implemented | Yes | Yes | Yes (Category/Collection API) |
+| **Our Story (`/our-story`)** | Yes | Fully Implemented | Yes | Yes | Yes (Merged Brand Narrative Page) |
+| **Contact (`/contact`)** | Yes | Fully Implemented | Yes | Yes | Yes |
+| **Gallery (`/gallery`)** | Yes | Fully Implemented | Yes | Yes | Yes |
+| **Learning Studio (`/learning`)** | Yes | Fully Implemented | Yes | Yes | Yes (Tutorial & Instructor API) |
+| **Login / Signup (`/auth/login`)**| Yes | Fully Implemented | Yes | Yes | Yes (JWT Auth API) |
+| **Customer Account (`/account`)**| Yes | Fully Implemented | Yes | Yes | Yes (Order History, PDF Invoices, Returns) |
+| **Wishlist (`/wishlist`)** | Yes | Fully Implemented | Yes | Yes | Yes (Wishlist API) |
+| **Cart Drawer (`CartDrawer`)** | Yes | Fully Implemented | Yes | Yes | Yes (Cart Sync API) |
+| **Checkout (`/checkout`)** | Yes | Fully Implemented | Yes | Yes | Yes (Razorpay + COD Policy 2.0 API) |
+| **Admin Dashboard (`/admin`)** | Yes | Fully Implemented | Yes | Yes | Yes (KPI Analytics API) |
+| **Admin PIM (`/admin/products`)**| Yes | Fully Implemented | Yes | Yes | Yes (Full Product/Variant CRUD + Batch Actions) |
+| **Admin Orders (`/admin/orders`)**| Yes | Fully Implemented | Yes | Yes | Yes (Status State Machine & Refunds) |
+| **Admin Customers (`/admin/customers`)**| Yes | Fully Implemented | Yes | Yes | Yes (CRM & Risk Overrides) |
+| **Admin Inventory (`/admin/inventory`)**| Yes | Fully Implemented | Yes | Yes | Yes (Stock Adjustments & Audit Logs) |
+| **Admin Reviews (`/admin/reviews`)**| Yes | Fully Implemented | Yes | Yes | Yes (Review Moderation API) |
 
 ---
 
-## 4. Frontend Progress
+## 5. Subsystem Status & Audit Summaries
 
-| Page / Route             | Exists? | Status                                              | Responsive? | Production Ready?                 |
-| :----------------------- | :------ | :-------------------------------------------------- | :---------- | :-------------------------------- |
-| **Home**                 | Yes     | Fully implemented                                   | Yes         | Yes (needs image optimization)    |
-| **Shop**                 | Yes     | Fully implemented (static data)                     | Yes         | No (requires backend integration) |
-| **Product Page**         | Yes     | Partially implemented                               | Yes         | No                                |
-| **Collections**          | Yes     | Fully implemented (static data)                     | Yes         | No                                |
-| **About (Our Story)**    | Yes     | Fully implemented with SYS parent section           | Yes         | Yes                               |
-| **Contact**              | Yes     | Fully implemented with business entity card         | Yes         | Yes                               |
-| **Gallery**              | Yes     | Fully implemented                                   | Yes         | Yes                               |
-| **Learning / Tutorials** | Yes     | Fully implemented                                   | Yes         | Yes                               |
-| **Login / Signup**       | Yes     | Fully implemented                                   | Yes         | No (requires backend hook)        |
-| **Account**              | Yes     | Fully implemented (includes printed invoices modal) | Yes         | Yes                               |
-| **Wishlist**             | Yes     | Partially implemented                               | Yes         | No                                |
-| **Cart**                 | Yes     | Fully implemented (Zustand)                         | Yes         | Yes (frontend logic)              |
-| **Checkout**             | Yes     | Fully implemented (Frontend)                        | Yes         | No (missing payment gateway)      |
-| **Careers**              | Yes     | Fully implemented with submission modal             | Yes         | Yes                               |
-| **Legal Policies**       | Yes     | Fully implemented with tabbed sidebar               | Yes         | Yes                               |
-| **Sustainability**       | Yes     | Fully implemented                                   | Yes         | Yes                               |
-| **Admin Dashboard**      | Yes     | Partially implemented                               | Yes         | No                                |
-| **Product/User Mgt.**    | Yes     | UI exists (Admin)                                   | Yes         | No (no backend mutation)          |
-| **Settings**             | Yes     | UI exists                                           | Yes         | No                                |
+### A. Authentication & Security (100% Complete)
+- **Token Security**: Short-lived JWT Access Token passed in Bearer headers, Refresh Token stored securely in database with SHA-256 hash.
+- **Password Security**: Passwords hashed using `bcrypt` (10 rounds).
+- **Access Control**: Express middleware `requireAuth` and `requireRole(Role.ADMIN)` enforce endpoint permissions.
 
-**Frontend Completion Estimate**: 92% (UI/UX is largely complete, basic routing/forms setup, backend integration started).
+### B. Catalog & Product Information Management (PIM) (100% Complete)
+- **Data Models**: `Product`, `ProductVariant`, `Category`, `Collection`, `Tag`, `ProductImage`, `ProductMedia`.
+- **Inventory Tracking**: Stock quantities tracked per product or variant; backorders and low stock thresholds supported.
+- **Admin Catalog Batch Actions**: Select multiple existing products to publish, archive, hide, feature, or assign to categories/collections (`POST /api/v1/products/admin/bulk-action`).
+- **GST & Tax Compliance**: HSN code mapping, tax class, and GST percentage fields embedded in catalog models.
 
----
+### C. Bulk Spreadsheet Product Import & Export Engine (0% — Planned Roadmap)
+- **Status**: Planned (Detailed roadmap in `docs/Bulk Import plan.md`).
+- **Missing Infrastructure**: `ImportJob` & `ImportJobRow` Prisma models, CSV/Excel file parsers, column mapping interface, row validation engine, duplicate SKU detection, and CSV export streaming.
 
-## 5. UI Components
+### D. Checkout & Risk Management Engine (100% Complete)
+- **COD Policy 2.0**: Customer Tiers (`NEW_MAKER`, `ARTISAN_FRIEND`, `PATRON`, `ATELIER_COLLECTOR`), dynamic tier order limits stored in `StudioSettings`, admin overrides (`forceCodAllowed`, `forcePrepaidOnly`).
+- **Fraud Detection**: Disposable email domain checking, multi-account phone/address detection, 24h order velocity rate limiting.
+- **SMS OTP Verification**: Phone verification enforced for high-value or first-time COD orders via `OtpVerification`.
 
-- **Navbar / Footer**: Complete, Reusable
-- **ScrollReveal / IntroAnimation**: Complete, Reusable
-- **Buttons / Inputs**: Complete (Tailwind styled directly in code), Partially abstracted
-- **Cards / Product Cards**: Complete, Reusable
-- **Modal / Drawer (Cart Drawer)**: Complete, Reusable
-- **DataTable**: Complete, Reusable (Admin Panel)
-- **Forms**: Complete (UI level), Needs backend hooking
-- **Carousel / Image Gallery**: Complete (Masonry Gallery)
-- **Hero / Sections**: Complete, Mostly single-use (bound to `HomeSections.tsx`)
-- **Skeleton Loaders**: Complete, Reusable
+### E. Payments & Invoicing (100% Complete)
+- **Razorpay Integration**: Server-side order creation (`POST /api/v1/payments/orders/:orderId/razorpay-order`) and HMAC signature verification.
+- **PDF Invoices**: Server-side PDF rendering engine (`invoice.service.ts`) streaming compliant invoice documents with company GST and itemized breakdowns.
+
+### F. Returns Management Engine & Policy (100% Complete)
+- **Database Schema**: `ReturnRequest` & `ReturnRequestItem` models with return reasons, item condition inspection, and refund status tracking.
+- **Operational SOP**: Comprehensive guidelines in `docs/Studio Return Policy.md` detailing mandatory unboxing video verification, 48h/7-day claim windows, physical studio inspection steps, and customer email response templates.
 
 ---
 
-## 6. Authentication System
+## 6. Project Completion Index
 
-- **Login flow**: Mocked client-side. Allows logging in as customer or admin (e.g. `admin@twothreads.com`).
-- **Signup**: Mocked client-side with basic validation.
-- **Logout**: Mocked client-side clearing context state.
-- **JWT / Token storage**: **Missing**. No real token logic exists.
-- **Protected routes**: Route guards exist in React Router to redirect unauthenticated users away from `/account` and `/admin`.
-- **Current issues**: Entirely relies on React Context memory. A page refresh loses session state unless explicitly persisted (not currently verified). Highly insecure for production.
+```
+Overall Progress: ~90% Complete
 
----
+[████████████████████████░░░]
 
-## 7. Backend Status
-
-**Status**: 60% Completed (In Progress)
-
-- **Routes / Controllers / Models**: Implemented in `/backend/src` with Express controllers and models for authentication flow.
-- **ORM / Database**: Prisma configured to manage schema migrations and queries.
-- **Authentication / Authorization**: Secure JWT token generation and password bcrypt hashing implemented.
-- **Error Handling / Logging**: Request validation handlers and secure route guards completed.
+• Frontend Storefront UI & Layouts:   100%
+• Backend Express & Prisma Core API:  100%
+• Payment Processing & Invoices:      100%
+• COD Policy 2.0 & Risk Engine:       100%
+• Admin Operations OS (PIM/CRM/Orders):100%
+• Returns Engine & Policy SOP:         100%
+• Bulk CSV/Excel Product Import:         0% (Planned Roadmap)
+• Production Polish & Deployment:      60%
+```
 
 ---
 
-## 8. Database
+## 7. Recommended Next Steps
 
-**Status**: 50% Completed (In Progress)
-
-- **Engine**: PostgreSQL schema and connection setup configured.
-- **Models**: Schemas for User data, tokens, and roles are persisted in the database via migrations.
-
----
-
-## 9. Admin Panel
-
-- **Dashboard**: Working (UI only, static charts/stats)
-- **Orders**: Working (UI only, data table exists)
-- **Products / Inventory**: Working (UI only)
-- **Customers**: Working (UI only)
-- **Analytics**: Working (UI only)
-- **Settings**: Working (UI only)
-- **Billing / Reports**: Missing / Incomplete
-
----
-
-## 10. E-Commerce Features
-
-- **Product browsing**: Working
-- **Categories / Filters**: Working (Frontend state)
-- **Wishlist**: Working (Frontend state)
-- **Cart**: Working (Zustand + LocalStorage, supports item quantity & customizations)
-- **Checkout**: Working (Multi-step frontend flow)
-- **Payments**: **Missing** (No Stripe/PayPal integration)
-- **Order history / Invoices**: Working (includes interactive printable invoice viewer modal)
-- **Shipping**: **Missing**
-- **Coupons / Reviews / Returns**: Reviews fully implemented on Home page; Returns policy legally declared under tabbed policy pages; Coupons are missing
-
----
-
-## 11. Responsive Design Audit
-
-- **Desktop / Laptop**: Fully responsive, high-end editorial layouts.
-- **Tablet**: Fully responsive.
-- **Mobile**: Fully responsive.
-- The project strictly follows a mobile-first Tailwind approach. The Authentication pages even feature completely distinct HTML structures for mobile vs desktop for a pixel-perfect native feel.
-
----
-
-## 12. Performance
-
-- **Heavy bundles**: Framer Motion is included but not overly abused.
-- **Image optimization**: Currently poor. Many images are massive PNGs/JPEGs (e.g. 2K macro backdrops) or heavy Unsplash URLs. Needs conversion to WebP/AVIF and proper `<picture>` tags.
-- **Lazy loading**: **Missing**. Not implemented natively on most `<img>` tags below the fold.
-- **Large components**: `HomeSections.tsx` contains 10+ exported components and should be refactored into smaller files.
-- **Potential improvements**: Implement Code Splitting (React.lazy) for the Admin Dashboard and route-level pages to reduce initial bundle size.
-
----
-
-## 13. Security Audit
-
-- **Authentication/Authorization**: Completely insecure (Frontend mocked).
-- **Password handling**: None (Passwords are currently validated in raw text via frontend state).
-- **API security / JWT**: None (No API exists).
-- **Environment variables**: Not utilized securely for any secrets (since there is no backend).
-
----
-
-## 14. Current Bugs
-
-| Priority | Issue            | Location                | Cause                        | Suggested Fix                          |
-| -------- | ---------------- | ----------------------- | ---------------------------- | -------------------------------------- |
-| High     | Session Loss     | `AuthContext.tsx`       | No persistence               | Implement JWT and real backend auth.   |
-| Medium   | Image Load Times | `Login.tsx`, `Home.tsx` | Heavy 2K PNG/JPEG assets     | Compress assets, add `loading="lazy"`. |
-| Low      | Component Bloat  | `HomeSections.tsx`      | 400+ lines, multiple exports | Refactor into individual files.        |
-
----
-
-## 15. Missing Features
-
-- **Backend**: Completely missing (Node.js/Express Server, DB connection).
-- **Admin**: CRUD operations to mutate products/users in a real database.
-- **User**: Order history fetching, real profile updates, address management.
-- **Business**: Stripe payment gateway, transactional emails (SendGrid/Mailgun), Shipping calculation.
-
----
-
-## 16. Code Quality
-
-- **Project structure**: Good. Clear separation of pages, components, and global stores.
-- **Naming / Consistency**: Excellent. Consistent use of TypeScript interfaces and Tailwind class architecture.
-- **Scalability / Maintainability**: The frontend is highly scalable, but the massive `HomeSections.tsx` file is technical debt.
-- **Reusability**: Core UI pieces (`DataTable`, `Modal`, `ScrollReveal`) are cleanly abstracted.
-
----
-
-## 17. Dependencies
-
-- `react`, `react-dom`, `react-router-dom`: Core framework.
-- `tailwindcss`, `postcss`, `autoprefixer`: Styling engine.
-- `zustand`: Used effectively for global e-commerce state (Cart/Checkout).
-- `framer-motion`: Actively used for UI animations.
-- `lucide-react`: Actively used for iconography.
-
----
-
-## 18. Environment Configuration
-
-- **Environment variables**: Unable to Verify (No `.env` file active for core features).
-- **API URLs**: None exist.
-- **Database**: None exists.
-- **Deployment readiness**: **Not Ready**. The lack of a backend and real authentication makes this unsuitable for production.
-
----
-
-## 19. Project Completion Estimate
-
-- **Frontend**: 85%
-- **Backend**: 0%
-- **Authentication**: 10% (UI only)
-- **Admin Panel**: 40% (UI only)
-- **E-commerce Features**: 30% (Cart/Checkout UI only, no payments)
-- **UI Polish**: 95% (Highly refined design system)
-- **Testing**: 0% (No Jest/Cypress tests written)
-- **Overall Project**: ~35%
-
----
-
-## 20. Recommended Next Development Roadmap
-
-- **Phase 1: Backend Initialization**: Set up Node.js/Express server and MongoDB/PostgreSQL database. Create basic schemas for Users and Products.
-- **Phase 2: Real Authentication**: Replace `AuthContext` with JWT-based authentication. Secure the `/admin` and `/account` routes properly.
-- **Phase 3: CMS & Product Integration**: Migrate hardcoded frontend product arrays to the database and build API endpoints to fetch them dynamically.
-- **Phase 4: Payment Gateway (Checkout)**: Connect the Zustand checkout flow to Stripe/PayPal to process real transactions securely.
-- **Phase 5: Admin Panel Wiring**: Connect the Admin Dashboard UI to the backend to allow true CRUD operations on inventory and orders.
-- **Phase 6: Performance Optimization**: Implement image compression, lazy loading, and code splitting.
-- **Phase 7: Deployment**: Deploy frontend to Vercel/Netlify and backend to Render/AWS.
+1. **Implement Phase 10 — Bulk Product CSV/Excel Import & Export Engine** (`docs/Bulk Import plan.md`).
+2. **Transactional Email Setup**: Configure Resend / SendGrid API keys in `.env`.
+3. **Asset Compression Pipeline**: Compress storefront PNG/JPEG assets into optimized WebP/AVIF formats.
+4. **CI/CD & Deployment**: Host frontend on Vercel/Netlify and backend service on Render/Railway.
