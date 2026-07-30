@@ -128,10 +128,15 @@ export const razorpayProvider: PaymentProvider = {
         };
       }
 
-      const razorpay = new Razorpay({
+      const options: any = {
         key_id: keyId,
         key_secret: keySecret,
-      });
+      };
+      if (params.idempotencyKey) {
+        options.headers = { 'X-Payment-Idempotency': params.idempotencyKey };
+      }
+
+      const razorpay = new Razorpay(options);
 
       const refundPayload: any = {
         speed: 'normal',
@@ -152,6 +157,36 @@ export const razorpayProvider: PaymentProvider = {
     } catch (err: any) {
       throw new AppError(
         `Razorpay refund failed: ${err?.error?.description || err.message}`,
+        HTTP_STATUS.BAD_GATEWAY
+      );
+    }
+  },
+
+  async fetchRefund(refundId: string): Promise<RefundResult> {
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET;
+
+    if (!keyId || !keySecret || keyId.includes('dummy') || keyId.includes('your_')) {
+      return {
+        refundId,
+        status: 'processed',
+        amount: 0,
+        raw: { id: refundId, status: 'processed' },
+      };
+    }
+
+    try {
+      const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+      const refund: any = await razorpay.refunds.fetch(refundId);
+      return {
+        refundId: refund.id,
+        status: refund.status,
+        amount: refund.amount as number,
+        raw: refund as unknown as Record<string, unknown>,
+      };
+    } catch (err: any) {
+      throw new AppError(
+        `Failed to fetch refund from Razorpay: ${err?.error?.description || err.message}`,
         HTTP_STATUS.BAD_GATEWAY
       );
     }

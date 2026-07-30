@@ -85,8 +85,12 @@ eventDispatcher.on('return.inspection_failed', ({ returnRequest }: any) => {
   logger.info({ returnRequestId: returnRequest?.id }, 'Event Listener: return.inspection_failed');
 });
 
+eventDispatcher.on('return.refund_initiated', ({ returnRequest, finalRefund, refundId }: any) => {
+  logger.info({ returnRequestId: returnRequest?.id, finalRefund, refundId }, 'Event Listener: return.refund_initiated — notification sent to customer');
+});
+
 eventDispatcher.on('return.refunded', ({ returnRequest, finalRefund }: any) => {
-  logger.info({ returnRequestId: returnRequest?.id, finalRefund }, 'Event Listener: return.refunded — return closed');
+  logger.info({ returnRequestId: returnRequest?.id, finalRefund }, 'Event Listener: return.refunded — bank settlement confirmed, return closed');
 });
 
 eventDispatcher.on('return.rejected', ({ returnRequest, note }: any) => {

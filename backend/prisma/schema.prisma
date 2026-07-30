@@ -217,6 +217,14 @@ enum RefundType {
   GIFT_CARD
 }
 
+/// Lifecycle of an individual refund attempt
+enum RefundStatus {
+  INITIATED
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
 /// Exchange request lifecycle
 enum ExchangeStatus {
   PENDING
@@ -808,6 +816,7 @@ model Order {
   auditLogs     OrderAuditLog[]
   payment       Payment?
   shipment      Shipment?
+  refunds       Refund[]
   reviewQueue   ManualReviewQueue?
   fraudFlags    FraudFlag[]
   returnRequests ReturnRequest[]
@@ -925,6 +934,7 @@ model Payment {
   metadata Json?
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refunds Refund[]
 
   @@index([orderId])
   @@index([status])
@@ -1453,6 +1463,10 @@ model ReturnRequest {
   restockingFee     Decimal    @default(0) @db.Decimal(10, 2)
   finalRefundAmount Decimal?   @db.Decimal(10, 2)
   refundId          String?
+  razorpayRefundId  String?
+  refundStatus      String?
+  bankReferenceNumber String?
+  refundInitiatedAt DateTime?
   refundProcessedAt DateTime?
 
   // Auto-approval metadata
@@ -1483,6 +1497,7 @@ model ReturnRequest {
 
   items    ReturnRequestItem[]
   timeline ReturnTimeline[]
+  refunds  Refund[]
 
   order Order @relation(fields: [orderId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
@@ -1651,5 +1666,54 @@ model ImportJobRow {
   @@index([importJobId])
   @@index([status])
   @@map("import_job_rows")
+}
+
+/// Dedicated Refund model supporting multiple partial refunds per payment/order
+model Refund {
+  id                  String       @id @default(cuid())
+  paymentId           String
+  returnRequestId     String?
+  orderId             String
+  provider            String       @default("RAZORPAY")
+  providerRefundId    String?      @unique
+  status              RefundStatus @default(INITIATED)
+  amount              Decimal      @db.Decimal(10, 2)
+  currency            String       @default("INR")
+  reason              String?
+  speed               String?      @default("normal")
+  bankReferenceNumber String?
+  providerPayload     Json?
+  idempotencyKey      String?      @unique
+  initiatedAt         DateTime     @default(now())
+  processedAt         DateTime?
+  failedAt            DateTime?
+  failureReason       String?
+  gatewayErrorCode    String?
+  gatewayErrorDesc    String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  payment       Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  returnRequest ReturnRequest? @relation(fields: [returnRequestId], references: [id])
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([returnRequestId])
+  @@index([orderId])
+  @@index([providerRefundId])
+  @@map("refunds")
+}
+
+/// Webhook idempotency registry to prevent duplicate processing
+model ProcessedWebhook {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  eventType   String
+  receivedAt  DateTime @default(now())
+  processedAt DateTime @default(now())
+  payloadHash String?
+
+  @@index([eventId])
+  @@map("processed_webhooks")
 }
 

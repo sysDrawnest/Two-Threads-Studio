@@ -451,9 +451,11 @@ export const OrdersTab: React.FC = () => {
                   {(activeReturn.status === 'REFUNDED' || activeReturn.status === 'REFUND_PROCESSING' || activeReturn.finalRefundAmount) && (
                     <RefundReceiptCard
                       refundAmount={Number(activeReturn.finalRefundAmount || activeReturn.approvedAmount || selectedOrder.grandTotal)}
-                      refundId={activeReturn.refundId}
+                      refundId={(activeReturn as any).razorpayRefundId || activeReturn.refundId}
                       paymentMethod={selectedOrder.paymentMethod}
                       refundProcessedAt={activeReturn.refundProcessedAt || activeReturn.resolvedAt}
+                      status={activeReturn.status}
+                      bankReferenceNumber={(activeReturn as any).bankReferenceNumber}
                     />
                   )}
 

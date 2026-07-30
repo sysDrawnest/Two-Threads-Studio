@@ -335,78 +335,51 @@ export const returnService = {
       }
     });
 
-    // Trigger Razorpay refund (outside main tx to avoid timeout)
+    // Trigger refund process via paymentService
     try {
       const payment = request.order.payment as any;
-      if (payment?.id && request.refundType === 'ORIGINAL_PAYMENT') {
+      if (payment?.id) {
         await paymentService.processRefund(
           payment.id,
           adminId,
           finalRefund,
-          `Return approved — ${request.reason}`
+          `Return approved — ${request.reason}`,
+          returnId
         );
-      } else if (request.refundType !== 'ORIGINAL_PAYMENT') {
-        // STORE_CREDIT / WALLET_CREDIT / GIFT_CARD — not yet automated.
-        // Log for manual processing; the timeline note below will inform the admin.
-        logger.info(
-          { returnId, refundType: request.refundType, finalRefund },
-          '[Returns] Non-payment refund type — manual processing required'
-        );
+      } else {
+        // Fallback for orders without explicit payment record
+        await prisma.$transaction(async (tx) => {
+          await tx.returnRequest.update({
+            where: { id: returnId },
+            data: { status: ReturnStatus.REFUNDED, resolvedAt: new Date(), refundProcessedAt: new Date() },
+          });
+          await tx.order.update({
+            where: { id: request.orderId },
+            data: { orderStatus: OrderStatus.RETURNED, paymentStatus: PaymentStatus.REFUNDED },
+          });
+          await tx.returnTimeline.create({
+            data: {
+              returnRequestId: returnId,
+              status: ReturnStatus.REFUNDED,
+              note: `₹${finalRefund.toFixed(2)} refund processed to customer.`,
+              actorType: 'SYSTEM',
+            },
+          });
+        });
       }
 
-      const refundNote = request.refundType === 'ORIGINAL_PAYMENT'
-        ? `₹${finalRefund.toFixed(2)} refund processed to original payment method.`
-        : `₹${finalRefund.toFixed(2)} refund via ${request.refundType} — requires manual issuance.`;
-
-      await prisma.$transaction(async (tx) => {
-        await tx.returnRequest.update({
-          where: { id: returnId },
-          data: { status: ReturnStatus.REFUNDED, resolvedAt: new Date(), refundProcessedAt: new Date() },
-        });
-
-        // Always update order status and payment status when refund completes
-        await tx.order.update({
-          where: { id: request.orderId },
-          data: { 
-            orderStatus: OrderStatus.RETURNED,
-            paymentStatus: PaymentStatus.REFUNDED 
-          },
-        });
-
-        // Ensure Payment record also updates if it wasn't already handled by processRefund
-        const payment = request.order.payment as any;
-        if (payment?.id) {
-          await tx.payment.update({
-            where: { id: payment.id },
-            data: { status: PaymentStatus.REFUNDED },
-          });
-        }
-
-        await tx.returnTimeline.create({
-          data: {
-            returnRequestId: returnId,
-            status: ReturnStatus.REFUNDED,
-            note: refundNote,
-            actorType: 'SYSTEM',
-          },
-        });
-      });
-
-
-      logger.info({ returnId, finalRefund }, '[Returns] Refund processed successfully');
-      eventDispatcher.emit(ReturnEvents.REFUNDED, { returnRequest: request, finalRefund, refundType: request.refundType }).catch(() => {});
+      logger.info({ returnId, finalRefund }, '[Returns] Refund workflow step completed');
+      eventDispatcher.emit(ReturnEvents.REFUND_INITIATED, { returnRequest: request, finalRefund }).catch(() => {});
     } catch (err: any) {
       logger.error({ returnId, err: err.message }, '[Returns] Refund failed after inspection');
-      // Do NOT revert to INSPECTION_PASSED — keep REFUND_PROCESSING so the admin
-      // can see it failed and retry. Write a timeline entry with the error for visibility.
       await prisma.returnTimeline.create({
         data: {
           returnRequestId: returnId,
-          status: ReturnStatus.REFUND_PROCESSING, // stay in processing state
+          status: ReturnStatus.REFUND_PROCESSING,
           note: `Refund attempt failed: ${err.message}. Admin action required to retry.`,
           actorType: 'SYSTEM',
         },
-      }).catch(() => {}); // fire-and-forget — don't mask the original error
+      }).catch(() => {});
       throw err;
     }
   },

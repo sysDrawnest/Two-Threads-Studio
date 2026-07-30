@@ -48,6 +48,8 @@ export interface RefundParams {
   amount?: number;
   /** Reason shown to customer / provider */
   reason?: string;
+  /** Unique idempotency key to prevent duplicate refunds on gateway */
+  idempotencyKey?: string;
 }
 
 export interface RefundResult {
@@ -76,4 +78,9 @@ export interface PaymentProvider {
    * Process a full or partial refund.
    */
   processRefund(params: RefundParams): Promise<RefundResult>;
+
+  /**
+   * Fetch refund details directly from gateway for status reconciliation.
+   */
+  fetchRefund?(refundId: string): Promise<RefundResult>;
 }

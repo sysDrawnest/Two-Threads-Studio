@@ -13,6 +13,7 @@
 
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
+import prisma from '../prisma';
 import { paymentService } from '../services/payment.service';
 import { paymentRepository } from '../repositories/payment.repository';
 import logger from '../lib/logger';
@@ -68,6 +69,28 @@ router.post('/razorpay', async (req: Request, res: Response) => {
 
   logger.info({ event: event.event }, '[Webhook] Received Razorpay event');
 
+  // Check Webhook Idempotency before processing
+  const eventId = event.event_id || event.id || `${event.event}_${Date.now()}`;
+  try {
+    const existingWebhook = await prisma.processedWebhook.findUnique({
+      where: { eventId },
+    });
+    if (existingWebhook) {
+      logger.info({ eventId, event: event.event }, '[Webhook] Duplicate webhook event received — skipping (idempotent)');
+      return res.status(200).json({ status: 'ok', note: 'duplicate event skipped' });
+    }
+
+    // Save eventId to prevent future duplicates
+    await prisma.processedWebhook.create({
+      data: {
+        eventId,
+        eventType: event.event || 'unknown',
+      },
+    }).catch(() => {}); // ignore race condition unique constraint errors
+  } catch (err: any) {
+    logger.warn({ err: err.message }, '[Webhook] Failed to check webhook idempotency record');
+  }
+
   // Respond 200 immediately — Razorpay retries if it doesn't get 200 within 5s
   res.status(200).json({ status: 'ok' });
 
@@ -75,6 +98,7 @@ router.post('/razorpay', async (req: Request, res: Response) => {
   setImmediate(async () => {
     try {
       const payload = event.payload?.payment?.entity;
+      const refundEntity = event.payload?.refund?.entity;
 
       switch (event.event) {
         case 'payment.captured': {
@@ -92,15 +116,12 @@ router.post('/razorpay', async (req: Request, res: Response) => {
             break;
           }
 
-          // We already verified the webhook signature above — pass empty string to bypass re-verify
-          // The service's verifyPayment will call verifySignature with providerOrderId|providerPaymentId
-          // Since we already verified the webhook HMAC, we can trust the event data
           await paymentService.verifyPayment(
             payment.orderId,
             'WEBHOOK',
             payload.order_id,
             payload.id,
-            payload.id  // Use paymentId as placeholder — webhook already verified above
+            payload.id
           );
           logger.info({ orderId: payment.orderId }, '[Webhook] payment.captured processed');
           break;
@@ -119,6 +140,126 @@ router.post('/razorpay', async (req: Request, res: Response) => {
             payload.error_code
           );
           logger.info({ orderId: payment.orderId }, '[Webhook] payment.failed processed');
+          break;
+        }
+
+        case 'refund.created':
+        case 'refund.speed_changed': {
+          if (!refundEntity?.id) break;
+          const providerRefundId = refundEntity.id;
+
+          await prisma.refund.updateMany({
+            where: { providerRefundId },
+            data: {
+              status: 'PROCESSING',
+              providerPayload: refundEntity,
+            },
+          }).catch(() => {});
+          logger.info({ providerRefundId }, '[Webhook] refund.created processed');
+          break;
+        }
+
+        case 'refund.processed': {
+          if (!refundEntity?.id) break;
+          const providerRefundId = refundEntity.id;
+          const rrn = refundEntity.acquirer_data?.rrn || null;
+          const now = new Date();
+
+          const refund = await prisma.refund.findUnique({
+            where: { providerRefundId },
+            include: { payment: true, returnRequest: true },
+          });
+
+          if (!refund) {
+            logger.warn({ providerRefundId }, '[Webhook] No matching Refund record found for refund.processed');
+            break;
+          }
+
+          if (refund.status === 'PROCESSED') {
+            logger.info({ providerRefundId }, '[Webhook] Refund already marked PROCESSED — skipping');
+            break;
+          }
+
+          await prisma.$transaction(async (tx) => {
+            await tx.refund.update({
+              where: { id: refund.id },
+              data: {
+                status: 'PROCESSED',
+                processedAt: now,
+                bankReferenceNumber: rrn,
+                providerPayload: refundEntity,
+              },
+            });
+
+            await tx.payment.update({
+              where: { id: refund.paymentId },
+              data: { status: 'REFUNDED' },
+            });
+
+            await tx.order.update({
+              where: { id: refund.orderId },
+              data: { paymentStatus: 'REFUNDED', orderStatus: 'REFUNDED' },
+            });
+
+            if (refund.returnRequestId) {
+              await tx.returnRequest.update({
+                where: { id: refund.returnRequestId },
+                data: {
+                  status: 'REFUNDED',
+                  refundStatus: 'processed',
+                  bankReferenceNumber: rrn,
+                  refundProcessedAt: now,
+                  resolvedAt: now,
+                },
+              });
+
+              await tx.returnTimeline.create({
+                data: {
+                  returnRequestId: refund.returnRequestId,
+                  status: 'REFUNDED',
+                  note: `Bank Credit Completed — Credited to payment method${rrn ? ` (Bank RRN: ${rrn})` : ''}.`,
+                  actorType: 'SYSTEM',
+                },
+              });
+            }
+          });
+
+          logger.info({ refundId: refund.id, providerRefundId }, '[Webhook] refund.processed workflow completed successfully');
+          break;
+        }
+
+        case 'refund.failed': {
+          if (!refundEntity?.id) break;
+          const providerRefundId = refundEntity.id;
+          const errCode = refundEntity.error_code || 'GATEWAY_ERROR';
+          const errDesc = refundEntity.error_description || 'Refund failed on gateway';
+
+          const refund = await prisma.refund.findUnique({ where: { providerRefundId } });
+          if (refund) {
+            await prisma.refund.update({
+              where: { id: refund.id },
+              data: {
+                status: 'FAILED',
+                failedAt: new Date(),
+                gatewayErrorCode: errCode,
+                gatewayErrorDesc: errDesc,
+                failureReason: errDesc,
+                providerPayload: refundEntity,
+              },
+            });
+
+            if (refund.returnRequestId) {
+              await prisma.returnTimeline.create({
+                data: {
+                  returnRequestId: refund.returnRequestId,
+                  status: 'REFUND_PROCESSING',
+                  note: `Refund Failed on Gateway — ${errDesc}. Available for Admin Retry.`,
+                  actorType: 'SYSTEM',
+                },
+              });
+            }
+          }
+          logger.info({ providerRefundId, errDesc }, '[Webhook] refund.failed logged');
           break;
         }
 

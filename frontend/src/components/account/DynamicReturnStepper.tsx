@@ -116,23 +116,23 @@ export const DynamicReturnStepper: React.FC<Props> = ({ returnRequest, isDigital
     {
       id: 'REFUND_PROCESSING',
       label: 'Refund Initiated',
-      description: 'Refund request submitted to payment network',
+      description: 'Refund request submitted to Razorpay gateway',
       icon: CreditCard,
-      timestamp: formatDate(returnRequest.refundProcessedAt),
+      timestamp: formatDate(returnRequest.refundProcessedAt || returnRequest.requestedAt),
+    },
+    {
+      id: 'SENT_TO_BANK',
+      label: 'Sent to Bank',
+      description: 'Payment network processing bank transfer (3–7 days)',
+      icon: CreditCard,
+      timestamp: status === 'REFUNDED' || status === 'REFUND_PROCESSING' ? 'Processing with Bank' : null,
     },
     {
       id: 'REFUNDED',
-      label: 'Refund Processed',
-      description: 'Refund processed successfully to payment method',
+      label: 'Bank Credit Completed',
+      description: 'Funds credited successfully to customer account',
       icon: Check,
       timestamp: formatDate(returnRequest.resolvedAt),
-    },
-    {
-      id: 'BANK_CREDIT',
-      label: 'Awaiting Bank Credit',
-      description: 'Most banks credit funds in 3–7 business days',
-      icon: CreditCard,
-      timestamp: status === 'REFUNDED' ? 'Expected in 3–7 days' : null,
     },
   ].filter(Boolean) as StepConfig[];
 

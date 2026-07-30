@@ -26,6 +26,8 @@ import {
   PaymentMethod,
   AuditAction,
   AuditActorType,
+  RefundStatus,
+  ReturnStatus,
 } from '@prisma/client';
 import { eventDispatcher, PaymentEvents, OrderEvents } from '../events';
 import logger from '../lib/logger';
@@ -352,14 +354,15 @@ export const paymentService = {
 
   /**
    * Admin: Process a refund (Razorpay or COD / Bank Transfer).
-   * Ensures Payment.status and Order.paymentStatus transition to REFUNDED or PARTIALLY_REFUNDED.
-   * Payment.status will NEVER remain PENDING after a completed refund.
+   * Creates a dedicated `Refund` entity, passes X-Payment-Idempotency header,
+   * sets status to INITIATED, and relies on Webhook (or manual sync) for completion.
    */
   processRefund: async (
     paymentId: string,
     adminId: string,
     amount?: number,
-    reason?: string
+    reason?: string,
+    returnRequestId?: string
   ) => {
     const payment = await paymentRepository.findById(paymentId);
     if (!payment) throw new AppError('Payment not found', HTTP_STATUS.NOT_FOUND);
@@ -368,7 +371,12 @@ export const paymentService = {
     const refundAmountActual = amount || Number(payment.amount);
     const refundAmountPaise = Math.round(refundAmountActual * 100);
 
-    let refundResult: { refundId?: string; raw?: any } = {};
+    // Derive X-Payment-Idempotency key from returnRequestId or paymentId
+    const idempotencyKey = returnRequestId
+      ? `idemp_rfnd_${returnRequestId}`
+      : `idemp_rfnd_${paymentId}_${Date.now()}`;
+
+    let refundResult: { refundId: string; raw?: any } = { refundId: '' };
 
     // Process external gateway refund for Razorpay online payments
     if (isOnline && payment.providerPaymentId) {
@@ -377,28 +385,72 @@ export const paymentService = {
           providerPaymentId: payment.providerPaymentId,
           amount: refundAmountPaise,
           reason: reason || 'Customer refund',
+          idempotencyKey,
         });
         refundResult = { refundId: res.refundId, raw: res.raw };
       } catch (err: any) {
         logger.error({ paymentId, err: err.message }, '[PaymentService] Razorpay gateway refund failed');
+
+        // Record failed Refund attempt in DB for visibility & retry
+        await prisma.refund.create({
+          data: {
+            paymentId,
+            returnRequestId,
+            orderId: payment.orderId,
+            provider: payment.provider || 'RAZORPAY',
+            status: RefundStatus.FAILED,
+            amount: refundAmountActual,
+            reason: reason || 'Customer refund',
+            idempotencyKey,
+            failureReason: err.message || 'Razorpay refund failed',
+            gatewayErrorDesc: err.message,
+            failedAt: new Date(),
+          },
+        }).catch(() => {});
+
         throw new AppError(`Gateway refund failed: ${err.message || 'Razorpay error'}`, HTTP_STATUS.BAD_GATEWAY);
       }
     } else {
       // Manual / COD refund reference
-      refundResult = { refundId: `rfnd_manual_${Date.now()}` };
+      refundResult = {
+        refundId: `rfnd_manual_${Date.now().toString(36)}`,
+        raw: { type: 'manual', note: 'Manual / COD / Store credit refund' },
+      };
     }
 
-    const newStatus = amount && amount < Number(payment.amount)
-      ? PaymentStatus.PARTIALLY_REFUNDED
-      : PaymentStatus.REFUNDED;
+    const isPartial = refundAmountActual < Number(payment.amount);
+    const initialRefundStatus = isOnline ? RefundStatus.INITIATED : RefundStatus.PROCESSED;
 
-    await prisma.$transaction(async (tx) => {
+    const refundRecord = await prisma.$transaction(async (tx) => {
+      // 1. Create Refund record
+      const refund = await tx.refund.create({
+        data: {
+          paymentId,
+          returnRequestId,
+          orderId: payment.orderId,
+          provider: payment.provider || 'RAZORPAY',
+          providerRefundId: refundResult.refundId,
+          status: initialRefundStatus,
+          amount: refundAmountActual,
+          reason: reason || 'Customer return refund',
+          idempotencyKey,
+          providerPayload: refundResult.raw as any,
+          initiatedAt: new Date(),
+          processedAt: isOnline ? null : new Date(),
+        },
+      });
+
+      // 2. Update Payment status & metadata
+      const newPaymentStatus = isOnline
+        ? (isPartial ? PaymentStatus.PARTIALLY_REFUNDED : payment.status)
+        : (isPartial ? PaymentStatus.PARTIALLY_REFUNDED : PaymentStatus.REFUNDED);
+
       await tx.payment.update({
         where: { id: paymentId },
         data: {
-          status: newStatus,
+          status: newPaymentStatus,
           metadata: {
-            refundId: refundResult.refundId,
+            latestRefundId: refundResult.refundId,
             refundReason: reason || 'Customer return refund',
             refundAmount: refundAmountActual,
             ...(refundResult.raw || {}),
@@ -406,13 +458,28 @@ export const paymentService = {
         },
       });
 
+      // 3. Update Order status
       await tx.order.update({
         where: { id: payment.orderId },
         data: {
-          paymentStatus: newStatus,
-          orderStatus: newStatus === PaymentStatus.REFUNDED ? OrderStatus.REFUNDED : OrderStatus.RETURNED,
+          paymentStatus: isOnline ? PaymentStatus.PENDING : newPaymentStatus,
+          orderStatus: isOnline ? OrderStatus.RETURNED : (isPartial ? OrderStatus.RETURNED : OrderStatus.REFUNDED),
         },
       });
+
+      // 4. Update ReturnRequest status if attached
+      if (returnRequestId) {
+        await tx.returnRequest.update({
+          where: { id: returnRequestId },
+          data: {
+            status: isOnline ? ReturnStatus.REFUND_PROCESSING : ReturnStatus.REFUNDED,
+            razorpayRefundId: refundResult.refundId,
+            refundStatus: isOnline ? 'initiated' : 'processed',
+            refundInitiatedAt: new Date(),
+            refundProcessedAt: isOnline ? null : new Date(),
+          },
+        });
+      }
 
       await tx.orderAuditLog.create({
         data: {
@@ -423,6 +490,8 @@ export const paymentService = {
           details: { refundId: refundResult.refundId, amount: refundAmountActual, reason },
         },
       });
+
+      return refund;
     });
 
     const updatedPayment = await paymentRepository.findById(paymentId);
@@ -431,10 +500,107 @@ export const paymentService = {
     eventDispatcher.emit(PaymentEvents.REFUND_INITIATED, {
       order,
       payment: updatedPayment,
+      refund: refundRecord,
       refundAmount: refundAmountActual,
     }).catch(() => {});
 
-    return updatedPayment;
+    return { payment: updatedPayment, refund: refundRecord };
+  },
+
+  /**
+   * Admin: Retry a failed refund using existing idempotency key
+   */
+  retryRefund: async (refundRecordId: string, adminId: string) => {
+    const refund = await prisma.refund.findUnique({
+      where: { id: refundRecordId },
+      include: { payment: true },
+    });
+
+    if (!refund) throw new AppError('Refund record not found', HTTP_STATUS.NOT_FOUND);
+    if (refund.status === RefundStatus.PROCESSED) {
+      throw new AppError('Refund has already been processed successfully', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    return paymentService.processRefund(
+      refund.paymentId,
+      adminId,
+      Number(refund.amount),
+      refund.reason || 'Admin retry refund',
+      refund.returnRequestId || undefined
+    );
+  },
+
+  /**
+   * Admin / Sync job: Fetch refund status directly from Razorpay for stuck refunds
+   */
+  syncRefundStatus: async (refundRecordId: string) => {
+    const refund = await prisma.refund.findUnique({
+      where: { id: refundRecordId },
+      include: { payment: true, returnRequest: true },
+    });
+
+    if (!refund || !refund.providerRefundId) {
+      throw new AppError('Refund record or Razorpay refund ID not found', HTTP_STATUS.NOT_FOUND);
+    }
+
+    if (!paymentProvider.fetchRefund) {
+      throw new AppError('Gateway does not support fetching refund status', HTTP_STATUS.NOT_IMPLEMENTED);
+    }
+
+    const gatewayRefund = await paymentProvider.fetchRefund(refund.providerRefundId);
+
+    if (gatewayRefund.status === 'processed' && refund.status !== RefundStatus.PROCESSED) {
+      const now = new Date();
+      const rrn = (gatewayRefund.raw as any)?.acquirer_data?.rrn || null;
+
+      await prisma.$transaction(async (tx) => {
+        await tx.refund.update({
+          where: { id: refundRecordId },
+          data: {
+            status: RefundStatus.PROCESSED,
+            processedAt: now,
+            bankReferenceNumber: rrn,
+            providerPayload: gatewayRefund.raw as any,
+          },
+        });
+
+        await tx.payment.update({
+          where: { id: refund.paymentId },
+          data: { status: PaymentStatus.REFUNDED },
+        });
+
+        await tx.order.update({
+          where: { id: refund.orderId },
+          data: { paymentStatus: PaymentStatus.REFUNDED, orderStatus: OrderStatus.REFUNDED },
+        });
+
+        if (refund.returnRequestId) {
+          await tx.returnRequest.update({
+            where: { id: refund.returnRequestId },
+            data: {
+              status: ReturnStatus.REFUNDED,
+              refundStatus: 'processed',
+              bankReferenceNumber: rrn,
+              refundProcessedAt: now,
+              resolvedAt: now,
+            },
+          });
+
+          await tx.returnTimeline.create({
+            data: {
+              returnRequestId: refund.returnRequestId,
+              status: ReturnStatus.REFUNDED,
+              note: `Bank Credit Completed — Credited to payment method${rrn ? ` (Bank RRN: ${rrn})` : ''}.`,
+              actorType: 'SYSTEM',
+            },
+          });
+        }
+      });
+
+      logger.info({ refundRecordId }, '[PaymentService] Refund status synced successfully -> PROCESSED');
+    }
+
+    return prisma.refund.findUnique({ where: { id: refundRecordId } });
   },
 
   /**
