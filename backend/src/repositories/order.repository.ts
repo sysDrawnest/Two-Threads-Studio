@@ -26,6 +26,14 @@ export const orderRepository = {
         },
         shippingAddress: true,
         billingAddress: true,
+        payment: true,
+        returnRequests: {
+          orderBy: { requestedAt: 'desc' },
+          include: {
+            timeline: { orderBy: { createdAt: 'asc' } },
+            items: true,
+          },
+        },
         user: {
           select: {
             id: true,

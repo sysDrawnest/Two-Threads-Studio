@@ -85,6 +85,8 @@ router.post('/returns/:returnId/reject', validate(adminRejectReturnSchema), retu
 router.post('/returns/:returnId/picked-up', returnController.adminMarkPickedUp);
 router.post('/returns/:returnId/received', returnController.adminMarkReceived);
 router.post('/returns/:returnId/inspect', validate(adminInspectReturnSchema), returnController.adminRecordInspection);
+router.post('/returns/:returnId/schedule-pickup', returnController.adminSchedulePickup);
+router.patch('/returns/:returnId/tracking', returnController.adminUpdateTracking);
 
 export default router;
 

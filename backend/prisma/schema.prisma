@@ -1463,12 +1463,23 @@ model ReturnRequest {
   fraudFlagged Boolean @default(false)
   fraudReason  String?
 
+  // Shipping & Tracking fields
+  courierPartner     String?
+  trackingNumber     String?
+  shipmentId         String?
+  trackingUrl        String?
+  pickupStatus       String?
+  estimatedDelivery  DateTime?
+  lastTrackingSync   DateTime?
+
   // Timeline
-  requestedAt DateTime  @default(now())
-  approvedAt  DateTime?
-  receivedAt  DateTime?
-  resolvedAt  DateTime?
-  updatedAt   DateTime  @updatedAt
+  requestedAt        DateTime  @default(now())
+  approvedAt         DateTime?
+  pickupScheduledAt  DateTime?
+  pickedUpAt         DateTime?
+  receivedAt         DateTime?
+  resolvedAt         DateTime?
+  updatedAt          DateTime  @updatedAt
 
   items    ReturnRequestItem[]
   timeline ReturnTimeline[]

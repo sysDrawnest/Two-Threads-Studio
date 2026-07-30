@@ -24,6 +24,10 @@ import { orderService, Order, Shipment } from '../../services/orderService';
 import { reviewService } from '../../services/reviewService';
 import { ReviewModal } from '../../components/reviews/ReviewModal';
 import LoadingSkeleton from './LoadingSkeleton';
+import { DynamicReturnStepper } from '../../components/account/DynamicReturnStepper';
+import { RefundReceiptCard } from '../../components/account/RefundReceiptCard';
+import { ReturnTrackingCard } from '../../components/account/ReturnTrackingCard';
+import { ReturnActivityFeed } from '../../components/account/ReturnActivityFeed';
 
 const ORDER_STATUS_STEPS = [
   { status: 'PENDING', label: 'Order Placed', desc: 'Awaiting initial confirmation.' },
@@ -422,22 +426,57 @@ export const OrdersTab: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {/* Return Request Banner (when already requested) */}
-          {(selectedOrder.orderStatus === 'RETURN_REQUESTED' || selectedOrder.orderStatus === 'RETURNED') && (
-            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+          {/* Return Request & Tracking Journey Section */}
+          {((selectedOrder as any).returnRequests && (selectedOrder as any).returnRequests.length > 0) ? (
+            (() => {
+              const activeReturn = (selectedOrder as any).returnRequests[0];
+              const isDigital = selectedOrder.items?.every((item: any) => item.product?.type === 'DIGITAL') ?? false;
+
+              return (
+                <div className="space-y-4">
+                  {/* Dynamic Multi-Stage Visual Stepper */}
+                  <DynamicReturnStepper returnRequest={activeReturn} isDigital={isDigital} />
+
+                  {/* Return Shipment Tracking Card */}
+                  <ReturnTrackingCard
+                    courierPartner={activeReturn.courierPartner}
+                    trackingNumber={activeReturn.trackingNumber}
+                    trackingUrl={activeReturn.trackingUrl}
+                    pickupScheduledAt={activeReturn.pickupScheduledAt}
+                    estimatedDelivery={activeReturn.estimatedDelivery}
+                    pickupStatus={activeReturn.pickupStatus}
+                  />
+
+                  {/* Refund Receipt Card (if refunded or refund processing) */}
+                  {(activeReturn.status === 'REFUNDED' || activeReturn.status === 'REFUND_PROCESSING' || activeReturn.finalRefundAmount) && (
+                    <RefundReceiptCard
+                      refundAmount={Number(activeReturn.finalRefundAmount || activeReturn.approvedAmount || selectedOrder.grandTotal)}
+                      refundId={activeReturn.refundId}
+                      paymentMethod={selectedOrder.paymentMethod}
+                      refundProcessedAt={activeReturn.refundProcessedAt || activeReturn.resolvedAt}
+                    />
+                  )}
+
+                  {/* Chronological Activity Feed */}
+                  <ReturnActivityFeed timeline={activeReturn.timeline} />
+                </div>
+              );
+            })()
+          ) : (selectedOrder.orderStatus === 'RETURN_REQUESTED' || selectedOrder.orderStatus === 'RETURNED') ? (
+            <div className="bg-[#faf8f5] border border-[#e8d7c8] rounded-xl p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <RotateCcw className="w-4 h-4 text-orange-600" />
-                <h4 className="font-medium text-orange-800">
-                  {selectedOrder.orderStatus === 'RETURN_REQUESTED' ? 'Return Request Submitted' : 'Return Completed'}
+                <RotateCcw className="w-5 h-5 text-[#8b6f5c]" />
+                <h4 className="font-serif font-semibold text-base text-[#5c4a3e]">
+                  {selectedOrder.orderStatus === 'RETURN_REQUESTED' ? 'Return Request Submitted' : 'Return Processed'}
                 </h4>
               </div>
-              <p className="text-sm text-orange-700">
+              <p className="text-xs text-[#78675c] leading-relaxed">
                 {selectedOrder.orderStatus === 'RETURN_REQUESTED'
-                  ? 'We are reviewing your return request. You will hear from us within 2–3 business days. Refund is processed only after item inspection.'
-                  : 'Your return has been completed and refund processed.'}
+                  ? 'We have received your return request and our studio team is reviewing it. Your item will be inspected upon warehouse receipt before a refund is issued.'
+                  : 'Your return has been completed and processed.'}
               </p>
             </div>
-          )}
+          ) : null}
 
           {/* Quick Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-neutral-50 p-6 rounded-xl border border-neutral-150">

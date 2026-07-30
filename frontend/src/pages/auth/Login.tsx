@@ -34,20 +34,11 @@ const Login: React.FC = () => {
 
     const result = await login(email, password);
     if (result.success) {
-      // After login, user is set in context. Use role from the result, not email.
-      // But since login() updates state asynchronously, we read redirectPath from params.
-      // For admins arriving without a specific storefront redirect, go to /admin.
       const isStorefrontRedirect = redirectPath !== '/account' && !redirectPath.startsWith('/admin') && !redirectPath.startsWith('/auth');
-      // We can't read user.role here reliably yet (state update is async),
-      // so we redirect to the saved path; the isAuthenticated guard above handles admin redirect on next render.
       navigate(isStorefrontRedirect ? redirectPath : redirectPath);
     } else {
       setError(result.error || 'Login failed.');
     }
-  };
-
-  const handleGuest = () => {
-    navigate('/shop');
   };
 
   return (
@@ -70,42 +61,34 @@ const Login: React.FC = () => {
       {/* Main Container for Tag + Modal to manage positioning */}
       <div className="relative z-10 flex items-center justify-center max-w-4xl w-full mx-auto">
         
-        {/* Floating Guest Access Pass Tag (Positioned absolutely relative to the flex container or modal) */}
-        <div className="absolute left-4 md:left-[10%] lg:left-[20%] top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center select-none group">
-          {/* Connecting String SVG */}
-          <svg width="60" height="100" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute -top-[85px] left-[55%] -translate-x-1/2 -z-10 opacity-70">
-            <path d="M50 0 C 40 40, 10 60, 20 100" stroke="#a3968e" strokeWidth="1" strokeDasharray="2 2" fill="none" />
-          </svg>
-          
-          {/* Tag Body */}
-          <div 
-            onClick={handleGuest}
-            title={redirectPath.includes('/checkout') ? "Checkout requires an account" : "Browse without an account"}
-            className="guest-tag-ripple w-[160px] bg-[#FAF8F5] border border-[#d2c4bc] rounded-b-md rounded-t-sm shadow-lg flex flex-col items-center pt-3 pb-6 px-4 cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative before:absolute before:content-[''] before:w-full before:h-full before:top-0 before:left-0 before:bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] before:opacity-40 before:pointer-events-none"
-            style={{ transform: 'rotate(-4deg)' }}
-          >
-            {/* Tag Hole */}
-            <div className="w-3 h-3 rounded-full bg-[#e8ded6] border border-[#bfae9f] shadow-inner mb-4 relative z-10"></div>
-            
-            {/* Tag Content */}
-            <h3 className="font-serif text-[#b8860b] text-center text-[19px] leading-[1.1] font-semibold mb-3 tracking-wide drop-shadow-sm">
-              GUEST<br/>ACCESS<br/>PASS
+        {/* Luxury Brand Welcome Banner (Desktop Left Card) */}
+        <div className="hidden lg:flex flex-col justify-between w-[320px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-l-xl p-8 shadow-xl relative z-20 -mr-4 my-6">
+          <div className="space-y-4">
+            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c]">
+              ✨
+            </div>
+            <h3 className="font-serif text-[24px] leading-tight text-[#5c4a3e] font-semibold">
+              Every stitch<br />has a story.
             </h3>
-            
-            <p className="font-sans text-[#5c544d] text-center text-[11px] uppercase tracking-widest leading-tight mb-2">
-              explore the<br/>collections
+            <p className="font-sans text-[13px] text-[#78675c] leading-relaxed">
+              Sign in to follow your handmade creations, track orders, manage returns, and stay updated from stitch to delivery.
             </p>
+          </div>
 
-            {redirectPath.includes('/checkout') && (
-              <span className="text-[9px] text-[#A34A38] text-center uppercase tracking-wider font-semibold font-mono">
-                Checkout requires account
-              </span>
-            )}
+          <div className="pt-6 border-t border-[#e6dcad]/50 space-y-2">
+            <div className="flex items-center gap-2 text-xs text-[#8b6f5c]">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+              <span>100% Hand-Embroidered Artisanal Quality</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-[#8b6f5c]">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+              <span>Hassle-Free Returns & Live Tracking</span>
+            </div>
           </div>
         </div>
 
         {/* Glassmorphism Login Modal */}
-        <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none py-6 px-5 sm:p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
+        <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-xl py-6 px-5 sm:p-8 md:p-12 z-10 overflow-hidden">
           
           {/* Subtle inner noise texture for realism */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
@@ -133,19 +116,18 @@ const Login: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-4 sm:mb-8 relative z-10">
-            <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm mb-4">
-              Log In to<br/>Artisanal Creations
+            <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm mb-2">
+              Welcome Back
             </h2>
+            <p className="font-sans text-xs text-[#78675c]">
+              Sign in to manage your orders, returns, and handmade creations
+            </p>
 
             {/* Secure Checkout Context Alert */}
             {redirectPath.includes('/checkout') && (
-              <div className="bg-[#FAF9F7]/95 border border-[#E8E4DF] p-4 text-left text-xs text-[#5C544D] font-sans flex gap-3 items-start shadow-sm rounded-sm">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A34A38" strokeWidth="1.5" className="flex-shrink-0 mt-0.5">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
+              <div className="mt-4 p-3 bg-[#fdf8f3] border border-[#e8d7c8] rounded-md text-left flex items-start gap-2.5 shadow-sm">
+                <span className="text-base flex-shrink-0">🔒</span>
                 <div>
-                  <span className="font-semibold text-[#1C1C1B] block mb-0.5">🔒 Secure Checkout</span>
                   <span className="leading-relaxed">You're signing in to securely save your order, track deliveries, access invoices, and enjoy faster future purchases.</span>
                 </div>
               </div>
@@ -232,15 +214,6 @@ const Login: React.FC = () => {
           </form>
         </div>
 
-        {/* Mobile Guest Link (Visible only on small screens where tag is hidden) */}
-        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 md:hidden text-center w-full z-10">
-           <button 
-             onClick={handleGuest}
-             className="font-serif italic text-[15px] text-[#fef8f3] drop-shadow-md underline decoration-[#d4af37]/50 underline-offset-4 hover:text-[#d4af37] transition-colors bg-transparent border-none"
-           >
-             {redirectPath.includes('/checkout') ? 'Browse Products' : 'Continue as a Guest'}
-           </button>
-        </div>
       </div>
       
       {/* Subtle Footer Links */}

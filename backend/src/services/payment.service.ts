@@ -351,7 +351,9 @@ export const paymentService = {
   },
 
   /**
-   * Admin: Process a refund via Razorpay.
+   * Admin: Process a refund (Razorpay or COD / Bank Transfer).
+   * Ensures Payment.status and Order.paymentStatus transition to REFUNDED or PARTIALLY_REFUNDED.
+   * Payment.status will NEVER remain PENDING after a completed refund.
    */
   processRefund: async (
     paymentId: string,
@@ -362,41 +364,53 @@ export const paymentService = {
     const payment = await paymentRepository.findById(paymentId);
     if (!payment) throw new AppError('Payment not found', HTTP_STATUS.NOT_FOUND);
 
-    if (payment.status !== PaymentStatus.CAPTURED) {
-      throw new AppError('Only captured payments can be refunded', HTTP_STATUS.BAD_REQUEST);
+    const isOnline = payment.method === PaymentMethod.ONLINE && Boolean(payment.providerPaymentId);
+    const refundAmountActual = amount || Number(payment.amount);
+    const refundAmountPaise = Math.round(refundAmountActual * 100);
+
+    let refundResult: { refundId?: string; raw?: any } = {};
+
+    // Process external gateway refund for Razorpay online payments
+    if (isOnline && payment.providerPaymentId) {
+      try {
+        const res = await paymentProvider.processRefund({
+          providerPaymentId: payment.providerPaymentId,
+          amount: refundAmountPaise,
+          reason: reason || 'Customer refund',
+        });
+        refundResult = { refundId: res.refundId, raw: res.raw };
+      } catch (err: any) {
+        logger.error({ paymentId, err: err.message }, '[PaymentService] Razorpay gateway refund failed');
+        throw new AppError(`Gateway refund failed: ${err.message || 'Razorpay error'}`, HTTP_STATUS.BAD_GATEWAY);
+      }
+    } else {
+      // Manual / COD refund reference
+      refundResult = { refundId: `rfnd_manual_${Date.now()}` };
     }
-
-    if (!payment.providerPaymentId) {
-      throw new AppError('Payment has no provider reference — cannot refund', HTTP_STATUS.BAD_REQUEST);
-    }
-
-    const refundAmountPaise = amount
-      ? Math.round(amount * 100)
-      : Math.round(Number(payment.amount) * 100);
-
-    const refundResult = await paymentProvider.processRefund({
-      providerPaymentId: payment.providerPaymentId,
-      amount: refundAmountPaise,
-      reason: reason || 'Customer refund',
-    });
 
     const newStatus = amount && amount < Number(payment.amount)
       ? PaymentStatus.PARTIALLY_REFUNDED
       : PaymentStatus.REFUNDED;
 
-    const refundAmountActual = amount || Number(payment.amount);
-
     await prisma.$transaction(async (tx) => {
       await tx.payment.update({
         where: { id: paymentId },
-        data: { status: newStatus, metadata: { refundId: refundResult.refundId, ...refundResult.raw } as any },
+        data: {
+          status: newStatus,
+          metadata: {
+            refundId: refundResult.refundId,
+            refundReason: reason || 'Customer return refund',
+            refundAmount: refundAmountActual,
+            ...(refundResult.raw || {}),
+          } as any,
+        },
       });
 
       await tx.order.update({
         where: { id: payment.orderId },
         data: {
           paymentStatus: newStatus,
-          orderStatus: newStatus === PaymentStatus.REFUNDED ? OrderStatus.REFUNDED : undefined,
+          orderStatus: newStatus === PaymentStatus.REFUNDED ? OrderStatus.REFUNDED : OrderStatus.RETURNED,
         },
       });
 

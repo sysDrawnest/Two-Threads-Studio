@@ -107,4 +107,28 @@ export const returnController = {
       next(err);
     }
   },
+
+  adminSchedulePickup: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const returnId = req.params['returnId'] as string;
+      const result = await returnService.scheduleReturnPickup(
+        returnId,
+        req.user!.id,
+        req.body
+      );
+      return successResponse(res, { returnRequest: result }, 'Reverse pickup scheduled successfully');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  adminUpdateTracking: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const returnId = req.params['returnId'] as string;
+      const result = await returnService.updateReturnTracking(returnId, req.body);
+      return successResponse(res, { returnRequest: result }, 'Tracking status updated');
+    } catch (err) {
+      next(err);
+    }
+  },
 };

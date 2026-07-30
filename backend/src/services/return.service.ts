@@ -397,6 +397,108 @@ export const returnService = {
   },
 
   /**
+   * Admin: Schedule reverse pickup for approved return request
+   */
+  scheduleReturnPickup: async (
+    returnId: string,
+    adminId: string,
+    data: {
+      courierPartner: string;
+      trackingNumber: string;
+      trackingUrl?: string;
+      shipmentId?: string;
+      estimatedDeliveryDays?: number;
+      pickupNote?: string;
+    }
+  ) => {
+    const request = await prisma.returnRequest.findUnique({ where: { id: returnId } });
+    if (!request) throw new AppError('Return request not found', HTTP_STATUS.NOT_FOUND);
+
+    const now = new Date();
+    const estimatedDelivery = data.estimatedDeliveryDays
+      ? new Date(now.getTime() + data.estimatedDeliveryDays * 86400000)
+      : new Date(now.getTime() + 3 * 86400000); // 3 days default
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const updatedReq = await tx.returnRequest.update({
+        where: { id: returnId },
+        data: {
+          status: ReturnStatus.PICKUP_SCHEDULED,
+          courierPartner: data.courierPartner,
+          trackingNumber: data.trackingNumber,
+          trackingUrl: data.trackingUrl || `https://track.shiprocket.in/${data.trackingNumber}`,
+          shipmentId: data.shipmentId || `SR-${Date.now()}`,
+          pickupStatus: 'PICKUP_SCHEDULED',
+          pickupScheduledAt: now,
+          estimatedDelivery,
+          lastTrackingSync: now,
+        },
+      });
+
+      await tx.returnTimeline.create({
+        data: {
+          returnRequestId: returnId,
+          status: ReturnStatus.PICKUP_SCHEDULED,
+          note: data.pickupNote || `Pickup scheduled with ${data.courierPartner}. Tracking AWB: ${data.trackingNumber}`,
+          actorType: 'ADMIN',
+          actorId: adminId,
+        },
+      });
+
+      return updatedReq;
+    });
+
+    eventDispatcher.emit(ReturnEvents.PICKUP_CREATED, { returnRequest: updated }).catch(() => {});
+    return updated;
+  },
+
+  /**
+   * Partner / Webhook / Admin: Update tracking status (picked up, transit, warehouse received)
+   */
+  updateReturnTracking: async (
+    returnId: string,
+    data: {
+      status: ReturnStatus;
+      pickupStatus?: string;
+      note?: string;
+      actorType?: 'SYSTEM' | 'ADMIN' | 'COURIER';
+    }
+  ) => {
+    const now = new Date();
+    const updateData: any = {
+      status: data.status,
+      lastTrackingSync: now,
+    };
+    if (data.pickupStatus) updateData.pickupStatus = data.pickupStatus;
+    if (data.status === ReturnStatus.PICKED_UP || data.status === ReturnStatus.IN_TRANSIT) {
+      updateData.pickedUpAt = now;
+    }
+    if (data.status === ReturnStatus.RECEIVED) {
+      updateData.receivedAt = now;
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const updatedReq = await tx.returnRequest.update({
+        where: { id: returnId },
+        data: updateData,
+      });
+
+      await tx.returnTimeline.create({
+        data: {
+          returnRequestId: returnId,
+          status: data.status,
+          note: data.note || `Return package status updated to ${data.status.replace(/_/g, ' ')}`,
+          actorType: data.actorType || 'COURIER',
+        },
+      });
+
+      return updatedReq;
+    });
+
+    return updated;
+  },
+
+  /**
    * Analytics for admin dashboard
    */
   getReturnAnalytics: async (startDate?: string, endDate?: string) => {
@@ -449,3 +551,4 @@ export const returnService = {
     };
   },
 };
+
