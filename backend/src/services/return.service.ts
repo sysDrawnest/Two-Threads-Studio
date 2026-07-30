@@ -1,7 +1,7 @@
 import prisma from '../prisma';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
-import { ReturnStatus, OrderStatus, ReturnDisposition, AuditAction, AuditActorType } from '@prisma/client';
+import { ReturnStatus, OrderStatus, ReturnDisposition, AuditAction, AuditActorType, PaymentStatus } from '@prisma/client';
 import { paymentService } from './payment.service';
 import { eventDispatcher, ReturnEvents } from '../events';
 import logger from '../lib/logger';
@@ -363,10 +363,25 @@ export const returnService = {
           where: { id: returnId },
           data: { status: ReturnStatus.REFUNDED, resolvedAt: new Date(), refundProcessedAt: new Date() },
         });
+
+        // Always update order status and payment status when refund completes
         await tx.order.update({
           where: { id: request.orderId },
-          data: { orderStatus: OrderStatus.RETURNED },
+          data: { 
+            orderStatus: OrderStatus.RETURNED,
+            paymentStatus: PaymentStatus.REFUNDED 
+          },
         });
+
+        // Ensure Payment record also updates if it wasn't already handled by processRefund
+        const payment = request.order.payment as any;
+        if (payment?.id) {
+          await tx.payment.update({
+            where: { id: payment.id },
+            data: { status: PaymentStatus.REFUNDED },
+          });
+        }
+
         await tx.returnTimeline.create({
           data: {
             returnRequestId: returnId,
