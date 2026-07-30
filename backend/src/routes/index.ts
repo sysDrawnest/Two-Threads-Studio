@@ -73,7 +73,13 @@ import reviewRoutes from './review.routes';
 router.use('/coupons', couponRoutes);
 router.use('/reviews', reviewRoutes);
 
+// Phase 10 — Bulk Product Import & Export Engine
+import importRoutes from './import.routes';
+
+router.use('/admin/import', importRoutes);
+
 export default router;
+
 
 
 

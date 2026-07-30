@@ -1,6 +1,7 @@
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
+  ACCEPTED: 202,
   NO_CONTENT: 204,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
@@ -15,4 +16,5 @@ export const HTTP_STATUS = {
   PRECONDITION_REQUIRED: 428,
   GATEWAY_TIMEOUT: 504,
 } as const;
+
 

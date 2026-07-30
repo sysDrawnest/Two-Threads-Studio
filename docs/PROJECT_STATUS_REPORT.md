@@ -25,7 +25,7 @@
 - **Invoicing & Documents**: Server-side PDF invoice generation (`invoice.service.ts`).
 - **Risk & Trust Engine**: Dynamic customer tiers (`NEW_MAKER`, `ARTISAN_FRIEND`, `PATRON`, `ATELIER_COLLECTOR`), fraud velocity detectors, phone OTP verification (`OtpVerification`), single-row `StudioSettings` feature flags.
 - **Returns System**: Item-level return requests (`ReturnRequest`, `ReturnRequestItem`), physical studio inspection workflow, reverse pickup SOP (`docs/Studio Return Policy.md`).
-- **Bulk Product Import**: **Planned (0%)** — Spreadsheet CSV/Excel upload engine outlined in `docs/Bulk Import plan.md` is on the roadmap. Admin catalog batch actions (publishing, archiving, category updates for existing items) are active (`/admin/bulk-action`).
+- **Bulk Product Import Engine**: **Complete (100%)** — Enterprise CSV and Excel (`.xlsx`) parser, dry-run validation, background worker (50-row batch transactions), duplicate SKU strategies, multi-image and variant handling, failed-row CSV stream, and catalog CSV exporter.
 
 ---
 
@@ -122,25 +122,25 @@ Two Threads Studio/
 ## 6. Project Completion Index
 
 ```
-Overall Progress: ~90% Complete
+Overall Progress: ~96% Complete
 
-[████████████████████████░░░]
+[███████████████████████████░]
 
-• Frontend Storefront UI & Layouts:   100%
-• Backend Express & Prisma Core API:  100%
-• Payment Processing & Invoices:      100%
-• COD Policy 2.0 & Risk Engine:       100%
-• Admin Operations OS (PIM/CRM/Orders):100%
+• Frontend Storefront UI & Layouts:    100%
+• Backend Express & Prisma Core API:   100%
+• Payment Processing & Invoices:       100%
+• COD Policy 2.0 & Risk Engine:        100%
+• Admin Operations OS (PIM/CRM/Orders): 100%
 • Returns Engine & Policy SOP:         100%
-• Bulk CSV/Excel Product Import:         0% (Planned Roadmap)
-• Production Polish & Deployment:      60%
+• Bulk CSV/Excel Product Import:       100% (Phase 10 v2.0 Complete)
+• Production Polish & Deployment:       75%
 ```
 
 ---
 
 ## 7. Recommended Next Steps
 
-1. **Implement Phase 10 — Bulk Product CSV/Excel Import & Export Engine** (`docs/Bulk Import plan.md`).
-2. **Transactional Email Setup**: Configure Resend / SendGrid API keys in `.env`.
-3. **Asset Compression Pipeline**: Compress storefront PNG/JPEG assets into optimized WebP/AVIF formats.
-4. **CI/CD & Deployment**: Host frontend on Vercel/Netlify and backend service on Render/Railway.
+1. **Transactional Email Setup**: Configure Resend / SendGrid API keys in `.env` for order confirmation & shipment dispatch emails.
+2. **Asset Compression Pipeline**: Compress storefront PNG/JPEG assets into optimized WebP/AVIF formats.
+3. **CI/CD & Deployment**: Host frontend on Vercel/Netlify and backend service on Render/Railway.
+

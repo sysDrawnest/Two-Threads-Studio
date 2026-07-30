@@ -303,6 +303,7 @@ model User {
   customerRisk   CustomerRisk?
   otpVerifications OtpVerification[]
   returnRequests   ReturnRequest[]
+  importJobs       ImportJob[]
 
   @@map("users")
 }
@@ -1543,3 +1544,101 @@ model ExchangeRequest {
 
   @@map("exchange_requests")
 }
+
+// ─────────────────────────────────────────────
+// Phase 10 — Bulk Product Import Engine
+// ─────────────────────────────────────────────
+
+enum ImportJobStatus {
+  PENDING
+  VALIDATING
+  VALIDATED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ImportRowStatus {
+  SUCCESS
+  FAILED
+  SKIPPED
+  UPDATED
+}
+
+enum DuplicateStrategy {
+  SKIP
+  UPDATE
+  REPLACE
+  AUTO_RENAME
+}
+
+enum ImportMode {
+  CREATE_ONLY
+  UPDATE_EXISTING
+  UPSERT
+}
+
+/// Tracks a single bulk import session end-to-end
+model ImportJob {
+  id               String            @id @default(cuid())
+  userId           String
+  fileName         String
+  fileSize         Int               @default(0)
+  fileType         String            @default("csv")
+
+  status           ImportJobStatus   @default(PENDING)
+  importMode       ImportMode        @default(CREATE_ONLY)
+  duplicateStrategy DuplicateStrategy @default(SKIP)
+  validationOnly   Boolean           @default(false)
+
+  totalRows        Int               @default(0)
+  processedRows    Int               @default(0)
+  createdProducts  Int               @default(0)
+  updatedProducts  Int               @default(0)
+  failedProducts   Int               @default(0)
+  skippedProducts  Int               @default(0)
+  categoriesCreated Int              @default(0)
+  imagesAdded      Int               @default(0)
+  variantsCreated  Int               @default(0)
+
+  durationMs       Int?
+  errorSummary     String?
+
+  startedAt        DateTime?
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+  cancelledBy      String?
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rows             ImportJobRow[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("import_jobs")
+}
+
+/// Per-row execution record for an ImportJob
+model ImportJobRow {
+  id           String          @id @default(cuid())
+  importJobId  String
+  rowNumber    Int
+  sku          String?
+  productName  String?
+  status       ImportRowStatus @default(FAILED)
+  errorMessage String?
+  productId    String?
+  payload      Json
+
+  createdAt    DateTime        @default(now())
+
+  importJob    ImportJob       @relation(fields: [importJobId], references: [id], onDelete: Cascade)
+
+  @@index([importJobId])
+  @@index([status])
+  @@map("import_job_rows")
+}
+

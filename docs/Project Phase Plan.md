@@ -21,7 +21,7 @@
 | **Phase 7 — Reviews System** | Rating & Review Schema, Public Review Listings, Admin Review Moderation Queue | ✅ Complete | 100% |
 | **Phase 8 — Admin Operations & Refund Engine** | Order Lifecycle Management, Status Transitions, Invoice/Packing Slip Printing, Refund Engine | ✅ Complete | 100% |
 | **Phase 9 — Returns Management Engine** | ReturnRequest & ReturnRequestItem Models, Reverse Pickup SOP, Item-level Refunds, Return Policy Verification | ✅ Complete | 100% |
-| **Phase 10 — Bulk Product Import & Export Engine** | Excel/CSV Template Upload, `ImportJob` DB Models, Column Mapping, Validation & Export Engine | 🔴 Planned | 0% |
+| **Phase 10 — Enterprise PIM Bulk Import & Export Engine** | Excel/CSV Template Upload, `ImportJob` DB Models, Validation Engine, Background Worker & CSV Export | ✅ Complete | 100% |
 | **Phase 10.5 — Final Polish & Performance Optimization** | Responsive Micro-animations, Image Compression, Lazy Loading, Skeleton Loaders | 🟢 In Progress | ~75% |
 | **Phase 11 — Production Deployment Readiness** | Transactional Email Templates (Resend), Security Hardening, Production Deployment | 🟢 In Progress | ~60% |
 
@@ -45,6 +45,7 @@ The core e-commerce platform and operational back-office are fully built, integr
 * ✅ **Customer Risk & Fraud Detection**: Disposable email filters, 24h frequency velocity checks, continuous trust score calculation (0–100), SMS OTP verification for first-time / high-risk orders.
 * ✅ **PDF Invoice Generation**: Server-side PDF invoice rendering via `invoice.service.ts` with instant download stream.
 * ✅ **Returns Management Engine**: Full `ReturnRequest` & `ReturnRequestItem` schema models, return policy SOP (`docs/Studio Return Policy.md`), item-level refund calculations, reverse pickup authorization flow.
+* ✅ **Enterprise PIM Bulk Import & Export Engine (Phase 10 v2.0)**: Multi-format file parser (`.csv` and `.xlsx`), dry-run validation engine, background batch processor with 50-row chunk transactions, duplicate SKU strategies (`SKIP`, `UPDATE`, `REPLACE`, `AUTO_RENAME`), multi-image and variant creation, failed-row CSV export stream, and catalog CSV exporter.
 * ✅ **Review & Rating System**: Verified purchase reviews, rating distribution, admin moderation queue (`isVerified` flag).
 * ✅ **Admin Operations OS**: Operational dashboard with live KPIs, order status state machine, manual review queue, inventory stock adjustment modal with audit reasons, customer CRM with LTV tracking.
 
