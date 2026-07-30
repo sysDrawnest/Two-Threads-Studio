@@ -10,12 +10,17 @@ import { Role } from '@prisma/client';
  */
 export const requireAuth = (req: Request, _res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
+  let token: string | undefined;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new AppError('Authentication required. Please provide a valid token.', HTTP_STATUS.UNAUTHORIZED));
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.query.token && typeof req.query.token === 'string') {
+    token = req.query.token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return next(new AppError('Authentication required. Please provide a valid token.', HTTP_STATUS.UNAUTHORIZED));
+  }
 
   try {
     const decoded = verifyAccessToken(token);

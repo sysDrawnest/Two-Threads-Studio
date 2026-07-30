@@ -18,6 +18,7 @@ import {
   generateFailedRowsCsv,
   exportCatalogCsv,
   generateSampleTemplate,
+  generateSampleExcelTemplate,
   ParsedProductRow,
 } from '../services/import.service';
 import { DuplicateStrategy, ImportJobStatus, ImportMode } from '@prisma/client';
@@ -215,10 +216,19 @@ export const downloadFailedRows = catchAsync(async (req: Request, res: Response)
 export const downloadSampleTemplate = catchAsync(async (req: Request, res: Response) => {
   const rawType = String(req.query.type ?? 'basic');
   const type = (['basic', 'variants', 'images'].includes(rawType) ? rawType : 'basic') as 'basic' | 'variants' | 'images';
-  const csv = generateSampleTemplate(type);
-  res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', `attachment; filename="twothreads_import_template_${type}.csv"`);
-  res.send(csv);
+  const format = String(req.query.format ?? 'xlsx').toLowerCase();
+
+  if (format === 'xlsx' || format === 'excel') {
+    const buffer = generateSampleExcelTemplate(type);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="twothreads_import_template_${type}.xlsx"`);
+    res.send(buffer);
+  } else {
+    const csv = generateSampleTemplate(type);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="twothreads_import_template_${type}.csv"`);
+    res.send(csv);
+  }
 });
 
 // ─── 9. Export Catalog ────────────────────────────────────────────────────────

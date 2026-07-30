@@ -189,19 +189,51 @@ const ProductImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
             <div className="space-y-5">
               {/* Template downloads */}
               <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                <p className="text-sm font-medium text-amber-800 mb-3">Download a sample template first:</p>
-                <div className="flex flex-wrap gap-2">
-                  {(['basic', 'variants', 'images'] as const).map((t) => (
-                    <a
-                      key={t}
-                      href={getTemplateDownloadUrl(t)}
-                      download
-                      className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-white border border-amber-200 rounded-lg text-amber-700 hover:bg-amber-50 transition-colors"
-                    >
-                      <Download size={12} />
-                      {t.charAt(0).toUpperCase() + t.slice(1)} Template
-                    </a>
-                  ))}
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium text-amber-900">Download Sample Spreadsheets:</p>
+                  <span className="text-[11px] font-medium text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full">
+                    📊 Excel (.xlsx) & CSV (.csv) Supported
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-xs font-semibold text-amber-800 uppercase tracking-wider block mb-1">
+                      Excel Templates (.xlsx):
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['basic', 'variants', 'images'] as const).map((t) => (
+                        <a
+                          key={`xlsx-${t}`}
+                          href={getTemplateDownloadUrl(t, 'xlsx')}
+                          download
+                          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors shadow-sm"
+                        >
+                          <Download size={12} />
+                          {t.charAt(0).toUpperCase() + t.slice(1)} (Excel .xlsx)
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-1">
+                    <span className="text-xs text-amber-700 font-medium block mb-1">
+                      CSV Templates (.csv):
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {(['basic', 'variants', 'images'] as const).map((t) => (
+                        <a
+                          key={`csv-${t}`}
+                          href={getTemplateDownloadUrl(t, 'csv')}
+                          download
+                          className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 bg-white border border-amber-200 text-amber-700 rounded-lg hover:bg-amber-50 transition-colors"
+                        >
+                          <Download size={12} />
+                          {t.charAt(0).toUpperCase() + t.slice(1)} (.csv)
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 

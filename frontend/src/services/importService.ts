@@ -122,12 +122,17 @@ export async function listImportJobs(): Promise<ImportJob[]> {
 
 // ─── Download failed rows CSV ─────────────────────────────────────────────────
 export function getFailedRowsDownloadUrl(jobId: string): string {
-  return `${BASE_URL}/admin/import/jobs/${jobId}/failed-rows`;
+  const token = localStorage.getItem('tt_access_token') || '';
+  return `${BASE_URL}/admin/import/jobs/${jobId}/failed-rows?token=${token}`;
 }
 
-// ─── Download sample template ─────────────────────────────────────────────────
-export function getTemplateDownloadUrl(type: 'basic' | 'variants' | 'images'): string {
-  return `${BASE_URL}/admin/import/template?type=${type}`;
+// ─── Download sample template (Excel .xlsx or CSV) ───────────────────────────
+export function getTemplateDownloadUrl(
+  type: 'basic' | 'variants' | 'images',
+  format: 'xlsx' | 'csv' = 'xlsx'
+): string {
+  const token = localStorage.getItem('tt_access_token') || '';
+  return `${BASE_URL}/admin/import/template?type=${type}&format=${format}&token=${token}`;
 }
 
 // ─── Catalog export ───────────────────────────────────────────────────────────
@@ -137,11 +142,13 @@ export function getCatalogExportUrl(filters?: {
   collectionId?: string;
   search?: string;
 }): string {
+  const token = localStorage.getItem('tt_access_token') || '';
   const params = new URLSearchParams();
   if (filters?.status) params.set('status', filters.status);
   if (filters?.categoryId) params.set('categoryId', filters.categoryId);
   if (filters?.collectionId) params.set('collectionId', filters.collectionId);
   if (filters?.search) params.set('search', filters.search);
+  if (token) params.set('token', token);
   const qs = params.toString();
   return `${BASE_URL}/admin/import/export${qs ? `?${qs}` : ''}`;
 }

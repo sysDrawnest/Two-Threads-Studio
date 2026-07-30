@@ -21,6 +21,7 @@ export const ReviewsManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
   
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<any>(null);
@@ -30,7 +31,8 @@ export const ReviewsManagement: React.FC = () => {
     page,
     limit: 15,
     search,
-    status
+    status,
+    sortBy
   });
 
   const { mutate: moderateReview, isPending: isModerating } = useModerateReview();
@@ -38,9 +40,6 @@ export const ReviewsManagement: React.FC = () => {
   const handleActionClick = (review: any, type: 'approve' | 'reject' | 'delete' | 'hide' | 'feature' | 'pin') => {
     setSelectedReview(review);
     setActionType(type);
-    
-    // Toggle action types (feature and pin) can be executed directly without modal if desired,
-    // but confirming is fine or we can run them immediately. Let's use confirmation modal for safety.
     setConfirmOpen(true);
   };
 
@@ -78,6 +77,14 @@ export const ReviewsManagement: React.FC = () => {
     { label: 'Hidden', value: 'HIDDEN' },
   ];
 
+  const sortOptions = [
+    { label: 'Newest First', value: 'newest' },
+    { label: 'Highest Rating (5★ → 1★)', value: 'rating_desc' },
+    { label: 'Lowest Rating (1★ → 5★)', value: 'rating_asc' },
+    { label: 'Oldest First', value: 'oldest' },
+    { label: 'Most Helpful', value: 'helpful' },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -95,12 +102,20 @@ export const ReviewsManagement: React.FC = () => {
             placeholder="Search by product, customer, or comment content..."
             className="w-full sm:w-80"
           />
-          <AdminFilterBar
-            label="Filter by"
-            options={statusOptions}
-            value={status}
-            onChange={(v) => { setStatus(v); setPage(1); }}
-          />
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <AdminFilterBar
+              label="Filter by"
+              options={statusOptions}
+              value={status}
+              onChange={(v) => { setStatus(v); setPage(1); }}
+            />
+            <AdminFilterBar
+              label="Sort by"
+              options={sortOptions}
+              value={sortBy}
+              onChange={(v) => { setSortBy(v); setPage(1); }}
+            />
+          </div>
         </div>
 
         {isLoading ? (

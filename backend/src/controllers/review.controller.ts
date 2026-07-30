@@ -18,6 +18,7 @@ export const reviewController = {
       const limit = Math.min(50, parseInt(req.query['limit'] as string) || 20);
       const status = req.query['status'] as string | undefined;
       const search = (req.query['search'] as string) || '';
+      const sortBy = (req.query['sortBy'] as string) || 'newest';
       const minRating = parseInt(req.query['minRating'] as string) || undefined;
       const maxRating = parseInt(req.query['maxRating'] as string) || undefined;
 
@@ -40,12 +41,25 @@ export const reviewController = {
         ];
       }
 
+      let orderBy: any[] = [{ isPinned: 'desc' }];
+      if (sortBy === 'rating_desc' || sortBy === 'highest') {
+        orderBy.push({ rating: 'desc' }, { createdAt: 'desc' });
+      } else if (sortBy === 'rating_asc' || sortBy === 'lowest') {
+        orderBy.push({ rating: 'asc' }, { createdAt: 'desc' });
+      } else if (sortBy === 'oldest') {
+        orderBy.push({ createdAt: 'asc' });
+      } else if (sortBy === 'helpful') {
+        orderBy.push({ helpfulCount: 'desc' }, { createdAt: 'desc' });
+      } else {
+        orderBy.push({ createdAt: 'desc' });
+      }
+
       const [reviews, total] = await Promise.all([
         prisma.review.findMany({
           where,
           skip,
           take: limit,
-          orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+          orderBy,
           include: {
             user: {
               select: { id: true, firstName: true, lastName: true, email: true, avatarUrl: true },

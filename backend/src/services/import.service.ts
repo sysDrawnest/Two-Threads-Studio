@@ -667,3 +667,44 @@ export function generateSampleTemplate(type: 'basic' | 'variants' | 'images'): s
 
   return `${header}\r\n${dataRow}\r\n`;
 }
+
+export function generateSampleExcelTemplate(type: 'basic' | 'variants' | 'images'): Buffer {
+  const headers = ['name', 'slug', 'sku', 'description', 'price', 'compare_price', 'status', 'type', 'category', 'tags', 'stock', 'is_featured', 'is_best_seller', 'is_new_arrival', 'seo_title', 'seo_description'];
+  if (type === 'variants') {
+    headers.push('variant_name', 'variant_sku', 'variant_price_adj', 'variant_stock', 'variant_options', 'images');
+  } else if (type === 'images') {
+    headers.push('images');
+  }
+
+  const sampleRow: (string | number | boolean)[] = [
+    'Luxury Embroidery Starter Kit',
+    'luxury-embroidery-starter-kit',
+    'KIT001',
+    'A beautiful handcrafted embroidery kit for beginners',
+    1299,
+    1499,
+    'ACTIVE',
+    'PHYSICAL',
+    'Embroidery Kits',
+    'starter,beginner,gift',
+    50,
+    false,
+    true,
+    false,
+    'Premium Embroidery Kit',
+    'Start your embroidery journey'
+  ];
+
+  if (type === 'variants') {
+    sampleRow.push('Gold Edition', 'KIT001-GOLD', 200, 10, 'Color:Gold', 'https://res.cloudinary.com/example/image1.jpg|https://res.cloudinary.com/example/image2.jpg');
+  } else if (type === 'images') {
+    sampleRow.push('https://res.cloudinary.com/example/image1.jpg|https://res.cloudinary.com/example/image2.jpg');
+  }
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, sampleRow]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
+
+  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+}
+
