@@ -6,7 +6,12 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const connectionString = env.DATABASE_URL;
-const pool = new Pool({ connectionString });
+const pool = new Pool({
+  connectionString,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
 const adapter = new PrismaPg(pool);
 
 const prismaConfig: any = { adapter };
@@ -30,7 +35,7 @@ if (env.NODE_ENV === 'development') {
         type: 'slow_query',
         severity,
         duration,
-        route: e.query,
+        query: e.query,
       });
     } else {
       let querySummary = e.query;
