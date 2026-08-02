@@ -58,35 +58,9 @@ const Login: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-[#fef8f3]/30 to-[#1d1b19]/20"></div>
       </div>
 
-      {/* Main Container for Tag + Modal to manage positioning */}
+      {/* Main Container */}
       <div className="relative z-10 flex items-center justify-center max-w-4xl w-full mx-auto">
         
-        {/* Luxury Brand Welcome Banner (Desktop Left Card) */}
-        <div className="hidden lg:flex flex-col justify-between w-[320px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-l-xl p-8 shadow-xl relative z-20 -mr-4 my-6">
-          <div className="space-y-4">
-            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c]">
-              ✨
-            </div>
-            <h3 className="font-serif text-[24px] leading-tight text-[#5c4a3e] font-semibold">
-              Every stitch<br />has a story.
-            </h3>
-            <p className="font-sans text-[13px] text-[#78675c] leading-relaxed">
-              Sign in to follow your handmade creations, track orders, manage returns, and stay updated from stitch to delivery.
-            </p>
-          </div>
-
-          <div className="pt-6 border-t border-[#e6dcad]/50 space-y-2">
-            <div className="flex items-center gap-2 text-xs text-[#8b6f5c]">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-              <span>100% Hand-Embroidered Artisanal Quality</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-[#8b6f5c]">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-              <span>Hassle-Free Returns & Live Tracking</span>
-            </div>
-          </div>
-        </div>
-
         {/* Glassmorphism Login Modal */}
         <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-xl py-6 px-5 sm:p-8 md:p-12 z-10 overflow-hidden">
           
@@ -120,18 +94,8 @@ const Login: React.FC = () => {
               Welcome Back
             </h2>
             <p className="font-sans text-xs text-[#78675c]">
-              Sign in to manage your orders, returns, and handmade creations
+              Sign in to your Studio Account
             </p>
-
-            {/* Secure Checkout Context Alert */}
-            {redirectPath.includes('/checkout') && (
-              <div className="mt-4 p-3 bg-[#fdf8f3] border border-[#e8d7c8] rounded-md text-left flex items-start gap-2.5 shadow-sm">
-                <span className="text-base flex-shrink-0">🔒</span>
-                <div>
-                  <span className="leading-relaxed">You're signing in to securely save your order, track deliveries, access invoices, and enjoy faster future purchases.</span>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Form */}
