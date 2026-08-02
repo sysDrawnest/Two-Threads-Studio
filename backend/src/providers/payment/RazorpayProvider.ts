@@ -155,8 +155,20 @@ export const razorpayProvider: PaymentProvider = {
         raw: refund as unknown as Record<string, unknown>,
       };
     } catch (err: any) {
+      console.error('[RazorpayProvider Refund ERROR]: Name:', err?.name);
+      console.error('[RazorpayProvider Refund ERROR]: Message:', err?.message);
+      console.error('[RazorpayProvider Refund ERROR]: Status Code:', err?.statusCode);
+      console.error('[RazorpayProvider Refund ERROR]: Description:', err?.error?.description || err?.description);
+      console.error('[RazorpayProvider Refund ERROR]: Full JSON:', JSON.stringify(err, null, 2));
+
+      const errorMessage =
+        err?.error?.description ||
+        err?.description ||
+        err?.message ||
+        (typeof err === 'string' ? err : 'Razorpay gateway failure');
+
       throw new AppError(
-        `Razorpay refund failed: ${err?.error?.description || err.message}`,
+        `Razorpay refund failed: ${errorMessage}`,
         HTTP_STATUS.BAD_GATEWAY
       );
     }
