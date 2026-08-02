@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { returnService } from '../services/return.service';
+import { paymentService } from '../services/payment.service';
 import { HTTP_STATUS } from '../constants/httpStatus';
 
 const successResponse = (res: Response, data: any, message = 'Success', status = HTTP_STATUS.OK) =>
@@ -127,6 +128,37 @@ export const returnController = {
       const returnId = req.params['returnId'] as string;
       const result = await returnService.updateReturnTracking(returnId, req.body);
       return successResponse(res, { returnRequest: result }, 'Tracking status updated');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  adminRetryRefund: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refundId = req.params['refundId'] as string;
+      const result = await paymentService.retryRefund(refundId, req.user!.id);
+      return successResponse(res, { refund: result }, 'Refund retry initiated successfully');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  adminSyncRefund: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refundId = req.params['refundId'] as string;
+      const result = await paymentService.syncRefundStatus(refundId);
+      return successResponse(res, { refund: result }, 'Refund status synced successfully');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  adminManualOverrideRefund: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refundId = req.params['refundId'] as string;
+      const { reason } = req.body;
+      const result = await paymentService.manualOverrideRefund(refundId, req.user!.id, reason);
+      return successResponse(res, { refund: result }, 'Refund overridden successfully');
     } catch (err) {
       next(err);
     }

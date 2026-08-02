@@ -37,3 +37,7 @@ export const ReturnEvents = {
   REFUNDED: 'return.refunded',
   REJECTED: 'return.rejected',
 };
+
+export const RefundEvents = {
+  TIMELINE_CREATED: 'refund.timeline_created',
+};

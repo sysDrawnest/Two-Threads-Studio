@@ -255,4 +255,137 @@ export const analyticsController = {
       next(err);
     }
   },
+
+  // ── Refund Analytics Dashboard with 5-minute in-memory caching ────────────────
+  getRefundAnalytics: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const nowMs = Date.now();
+      if (cacheRefundAnalytics && nowMs < cacheRefundAnalyticsExpiry) {
+        return successResponse(res, { ...cacheRefundAnalytics, fromCache: true });
+      }
+
+      // 1. Gather all refunds
+      const refunds = await prisma.refund.findMany({
+        select: {
+          id: true,
+          status: true,
+          amount: true,
+          gatewayErrorCode: true,
+          createdAt: true,
+          processedAt: true,
+          manualOverride: true,
+        },
+      });
+
+      // 2. Count totals
+      let totalRefunded = 0;
+      let totalInitiated = 0;
+      let totalFailed = 0;
+      let totalOverride = 0;
+      const statusCounts: Record<string, number> = {
+        INITIATED: 0,
+        PROCESSING: 0,
+        PROCESSED: 0,
+        FAILED: 0,
+      };
+
+      const errorClassMap = new Map<string, number>();
+      let totalErrors = 0;
+
+      let totalSyncTimeMs = 0;
+      let processedWithTimeCount = 0;
+
+      for (const r of refunds) {
+        statusCounts[r.status] = (statusCounts[r.status] || 0) + 1;
+        if (r.status === 'PROCESSED') {
+          totalRefunded += Number(r.amount);
+          if (r.processedAt) {
+            const timeDiff = r.processedAt.getTime() - r.createdAt.getTime();
+            totalSyncTimeMs += timeDiff;
+            processedWithTimeCount++;
+          }
+        } else if (r.status === 'INITIATED') {
+          totalInitiated++;
+        } else if (r.status === 'FAILED') {
+          totalFailed++;
+        }
+
+        if (r.manualOverride) {
+          totalOverride++;
+        }
+
+        if (r.gatewayErrorCode) {
+          const errCode = r.gatewayErrorCode.toUpperCase();
+          let cls = 'GATEWAY_ERROR';
+          if (errCode.includes('TIMEOUT') || errCode.includes('NETWORK')) cls = 'NETWORK_ERROR';
+          else if (errCode.includes('BALANCE')) cls = 'INSUFFICIENT_BALANCE';
+          else if (errCode.includes('REJECTED') || errCode.includes('DECLINED')) cls = 'BANK_REJECTED';
+          else if (errCode.includes('DUPLICATE')) cls = 'DUPLICATE_REQUEST';
+          else if (errCode.includes('BAD_REQUEST') || errCode.includes('INVALID')) cls = 'INVALID_PAYMENT';
+
+          errorClassMap.set(cls, (errorClassMap.get(cls) || 0) + 1);
+          totalErrors++;
+        }
+      }
+
+      // 3. Top Refund/Return Reasons
+      const returns = await prisma.returnRequest.findMany({
+        select: { reason: true },
+      });
+      const reasonCounts = new Map<string, number>();
+      for (const ret of returns) {
+        reasonCounts.set(ret.reason, (reasonCounts.get(ret.reason) || 0) + 1);
+      }
+      const topReasons = Array.from(reasonCounts.entries())
+        .map(([reason, count]) => ({ reason, count, pct: Math.round((count / returns.length) * 100) || 0 }))
+        .sort((a, b) => b.count - a.count);
+
+      // 4. Rate metrics
+      const totalOrdersCount = await prisma.order.count({
+        where: { orderStatus: { in: ['CONFIRMED', 'DELIVERED', 'RETURNED', 'REFUNDED'] } },
+      });
+      const returnedOrdersCount = await prisma.order.count({
+        where: { orderStatus: 'RETURNED' },
+      });
+      const refundedOrdersCount = await prisma.order.count({
+        where: { orderStatus: 'REFUNDED' },
+      });
+
+      const returnRate = totalOrdersCount > 0 ? (returnedOrdersCount / totalOrdersCount) * 100 : 0;
+      const refundRate = totalOrdersCount > 0 ? (refundedOrdersCount / totalOrdersCount) * 100 : 0;
+
+      const avgProcessingTimeHours = processedWithTimeCount > 0
+        ? Math.round((totalSyncTimeMs / processedWithTimeCount) / (1000 * 60 * 60) * 100) / 100
+        : 0;
+
+      cacheRefundAnalytics = {
+        summary: {
+          totalRefundedVolume: Math.round(totalRefunded * 100) / 100,
+          pendingVolumeCount: totalInitiated,
+          failedVolumeCount: totalFailed,
+          manualOverrideCount: totalOverride,
+          avgProcessingTimeHours,
+        },
+        rates: {
+          returnRate: Math.round(returnRate * 100) / 100,
+          refundRate: Math.round(refundRate * 100) / 100,
+        },
+        statuses: statusCounts,
+        failureDistribution: Array.from(errorClassMap.entries()).map(([errorClass, count]) => ({
+          errorClass,
+          count,
+          pct: Math.round((count / totalErrors) * 100) || 0,
+        })),
+        topReasons,
+      };
+      cacheRefundAnalyticsExpiry = nowMs + 5 * 60 * 1000; // 5-minute TTL
+
+      return successResponse(res, cacheRefundAnalytics);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
+
+let cacheRefundAnalytics: any = null;
+let cacheRefundAnalyticsExpiry = 0;

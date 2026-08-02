@@ -6,9 +6,10 @@
  */
 
 import { eventDispatcher } from '../LocalEventDispatcher';
-import { PaymentEvents } from '../OrderEvents';
+import { PaymentEvents, RefundEvents } from '../OrderEvents';
 import { orderNotifications } from '../../notifications/order.notifications';
 import logger from '../../lib/logger';
+import { RefundStatus } from '@prisma/client';
 
 eventDispatcher.on(PaymentEvents.CAPTURED, async ({ order, payment }: any) => {
   logger.info({
@@ -44,4 +45,24 @@ eventDispatcher.on(PaymentEvents.REFUND_INITIATED, async ({ order, payment, refu
   orderNotifications.onRefundInitiated(order, refundAmount).catch((err) => {
     logger.error({ err }, 'Failed to send refund initiated notification');
   });
+});
+
+eventDispatcher.on(RefundEvents.TIMELINE_CREATED, async ({ timeline }: any) => {
+  logger.info(
+    { timelineId: timeline.id, status: timeline.status, title: timeline.title },
+    `[RefundListener] Timeline entry created: ${timeline.title} (${timeline.status})`
+  );
+
+  // Send simulated email based on refund timeline changes
+  try {
+    if (timeline.status === RefundStatus.PROCESSED) {
+      logger.info({ timeline }, '[EmailHook] dispatching customer email: "Your refund has been sent to your bank."');
+    } else if (timeline.status === RefundStatus.FAILED) {
+      logger.info({ timeline }, '[EmailHook] dispatching customer email: "We are looking into a payment issue."');
+    } else if (timeline.status === RefundStatus.INITIATED) {
+      logger.info({ timeline }, '[EmailHook] dispatching customer email: "We have initiated your refund."');
+    }
+  } catch (err: any) {
+    logger.error({ err: err.message }, 'Failed to dispatch timeline email notifications');
+  }
 });

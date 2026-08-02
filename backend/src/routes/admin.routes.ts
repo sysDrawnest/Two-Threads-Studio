@@ -53,6 +53,7 @@ router.get('/analytics/orders', analyticsController.getOrderAnalytics);
 router.get('/analytics/products', analyticsController.getTopProducts);
 router.get('/analytics/customers', analyticsController.getCustomerGrowth);
 router.get('/analytics/categories', analyticsController.getCategoryBreakdown);
+router.get('/analytics/refunds', analyticsController.getRefundAnalytics);
 
 // ── Inventory ──────────────────────────────────────────────────────────────
 router.get('/inventory', inventoryController.listInventory);
@@ -87,6 +88,11 @@ router.post('/returns/:returnId/received', returnController.adminMarkReceived);
 router.post('/returns/:returnId/inspect', validate(adminInspectReturnSchema), returnController.adminRecordInspection);
 router.post('/returns/:returnId/schedule-pickup', returnController.adminSchedulePickup);
 router.patch('/returns/:returnId/tracking', returnController.adminUpdateTracking);
+
+// ── Refund Management ──────────────────────────────────────────────────────
+router.post('/refunds/:refundId/retry', returnController.adminRetryRefund);
+router.post('/refunds/:refundId/sync', returnController.adminSyncRefund);
+router.post('/refunds/:refundId/override', returnController.adminManualOverrideRefund);
 
 export default router;
 

@@ -81,6 +81,7 @@ export const returnService = {
           },
         },
         timeline: { orderBy: { createdAt: 'asc' } },
+        refunds: { include: { timeline: { orderBy: { createdAt: 'asc' } } } },
       },
     });
 

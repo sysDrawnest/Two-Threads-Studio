@@ -99,6 +99,9 @@ enum AuditAction {
   PAYMENT_CAPTURED
   PAYMENT_FAILED
   REFUND_INITIATED
+  REFUND_PROCESSED
+  REFUND_FAILED
+  REFUND_OVERRIDDEN
   SHIPMENT_CREATED
   // Phase 5C
   RISK_EVALUATED
@@ -1693,9 +1696,16 @@ model Refund {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
+  // Manual Override Fields
+  manualOverride      Boolean   @default(false)
+  overrideReason      String?
+  overriddenBy        String?
+  overriddenAt        DateTime?
+
   payment       Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
   returnRequest ReturnRequest? @relation(fields: [returnRequestId], references: [id])
   order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  timeline      RefundTimeline[]
 
   @@index([paymentId])
   @@index([returnRequestId])
@@ -1715,5 +1725,32 @@ model ProcessedWebhook {
 
   @@index([eventId])
   @@map("processed_webhooks")
+}
+
+/// Granular step tracking for individual refund attempts
+model RefundTimeline {
+  id          String       @id @default(cuid())
+  refundId    String
+  status      RefundStatus
+  title       String
+  description String?
+  source      String       @default("SYSTEM") // SYSTEM, GATEWAY, ADMIN, WEBHOOK
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  refund Refund @relation(fields: [refundId], references: [id], onDelete: Cascade)
+
+  @@index([refundId])
+  @@map("refund_timelines")
+}
+
+/// Cluster-safe job synchronization locks
+model CronJobLock {
+  id        String   @id
+  lockedAt  DateTime @default(now())
+  lockedBy  String
+  expiresAt DateTime
+
+  @@map("cron_job_locks")
 }
 

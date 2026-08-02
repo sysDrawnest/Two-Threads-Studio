@@ -26,7 +26,20 @@ export const orderRepository = {
         },
         shippingAddress: true,
         billingAddress: true,
-        payment: true,
+        payment: {
+          include: {
+            refunds: {
+              include: {
+                timeline: { orderBy: { createdAt: 'asc' } }
+              }
+            }
+          }
+        },
+        refunds: {
+          include: {
+            timeline: { orderBy: { createdAt: 'asc' } }
+          }
+        },
         returnRequests: {
           orderBy: { requestedAt: 'desc' },
           include: {

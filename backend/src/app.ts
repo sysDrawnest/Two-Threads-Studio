@@ -121,3 +121,18 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
 app.use(errorHandler);
 
 export default app;
+
+// 5. SCHEDULED RECONCILIATION
+import { reconciliationService } from './services/reconciliation.service';
+const SIX_HOURS = 6 * 60 * 60 * 1000;
+setInterval(() => {
+  reconciliationService.runReconciliation('app_scheduler_interval').catch((err) => {
+    logger.error({ err: err.message }, '[Scheduler] Refund reconciliation job failed');
+  });
+}, SIX_HOURS);
+
+setTimeout(() => {
+  reconciliationService.runReconciliation('app_scheduler_startup').catch((err) => {
+    logger.error({ err: err.message }, '[Scheduler] Startup Refund reconciliation failed');
+  });
+}, 10000);

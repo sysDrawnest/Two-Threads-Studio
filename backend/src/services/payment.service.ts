@@ -29,7 +29,7 @@ import {
   RefundStatus,
   ReturnStatus,
 } from '@prisma/client';
-import { eventDispatcher, PaymentEvents, OrderEvents } from '../events';
+import { eventDispatcher, PaymentEvents, OrderEvents, RefundEvents } from '../events';
 import logger from '../lib/logger';
 
 export const paymentService = {
@@ -494,6 +494,17 @@ export const paymentService = {
       return refund;
     });
 
+    await paymentService.createTimelineEvent({
+      refundId: refundRecord.id,
+      status: initialRefundStatus,
+      title: isOnline ? 'Refund Initiated' : 'Manual Refund Completed',
+      description: isOnline 
+        ? `Refund of ₹${refundAmountActual.toFixed(2)} submitted to Razorpay gateway.` 
+        : `Manual refund of ₹${refundAmountActual.toFixed(2)} recorded successfully.`,
+      source: isOnline ? 'SYSTEM' : 'ADMIN',
+      metadata: { refundId: refundRecord.id, amount: refundAmountActual, isOnline },
+    });
+
     const updatedPayment = await paymentRepository.findById(paymentId);
     const order = await orderRepository.findById(payment.orderId);
 
@@ -520,6 +531,15 @@ export const paymentService = {
     if (refund.status === RefundStatus.PROCESSED) {
       throw new AppError('Refund has already been processed successfully', HTTP_STATUS.BAD_REQUEST);
     }
+
+    await paymentService.createTimelineEvent({
+      refundId: refundRecordId,
+      status: RefundStatus.INITIATED,
+      title: 'Refund Retry Initiated',
+      description: 'Retrying failed refund attempt on payment gateway.',
+      source: 'ADMIN',
+      metadata: { adminId },
+    });
 
     return paymentService.processRefund(
       refund.paymentId,
@@ -597,10 +617,139 @@ export const paymentService = {
         }
       });
 
+      await paymentService.createTimelineEvent({
+        refundId: refundRecordId,
+        status: RefundStatus.PROCESSED,
+        title: 'Refund Processed',
+        description: `Refund completed successfully by bank${rrn ? ` (RRN: ${rrn})` : ''}.`,
+        source: 'GATEWAY',
+        metadata: { rrn },
+      });
+
       logger.info({ refundRecordId }, '[PaymentService] Refund status synced successfully -> PROCESSED');
     }
 
     return prisma.refund.findUnique({ where: { id: refundRecordId } });
+  },
+
+  createTimelineEvent: async (params: {
+    refundId: string;
+    status: RefundStatus;
+    title: string;
+    description?: string;
+    source: string;
+    metadata?: any;
+  }) => {
+    const timeline = await prisma.refundTimeline.create({
+      data: {
+        refundId: params.refundId,
+        status: params.status,
+        title: params.title,
+        description: params.description,
+        source: params.source,
+        metadata: params.metadata || {},
+      },
+    });
+
+    eventDispatcher.emit(RefundEvents.TIMELINE_CREATED, { timeline }).catch(() => {});
+    return timeline;
+  },
+
+  classifyFailureReason: (gatewayErrorCode?: string | null): string => {
+    if (!gatewayErrorCode) return 'UNKNOWN_ERROR';
+    const code = gatewayErrorCode.toUpperCase();
+    if (code.includes('TIMEOUT') || code.includes('NETWORK')) return 'NETWORK_ERROR';
+    if (code.includes('BALANCE')) return 'INSUFFICIENT_BALANCE';
+    if (code.includes('REJECTED') || code.includes('DECLINED')) return 'BANK_REJECTED';
+    if (code.includes('DUPLICATE')) return 'DUPLICATE_REQUEST';
+    if (code.includes('BAD_REQUEST') || code.includes('INVALID')) return 'INVALID_PAYMENT';
+    return 'GATEWAY_ERROR';
+  },
+
+  manualOverrideRefund: async (refundId: string, adminId: string, reason: string) => {
+    const refund = await prisma.refund.findUnique({
+      where: { id: refundId },
+      include: { payment: true },
+    });
+
+    if (!refund) throw new AppError('Refund record not found', HTTP_STATUS.NOT_FOUND);
+    if (refund.status === RefundStatus.PROCESSED) {
+      throw new AppError('Refund is already completed', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const now = new Date();
+
+    await prisma.$transaction(async (tx) => {
+      await tx.refund.update({
+        where: { id: refundId },
+        data: {
+          status: RefundStatus.PROCESSED,
+          processedAt: now,
+          manualOverride: true,
+          overrideReason: reason,
+          overriddenBy: adminId,
+          overriddenAt: now,
+        },
+      });
+
+      await tx.payment.update({
+        where: { id: refund.paymentId },
+        data: { status: PaymentStatus.REFUNDED },
+      });
+
+      await tx.order.update({
+        where: { id: refund.orderId },
+        data: {
+          paymentStatus: PaymentStatus.REFUNDED,
+          orderStatus: OrderStatus.REFUNDED,
+        },
+      });
+
+      if (refund.returnRequestId) {
+        await tx.returnRequest.update({
+          where: { id: refund.returnRequestId },
+          data: {
+            status: ReturnStatus.REFUNDED,
+            refundStatus: 'processed',
+            refundProcessedAt: now,
+            resolvedAt: now,
+          },
+        });
+
+        await tx.returnTimeline.create({
+          data: {
+            returnRequestId: refund.returnRequestId,
+            status: ReturnStatus.REFUNDED,
+            note: `Refund Manual Override — Completed offline by Admin. Reason: ${reason}`,
+            actorType: 'ADMIN',
+            actorId: adminId,
+          },
+        });
+      }
+
+      await tx.orderAuditLog.create({
+        data: {
+          orderId: refund.orderId,
+          action: AuditAction.REFUND_OVERRIDDEN,
+          actorType: AuditActorType.ADMIN,
+          actorId: adminId,
+          details: { refundId, reason },
+        },
+      });
+    });
+
+    const updatedRefund = await prisma.refund.findUnique({ where: { id: refundId } });
+
+    await paymentService.createTimelineEvent({
+      refundId,
+      status: RefundStatus.PROCESSED,
+      title: 'Manual Override Applied',
+      description: `Refund completed offline by administrator. Reason: ${reason}`,
+      source: 'ADMIN',
+      metadata: { adminId, reason },
+    });
+
+    return updatedRefund;
   },
 
   /**

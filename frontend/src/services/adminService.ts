@@ -354,6 +354,26 @@ export const adminService = {
     return response;
   },
 
+  retryRefund: async (refundId: string) => {
+    const response = await apiClient.post(`/admin/refunds/${refundId}/retry`);
+    return response.data;
+  },
+
+  syncRefund: async (refundId: string) => {
+    const response = await apiClient.post(`/admin/refunds/${refundId}/sync`);
+    return response.data;
+  },
+
+  overrideRefund: async (refundId: string, reason: string) => {
+    const response = await apiClient.post(`/admin/refunds/${refundId}/override`, { reason });
+    return response.data;
+  },
+
+  getRefundAnalytics: async () => {
+    const response = await apiClient.get('/admin/analytics/refunds');
+    return response.data;
+  },
+
   // ── Security & RBAC ───────────────────────────────────────────────────────
   getSecurityAuditLogs: async (params?: any) => {
     const response = await apiClient.get('/admin/risk/dashboard', { params });

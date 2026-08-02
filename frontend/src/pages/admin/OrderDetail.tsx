@@ -56,6 +56,47 @@ export const OrderDetail: React.FC = () => {
     }
   };
 
+  const [isOverrideModalOpen, setIsOverrideModalOpen] = useState(false);
+  const [selectedRefundId, setSelectedRefundId] = useState('');
+  const [overrideReasonInput, setOverrideReasonInput] = useState('');
+  const [isOverriding, setIsOverriding] = useState(false);
+
+  const handleRetryRefund = async (refundId: string) => {
+    try {
+      await adminService.retryRefund(refundId);
+      toast.success('Retry request submitted to gateway');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to retry refund');
+    }
+  };
+
+  const handleSyncRefund = async (refundId: string) => {
+    try {
+      await adminService.syncRefund(refundId);
+      toast.success('Synced status successfully');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to sync refund status');
+    }
+  };
+
+  const handleOverrideRefund = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsOverriding(true);
+      await adminService.overrideRefund(selectedRefundId, overrideReasonInput);
+      toast.success('Manual override marked successfully');
+      setIsOverrideModalOpen(false);
+      setOverrideReasonInput('');
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to apply manual override');
+    } finally {
+      setIsOverriding(false);
+    }
+  };
+
   const handlePrintInvoice = () => {
     window.print();
   };
@@ -326,6 +367,84 @@ export const OrderDetail: React.FC = () => {
             </div>
           </div>
 
+          {/* Refund Attempts */}
+          {order.payment?.refunds && order.payment.refunds.length > 0 && (
+            <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
+              <div className="border-b border-outline-variant px-6 py-4 bg-surface-container/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="h-5 w-5 text-on-secondary-container" />
+                  <h2 className="font-serif text-lg font-medium text-primary-container">Refund History</h2>
+                </div>
+              </div>
+              <div className="p-6 space-y-4 text-sm divide-y divide-outline-variant">
+                {order.payment.refunds.map((refund: any, rIdx: number) => (
+                  <div key={refund.id} className={`${rIdx > 0 ? 'pt-4' : ''} space-y-2`}>
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-primary-container">₹{refund.amount}</span>
+                      <AdminBadge variant={refund.status === 'PROCESSED' ? 'success' : refund.status === 'FAILED' ? 'error' : 'warning'}>
+                        {refund.status}
+                      </AdminBadge>
+                    </div>
+                    {refund.providerRefundId && (
+                      <div className="flex justify-between">
+                        <span className="text-on-secondary-container text-xs">Reference ID</span>
+                        <span className="font-mono text-xs text-primary-container">{refund.providerRefundId}</span>
+                      </div>
+                    )}
+                    {refund.bankReferenceNumber && (
+                      <div className="flex justify-between">
+                        <span className="text-on-secondary-container text-xs">Bank RRN</span>
+                        <span className="font-mono text-xs text-primary-container">{refund.bankReferenceNumber}</span>
+                      </div>
+                    )}
+                    {refund.manualOverride && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded text-xs text-emerald-800 dark:text-emerald-300">
+                        <p className="font-semibold">Offline Override Settle</p>
+                        <p className="italic">"{refund.overrideReason}"</p>
+                      </div>
+                    )}
+                    {refund.status === 'FAILED' && (
+                      <div className="bg-red-500/10 border border-red-500/20 p-2 rounded text-xs text-red-800 dark:text-red-300">
+                        <p className="font-semibold">Gateway Error:</p>
+                        <p>{refund.gatewayErrorDesc || refund.failureReason || 'Failed to process'}</p>
+                      </div>
+                    )}
+                    {/* Action buttons */}
+                    <div className="flex gap-2 pt-1">
+                      {refund.status === 'FAILED' && (
+                        <button
+                          onClick={() => handleRetryRefund(refund.id)}
+                          className="flex-1 bg-surface-container hover:bg-outline-variant text-primary-container text-xs font-semibold py-1 rounded border border-outline-variant transition-colors"
+                        >
+                          Retry
+                        </button>
+                      )}
+                      {(refund.status === 'INITIATED' || refund.status === 'PROCESSING') && (
+                        <button
+                          onClick={() => handleSyncRefund(refund.id)}
+                          className="flex-1 bg-surface-container hover:bg-outline-variant text-primary-container text-xs font-semibold py-1 rounded border border-outline-variant transition-colors"
+                        >
+                          Sync Gateway
+                        </button>
+                      )}
+                      {refund.status !== 'PROCESSED' && (
+                        <button
+                          onClick={() => {
+                            setSelectedRefundId(refund.id);
+                            setIsOverrideModalOpen(true);
+                          }}
+                          className="flex-1 bg-surface-container hover:bg-outline-variant text-primary-container text-xs font-semibold py-1 rounded border border-outline-variant transition-colors"
+                        >
+                          Manual Override
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Shipping Info */}
           <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">
             <div className="border-b border-outline-variant px-6 py-4 bg-surface-container/30 flex items-center gap-2">
@@ -392,6 +511,54 @@ export const OrderDetail: React.FC = () => {
                   className="px-4 py-2 rounded-md bg-[#c5221f] text-sm font-medium text-white hover:bg-[#a51c1a] transition-colors disabled:opacity-50"
                 >
                   {isRefunding ? 'Processing...' : 'Confirm Refund'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Override Modal */}
+      {isOverrideModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-xl bg-background border border-outline-variant shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4 bg-surface-container/20">
+              <h3 className="font-serif text-lg font-bold text-primary-container">Manual Offline Override</h3>
+              <button onClick={() => setIsOverrideModalOpen(false)} className="text-on-secondary-container hover:text-primary-container">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleOverrideRefund} className="p-6 space-y-4">
+              <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded text-xs text-amber-800 dark:text-amber-300">
+                <p className="font-semibold">⚠️ WARNING:</p>
+                <p>This will force mark the refund as completed offline. Only use this if the funds have been manually settled through offline channels (bank transfer/cash) and cannot be automated through the gateway.</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] mb-1.5">Override Reason / Audit Note</label>
+                <textarea 
+                  value={overrideReasonInput} 
+                  onChange={e => setOverrideReasonInput(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border border-[#c8b5aa] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] outline-none"
+                  placeholder="Explain why offline override is being applied..."
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant">
+                <button 
+                  type="button" 
+                  onClick={() => setIsOverrideModalOpen(false)}
+                  className="px-4 py-2 rounded-md border border-outline-variant text-sm font-medium text-primary-container hover:bg-surface-container transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isOverriding || !overrideReasonInput.trim()}
+                  className="px-4 py-2 rounded-md bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {isOverriding ? 'Applying...' : 'Apply Offline Override'}
                 </button>
               </div>
             </form>
