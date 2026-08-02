@@ -148,24 +148,41 @@ export const pricingEngine = {
     if (isCouponFreeShipping) {
       shipping = 0;
       selectedShippingMethodName = 'Free Coupon Shipping';
-    } else if (params.shippingMethodId) {
-      const method = await prisma.shippingMethod.findUnique({
-        where: { id: params.shippingMethodId },
-      });
-
-      if (method && method.isEnabled) {
-        selectedShippingMethodName = method.name;
-        const minForFree = method.minOrderForFree ? Number(method.minOrderForFree) : freeShippingThreshold;
-        if (discountedSubtotal >= minForFree) {
-          shipping = 0;
-        } else {
-          shipping = Number(method.basePrice);
-        }
-      } else {
-        shipping = discountedSubtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
-      }
     } else {
-      shipping = discountedSubtotal >= freeShippingThreshold ? 0 : standardShippingCharge;
+      // Tier-based shipping charges:
+      // - Under ₹2,000: ₹149
+      // - ₹2,000–₹4,999: ₹99
+      // - ₹5,000+: FREE
+      if (discountedSubtotal < 2000) {
+        shipping = 149;
+      } else if (discountedSubtotal < 5000) {
+        shipping = 99;
+      } else {
+        shipping = 0;
+      }
+
+      if (params.shippingMethodId) {
+        const method = await prisma.shippingMethod.findUnique({
+          where: { id: params.shippingMethodId },
+        });
+
+        if (method && method.isEnabled) {
+          selectedShippingMethodName = method.name;
+          // For express or priority options, respect their specific configured base pricing
+          if (
+            method.name.toLowerCase().includes('express') ||
+            method.name.toLowerCase().includes('priority') ||
+            method.name.toLowerCase().includes('next day')
+          ) {
+            const minForFree = method.minOrderForFree ? Number(method.minOrderForFree) : 5000;
+            if (discountedSubtotal >= minForFree) {
+              shipping = 0;
+            } else {
+              shipping = Number(method.basePrice);
+            }
+          }
+        }
+      }
     }
 
     shipping = Number(shipping.toFixed(2));

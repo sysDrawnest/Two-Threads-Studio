@@ -92,7 +92,7 @@ export const returnService = {
   /**
    * Admin: approve a return request (→ APPROVED). Does NOT refund yet — refund happens after inspection.
    */
-  approveReturn: async (returnId: string, adminId: string, data: { note?: string; approvedAmount?: number; refundType?: string }) => {
+  approveReturn: async (returnId: string, adminId: string, data: { note?: string; approvedAmount?: number; refundType?: string; restockingFee?: number }) => {
     const request = await returnService.getReturnRequest(returnId);
 
     if (request.status !== ReturnStatus.REQUESTED) {
@@ -109,6 +109,7 @@ export const returnService = {
           adminNote: data.note,
           approvedAmount: approvedAmount,
           refundType: (data.refundType as any) ?? request.refundType,
+          restockingFee: data.restockingFee !== undefined ? data.restockingFee : undefined,
           approvedAt: new Date(),
         },
       });

@@ -52,6 +52,7 @@ export const ReturnsManagement: React.FC = () => {
   const [actionModal, setActionModal] = useState<'approve' | 'reject' | 'inspect' | null>(null);
   const [actionNote, setActionNote] = useState('');
   const [actionAmount, setActionAmount] = useState('');
+  const [restockingFee, setRestockingFee] = useState('');
   const [inspectPassed, setInspectPassed] = useState(true);
   const [inspectDisposition, setInspectDisposition] = useState('RESTOCK');
   const [actionLoading, setActionLoading] = useState(false);
@@ -97,6 +98,7 @@ export const ReturnsManagement: React.FC = () => {
         await adminService.approveReturn(selectedReturn.id, {
           note: actionNote,
           approvedAmount: actionAmount ? parseFloat(actionAmount) : undefined,
+          restockingFee: restockingFee ? parseFloat(restockingFee) : undefined,
         });
         toast.success('Return approved');
       } else if (actionModal === 'reject') {
@@ -114,6 +116,7 @@ export const ReturnsManagement: React.FC = () => {
       setActionModal(null);
       setActionNote('');
       setActionAmount('');
+      setRestockingFee('');
       const res: any = await adminService.getReturnRequest(selectedReturn.id);
       setSelectedReturn(res.returnRequest);
       fetchReturns();
@@ -272,6 +275,7 @@ export const ReturnsManagement: React.FC = () => {
                   <div><span className="text-gray-500">Refund type:</span> <span className="font-medium">{selectedReturn.refundType?.replace('_', ' ')}</span></div>
                   <div><span className="text-gray-500">Requested:</span> <span className="font-medium">₹{Number(selectedReturn.requestedAmount || 0).toFixed(2)}</span></div>
                   {selectedReturn.approvedAmount && <div><span className="text-gray-500">Approved:</span> <span className="font-medium text-green-700">₹{Number(selectedReturn.approvedAmount).toFixed(2)}</span></div>}
+                  {Number(selectedReturn.restockingFee || 0) > 0 && <div><span className="text-gray-500">Restocking Fee:</span> <span className="font-medium text-red-600">−₹{Number(selectedReturn.restockingFee).toFixed(2)}</span></div>}
                   {selectedReturn.finalRefundAmount && <div><span className="text-gray-500">Final refund:</span> <span className="font-medium text-green-700">₹{Number(selectedReturn.finalRefundAmount).toFixed(2)}</span></div>}
                   {selectedReturn.autoApproved && <div className="col-span-2"><span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">⚡ Auto-approved: {selectedReturn.autoApproveRule}</span></div>}
                 </div>
@@ -335,7 +339,7 @@ export const ReturnsManagement: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   {selectedReturn.status === 'REQUESTED' && (
                     <>
-                      <button onClick={() => { setActionModal('approve'); setActionAmount(String(Number(selectedReturn.requestedAmount).toFixed(2))); }} className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white text-sm rounded-xl hover:bg-green-700">
+                      <button onClick={() => { setActionModal('approve'); setActionAmount(String(Number(selectedReturn.requestedAmount).toFixed(2))); setRestockingFee(''); }} className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white text-sm rounded-xl hover:bg-green-700">
                         <CheckCircle className="w-4 h-4" /> Approve
                       </button>
                       <button onClick={() => setActionModal('reject')} className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-700 border border-red-200 text-sm rounded-xl hover:bg-red-100">
@@ -400,6 +404,27 @@ export const ReturnsManagement: React.FC = () => {
               <div className="mb-3">
                 <label className="text-xs text-gray-500 mb-1 block">Refund Amount (₹)</label>
                 <input type="number" value={actionAmount} onChange={e => setActionAmount(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" />
+                {actionModal === 'inspect' && Number(selectedReturn?.restockingFee || 0) > 0 && (
+                  <span className="text-[10px] text-amber-800 font-mono mt-1 block">
+                    ⚠️ A restocking fee of ₹{Number(selectedReturn.restockingFee).toFixed(2)} will be automatically deducted from this final payout amount.
+                  </span>
+                )}
+              </div>
+            )}
+
+            {actionModal === 'approve' && (
+              <div className="mb-3">
+                <label className="text-xs text-gray-500 mb-1 block font-medium">Restocking / Return Fee (₹) — [Optional]</label>
+                <input
+                  type="number"
+                  placeholder="Leave empty for standard 100% full refund"
+                  value={restockingFee}
+                  onChange={e => setRestockingFee(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                <span className="text-[10px] text-amber-800 font-mono mt-1 block">
+                  💡 Standard Policy: Leave blank to issue a 100% full refund. Only enter a fee for flagged abuser accounts.
+                </span>
               </div>
             )}
 

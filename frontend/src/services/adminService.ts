@@ -459,7 +459,7 @@ export const adminService = {
     return apiClient.get(`/admin/returns/analytics?${query.toString()}`);
   },
   
-  approveReturn: async (returnId: string, data?: { note?: string; approvedAmount?: number; refundType?: string }) =>
+  approveReturn: async (returnId: string, data?: { note?: string; approvedAmount?: number; refundType?: string; restockingFee?: number }) =>
     apiClient.post(`/admin/returns/${returnId}/approve`, data || {}),
 
   rejectReturn: async (returnId: string, note: string) =>

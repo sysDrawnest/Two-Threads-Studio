@@ -579,6 +579,9 @@ const Checkout: React.FC = () => {
                         <div>
                           <p className="text-xs font-semibold text-[#1C1C1B]">Standard Artisan Courier</p>
                           <p className="text-[11px] text-[#7A7067]">Dispatched in protective linen wrap • 3–5 Business Days</p>
+                          <p className="text-[10px] text-[#A34A38] font-mono mt-1 uppercase tracking-wider font-semibold">
+                            Tiers: Under ₹2k: ₹149 | ₹2k–₹5k: ₹99 | ₹5k+: FREE
+                          </p>
                         </div>
                       </div>
                       <span className="font-mono text-sm font-semibold text-[#1C1C1B]">
@@ -778,12 +781,21 @@ const Checkout: React.FC = () => {
                 <span>Inclusive</span>
               </div>
 
-              <div className="flex justify-between">
+               <div className="flex justify-between">
                 <span className="font-sans">Standard Delivery</span>
                 <span className="text-[#1C1C1B] font-semibold font-mono">
                   {stepNumber >= 2 ? (totals.shipping > 0 ? `₹${totals.shipping}` : 'FREE') : 'Calculated next step'}
                 </span>
               </div>
+              {totals.subtotal < 5000 && (
+                <div className="text-[10px] text-[#A34A38] text-right font-sans mt-0.5 font-medium">
+                  {totals.subtotal < 2000 ? (
+                    <span>Add <strong className="font-bold">₹{(2000 - totals.subtotal).toLocaleString()}</strong> more for ₹99 shipping</span>
+                  ) : (
+                    <span>Add <strong className="font-bold">₹{(5000 - totals.subtotal).toLocaleString()}</strong> more for <strong className="font-bold uppercase text-[#1C1C1B]">Free</strong> delivery</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Total Display */}
