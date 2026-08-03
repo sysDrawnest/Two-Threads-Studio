@@ -784,7 +784,7 @@ const Checkout: React.FC = () => {
                <div className="flex justify-between">
                 <span className="font-sans">Standard Delivery</span>
                 <span className="text-[#1C1C1B] font-semibold font-mono">
-                  {stepNumber >= 2 ? (totals.shipping > 0 ? `₹${totals.shipping}` : 'FREE') : 'Calculated next step'}
+                  {totals.shipping > 0 ? `₹${totals.shipping}` : 'FREE'}
                 </span>
               </div>
               {totals.subtotal < 5000 && (
