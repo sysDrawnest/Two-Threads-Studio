@@ -155,6 +155,7 @@ export const paymentService = {
           providerPaymentId: razorpayPaymentId,
           providerSignature: razorpaySignature,
           status: PaymentStatus.CAPTURED,
+          method: 'ONLINE',
           paidAt: now,
           metadata: { razorpayOrderId, razorpayPaymentId, razorpaySignature } as any,
         },
