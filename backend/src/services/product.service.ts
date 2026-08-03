@@ -21,9 +21,15 @@ import type {
 } from '../validators/product.validator';
 
 const homepageCache = new SimpleCache<any>(60 * 1000); // 60 seconds TTL
+const featuredCache = new SimpleCache<any>(60 * 1000);
+const newArrivalsCache = new SimpleCache<any>(60 * 1000);
+const bestSellersCache = new SimpleCache<any>(60 * 1000);
 
 export const clearHomepageCache = () => {
   homepageCache.clear();
+  featuredCache.clear();
+  newArrivalsCache.clear();
+  bestSellersCache.clear();
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -127,18 +133,30 @@ export const productService = {
   // ─── Homepage Helpers ───
 
   getFeaturedProducts: async () => {
+    const cached = featuredCache.get('featured');
+    if (cached) return cached;
     const products = await productRepository.findFeatured(8);
-    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    featuredCache.set('featured', result);
+    return result;
   },
 
   getNewArrivals: async () => {
+    const cached = newArrivalsCache.get('new_arrivals');
+    if (cached) return cached;
     const products = await productRepository.findNewArrivals(8);
-    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    newArrivalsCache.set('new_arrivals', result);
+    return result;
   },
 
   getBestSellers: async () => {
+    const cached = bestSellersCache.get('bestsellers');
+    if (cached) return cached;
     const products = await productRepository.findBestSellers(8);
-    return products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
+    bestSellersCache.set('bestsellers', result);
+    return result;
   },
 
   getHomepageData: async () => {

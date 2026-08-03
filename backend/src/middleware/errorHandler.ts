@@ -51,7 +51,11 @@ export const errorHandler = (
     ...(env.NODE_ENV === 'development' && { stack: err.stack }),
   };
 
-  req.log.error({ err, path: req.originalUrl }, err.message);
+  if (statusCode >= 500) {
+    req.log.error({ err, path: req.originalUrl }, err.message);
+  } else {
+    req.log.info({ path: req.originalUrl, statusCode }, err.message);
+  }
 
   return errorResponse(res, message, statusCode, code, errorObj, req.originalUrl);
 };

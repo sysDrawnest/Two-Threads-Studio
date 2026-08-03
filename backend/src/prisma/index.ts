@@ -28,20 +28,25 @@ if (env.NODE_ENV === 'development') {
 
 const prisma = new PrismaClient(prismaConfig);
 
+import { requestContext } from '../lib/requestContext';
+
 if (env.NODE_ENV === 'development') {
   (prisma as any).$on('query', (e: any) => {
     const duration = e.duration;
-    if (duration > 400) {
+    if (duration > 1500) {
       let severity = 'WARNING';
-      if (duration > 2000) {
+      if (duration > 5000) {
         severity = 'CRITICAL';
-      } else if (duration > 1000) {
+      } else if (duration > 3000) {
         severity = 'SEVERE';
       }
+      const store = requestContext.getStore();
+      const routeStr = store ? `${store.method} ${store.route}` : 'System / Background';
       logger.info({
         type: 'slow_query',
         severity,
         duration,
+        route: routeStr,
         query: e.query,
       });
     } else {

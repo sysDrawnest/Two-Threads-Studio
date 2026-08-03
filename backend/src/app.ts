@@ -52,6 +52,15 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')
 // Cookie parser
 app.use(cookieParser());
 
+import { requestContext } from './lib/requestContext';
+
+// Request Context AsyncLocalStorage
+app.use((req, _res, next) => {
+  requestContext.run({ route: req.originalUrl || req.url, method: req.method }, () => {
+    next();
+  });
+});
+
 // Data compression
 app.use(compression());
 
