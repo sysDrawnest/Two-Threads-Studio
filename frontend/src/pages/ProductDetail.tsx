@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -139,6 +140,25 @@ const ProductDetail: React.FC = () => {
       setCartOpen(true);
     } catch (err: any) {
       alert(err.message || 'Failed to add item to bag.');
+    }
+  };
+
+  const handleBuyNow = async () => {
+    try {
+      await addToCartMutation.mutateAsync({
+        productId: product.id,
+        quantity: 1,
+        giftWrap: hasGiftWrap,
+        engravingText: hasEngraving ? engravingText : null,
+        customization: {
+          hoopFinish,
+          engravingFont: hasEngraving ? engravingFont : undefined,
+          giftMessage: hasGiftWrap ? giftMessage : undefined,
+        },
+      });
+      navigate('/checkout');
+    } catch (err: any) {
+      alert(err.message || 'Failed to process Buy Now.');
     }
   };
 
@@ -365,13 +385,23 @@ const ProductDetail: React.FC = () => {
               </div>
             </div>
 
-            {/* Add to Bag Button - Mobile Optimized */}
-            <button
-              onClick={handleAddToBag}
-              className="bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] py-4 md:py-4.5 font-sans text-xs tracking-[0.2em] uppercase cursor-pointer hover:bg-neutral-800 transition-colors w-full shadow-sm"
-            >
-              Add to Bag
-            </button>
+            {/* Add to Cart & Buy Now Dual Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleAddToBag}
+                className="flex-1 bg-white text-[#1C1C1B] border border-[#1C1C1B] py-4 md:py-4.5 font-sans text-xs tracking-[0.2em] uppercase cursor-pointer hover:bg-neutral-100 transition-all font-semibold shadow-sm text-center"
+              >
+                Add to Cart
+              </button>
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                className="flex-1 bg-[#1C1C1B] text-[#FAF9F7] border border-[#1C1C1B] py-4 md:py-4.5 font-sans text-xs tracking-[0.2em] uppercase cursor-pointer hover:bg-neutral-800 transition-all font-semibold shadow-md text-center"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
       </section>
