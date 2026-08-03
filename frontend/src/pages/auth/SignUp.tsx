@@ -57,10 +57,6 @@ const Signup: React.FC = () => {
     }
   };
 
-  const handleGuest = () => {
-    navigate('/'); 
-  };
-
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center p-6 md:p-8 overflow-hidden font-sans">
       
@@ -79,31 +75,20 @@ const Signup: React.FC = () => {
       {/* Main Container */}
       <div className="relative z-10 flex items-center justify-center max-w-4xl w-full mx-auto">
         
-        {/* Floating Guest Access Pass Tag */}
-        <div className="absolute left-4 md:left-[5%] lg:left-[15%] top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center select-none group">
-          <svg width="60" height="100" viewBox="0 0 60 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute -top-[85px] left-[55%] -translate-x-1/2 -z-10 opacity-70">
-            <path d="M50 0 C 40 40, 10 60, 20 100" stroke="#a3968e" strokeWidth="1" strokeDasharray="2 2" fill="none" />
-          </svg>
-          
-          <div 
-            onClick={handleGuest}
-            className="guest-tag-ripple w-[160px] bg-[#FAF8F5] border border-[#d2c4bc] rounded-b-md rounded-t-sm shadow-lg flex flex-col items-center pt-3 pb-6 px-4 cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all duration-300 relative before:absolute before:content-[''] before:w-full before:h-full before:top-0 before:left-0 before:bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] before:opacity-40 before:pointer-events-none"
-            style={{ transform: 'rotate(-4deg)' }}
-          >
-            <div className="w-3 h-3 rounded-full bg-[#e8ded6] border border-[#bfae9f] shadow-inner mb-4 relative z-10"></div>
-            
-            <h3 className="font-serif text-[#b8860b] text-center text-[19px] leading-[1.1] font-semibold mb-3 tracking-wide drop-shadow-sm">
-              GUEST<br/>ACCESS<br/>PASS
+        {/* Luxury Brand Welcome Banner (Desktop Left Card) */}
+        <div className="hidden lg:flex flex-col justify-center w-[320px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-l-xl p-8 shadow-xl relative z-20 -mr-4 my-6">
+          <div className="space-y-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c] mx-auto">
+              ✨
+            </div>
+            <h3 className="font-serif text-[24px] leading-tight text-[#5c4a3e] font-semibold italic">
+              "Every stitch<br />has a story."
             </h3>
-            
-            <p className="font-sans text-[#5c544d] text-center text-[11px] uppercase tracking-widest leading-tight">
-              explore the<br/>collections
-            </p>
           </div>
         </div>
 
         {/* Glassmorphism Signup Modal */}
-        <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-none py-6 px-5 sm:p-8 md:p-12 md:ml-[80px] z-10 overflow-hidden">
+        <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-xl py-6 px-5 sm:p-8 md:p-12 z-10 overflow-hidden">
           
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}></div>
 
@@ -128,9 +113,12 @@ const Signup: React.FC = () => {
 
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6 relative z-10">
-            <h2 className="font-serif text-[22px] sm:text-[28px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm">
+            <h2 className="font-serif text-[22px] sm:text-[28px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm mb-2">
               Create your<br/>Studio Account
             </h2>
+            <p className="font-sans text-xs text-[#78675c] italic">
+              "Every stitch has a story."
+            </p>
           </div>
 
           {/* Form */}
@@ -247,15 +235,7 @@ const Signup: React.FC = () => {
           </form>
         </div>
 
-        {/* Mobile Guest Link */}
-        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 md:hidden text-center w-full z-10">
-           <button 
-             onClick={handleGuest}
-             className="font-serif italic text-[15px] text-[#fef8f3] drop-shadow-md underline decoration-[#d4af37]/50 underline-offset-4 hover:text-[#d4af37] transition-colors bg-transparent border-none"
-           >
-             Continue as a Guest
-           </button>
-        </div>
+
       </div>
 
     </div>
