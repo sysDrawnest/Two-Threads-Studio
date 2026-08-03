@@ -24,11 +24,11 @@ const prisma = new PrismaClient(prismaConfig);
 if (env.NODE_ENV === 'development') {
   (prisma as any).$on('query', (e: any) => {
     const duration = e.duration;
-    if (duration > 150) {
+    if (duration > 400) {
       let severity = 'WARNING';
-      if (duration > 1000) {
+      if (duration > 2000) {
         severity = 'CRITICAL';
-      } else if (duration > 500) {
+      } else if (duration > 1000) {
         severity = 'SEVERE';
       }
       logger.info({
@@ -46,7 +46,7 @@ if (env.NODE_ENV === 'development') {
       } else {
         querySummary = e.query.substring(0, 60) + (e.query.length > 60 ? '...' : '');
       }
-      logger.info({
+      logger.debug({
         type: 'database_query',
         query: querySummary,
         duration,
