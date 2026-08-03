@@ -24,9 +24,20 @@ export const shipmentRepository = {
     id: string,
     status: ShipmentStatus,
     extra?: Partial<{
-      trackingNumber: string;
-      carrier: string;
+      externalShipmentId: string;
+      externalOrderId: string;
+      externalAwbNumber: string;
+      courierName: string;
+      courierCode: string;
+      trackingUrl: string;
       labelUrl: string;
+      invoiceUrl: string;
+      manifestUrl: string;
+      pickupId: string;
+      shippingCost: number;
+      weightGrams: number;
+      actualWeightGrams: number;
+      dimensions: Record<string, number>;
       estimatedDelivery: Date;
       shippedAt: Date;
       deliveredAt: Date;

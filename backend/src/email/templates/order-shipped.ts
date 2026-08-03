@@ -15,11 +15,11 @@ export function orderShippedTemplate(order: any, shipment: any): string {
       </div>
       <div class="order-row">
         <span class="order-label">Tracking Number</span>
-        <span class="order-value" style="font-family:monospace">${shipment.trackingNumber}</span>
+        <span class="order-value" style="font-family:monospace">${shipment.externalAwbNumber}</span>
       </div>
       <div class="order-row">
-        <span class="order-label">Carrier</span>
-        <span class="order-value">${shipment.carrier}</span>
+        <span class="order-label">Logistics Partner</span>
+        <span class="order-value">${shipment.courierName || 'Our logistics partner'}</span>
       </div>
       <div class="order-row">
         <span class="order-label">Shipped At</span>

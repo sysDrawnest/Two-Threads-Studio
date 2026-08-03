@@ -1,64 +1,10 @@
 /**
- * ShippingProvider Interface
+ * @deprecated This file has been superseded by the new modular provider structure.
+ * See: providers/shipping/interfaces/ShippingProvider.ts
  *
- * Abstract contract for all courier/shipping providers.
- * Current implementation: MockShippingProvider
- * Future implementations: ShiprocketProvider, DelhiveryProvider, etc.
+ * This file is kept only to avoid breaking any stale imports during migration.
+ * It will be deleted once Phase 2 is complete.
  */
-
-export interface CreateShipmentParams {
-  orderId: string;
-  orderNumber: string;
-  shippingAddress: {
-    fullName: string;
-    phone: string;
-    line1: string;
-    line2?: string | null;
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-  };
-  items: Array<{
-    productName: string;
-    sku?: string | null;
-    quantity: number;
-    weight?: number;
-  }>;
-  totalWeight?: number; // grams
-}
-
-export interface ShipmentDetails {
-  trackingNumber: string;
-  carrier: string;
-  shippingMethod: string;
-  estimatedDelivery: Date;
-  labelUrl?: string;
-  /** Raw provider response for audit */
-  raw: Record<string, unknown>;
-}
-
-export interface TrackingStatus {
-  status: string;
-  location?: string;
-  timestamp: Date;
-  events: Array<{
-    status: string;
-    location?: string;
-    timestamp: Date;
-    description: string;
-  }>;
-}
-
-export interface ShippingProvider {
-  /**
-   * Create a shipment with the courier provider.
-   * Returns tracking details.
-   */
-  createShipment(params: CreateShipmentParams): Promise<ShipmentDetails>;
-
-  /**
-   * Fetch the latest tracking status for a shipment.
-   */
-  getTrackingStatus(trackingNumber: string): Promise<TrackingStatus>;
-}
+export * from './interfaces/ShippingProvider';
+export * from './interfaces/ShippingDto';
+export * from './interfaces/ShippingCapabilities';

@@ -75,12 +75,26 @@ enum PaymentStatus {
 }
 
 enum ShipmentStatus {
+  // Active forward lifecycle
   PENDING
   PACKING
+  READY_TO_SHIP
+  PICKUP_SCHEDULED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  // Exception states
+  FAILED_DELIVERY
+  CANCELLED
+  // Return lifecycle
+  RETURN_REQUESTED
+  RETURN_PICKED_UP
+  RETURN_IN_TRANSIT
+  RETURN_RECEIVED
+  // Legacy aliases (kept for migration safety)
   READY
   SHIPPED
-  IN_TRANSIT
-  DELIVERED
   RETURNED
 }
 
@@ -103,6 +117,11 @@ enum AuditAction {
   REFUND_FAILED
   REFUND_OVERRIDDEN
   SHIPMENT_CREATED
+  SHIPMENT_PICKUP_SCHEDULED
+  SHIPMENT_PICKED_UP
+  SHIPMENT_CANCELLED
+  SHIPMENT_DELIVERED
+  RETURN_SHIPMENT_CREATED
   // Phase 5C
   RISK_EVALUATED
   TRUST_SCORE_UPDATED
@@ -480,21 +499,25 @@ model Product {
 
   salesCount Int    @default(0)
 
+  /// Shipping Engine: optional package profile for auto-filling shipment dimensions
+  packageProfileId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category   Category    @relation(fields: [categoryId], references: [id])
-  collection Collection? @relation(fields: [collectionId], references: [id])
-  images     ProductImage[]
-  variants   ProductVariant[]
-  tags       ProductTag[]
-  reviews    Review[]
-  wishlist   Wishlist[]
-  cartItems  CartItem[]
-  returnPolicy ReturnPolicy?
+  category       Category         @relation(fields: [categoryId], references: [id])
+  collection     Collection?      @relation(fields: [collectionId], references: [id])
+  images         ProductImage[]
+  variants       ProductVariant[]
+  tags           ProductTag[]
+  reviews        Review[]
+  wishlist       Wishlist[]
+  cartItems      CartItem[]
+  returnPolicy   ReturnPolicy?
   media                 ProductMedia[]
   secondaryCategories   ProductSecondaryCategory[]
   additionalCollections ProductAdditionalCollection[]
+  packageProfile PackageProfile?  @relation(fields: [packageProfileId], references: [id])
 
   @@index([status])
   @@index([isFeatured])
@@ -950,30 +973,181 @@ model Payment {
 // ─────────────────────────────────────────────
 
 model Shipment {
-  id             String         @id @default(cuid())
-  orderId        String         @unique
-  provider       String         @default("MOCK")
+  id      String @id @default(cuid())
+  orderId String @unique
 
-  trackingNumber String?
-  carrier        String?
-  shippingMethod String?        @default("STANDARD")
+  /// Which provider adapter created this shipment (e.g. "MOCK", "SHIPROCKET", "DELHIVERY")
+  provider String @default("MOCK")
 
-  status            ShipmentStatus @default(PENDING)
+  // ─── Provider-neutral external references ─────────────────────────────────
+  /// Provider's shipment identifier (Shiprocket: shipment_id, Delhivery: waybill, etc.)
+  externalShipmentId  String?
+  /// Provider's internal order reference (Shiprocket: order_id)
+  externalOrderId     String?
+  /// Air Waybill — primary tracking code shared with customer
+  externalAwbNumber   String? @unique
 
-  labelUrl          String?
+  // ─── Courier details ───────────────────────────────────────────────────────
+  trackingUrl    String?
+  courierName    String?
+  courierCode    String?
+  shippingMethod String?   @default("STANDARD")
+
+  // ─── Shipment status ───────────────────────────────────────────────────────
+  status ShipmentStatus @default(PENDING)
+
+  // ─── Documents ────────────────────────────────────────────────────────────
+  labelUrl     String?
+  invoiceUrl   String?
+  manifestUrl  String?
+
+  // ─── Costs & physical attributes ─────────────────────────────────────────
+  shippingCost      Decimal? @db.Decimal(10, 2)
+  /// Declared weight for booking (from PackageProfile)
+  weightGrams       Int?
+  /// Actual weight measured by courier at pickup (may differ)
+  actualWeightGrams Int?
+  dimensions        Json?    // { l: Int, b: Int, h: Int } in cm
+
+  // ─── Scheduling ───────────────────────────────────────────────────────────
+  pickupId          String?
   estimatedDelivery DateTime?
   shippedAt         DateTime?
   deliveredAt       DateTime?
+
+  // ─── Relations ────────────────────────────────────────────────────────────
+  /// Fulfillment location (workshop/studio) this was shipped from
+  locationId       String?
+  /// Package profile used for dimension/weight defaults
+  packageProfileId String?
 
   metadata  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order           Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  location        FulfillmentLocation? @relation(fields: [locationId], references: [id])
+  packageProfile  PackageProfile?      @relation(fields: [packageProfileId], references: [id])
+  timeline        ShipmentTimeline[]
 
   @@index([orderId])
   @@index([status])
+  @@index([externalAwbNumber])
+  @@index([provider, status])
   @@map("shipments")
+}
+
+// ─────────────────────────────────────────────
+// Shipping Engine Models (Phase 6)
+// ─────────────────────────────────────────────
+
+/// Append-only event log for a shipment. Every status transition is recorded here.
+model ShipmentTimeline {
+  id          String   @id @default(cuid())
+  shipmentId  String
+  /// Normalized internal status value (not provider-specific)
+  status      String
+  location    String?
+  description String
+  /// Where the event originated: WEBHOOK | ADMIN | SYSTEM | PROVIDER_POLL
+  source      String   @default("SYSTEM")
+  raw         Json?
+  occurredAt  DateTime
+  createdAt   DateTime @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+  @@index([shipmentId, occurredAt(sort: Desc)])
+  @@map("shipment_timelines")
+}
+
+/// Singleton runtime configuration for the shipping engine.
+/// Admin can change shipping behaviour without redeployment.
+/// .env should only contain secrets (API keys).
+model ShippingSettings {
+  id String @id @default("singleton")
+
+  /// Active shipping provider (must match SHIPPING_PROVIDER env unless overridden)
+  provider              String  @default("mock")
+  /// CHEAPEST | FASTEST | BEST_RATED | LOWEST_RTO | CUSTOM
+  selectionStrategy     String  @default("CHEAPEST")
+  autoAssignCourier     Boolean @default(true)
+  autoSchedulePickup    Boolean @default(false)
+  codEnabled            Boolean @default(true)
+
+  /// Default package dimensions (cm) when no PackageProfile is assigned
+  defaultWeightGrams Int @default(500)
+  defaultLength      Int @default(20)
+  defaultBreadth     Int @default(15)
+  defaultHeight      Int @default(10)
+  packagingExtraGrams Int @default(100)
+
+  defaultLocationId  String?
+  fragileHandlingNote String?
+
+  updatedAt DateTime @updatedAt
+
+  @@map("shipping_settings")
+}
+
+/// Reusable packaging templates assigned to products.
+/// Shipment creation auto-populates weight and dimensions from the product's profile.
+model PackageProfile {
+  id   String @id @default(cuid())
+  name String @unique // e.g. "Small Hoop", "Large Hoop", "DIY Kit", "Framed Art"
+
+  defaultWeightGrams Int
+  length             Int // cm
+  breadth            Int // cm
+  height             Int // cm
+
+  isFragile           Boolean  @default(false)
+  containsLiquid      Boolean  @default(false)
+  containsBattery     Boolean  @default(false)
+  requiresSignature   Boolean  @default(false)
+  insuranceValue      Decimal? @db.Decimal(10, 2)
+
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products  Product[]
+  shipments Shipment[]
+
+  @@map("package_profiles")
+}
+
+/// Physical dispatch origin for shipments.
+/// Replaces the hardcoded SHIPPING_PICKUP_LOCATION env variable.
+/// Multi-warehouse ready from day one.
+model FulfillmentLocation {
+  id   String @id @default(cuid())
+  name String @unique // e.g. "Main Studio Workshop", "Bengaluru Dispatch Center"
+
+  /// Provider's pickup location name/code (e.g. Shiprocket's pickup address name)
+  providerCode String?
+
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  pincode      String
+  country      String  @default("India")
+  phone        String
+  email        String?
+
+  isDefault Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shipments Shipment[]
+
+  @@index([isDefault])
+  @@index([isActive])
+  @@map("fulfillment_locations")
 }
 
 // ─────────────────────────────────────────────

@@ -19,7 +19,7 @@ eventDispatcher.on(ShipmentEvents.CREATED, async ({ order, shipment }: any) => {
 
 eventDispatcher.on(ShipmentEvents.SHIPPED, async ({ order, shipment }: any) => {
   logger.info(
-    { orderId: order.id, shipmentId: shipment.id, trackingNumber: shipment.trackingNumber },
+    { orderId: order.id, shipmentId: shipment.id, awb: shipment.externalAwbNumber },
     'Event Listener: shipment.shipped'
   );
   orderNotifications.onOrderShipped(order, shipment).catch((err) => {

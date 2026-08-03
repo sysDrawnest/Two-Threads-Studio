@@ -16,11 +16,11 @@ export function shipmentCreatedTemplate(order: any, shipment: any): string {
       </div>
       <div class="order-row">
         <span class="order-label">Tracking Number</span>
-        <span class="order-value" style="font-family:monospace">${shipment.trackingNumber || 'Pending'}</span>
+        <span class="order-value" style="font-family:monospace">${shipment.externalAwbNumber || 'Pending'}</span>
       </div>
       <div class="order-row">
-        <span class="order-label">Carrier</span>
-        <span class="order-value">${shipment.carrier || 'To be assigned'}</span>
+        <span class="order-label">Logistics Partner</span>
+        <span class="order-value">${shipment.courierName || 'To be assigned'}</span>
       </div>
       ${shipment.estimatedDelivery ? `
       <div class="order-row">

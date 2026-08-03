@@ -25,6 +25,18 @@ const envSchema = z.object({
   LOG_HTTP_BODY: z.string().default('false').transform((v) => v === 'true'),
   LOG_HEADERS: z.string().default('false').transform((v) => v === 'true'),
   LOG_PRETTY: z.string().default('true').transform((v) => v === 'true'),
+
+  // ─── Shipping Engine (Phase 6) ──────────────────────────────────────────
+  SHIPPING_PROVIDER: z
+    .enum(['mock', 'shiprocket', 'delhivery', 'nimbuspost'])
+    .default('mock'),
+
+  // Shiprocket credentials (required only when SHIPPING_PROVIDER=shiprocket)
+  SHIPROCKET_EMAIL:           z.string().email().optional(),
+  SHIPROCKET_PASSWORD:        z.string().optional(),
+  SHIPROCKET_CHANNEL_ID:      z.string().optional(),
+  SHIPROCKET_PICKUP_LOCATION: z.string().default('Primary'),
+  SHIPROCKET_WEBHOOK_SECRET:  z.string().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);
