@@ -64,23 +64,46 @@ const startServer = async () => {
     });
 
     // Graceful Shutdown
-    const gracefulShutdown = async () => {
-      logger.info('🛑 Received kill signal, shutting down gracefully...');
+    const gracefulShutdown = async (signal: string) => {
+      logger.info(`🛑 Received ${signal}, shutting down gracefully...`);
+      
+      // Close idle and active HTTP connections immediately so server.close doesn't hang
+      if (typeof server.closeIdleConnections === 'function') {
+        server.closeIdleConnections();
+      }
+      if (typeof server.closeAllConnections === 'function') {
+        server.closeAllConnections();
+      }
+
       server.close(async () => {
-        logger.info('💤 Closed out remaining connections');
-        await prisma.$disconnect();
-        process.exit(0);
+        logger.info('💤 Closed out remaining HTTP connections');
+        try {
+          await prisma.$disconnect();
+          logger.info('💤 Disconnected Prisma client');
+        } catch (e) {
+          logger.error({ err: e }, 'Error disconnecting Prisma');
+        }
+        if (signal === 'SIGUSR2') {
+          process.kill(process.pid, 'SIGUSR2');
+        } else {
+          process.exit(0);
+        }
       });
 
-      // Force shutdown after 10 seconds
+      // Force shutdown fallback after 3 seconds
       setTimeout(() => {
-        logger.error('⚠️ Could not close connections in time, forcefully shutting down');
-        process.exit(1);
-      }, 10000);
+        logger.warn('⚠️ Forcefully shutting down server process');
+        if (signal === 'SIGUSR2') {
+          process.kill(process.pid, 'SIGUSR2');
+        } else {
+          process.exit(1);
+        }
+      }, 3000);
     };
 
-    process.on('SIGTERM', gracefulShutdown);
-    process.on('SIGINT', gracefulShutdown);
+    process.once('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.once('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.once('SIGUSR2', () => gracefulShutdown('SIGUSR2'));
 
   } catch (error) {
     logger.error({ err: error }, '❌ Failed to start server or connect to database');

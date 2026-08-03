@@ -8,19 +8,19 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const connectionString = env.DATABASE_URL;
 const pool = new Pool({
   connectionString,
-  max: 20,
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 15000,
+  max: env.NODE_ENV === 'development' ? 10 : 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
   keepAlive: true,
-  keepAliveInitialDelayMillis: 10000,
+  keepAliveInitialDelayMillis: 5000,
+  ssl: { rejectUnauthorized: false },
 });
 
 pool.on('error', (err) => {
-  logger.warn({ errorMsg: err.message }, '[PostgreSQL Pool] Idle connection reset handled by pool');
+  logger.warn({ errorMsg: err.message }, '[PostgreSQL Pool] Connection error handled cleanly');
 });
 
 const adapter = new PrismaPg(pool);
-
 const prismaConfig: any = { adapter };
 if (env.NODE_ENV === 'development') {
   prismaConfig.log = [{ emit: 'event', level: 'query' }];
