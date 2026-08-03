@@ -121,16 +121,9 @@ export const DynamicReturnStepper: React.FC<Props> = ({ returnRequest, isDigital
       timestamp: formatDate(returnRequest.refundProcessedAt || returnRequest.requestedAt),
     },
     {
-      id: 'SENT_TO_BANK',
-      label: 'Sent to Bank',
-      description: 'Payment network processing bank transfer (3–7 days)',
-      icon: CreditCard,
-      timestamp: status === 'REFUNDED' || status === 'REFUND_PROCESSING' ? 'Processing with Bank' : null,
-    },
-    {
       id: 'REFUNDED',
-      label: 'Bank Credit Completed',
-      description: 'Funds credited successfully to customer account',
+      label: 'Refund Processed',
+      description: 'Refund processed successfully',
       icon: Check,
       timestamp: formatDate(returnRequest.resolvedAt),
     },
