@@ -58,9 +58,21 @@ const Login: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-[#fef8f3]/30 to-[#1d1b19]/20"></div>
       </div>
 
-      {/* Main Container */}
+      {/* Main Container for Tag + Modal to manage positioning */}
       <div className="relative z-10 flex items-center justify-center max-w-4xl w-full mx-auto">
         
+        {/* Luxury Brand Welcome Banner (Desktop Left Card) */}
+        <div className="hidden lg:flex flex-col justify-center w-[320px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-l-xl p-8 shadow-xl relative z-20 -mr-4 my-6">
+          <div className="space-y-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c] mx-auto">
+              ✨
+            </div>
+            <h3 className="font-serif text-[24px] leading-tight text-[#5c4a3e] font-semibold italic">
+              "Every stitch<br />has a story."
+            </h3>
+          </div>
+        </div>
+
         {/* Glassmorphism Login Modal */}
         <div className="relative w-[92%] sm:w-full max-w-[480px] bg-white/70 backdrop-blur-md border border-white/40 shadow-2xl rounded-xl py-6 px-5 sm:p-8 md:p-12 z-10 overflow-hidden">
           
@@ -70,21 +82,21 @@ const Login: React.FC = () => {
           {/* Graphic: Needle and Thread */}
           <div className="relative h-12 sm:h-24 w-full mb-1 sm:mb-2 pointer-events-none flex items-center justify-center">
              <svg width="100%" height="100%" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
-               {/* Thread Path */}
-               <path 
-                 d="M30 70 C 60 10, 140 10, 160 50 C 180 90, 260 90, 270 30" 
-                 stroke="#d4af37" 
-                 strokeWidth="1.5" 
-                 fill="none" 
-                 className="animate-pulse"
-                 style={{ filter: 'drop-shadow(0px 2px 4px rgba(212,175,55,0.3))' }}
-               />
-               {/* Oscillating Needle */}
-               <g className="animate-oscillate" style={{ transformOrigin: '35px 65px' }}>
-                 <path d="M25 80 L 45 35 L 47 36 L 27 81 Z" fill="#7f756f" />
-                 <path d="M45 35 L 55 15 C 57 11, 52 10, 50 14 L 47 36 Z" fill="#a3968e" />
-                 <ellipse cx="51" cy="20" rx="1" ry="4" fill="#f5f0eb" transform="rotate(-25 51 20)" />
-               </g>
+                {/* Thread Path */}
+                <path 
+                  d="M30 70 C 60 10, 140 10, 160 50 C 180 90, 260 90, 270 30" 
+                  stroke="#d4af37" 
+                  strokeWidth="1.5" 
+                  fill="none" 
+                  className="animate-pulse"
+                  style={{ filter: 'drop-shadow(0px 2px 4px rgba(212,175,55,0.3))' }}
+                />
+                {/* Oscillating Needle */}
+                <g className="animate-oscillate" style={{ transformOrigin: '35px 65px' }}>
+                  <path d="M25 80 L 45 35 L 47 36 L 27 81 Z" fill="#7f756f" />
+                  <path d="M45 35 L 55 15 C 57 11, 52 10, 50 14 L 47 36 Z" fill="#a3968e" />
+                  <ellipse cx="51" cy="20" rx="1" ry="4" fill="#f5f0eb" transform="rotate(-25 51 20)" />
+                </g>
              </svg>
           </div>
 
@@ -93,8 +105,8 @@ const Login: React.FC = () => {
             <h2 className="font-serif text-[22px] sm:text-[28px] md:text-[32px] leading-tight text-[#8b6f5c] font-medium drop-shadow-sm mb-2">
               Welcome Back
             </h2>
-            <p className="font-sans text-xs text-[#78675c]">
-              Sign in to your Studio Account
+            <p className="font-sans text-xs text-[#78675c] italic">
+              "Every stitch has a story."
             </p>
           </div>
 
