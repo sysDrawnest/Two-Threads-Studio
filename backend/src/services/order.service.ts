@@ -190,9 +190,19 @@ export const orderService = {
 
       const subtotal = calculatedSubtotal;
       const discount = params.couponDiscount || 0;
-      const shipping = 0;
+      const discountedSubtotal = Math.max(0, subtotal - discount);
+      
+      let shipping = 0;
+      if (discountedSubtotal < 2000) {
+        shipping = 149;
+      } else if (discountedSubtotal < 5000) {
+        shipping = 99;
+      } else {
+        shipping = 0;
+      }
+
       const tax = 0;
-      const grandTotal = Math.max(0, subtotal - discount);
+      const grandTotal = Math.max(0, discountedSubtotal + shipping + tax);
 
       // Create Order
       const order = await tx.order.create({
