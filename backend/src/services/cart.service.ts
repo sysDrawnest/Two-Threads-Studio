@@ -138,8 +138,20 @@ export const cartService = {
     // Calculate totals
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     const discount = 0; // future-ready placeholder
-    const shipping = 0; // future-ready placeholder
-    const tax = 0; // future-ready placeholder
+    
+    // Tier-based shipping: <2k = ₹149, 2k-5k = ₹99, 5k+ = FREE
+    let shipping = 0;
+    if (subtotal > 0) {
+      if (subtotal < 2000) {
+        shipping = 149;
+      } else if (subtotal < 5000) {
+        shipping = 99;
+      } else {
+        shipping = 0;
+      }
+    }
+
+    const tax = 0; // Inclusive GST
     const grandTotal = Math.max(0, subtotal - discount + shipping + tax);
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
