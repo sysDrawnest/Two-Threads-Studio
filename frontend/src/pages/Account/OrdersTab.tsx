@@ -458,35 +458,45 @@ export const OrdersTab: React.FC = () => {
               const isDigital = selectedOrder.items?.every((item: any) => item.product?.type === 'DIGITAL') ?? false;
 
               return (
-                <div className="space-y-4">
-                  {/* Dynamic Multi-Stage Visual Stepper */}
-                  <DynamicReturnStepper returnRequest={activeReturn} isDigital={isDigital} />
+                <details className="group bg-rose-50/30 p-6 rounded-xl border border-rose-100/50 space-y-6" open>
+                  <summary className="text-md font-bold text-neutral-900 cursor-pointer list-none flex items-center justify-between select-none">
+                    <div className="flex items-center gap-2">
+                      <RotateCcw className="w-5 h-5 text-rose-600" />
+                      Return Tracking Journey
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-neutral-400 transition-transform group-open:rotate-90" />
+                  </summary>
 
-                  {/* Return Shipment Tracking Card */}
-                  <ReturnTrackingCard
-                    courierPartner={activeReturn.courierPartner}
-                    trackingNumber={activeReturn.trackingNumber}
-                    trackingUrl={activeReturn.trackingUrl}
-                    pickupScheduledAt={activeReturn.pickupScheduledAt}
-                    estimatedDelivery={activeReturn.estimatedDelivery}
-                    pickupStatus={activeReturn.pickupStatus}
-                  />
+                  <div className="mt-6 space-y-4">
+                    {/* Dynamic Multi-Stage Visual Stepper */}
+                    <DynamicReturnStepper returnRequest={activeReturn} isDigital={isDigital} />
 
-                  {/* Refund Receipt Card (if refunded or refund processing) */}
-                  {(activeReturn.status === 'REFUNDED' || activeReturn.status === 'REFUND_PROCESSING' || activeReturn.finalRefundAmount) && (
-                    <RefundReceiptCard
-                      refundAmount={Number(activeReturn.finalRefundAmount || activeReturn.approvedAmount || selectedOrder.grandTotal)}
-                      refundId={(activeReturn as any).razorpayRefundId || activeReturn.refundId}
-                      paymentMethod={selectedOrder.paymentMethod}
-                      refundProcessedAt={activeReturn.refundProcessedAt || activeReturn.resolvedAt}
-                      status={activeReturn.status}
-                      bankReferenceNumber={(activeReturn as any).bankReferenceNumber}
+                    {/* Return Shipment Tracking Card */}
+                    <ReturnTrackingCard
+                      courierPartner={activeReturn.courierPartner}
+                      trackingNumber={activeReturn.trackingNumber}
+                      trackingUrl={activeReturn.trackingUrl}
+                      pickupScheduledAt={activeReturn.pickupScheduledAt}
+                      estimatedDelivery={activeReturn.estimatedDelivery}
+                      pickupStatus={activeReturn.pickupStatus}
                     />
-                  )}
 
-                  {/* Chronological Activity Feed */}
-                  <ReturnActivityFeed timeline={activeReturn.timeline} />
-                </div>
+                    {/* Refund Receipt Card (if refunded or refund processing) */}
+                    {(activeReturn.status === 'REFUNDED' || activeReturn.status === 'REFUND_PROCESSING' || activeReturn.finalRefundAmount) && (
+                      <RefundReceiptCard
+                        refundAmount={Number(activeReturn.finalRefundAmount || activeReturn.approvedAmount || selectedOrder.grandTotal)}
+                        refundId={(activeReturn as any).razorpayRefundId || activeReturn.refundId}
+                        paymentMethod={selectedOrder.paymentMethod}
+                        refundProcessedAt={activeReturn.refundProcessedAt || activeReturn.resolvedAt}
+                        status={activeReturn.status}
+                        bankReferenceNumber={(activeReturn as any).bankReferenceNumber}
+                      />
+                    )}
+
+                    {/* Chronological Activity Feed */}
+                    <ReturnActivityFeed timeline={activeReturn.timeline} />
+                  </div>
+                </details>
               );
             })()
           ) : (selectedOrder.orderStatus === 'RETURN_REQUESTED' || selectedOrder.orderStatus === 'RETURNED') ? (
