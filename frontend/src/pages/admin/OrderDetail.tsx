@@ -16,6 +16,10 @@ export const OrderDetail: React.FC = () => {
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [isRefunding, setIsRefunding] = useState(false);
+  const [isOverrideModalOpen, setIsOverrideModalOpen] = useState(false);
+  const [selectedRefundId, setSelectedRefundId] = useState('');
+  const [overrideReasonInput, setOverrideReasonInput] = useState('');
+  const [isOverriding, setIsOverriding] = useState(false);
 
   const order = orderResponse?.order || orderResponse?.data;
 
@@ -55,11 +59,6 @@ export const OrderDetail: React.FC = () => {
       setIsRefunding(false);
     }
   };
-
-  const [isOverrideModalOpen, setIsOverrideModalOpen] = useState(false);
-  const [selectedRefundId, setSelectedRefundId] = useState('');
-  const [overrideReasonInput, setOverrideReasonInput] = useState('');
-  const [isOverriding, setIsOverriding] = useState(false);
 
   const handleRetryRefund = async (refundId: string) => {
     try {
