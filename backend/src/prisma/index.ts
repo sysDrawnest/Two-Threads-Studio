@@ -9,9 +9,16 @@ const connectionString = env.DATABASE_URL;
 const pool = new Pool({
   connectionString,
   max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 15000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
+
+pool.on('error', (err) => {
+  logger.warn({ errorMsg: err.message }, '[PostgreSQL Pool] Idle connection reset handled by pool');
+});
+
 const adapter = new PrismaPg(pool);
 
 const prismaConfig: any = { adapter };
