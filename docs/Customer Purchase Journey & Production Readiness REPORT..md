@@ -306,3 +306,23 @@ Applying the prioritized fixes documented in Section 14 will resolve all blockin
 | **11**| Email Verification | 🔴 FAIL | Resend API key & sender domain restriction error |
 | **12**| Admin Verification | 🟢 PASS | Admin orders & payment tracking operate correctly |
 | **13**| Error Investigation | 🔴 FAIL | Multiple architectural bugs documented for remediation |
+
+
+
+```mermaid
+flowchart TD
+    A[Phase 1: Login] -->|PASS| B[Phase 2: Product Discovery]
+    B -->|PASS| C[Phase 3: Cart Management]
+    C -->|PASS| D[Phase 4: Checkout Entry]
+    D -->|PASS| E[Phase 5: Address Management]
+    E -->|FAIL - Zod Schema Mismatch| F[Phase 6: Shipping Methods]
+    F -->|PASS| G[Phase 7: Order Summary Math]
+    G -->|PASS| H[Phase 8: Coupon System]
+    H -->|FAIL - Zod Schema Mismatch| I[Phase 9: Payment Gateway]
+    I -->|FAIL - Secret Env Name Mismatch| J[Phase 10: Order Creation]
+    J -->|FAIL - Dependent on Address/Payment| K[Phase 11: Email Notifications]
+    K -->|FAIL - Resend API Key/Domain Error| L[Phase 12: Admin Dashboard]
+    L -->|PASS| M[Phase 13: QA Report & Synthesis]
+```
+
+---
