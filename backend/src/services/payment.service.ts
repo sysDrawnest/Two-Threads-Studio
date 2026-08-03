@@ -367,7 +367,7 @@ export const paymentService = {
     const payment = await paymentRepository.findById(paymentId);
     if (!payment) throw new AppError('Payment not found', HTTP_STATUS.NOT_FOUND);
 
-    const isOnline = payment.method === PaymentMethod.ONLINE && Boolean(payment.providerPaymentId);
+    const isOnline = Boolean(payment.providerPaymentId) && payment.provider === 'RAZORPAY';
     const refundAmountActual = amount || Number(payment.amount);
     const refundAmountPaise = Math.round(refundAmountActual * 100);
 
