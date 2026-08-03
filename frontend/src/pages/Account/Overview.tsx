@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen } from 'lucide-react';
 
 interface OverviewProps {
-  setActiveTab?: (tab: string) => void;
+  setActiveTab?: (tab: string, extraParams?: Record<string, string>) => void;
 }
 
 export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
@@ -84,7 +84,10 @@ export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
                 </div>
               </div>
 
-              <button className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-[#1C1C1B] border-b border-[#1C1C1B] pb-1 w-fit hover:text-[#A34A38] hover:border-[#A34A38] transition-colors mt-8">
+              <button 
+                onClick={() => setActiveTab?.('orders', { orderId: latestOrder.id })}
+                className="flex items-center gap-2 font-sans text-xs uppercase tracking-widest text-[#1C1C1B] border-b border-[#1C1C1B] pb-1 w-fit hover:text-[#A34A38] hover:border-[#A34A38] transition-colors mt-8"
+              >
                 Track Commission <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

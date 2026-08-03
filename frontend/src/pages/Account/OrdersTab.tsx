@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package,
@@ -53,6 +54,9 @@ const RETURN_REASONS = [
 ] as const;
 
 export const OrdersTab: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const orderIdFromUrl = searchParams.get('orderId');
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,20 +123,41 @@ export const OrdersTab: React.FC = () => {
     fetchUserReviews();
   }, []);
 
-  const handleSelectOrder = async (orderId: string) => {
+  const handleSelectOrder = async (orderId: string, updateUrl = true) => {
     try {
       setLoading(true);
       setShipment(null);
       setShowTrackingPanel(false);
+      if (updateUrl) {
+        setSearchParams({ tab: 'orders', orderId });
+      }
       const res = await orderService.getOrderById(orderId);
       if (res.success) {
         setSelectedOrder(res.order);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to retrieve order details');
+      if (updateUrl) {
+        setSearchParams({ tab: 'orders' });
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (orderIdFromUrl) {
+      handleSelectOrder(orderIdFromUrl, false);
+    } else {
+      setSelectedOrder(null);
+    }
+  }, [orderIdFromUrl]);
+
+  const handleBackToHistory = () => {
+    setSelectedOrder(null);
+    setShowTrackingPanel(false);
+    setShipment(null);
+    setSearchParams({ tab: 'orders' });
   };
 
   const handleDownloadInvoice = async (order: Order) => {
@@ -284,7 +309,7 @@ export const OrdersTab: React.FC = () => {
           {/* Detail Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-6">
             <button
-              onClick={() => { setSelectedOrder(null); setShowTrackingPanel(false); setShipment(null); }}
+              onClick={handleBackToHistory}
               className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 transition-colors self-start"
             >
               <ChevronLeft className="w-4 h-4" />

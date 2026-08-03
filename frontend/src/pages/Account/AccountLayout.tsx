@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import StudioNavigation from './StudioNavigation';
 import Overview from './Overview';
 import Profile from './Profile';
@@ -11,8 +12,13 @@ import OrdersTab from './OrdersTab';
 import { useAuth } from '../../context/AuthContext';
 
 export const AccountLayout: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
   const { logout } = useAuth();
+
+  const setActiveTab = (tab: string, extraParams?: Record<string, string>) => {
+    setSearchParams({ tab, ...(extraParams || {}) });
+  };
 
   const renderContent = () => {
     switch (activeTab) {
