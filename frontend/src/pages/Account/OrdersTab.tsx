@@ -44,13 +44,11 @@ const RETURN_REASONS = [
   { value: 'DAMAGED', label: 'Item arrived damaged' },
   { value: 'WRONG_PRODUCT', label: 'Wrong item received' },
   { value: 'DEFECTIVE', label: 'Item is defective' },
-  { value: 'NOT_AS_DESCRIBED', label: 'Does not match description' },
   { value: 'SIZE_ISSUE', label: 'Size issue' },
   { value: 'COLOR_DIFFERENCE', label: 'Color difference' },
   { value: 'QUALITY_ISSUE', label: 'Quality not as expected' },
   { value: 'MISSING_PARTS', label: 'Missing parts or accessories' },
-  { value: 'CHANGED_MIND', label: 'Changed my mind' },
-  { value: 'OTHER', label: 'Other' },
+  { value: 'OTHER', label: 'Other (Please specify)' },
 ] as const;
 
 export const OrdersTab: React.FC = () => {
