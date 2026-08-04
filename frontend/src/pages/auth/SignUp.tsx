@@ -62,14 +62,14 @@ const Signup: React.FC = () => {
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center p-6 md:p-8 overflow-hidden font-sans">
       
-      {/* Top Right Home Link */}
-      <div className="absolute top-6 right-6 z-30">
+      {/* Top Left Home Link */}
+      <div className="absolute top-6 left-6 z-30">
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FAF8F5]/90 hover:bg-[#FAF8F5] text-[#5c4a3e] hover:text-[#1d1b19] font-serif text-xs font-semibold tracking-wider uppercase backdrop-blur-md border border-[#d2c4bc]/60 shadow-md transition-all hover:shadow-lg hover:-translate-y-[1px]"
         >
-          <span>Home</span>
           <Home className="w-3.5 h-3.5 text-[#8b6f5c]" />
+          <span>Home</span>
         </Link>
       </div>
 
@@ -259,6 +259,15 @@ const Signup: React.FC = () => {
         </div>
 
 
+      </div>
+
+      {/* Subtle Footer Links */}
+      <div className="absolute bottom-6 right-6 z-10 flex gap-3 text-[11px] font-serif text-[#fef8f3]/90 drop-shadow-md hidden sm:flex">
+        <Link to="/about" className="hover:text-white transition-colors">Our Story</Link>
+        <span className="opacity-50">|</span>
+        <Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link>
+        <span className="opacity-50">|</span>
+        <Link to="/community" className="hover:text-white transition-colors">Community</Link>
       </div>
 
     </div>
