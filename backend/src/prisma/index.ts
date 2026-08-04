@@ -8,11 +8,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 const connectionString = env.DATABASE_URL;
 const pool = new Pool({
   connectionString,
-  max: env.NODE_ENV === 'development' ? 10 : 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  max: 10,
+  idleTimeoutMillis: 5000, // Evict idle connections in 5s before Supabase PgBouncer drops them
+  connectionTimeoutMillis: 30000, // 30s timeout for new connections to handle pooler latency spikes
   keepAlive: true,
-  keepAliveInitialDelayMillis: 5000,
+  keepAliveInitialDelayMillis: 2000,
   ssl: { rejectUnauthorized: false },
 });
 
