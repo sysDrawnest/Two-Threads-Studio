@@ -1,6 +1,6 @@
 # Master QA Report & Production Readiness Audit
 
-**Application**: Two Threads Studio (React 18 + Express.js 5 + Prisma 7.8 + PostgreSQL + Razorpay + Resend + Shiprocket)  
+**Application**: Two Threads Studio (React 18 + Express.js 5 + Prisma 7.8 + PostgreSQL + Razorpay + Resend + IThink Logistics)  
 **Audit Date**: August 3, 2026  
 **Status**: 🟢 **READY FOR PRODUCTION**  
 **Overall Readiness Score**: **100 / 100**  
@@ -23,7 +23,7 @@ All previously identified blocking bugs (Validation Middleware Zod Mismatch, Raz
 | **Backend REST API** | Express.js 5 + TypeScript + Node v22 (`http://localhost:5000/api/v1`) | 🟢 Active |
 | **Database & ORM** | Supabase PostgreSQL via Prisma ORM 7.8 (Adapter-PG Pooler) | 🟢 Connected |
 | **Payment Gateway** | Razorpay SDK (Sandbox: `rzp_test_TIl1fikHtjL2UO`) | 🟢 Verified |
-| **Logistics Integration** | Shiprocket Automated Logistics API | 🟢 Configured |
+| **Logistics Integration** | IThink Logistics Provider (Provider Abstraction Layer) | 🟢 Configured |
 | **Transactional Email** | Resend API SDK + PDF Invoice Generation Engine | 🟢 Dispatching |
 | **Cron & Reconciliation** | Cluster-Safe Single-Worker Lock Engine (`CronJobLock`) | 🟢 Active |
 
