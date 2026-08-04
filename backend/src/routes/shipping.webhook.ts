@@ -23,7 +23,7 @@ import logger from '../lib/logger';
 import prisma from '../prisma';
 import { mapProviderStatus } from '../providers/shipping/interfaces/ShipmentStatusMapper';
 import type { SupportedProviderKey } from '../providers/shipping/interfaces/ShipmentStatusMapper';
-import { ShipmentStatus } from '@prisma/client';
+import { ShipmentStatus, OrderStatus } from '@prisma/client';
 
 const router = Router();
 
@@ -77,18 +77,32 @@ async function processShiprocketWebhook(body: any): Promise<void> {
 
   const now = new Date(body.timestamp ?? Date.now());
 
-  // Append timeline event
-  await prisma.shipmentTimeline.create({
-    data: {
+  // Deduplication check: skip if identical event logged within last 60 seconds
+  const recentDuplicate = await prisma.shipmentTimeline.findFirst({
+    where: {
       shipmentId: shipment.id,
       status: internalStatus,
-      location: location ?? undefined,
       description: rawStatus,
-      source: 'WEBHOOK',
-      raw: body,
-      occurredAt: now,
+      occurredAt: { gte: new Date(Date.now() - 60_000) },
     },
   });
+
+  if (recentDuplicate) {
+    logger.info({ awb, rawStatus }, '[ShippingWebhook] Duplicate event within 60s — skipping timeline record');
+  } else {
+    // Append timeline event
+    await prisma.shipmentTimeline.create({
+      data: {
+        shipmentId: shipment.id,
+        status: internalStatus,
+        location: location ?? undefined,
+        description: rawStatus,
+        source: 'WEBHOOK',
+        raw: body,
+        occurredAt: now,
+      },
+    });
+  }
 
   // Update shipment status
   const deliveredAt =
@@ -107,15 +121,110 @@ async function processShiprocketWebhook(body: any): Promise<void> {
     },
   });
 
+  // Sync Order.orderStatus with shipment status
+  if (internalStatus === 'DELIVERED') {
+    await prisma.order.update({
+      where: { id: shipment.orderId },
+      data: { orderStatus: OrderStatus.DELIVERED },
+    }).catch(() => {});
+  } else if (internalStatus === 'PICKED_UP' || internalStatus === 'IN_TRANSIT') {
+    await prisma.order.update({
+      where: { id: shipment.orderId },
+      data: { orderStatus: OrderStatus.SHIPPED },
+    }).catch(() => {});
+  }
+
   logger.info(
     { awb, rawStatus, internalStatus, shipmentId: shipment.id },
     '[ShippingWebhook] Processed Shiprocket event'
   );
 }
 
+async function processIThinkWebhook(body: any): Promise<void> {
+  const awb: string | undefined = body.waybill_number || body.awb_number || body.awb;
+  const rawStatus: string | undefined = body.current_status || body.status;
+
+  if (!awb || !rawStatus) {
+    logger.warn({ body }, '[ShippingWebhook] Missing awb or status in IThink payload');
+    return;
+  }
+
+  const shipment = await prisma.shipment.findUnique({
+    where: { externalAwbNumber: awb },
+  });
+
+  if (!shipment) {
+    logger.warn({ awb }, '[ShippingWebhook] No shipment found for IThink AWB');
+    return;
+  }
+
+  const internalStatus = mapProviderStatus('ithink', rawStatus);
+  const location: string | undefined = body.location || body.current_location;
+  const now = new Date();
+
+  // Deduplication check
+  const recentDuplicate = await prisma.shipmentTimeline.findFirst({
+    where: {
+      shipmentId: shipment.id,
+      status: internalStatus,
+      description: rawStatus,
+      occurredAt: { gte: new Date(Date.now() - 60_000) },
+    },
+  });
+
+  if (!recentDuplicate) {
+    await prisma.shipmentTimeline.create({
+      data: {
+        shipmentId: shipment.id,
+        status: internalStatus,
+        location: location ?? undefined,
+        description: rawStatus,
+        source: 'WEBHOOK',
+        raw: body,
+        occurredAt: now,
+      },
+    });
+  }
+
+  const deliveredAt = internalStatus === 'DELIVERED' ? now : shipment.deliveredAt;
+  const shippedAt = internalStatus === 'PICKED_UP' || internalStatus === 'IN_TRANSIT' ? (shipment.shippedAt ?? now) : shipment.shippedAt;
+
+  await prisma.shipment.update({
+    where: { id: shipment.id },
+    data: {
+      status: internalStatus as ShipmentStatus,
+      shippedAt: shippedAt ?? undefined,
+      deliveredAt: deliveredAt ?? undefined,
+    },
+  });
+
+  if (internalStatus === 'DELIVERED') {
+    await prisma.order.update({
+      where: { id: shipment.orderId },
+      data: { orderStatus: OrderStatus.DELIVERED },
+    }).catch(() => {});
+  } else if (internalStatus === 'PICKED_UP' || internalStatus === 'IN_TRANSIT') {
+    await prisma.order.update({
+      where: { id: shipment.orderId },
+      data: { orderStatus: OrderStatus.SHIPPED },
+    }).catch(() => {});
+  }
+
+  logger.info({ awb, rawStatus, internalStatus, shipmentId: shipment.id }, '[ShippingWebhook] Processed IThink event');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Routes
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** POST /api/v1/webhooks/shipping/ithink */
+router.post('/ithink', async (req: Request, res: Response) => {
+  res.status(200).json({ received: true });
+
+  processIThinkWebhook(req.body).catch((err) => {
+    logger.error({ err }, '[ShippingWebhook] Error processing IThink webhook');
+  });
+});
 
 /** POST /api/v1/webhooks/shipping/shiprocket */
 router.post('/shiprocket', async (req: Request, res: Response) => {

@@ -16,9 +16,10 @@
 
 import type { ShippingProvider } from './interfaces/ShippingProvider';
 import { mockShippingProvider } from './mock/MockShippingProvider';
+import { ithinkProvider } from './ithink/IThinkProvider';
 import { shiprocketProvider } from './shiprocket/ShiprocketProvider';
 
-export type ShippingProviderName = 'mock' | 'shiprocket' | 'delhivery' | 'nimbuspost';
+export type ShippingProviderName = 'mock' | 'ithink' | 'shiprocket' | 'delhivery' | 'nimbuspost';
 
 export function getShippingProvider(
   name: ShippingProviderName = (process.env['SHIPPING_PROVIDER'] as ShippingProviderName) || 'mock'
@@ -26,6 +27,8 @@ export function getShippingProvider(
   switch (name) {
     case 'mock':
       return mockShippingProvider;
+    case 'ithink':
+      return ithinkProvider;
     case 'shiprocket':
       return shiprocketProvider;
 

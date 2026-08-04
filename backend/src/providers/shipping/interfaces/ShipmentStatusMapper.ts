@@ -67,6 +67,31 @@ export const SHIPROCKET_STATUS_MAP: Record<string, InternalShipmentStatus> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// IThink Logistics Status Map
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const ITHINK_STATUS_MAP: Record<string, InternalShipmentStatus> = {
+  'ORDER PLACED': 'PENDING',
+  'SHIPMENT CREATED': 'PACKING',
+  'MANIFESTED': 'PACKING',
+  'PICKUP SCHEDULED': 'PICKUP_SCHEDULED',
+  'PICKED UP': 'PICKED_UP',
+  'OUT FOR PICKUP': 'PICKUP_SCHEDULED',
+  'IN TRANSIT': 'IN_TRANSIT',
+  'IN-TRANSIT': 'IN_TRANSIT',
+  'REACHED AT HUB': 'IN_TRANSIT',
+  'OUT FOR DELIVERY': 'OUT_FOR_DELIVERY',
+  'DELIVERED': 'DELIVERED',
+  'UNDELIVERED': 'FAILED_DELIVERY',
+  'DELIVERY FAILED': 'FAILED_DELIVERY',
+  'CANCELLED': 'CANCELLED',
+  'CANCELED': 'CANCELLED',
+  'RTO INITIATED': 'RETURN_REQUESTED',
+  'RTO IN TRANSIT': 'RETURN_IN_TRANSIT',
+  'RTO DELIVERED': 'RETURN_RECEIVED',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Delhivery Status Map (placeholder — extend when adapter is added)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -83,9 +108,10 @@ export const DELHIVERY_STATUS_MAP: Record<string, InternalShipmentStatus> = {
 // Factory function — resolve a status string for a given provider
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type SupportedProviderKey = 'shiprocket' | 'delhivery' | 'mock';
+export type SupportedProviderKey = 'ithink' | 'shiprocket' | 'delhivery' | 'mock';
 
 const STATUS_MAPS: Record<SupportedProviderKey, Record<string, InternalShipmentStatus>> = {
+  ithink: ITHINK_STATUS_MAP,
   shiprocket: SHIPROCKET_STATUS_MAP,
   delhivery: DELHIVERY_STATUS_MAP,
   mock: {},

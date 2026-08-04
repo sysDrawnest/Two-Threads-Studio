@@ -38,7 +38,7 @@ export const ReturnTrackingCard: React.FC<Props> = ({
     }
   };
 
-  const defaultTrackingUrl = trackingUrl || (trackingNumber ? `https://track.shiprocket.in/${trackingNumber}` : undefined);
+  const defaultTrackingUrl = trackingUrl || (trackingNumber ? `https://ithinklogistics.com/track/${trackingNumber}` : undefined);
 
   return (
     <div className="bg-[#FAF8F5] border border-[#e8d7c8] rounded-xl p-5 mb-6 shadow-sm">

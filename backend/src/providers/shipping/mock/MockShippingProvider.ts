@@ -71,7 +71,7 @@ const MOCK_CAPABILITIES: ShippingCapabilities = {
   supportsRateEstimation: true,
   supportsServiceabilityCheck: true,
   supportsCancellation: true,
-  supportsWebhook: false,
+  supportsWebhook: true,
   supportsCourierRecommendation: true,
   supportsNDR: false,
 };

@@ -28,8 +28,14 @@ const envSchema = z.object({
 
   // ─── Shipping Engine (Phase 6) ──────────────────────────────────────────
   SHIPPING_PROVIDER: z
-    .enum(['mock', 'shiprocket', 'delhivery', 'nimbuspost'])
+    .enum(['mock', 'ithink', 'shiprocket', 'delhivery', 'nimbuspost'])
     .default('mock'),
+
+  // IThink Logistics credentials (required when SHIPPING_PROVIDER=ithink)
+  ITHINK_ACCESS_TOKEN:        z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_SECRET_KEY:          z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_PICKUP_LOCATION:     z.string().default('Primary'),
+  ITHINK_WEBHOOK_SECRET:      z.string().optional().or(z.literal('')).transform((v) => v || undefined),
 
   // Shiprocket credentials (required only when SHIPPING_PROVIDER=shiprocket)
   SHIPROCKET_EMAIL:           z.string().email().optional().or(z.literal('')).transform((v) => v || undefined),
@@ -37,7 +43,21 @@ const envSchema = z.object({
   SHIPROCKET_CHANNEL_ID:      z.string().optional().or(z.literal('')).transform((v) => v || undefined),
   SHIPROCKET_PICKUP_LOCATION: z.string().default('Primary'),
   SHIPROCKET_WEBHOOK_SECRET:  z.string().optional().or(z.literal('')).transform((v) => v || undefined),
-});
+}).refine(
+  (data) => {
+    if (data.SHIPPING_PROVIDER === 'ithink') {
+      return Boolean(data.ITHINK_ACCESS_TOKEN && data.ITHINK_SECRET_KEY);
+    }
+    if (data.SHIPPING_PROVIDER === 'shiprocket') {
+      return Boolean(data.SHIPROCKET_EMAIL && data.SHIPROCKET_PASSWORD);
+    }
+    return true;
+  },
+  {
+    message: 'Required shipping provider credentials missing for selected SHIPPING_PROVIDER',
+    path: ['SHIPPING_PROVIDER'],
+  }
+);
 
 const _env = envSchema.safeParse(process.env);
 

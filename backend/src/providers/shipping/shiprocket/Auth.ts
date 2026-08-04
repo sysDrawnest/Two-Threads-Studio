@@ -23,17 +23,23 @@ const TOKEN_TTL_MS = 55 * 60 * 1000;
 export class ShiprocketAuth {
   private token: string | null = null;
   private expiresAt: Date | null = null;
+  private loginPromise: Promise<void> | null = null;
 
   /**
    * Returns a valid Bearer token.
    * If the cached token is still valid, returns it immediately.
-   * Otherwise performs a login request to refresh.
+   * Otherwise performs a single-flight login request to refresh.
    */
   async getAccessToken(): Promise<string> {
     if (this.token && this.expiresAt && new Date() < this.expiresAt) {
       return this.token;
     }
-    await this.login();
+    if (!this.loginPromise) {
+      this.loginPromise = this.login().finally(() => {
+        this.loginPromise = null;
+      });
+    }
+    await this.loginPromise;
     return this.token!;
   }
 
