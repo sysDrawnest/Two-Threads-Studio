@@ -32,11 +32,11 @@ const envSchema = z.object({
     .default('mock'),
 
   // Shiprocket credentials (required only when SHIPPING_PROVIDER=shiprocket)
-  SHIPROCKET_EMAIL:           z.string().email().optional(),
-  SHIPROCKET_PASSWORD:        z.string().optional(),
-  SHIPROCKET_CHANNEL_ID:      z.string().optional(),
+  SHIPROCKET_EMAIL:           z.string().email().optional().or(z.literal('')).transform((v) => v || undefined),
+  SHIPROCKET_PASSWORD:        z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  SHIPROCKET_CHANNEL_ID:      z.string().optional().or(z.literal('')).transform((v) => v || undefined),
   SHIPROCKET_PICKUP_LOCATION: z.string().default('Primary'),
-  SHIPROCKET_WEBHOOK_SECRET:  z.string().optional(),
+  SHIPROCKET_WEBHOOK_SECRET:  z.string().optional().or(z.literal('')).transform((v) => v || undefined),
 });
 
 const _env = envSchema.safeParse(process.env);
