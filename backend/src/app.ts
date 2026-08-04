@@ -15,6 +15,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 import routes from './routes';
 import paymentWebhook from './payment/payment.webhook';
+import shippingWebhook from './routes/shipping.webhook';
 import './events';
 import { BASE_API_PATH } from './constants/api';
 import { HTTP_STATUS } from './constants/httpStatus';
@@ -35,10 +36,13 @@ app.use(cors(corsConfig));
 // Rate limiting
 app.use(BASE_API_PATH, limiter);
 
-// ── Webhook route: MUST use raw body BEFORE JSON parser ──────────────────
+// ── Webhook routes: MUST use raw body BEFORE JSON parser ─────────────────
 // Razorpay HMAC verification requires the raw Buffer body.
 // If express.json() runs first, the Buffer is destroyed.
 app.use('/webhooks', express.raw({ type: 'application/json' }), paymentWebhook);
+
+// Shipping webhooks use JSON body (Shiprocket sends JSON)
+app.use(`${BASE_API_PATH}/webhooks/shipping`, express.json(), shippingWebhook);
 
 
 // Body parser, reading data from body into req.body (10MB for rich product payloads/images)
@@ -145,3 +149,7 @@ setTimeout(() => {
     logger.error({ err: err.message }, '[Scheduler] Startup Refund reconciliation failed');
   });
 }, 10000);
+
+// 6. SHIPPING SYNC CRON
+import { registerShippingSyncCron } from './cron/shippingSync.cron';
+registerShippingSyncCron();

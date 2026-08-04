@@ -109,4 +109,93 @@ export const shipmentController = {
       next(err);
     }
   },
+
+  /** Admin: Schedule courier pickup */
+  adminSchedulePickup: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const pickupDate = req.body?.pickupDate ? new Date(req.body.pickupDate) : undefined;
+      const result = await shipmentService.schedulePickup(
+        req.params['orderId'] as string,
+        req.user!.id,
+        pickupDate
+      );
+      return successResponse(res, result, 'Pickup scheduled successfully');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Generate shipping label PDF */
+  adminGenerateLabel: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await shipmentService.generateLabel(
+        req.params['orderId'] as string,
+        req.user!.id
+      );
+      return successResponse(res, result, 'Label generated');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Generate invoice PDF */
+  adminGenerateInvoice: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await shipmentService.generateInvoice(
+        req.params['orderId'] as string,
+        req.user!.id
+      );
+      return successResponse(res, result, 'Invoice generated');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Cancel shipment */
+  adminCancelShipment: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await shipmentService.cancelShipment(
+        req.params['orderId'] as string,
+        req.user!.id,
+        req.body?.reason
+      );
+      return successResponse(res, null, 'Shipment cancelled');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Create return (reverse logistics) shipment */
+  adminCreateReturnShipment: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const shipment = await shipmentService.createReturnShipmentForOrder(
+        req.params['orderId'] as string,
+        req.user!.id
+      );
+      return successResponse(res, shipment, 'Return shipment created');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Get shipping settings */
+  adminGetSettings: async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const settings = await shipmentService.getShippingSettings();
+      return successResponse(res, settings);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** Admin: Update shipping settings */
+  adminUpdateSettings: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const settings = await shipmentService.updateShippingSettings(req.body);
+      return successResponse(res, settings, 'Shipping settings updated');
+    } catch (err) {
+      next(err);
+    }
+  },
 };
+

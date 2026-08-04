@@ -78,7 +78,14 @@ import importRoutes from './import.routes';
 
 router.use('/admin/import', importRoutes);
 
+// Shipping Engine (Provider-Agnostic Logistics)
+import { customerShipmentRouter, adminShipmentRouter } from './shipment.routes';
+
+router.use('/shipments',       customerShipmentRouter);
+router.use('/admin/shipments', adminShipmentRouter);
+
 export default router;
+
 
 
 

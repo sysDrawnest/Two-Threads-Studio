@@ -16,6 +16,7 @@
 
 import type { ShippingProvider } from './interfaces/ShippingProvider';
 import { mockShippingProvider } from './mock/MockShippingProvider';
+import { shiprocketProvider } from './shiprocket/ShiprocketProvider';
 
 export type ShippingProviderName = 'mock' | 'shiprocket' | 'delhivery' | 'nimbuspost';
 
@@ -25,10 +26,8 @@ export function getShippingProvider(
   switch (name) {
     case 'mock':
       return mockShippingProvider;
-
-    // Phase 2: ShiprocketProvider will be imported and returned here
-    // case 'shiprocket':
-    //   return shiprocketProvider;
+    case 'shiprocket':
+      return shiprocketProvider;
 
     default:
       console.warn(
