@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import bgImage from '../../assets/login,signup.png';
 
@@ -60,6 +61,17 @@ const Signup: React.FC = () => {
   return (
     <div className="min-h-screen w-full relative flex items-center justify-center p-6 md:p-8 overflow-hidden font-sans">
       
+      {/* Top Right Home Link */}
+      <div className="absolute top-6 right-6 z-30">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FAF8F5]/90 hover:bg-[#FAF8F5] text-[#5c4a3e] hover:text-[#1d1b19] font-serif text-xs font-semibold tracking-wider uppercase backdrop-blur-md border border-[#d2c4bc]/60 shadow-md transition-all hover:shadow-lg hover:-translate-y-[1px]"
+        >
+          <span>Home</span>
+          <Home className="w-3.5 h-3.5 text-[#8b6f5c]" />
+        </Link>
+      </div>
+
       {/* Immersive Background */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat animate-bg-drift"
@@ -75,13 +87,13 @@ const Signup: React.FC = () => {
       {/* Main Container */}
       <div className="relative z-10 flex items-center justify-center max-w-4xl w-full mx-auto">
         
-        {/* Luxury Brand Welcome Banner (Desktop Left Card) */}
-        <div className="hidden lg:flex flex-col justify-center w-[320px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-l-xl p-8 shadow-xl relative z-20 -mr-4 my-6">
-          <div className="space-y-4 text-center">
-            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c] mx-auto">
+        {/* Luxury Brand Welcome Banner (Desktop Left Card — Square Layout) */}
+        <div className="hidden lg:flex flex-col justify-center items-center w-[250px] h-[250px] bg-[#FAF8F5]/95 border border-[#d2c4bc] rounded-xl p-6 shadow-xl relative z-20 -mr-6 my-auto flex-shrink-0">
+          <div className="space-y-3 text-center">
+            <div className="w-10 h-10 rounded-full bg-[#f4ece4] border border-[#d2c4bc] flex items-center justify-center text-[#8b6f5c] mx-auto shadow-inner">
               ✨
             </div>
-            <h3 className="font-serif text-[24px] leading-tight text-[#5c4a3e] font-semibold italic">
+            <h3 className="font-serif text-[20px] leading-snug text-[#5c4a3e] font-semibold italic">
               "Every stitch<br />has a story."
             </h3>
           </div>
