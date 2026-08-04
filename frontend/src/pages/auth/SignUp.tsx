@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import bgImage from '../../assets/login,signup.png';
+import bgPc from '../../assets/Authentication page pc .jpeg';
+import bgMobile from '../../assets/Authentication page mobile.jpeg';
 
 const Signup: React.FC = () => {
   const { signup, isLoading, isAuthenticated } = useAuth();
@@ -72,12 +73,22 @@ const Signup: React.FC = () => {
         </Link>
       </div>
 
-      {/* Immersive Background */}
+      {/* Responsive Background — Mobile */}
       <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat animate-bg-drift"
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat md:hidden"
         style={{ 
-          backgroundImage: `url(${bgImage})`,
-          filter: 'contrast(1.1) brightness(0.9) saturate(1.2)'
+          backgroundImage: `url(${bgMobile})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-[#fef8f3]/20 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#fef8f3]/30 to-[#1d1b19]/20"></div>
+      </div>
+
+      {/* Responsive Background — PC / Desktop */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat hidden md:block"
+        style={{ 
+          backgroundImage: `url(${bgPc})`,
         }}
       >
         <div className="absolute inset-0 bg-[#fef8f3]/20 mix-blend-overlay"></div>
