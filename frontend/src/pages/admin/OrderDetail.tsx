@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Package, User, CreditCard, Clock, CheckCircle, Truck, FileText, Printer, RotateCcw, X } from 'lucide-react';
 import { useAdminOrderDetail, useUpdateOrderStatus } from '../../hooks/useAdminData';
 import { AdminBadge, AdminSkeleton, AdminTimeline } from '../../components/admin/ui';
+import { AdminShippingCard } from '../../components/admin/AdminShippingCard';
 import { adminService } from '../../services/adminService';
 import toast from 'react-hot-toast';
 
@@ -443,6 +444,9 @@ export const OrderDetail: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Enterprise Shipping Management Card */}
+          <AdminShippingCard orderId={order.id} orderStatus={order.orderStatus} onUpdate={refetch} />
 
           {/* Shipping Info */}
           <div className="rounded-xl border border-outline-variant bg-background overflow-hidden">

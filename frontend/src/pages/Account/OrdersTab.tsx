@@ -386,12 +386,12 @@ export const OrdersTab: React.FC = () => {
                   ) : shipment ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div className="bg-white rounded-lg p-4 border border-blue-100">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Tracking Number</p>
-                        <p className="text-sm font-bold text-neutral-900 font-mono">{shipment.trackingNumber || 'Not assigned yet'}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">AWB / Tracking Number</p>
+                        <p className="text-sm font-bold text-neutral-900 font-mono">{shipment.externalAwbNumber || shipment.trackingNumber || 'Not assigned yet'}</p>
                       </div>
                       <div className="bg-white rounded-lg p-4 border border-blue-100">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Carrier</p>
-                        <p className="text-sm font-bold text-neutral-900">{shipment.carrier || 'N/A'}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Courier Partner</p>
+                        <p className="text-sm font-bold text-neutral-900">{shipment.courierName || shipment.carrier || 'Logistics Partner'}</p>
                         {shipment.shippingMethod && (
                           <p className="text-xs text-neutral-500 mt-0.5">{shipment.shippingMethod}</p>
                         )}
@@ -400,12 +400,24 @@ export const OrdersTab: React.FC = () => {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Status</p>
                         <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
                           shipment.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700' :
-                          shipment.status === 'SHIPPED' || shipment.status === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-700' :
+                          shipment.status === 'SHIPPED' || shipment.status === 'IN_TRANSIT' || shipment.status === 'OUT_FOR_DELIVERY' ? 'bg-blue-100 text-blue-700' :
                           'bg-amber-100 text-amber-700'
                         }`}>
                           <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {formatShipmentStatus(shipment.status)}
                         </span>
+                        {shipment.trackingUrl && (
+                          <div className="mt-2">
+                            <a
+                              href={shipment.trackingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
+                            >
+                              Live Tracking Link ↗
+                            </a>
+                          </div>
+                        )}
                       </div>
                       {shipment.estimatedDelivery && (
                         <div className="bg-white rounded-lg p-4 border border-blue-100">

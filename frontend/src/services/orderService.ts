@@ -29,19 +29,42 @@ export interface OrderStatusHistory {
   createdAt: string;
 }
 
+export interface ShipmentTimelineEvent {
+  id: string;
+  shipmentId: string;
+  status: string;
+  location?: string | null;
+  description: string;
+  source: string;
+  occurredAt: string;
+}
+
 export interface Shipment {
   id: string;
   orderId: string;
   provider: string;
-  trackingNumber: string | null;
-  carrier: string | null;
-  shippingMethod: string | null;
-  estimatedDelivery: string | null;
-  labelUrl: string | null;
+  externalShipmentId?: string | null;
+  externalOrderId?: string | null;
+  externalAwbNumber?: string | null;
+  courierName?: string | null;
+  courierCode?: string | null;
+  trackingUrl?: string | null;
+  labelUrl?: string | null;
+  invoiceUrl?: string | null;
+  manifestUrl?: string | null;
+  pickupId?: string | null;
+  shippingCost?: number | null;
+  weightGrams?: number | null;
   status: string;
-  shippedAt: string | null;
-  deliveredAt: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
   createdAt: string;
+  // Backward compatibility fallbacks
+  trackingNumber?: string | null;
+  carrier?: string | null;
+  shippingMethod?: string | null;
+  estimatedDelivery?: string | null;
+  timeline?: ShipmentTimelineEvent[];
 }
 
 export interface Order {

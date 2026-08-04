@@ -80,6 +80,59 @@ export const adminService = {
     const response = await apiClient.patch(`/admin/orders/${id}/note`, { note });
     return response;
   },
+
+  // ── Shipping Engine ───────────────────────────────────────────────────────
+  createShipment: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}`);
+  },
+
+  markShipped: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/ship`);
+  },
+
+  markDelivered: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/deliver`);
+  },
+
+  schedulePickup: async (orderId: string, pickupDate?: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/pickup`, { pickupDate });
+  },
+
+  generateLabel: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/label`);
+  },
+
+  generateInvoice: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/invoice`);
+  },
+
+  cancelShipment: async (orderId: string, reason?: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/cancel`, { reason });
+  },
+
+  createReturnShipment: async (orderId: string) => {
+    return apiClient.post(`/admin/shipments/${orderId}/return`);
+  },
+
+  getShipmentTimeline: async (orderId: string) => {
+    return apiClient.get(`/admin/shipments/${orderId}/timeline`);
+  },
+
+  getProviderHealth: async () => {
+    return apiClient.get('/admin/shipments/health');
+  },
+
+  getShippingCapabilities: async () => {
+    return apiClient.get('/admin/shipments/capabilities');
+  },
+
+  getShippingSettings: async () => {
+    return apiClient.get('/admin/shipments/settings');
+  },
+
+  updateShippingSettings: async (data: any) => {
+    return apiClient.put('/admin/shipments/settings', data);
+  },
   
   // ── Customers ─────────────────────────────────────────────────────────────
   listCustomers: async (params?: any): Promise<PaginatedResponse<User>> => {
