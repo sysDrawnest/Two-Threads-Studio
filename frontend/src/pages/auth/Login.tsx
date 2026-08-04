@@ -214,12 +214,12 @@ const Login: React.FC = () => {
       </div>
       
       {/* Subtle Footer Links */}
-      <div className="absolute bottom-6 right-6 z-10 flex gap-3 text-[11px] font-serif text-[#fef8f3]/90 drop-shadow-md hidden sm:flex">
-        <Link to="/about" className="hover:text-white transition-colors">Our Story</Link>
+      <div className="absolute bottom-6 left-6 z-10 flex gap-3 text-[11px] font-serif text-[#fef8f3]/90 drop-shadow-md hidden sm:flex">
+        <Link to="/our-story" className="hover:text-white transition-colors">Our Story</Link>
         <span className="opacity-50">|</span>
         <Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link>
         <span className="opacity-50">|</span>
-        <Link to="/community" className="hover:text-white transition-colors">Community</Link>
+        <Link to="/gallery" className="hover:text-white transition-colors">Gallery</Link>
       </div>
 
     </div>

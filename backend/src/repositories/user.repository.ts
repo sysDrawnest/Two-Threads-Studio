@@ -73,15 +73,19 @@ const authMeSelect = {
 
 export const userRepository = {
   findByEmail: async (email: string): Promise<SafeUser | null> => {
+    if (!email || typeof email !== 'string') return null;
+    const cleanEmail = email.trim().toLowerCase();
     return prisma.user.findUnique({
-      where: { email },
+      where: { email: cleanEmail },
       select: safeUserSelect,
     });
   },
 
   findByEmailWithPassword: async (email: string) => {
+    if (!email || typeof email !== 'string') return null;
+    const cleanEmail = email.trim().toLowerCase();
     return prisma.user.findUnique({
-      where: { email },
+      where: { email: cleanEmail },
       select: { ...safeUserSelect, passwordHash: true },
     });
   },

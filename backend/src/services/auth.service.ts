@@ -62,7 +62,8 @@ export const authService = {
     ipAddress?: string,
     deviceInfo?: string
   ): Promise<{ user: SafeUser; accessToken: string; refreshToken: string }> => {
-    const user = await userRepository.findByEmailWithPassword(dto.email);
+    const cleanEmail = dto?.email ? dto.email.trim().toLowerCase() : '';
+    const user = await userRepository.findByEmailWithPassword(cleanEmail);
 
     if (!user) {
       throw new AppError('No account found with this email address.', HTTP_STATUS.NOT_FOUND, 'USER_NOT_FOUND');
