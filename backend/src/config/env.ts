@@ -34,6 +34,10 @@ const envSchema = z.object({
   // IThink Logistics credentials (required when SHIPPING_PROVIDER=ithink)
   ITHINK_ACCESS_TOKEN:        z.string().optional().or(z.literal('')).transform((v) => v || undefined),
   ITHINK_SECRET_KEY:          z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_USERNAME:            z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_PASSWORD:            z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_API_KEY:             z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  ITHINK_BASE_URL:            z.string().default('https://api.ithinklogistics.com/api/v3'),
   ITHINK_PICKUP_LOCATION:     z.string().default('Primary'),
   ITHINK_WEBHOOK_SECRET:      z.string().optional().or(z.literal('')).transform((v) => v || undefined),
 
@@ -46,7 +50,11 @@ const envSchema = z.object({
 }).refine(
   (data) => {
     if (data.SHIPPING_PROVIDER === 'ithink') {
-      return Boolean(data.ITHINK_ACCESS_TOKEN && data.ITHINK_SECRET_KEY);
+      return Boolean(
+        (data.ITHINK_ACCESS_TOKEN && data.ITHINK_SECRET_KEY) ||
+        (data.ITHINK_USERNAME && data.ITHINK_PASSWORD) ||
+        data.ITHINK_API_KEY
+      );
     }
     if (data.SHIPPING_PROVIDER === 'shiprocket') {
       return Boolean(data.SHIPROCKET_EMAIL && data.SHIPROCKET_PASSWORD);
