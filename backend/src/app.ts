@@ -41,7 +41,7 @@ app.use(BASE_API_PATH, limiter);
 // If express.json() runs first, the Buffer is destroyed.
 app.use('/webhooks', express.raw({ type: 'application/json' }), paymentWebhook);
 
-// Shipping webhooks use JSON body (Shiprocket sends JSON)
+// Shipping webhooks use JSON body (iThink Logistics sends JSON)
 app.use(`${BASE_API_PATH}/webhooks/shipping`, express.json(), shippingWebhook);
 
 
