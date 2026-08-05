@@ -54,7 +54,9 @@ export const errorHandler = (
   if (statusCode >= 500) {
     req.log.error({ err, path: req.originalUrl }, err.message);
   } else {
-    req.log.info({ path: req.originalUrl, statusCode }, err.message);
+    // Use warn (not info) to avoid pino-pretty's formatHTTPLog branch intercepting
+    // this intermediate log and printing a ghost "200 undefinedms" line.
+    req.log.warn({ path: req.originalUrl, statusCode }, err.message);
   }
 
   return errorResponse(res, message, statusCode, code, errorObj, req.originalUrl);
