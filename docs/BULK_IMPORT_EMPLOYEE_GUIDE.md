@@ -110,3 +110,65 @@ To moderate customer reviews effectively:
 
 * All bulk operations require an active Admin session with a valid JWT token (`requireAuth` & `requireRole('ADMIN')`).
 * All imported image URLs must point to valid HTTP/HTTPS image CDN hosts (e.g. Cloudinary, AWS S3).
+
+
+Viewed import.service.ts:400-450
+
+Let's present a clear, comprehensive, and helpful answer explaining how product images work in the **Bulk Import Engine**, including exact column formatting, multi-image support, image upload routes, and template examples.# How Product Images Work in Bulk Import & Management
+
+In **Two Threads Studio**, product images during bulk import and catalog management are handled seamlessly through an automated URL parsing engine and dedicated image schema.
+
+---
+
+## 1. How Images Are Formatted in Excel (`.xlsx`) or CSV
+
+In your Excel spreadsheet or CSV file, use the **`images`** column header.
+
+### Single Image
+Provide a single direct image URL:
+```csv
+images
+https://res.cloudinary.com/twothreads/image1.jpg
+```
+
+### Multiple Images (Gallery)
+Separate multiple image URLs using the **pipe (`|`)** symbol or **comma (`,`)**:
+```csv
+images
+https://res.cloudinary.com/twothreads/image1.jpg|https://res.cloudinary.com/twothreads/image2.jpg|https://res.cloudinary.com/twothreads/image3.jpg
+```
+
+---
+
+## 2. Automated Engine Processing
+
+When the bulk import engine processes your spreadsheet:
+
+1. **URL Extraction**: The engine splits the `images` column by `|` or `,` and trims whitespace.
+2. **Primary Thumbnail**: The **first URL** in the list (`position 0`) is automatically designated as **Primary (`isPrimary = true`)**. This image is displayed on product cards, category pages, bestsellers, and search results.
+3. **Gallery Images**: Additional URLs (`positions 1, 2, 3...`) are added to the product’s image gallery carousel on the product details page.
+4. **Duplicates Prevention**: `createMany` with `skipDuplicates: true` ensures duplicate image links aren't created if re-imported.
+5. **Import Statistics**: The import progress modal tracks and displays **Images Added** in real-time.
+
+---
+
+## 3. Dedicated Excel & CSV Templates for Images
+
+Inside the **Bulk Product Import Modal** (`/admin/products` -> **Import**), you can download pre-formatted sample templates:
+
+* **Images (Excel .xlsx)**: Dedicated Excel template demonstrating multi-image formatting.
+* **Images (.csv)**: CSV variant of the multi-image template.
+
+---
+
+## 4. How to Host & Upload Product Images
+
+To use images in your bulk spreadsheet import:
+
+1. **CDN / Cloud Storage (Recommended for Bulk)**:
+   - Upload your high-resolution product photos to your image host or Cloudinary / AWS S3.
+   - Paste the direct image URLs into your Excel sheet's `images` column.
+
+2. **Single Product Form (Manual Admin Upload)**:
+   - In the **Add/Edit Product** page (`/admin/products/new`), staff can drag and drop image files directly.
+   - The backend upload endpoint (`POST /api/v1/upload/image`) handles local/cloud storage and automatically generates the image URL.
