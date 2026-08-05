@@ -90,19 +90,37 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'The Floating Gallery',
-    description: 'Museum exhibition experience — floating asymmetrical textile artworks with organic typography flow.',
+    name: 'Split Spotlight',
+    description: 'Asymmetric editorial layout — large animated serif headline left, curated product showcase right.',
     icon: Columns2,
-    tag: 'Exhibition',
-    tagColor: 'bg-[#ab5a46]/20 text-[#ab5a46] dark:bg-[#ab5a46]/30 dark:text-[#f4ebd9]',
+    tag: 'Editorial',
+    tagColor: 'bg-[#1a1a2e]/30 text-[#8b7ab8] dark:bg-[#1a1a2e] dark:text-[#8b7ab8]',
     preview: (
-      <div className="w-full h-full bg-[#16120e] relative overflow-hidden rounded-sm p-2 flex flex-col justify-between">
-        <div className="absolute top-2 left-2 w-8 h-10 bg-[#ab5a46]/30 border border-[#f4ebd9]/20 rounded-xs" />
-        <div className="absolute top-3 right-3 w-10 h-12 bg-[#7a9b5e]/30 border border-[#f4ebd9]/20 rounded-xs" />
-        <div className="absolute bottom-2 left-4 w-7 h-9 bg-[#8b7ab8]/30 border border-[#f4ebd9]/20 rounded-xs" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 pointer-events-none">
-          <span className="font-serif text-[#f4ebd9] text-[10px]">Handcrafted</span>
-          <span className="font-serif text-[#ab5a46] text-[11px] italic">Memories</span>
+      <div className="w-full h-full bg-[#120a05] relative overflow-hidden rounded-sm flex">
+        <div className="flex-1 flex flex-col justify-center pl-3 pr-2">
+          <div className="font-serif text-[#f4ebd9]/70 text-xs leading-tight">
+            <span className="block">Artisanally</span>
+            <span className="block italic text-[#ab5a46]">Crafted</span>
+            <span className="block">For You</span>
+          </div>
+          <div className="mt-2 flex gap-1">
+            <div className="w-10 h-3 bg-[#ab5a46]/80 rounded-sm" />
+            <div className="w-8 h-3 border border-[#f4ebd9]/20 rounded-sm" />
+          </div>
+        </div>
+        <div className="w-[45%] flex flex-col gap-1 pr-1 py-1">
+          {[
+            { bg: 'from-[#3d2317] to-[#2a1a14]', accent: '#ab5a46' },
+            { bg: 'from-[#1e2a1a] to-[#141c10]', accent: '#7a9b5e' },
+            { bg: 'from-[#2a1a2a] to-[#1a101a]', accent: '#8b7ab8' },
+          ].map((c, i) => (
+            <div key={i} className={`flex-1 rounded-sm bg-gradient-to-br ${c.bg} relative overflow-hidden`}>
+              <div className="absolute bottom-1 left-1">
+                <div className="w-6 h-0.5 mb-0.5" style={{ background: c.accent }} />
+                <div className="w-4 h-0.5" style={{ background: `${c.accent}60` }} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     ),
