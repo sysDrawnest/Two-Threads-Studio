@@ -6,6 +6,7 @@
  * No external assets required — uses CSS gradients and patterns.
  */
 import React, { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Slide {
@@ -15,6 +16,7 @@ interface Slide {
   subheadline: string;
   caption: string;
   cta: string;
+  link: string;
   bg: string;
   accent: string;
   pattern: string;
@@ -28,6 +30,7 @@ const SLIDES: Slide[] = [
     subheadline: 'Kits',
     caption: 'Hand-dyed threads · Limited batches · Mindful craft',
     cta: 'Explore Collection',
+    link: '/shop',
     bg: 'from-[#2a1a14] via-[#3d2317] to-[#1a0f0a]',
     accent: '#ab5a46',
     pattern: 'radial-gradient(circle at 80% 20%, rgba(171,90,70,0.15) 0%, transparent 50%)',
@@ -39,6 +42,7 @@ const SLIDES: Slide[] = [
     subheadline: 'Collection',
     caption: 'Woven stories · Heritage patterns · Sustainable materials',
     cta: 'Shop Now',
+    link: '/shop',
     bg: 'from-[#1e2a1a] via-[#2d3d28] to-[#141c10]',
     accent: '#7a9b5e',
     pattern: 'radial-gradient(circle at 20% 80%, rgba(122,155,94,0.12) 0%, transparent 50%)',
@@ -50,6 +54,7 @@ const SLIDES: Slide[] = [
     subheadline: 'Studio',
     caption: 'Expert-led workshops · Community · Your creative journey',
     cta: 'Join a Workshop',
+    link: '/learning',
     bg: 'from-[#1a1a2e] via-[#2d2d4a] to-[#0f0f1e]',
     accent: '#8b7ab8',
     pattern: 'radial-gradient(circle at 50% 50%, rgba(139,122,184,0.12) 0%, transparent 60%)',
@@ -61,6 +66,7 @@ const SLIDES: Slide[] = [
     subheadline: 'Hampers',
     caption: 'Beautifully packaged · Perfect for every occasion',
     cta: 'Find a Gift',
+    link: '/shop',
     bg: 'from-[#2a1a1a] via-[#3d2626] to-[#1a1010]',
     accent: '#c4776a',
     pattern: 'radial-gradient(circle at 30% 60%, rgba(196,119,106,0.12) 0%, transparent 50%)',
@@ -218,24 +224,25 @@ export default function HeroTemplate2() {
           <p className="font-sans text-[10px] md:text-xs tracking-[0.2em] text-[#d2c4bc]/70 uppercase max-w-xs">
             {slide.caption}
           </p>
-          <button
-            className="shrink-0 font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-3.5 border transition-all duration-300"
+          <Link
+            to={slide.link}
+            className="shrink-0 font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-3.5 border transition-all duration-300 inline-block"
             style={{
               borderColor: slide.accent,
               color: slide.accent,
               background: 'transparent',
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = slide.accent;
-              (e.currentTarget as HTMLButtonElement).style.color = '#f4ebd9';
+              (e.currentTarget as HTMLElement).style.background = slide.accent;
+              (e.currentTarget as HTMLElement).style.color = '#f4ebd9';
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-              (e.currentTarget as HTMLButtonElement).style.color = slide.accent;
+              (e.currentTarget as HTMLElement).style.background = 'transparent';
+              (e.currentTarget as HTMLElement).style.color = slide.accent;
             }}
           >
             {slide.cta}
-          </button>
+          </Link>
         </div>
       </div>
 
