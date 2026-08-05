@@ -5,19 +5,29 @@ import logger from '../lib/logger';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-const connectionString = env.DATABASE_URL;
+// ─── Connection Pool ──────────────────────────────────────────────────────────
+// Prisma 7 uses a TypeScript-based ("Rust-free") client engine that requires a
+// driver adapter for database connectivity. We use the official @prisma/adapter-pg
+// which wraps node-postgres (pg) under the hood.
+//
+// Pool sizing:
+//   • Supabase free-tier pooler (PgBouncer) supports ~60 client connections.
+//   • We keep max=4 so multiple nodemon restarts or concurrent dev server
+//     instances don't exhaust the limit.
+//   • connectionTimeoutMillis=5000 → fail-fast (not 30 second hangs) when
+//     the pool is saturated.
 const pool = new Pool({
-  connectionString,
-  max: 10,
-  idleTimeoutMillis: 5000, // Evict idle connections in 5s before Supabase PgBouncer drops them
-  connectionTimeoutMillis: 30000, // 30s timeout for new connections to handle pooler latency spikes
+  connectionString: env.DATABASE_URL,
+  max: 4,
+  idleTimeoutMillis: 5000,       // Evict idle connections quickly before Supabase drops them
+  connectionTimeoutMillis: 5000, // Fail-fast: 5 s instead of hanging for 30 s
   keepAlive: true,
   keepAliveInitialDelayMillis: 2000,
   ssl: { rejectUnauthorized: false },
 });
 
 pool.on('error', (err) => {
-  logger.warn({ errorMsg: err.message }, '[PostgreSQL Pool] Connection error handled cleanly');
+  logger.warn({ errorMsg: err.message }, '[PostgreSQL Pool] Idle client error — connection dropped');
 });
 
 const adapter = new PrismaPg(pool);
