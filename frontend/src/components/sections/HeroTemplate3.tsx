@@ -1,315 +1,324 @@
-/**
- * Hero Template 3 — The Floating Gallery (Artisan Exhibition)
- * 
- * Inspired by a curated museum gallery of handcrafted textile memories.
- * Replaces standard grid/split layouts with floating asymmetrical artworks,
- * generous negative space, flowing typography, and calm tactile motion.
- * 
- * Desktop: Floating museum wall with organic text placement.
- * Mobile: Vertical scrolling story with overlapping full-width imagery.
- */
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
 
-// Fine art gallery image imports
-import imgPortrait from '../../assets/portrait_of_personalized_portraits_for_a_luxur.png';
-import imgWedding from '../../assets/portrait_of_wedding_keepsakes_for_a_luxury_em.png';
-import imgHeritage from '../../assets/portrait_of_a_heritage_collection_for_a_luxury.png';
-import imgBotanical from '../../assets/portrait_of_a_botanical_collection_for_a_luxur.png';
-
-interface ExhibitItem {
-  id: string;
-  title: string;
-  category: string;
-  image: string;
-  link: string;
-  aspect: string;
-  desktopPosition: string; // Tailored absolute or grid placement
-  caption: string;
-}
-
-const EXHIBITS: ExhibitItem[] = [
-  {
-    id: '01',
-    title: 'Custom Portraits',
-    category: 'Portrait',
-    image: imgPortrait,
-    link: '/custom-creations',
-    aspect: 'aspect-[3/4]',
-    desktopPosition: 'top-[8%] left-[6%] w-[22vw] max-w-[280px]',
-    caption: 'Fine needlework derived from heirloom photographs',
-  },
-  {
-    id: '02',
-    title: 'Wedding Keepsakes',
-    category: 'Wedding',
-    image: imgWedding,
-    link: '/collections',
-    aspect: 'aspect-[4/5]',
-    desktopPosition: 'top-[14%] right-[8%] w-[25vw] max-w-[320px]',
-    caption: 'Sacred vows & floral motifs captured in gold thread',
-  },
-  {
-    id: '03',
-    title: 'Heritage Threads',
-    category: 'Handmade',
-    image: imgHeritage,
-    link: '/artisans',
-    aspect: 'aspect-[3/4]',
-    desktopPosition: 'bottom-[10%] left-[12%] w-[20vw] max-w-[260px]',
-    caption: 'Traditional techniques handed down across generations',
-  },
-  {
-    id: '04',
-    title: 'Botanical Echoes',
-    category: 'Pet & Flora',
-    image: imgBotanical,
-    link: '/shop',
-    aspect: 'aspect-[4/5]',
-    desktopPosition: 'bottom-[8%] right-[14%] w-[21vw] max-w-[270px]',
-    caption: 'Organic dye palettes and botanical embroidery',
-  },
-];
+const NAV_LINKS = ['Story', 'Jobs', 'Message'];
+const SOCIAL_LINKS = ['Instagram', 'TikTok', 'YouTube'];
 
 export default function HeroTemplate3() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hoveredExhibit, setHoveredExhibit] = useState<string | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // Set document title & lock body scroll on drawer open
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
+    document.title = 'Marcus \u2014 Bennet';
   }, []);
 
+  useEffect(() => {
+    if (isDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isDrawerOpen]);
+
   return (
-    <section
-      id="hero"
-      className="relative min-h-[calc(100vh-65px)] md:h-[calc(100vh-70px)] md:min-h-[720px] w-full overflow-hidden bg-[#16120e] text-[#f4ebd9]"
-      aria-label="Hero: The Floating Gallery"
-    >
-      {/* Subtle ambient museum glow & grain texture */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'radial-gradient(#f4ebd9 1px, transparent 1px), radial-gradient(#ab5a46 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-            backgroundPosition: '0 0, 16px 16px',
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 40%, rgba(171,90,70,0.18) 0%, rgba(22,18,14,0.85) 65%, #16120e 100%)',
-          }}
-        />
-      </div>
+    <section className="relative h-[100dvh] w-full overflow-hidden bg-black font-hn text-cream select-none">
+      {/* ── Webfont & CSS Animations ── */}
+      <style>{`
+        @import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
 
-      {/* 
-        ════════════════════════════════════════
-        DESKTOP EXPERIENCE: Museum Floating Wall
-        ════════════════════════════════════════
-      */}
-      <div className="hidden md:block relative z-10 w-full h-full">
-        {/* Floating Headline & Curator Note — Natural Center Flow */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none">
-          <div
-            className="max-w-xl transition-all duration-1000 ease-out"
-            style={{
-              opacity: isLoaded ? 1 : 0,
-              transform: isLoaded ? 'translateY(0)' : 'translateY(24px)',
-            }}
-          >
-            {/* Gallery Exhibition Tag */}
-            <div className="inline-flex items-center gap-2 mb-6 px-3 py-1 rounded-full bg-[#ab5a46]/10 border border-[#ab5a46]/30">
-              <Sparkles className="w-3 h-3 text-[#ab5a46]" />
-              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#e6cdc3] font-medium">
-                The Floating Exhibition
-              </span>
-            </div>
+        @keyframes animFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
 
-            {/* Asymmetrical natural headline */}
-            <h1 className="font-serif text-[#f4ebd9] font-normal leading-[0.95] tracking-tight mb-6">
-              <span className="block text-[clamp(44px,5.5vw,78px)]">
-                Handcrafted
-              </span>
-              <span className="block text-[clamp(52px,6.5vw,92px)] italic text-[#ab5a46] -mt-2">
-                Memories
-              </span>
-            </h1>
+        @keyframes animRiseIn {
+          from {
+            opacity: 0;
+            transform: translateY(4vh) scale(1.03);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
 
-            <p className="font-sans text-xs lg:text-sm text-[#d2c4bc]/75 leading-relaxed tracking-wide mb-8 max-w-md mx-auto pointer-events-auto">
-              An exhibition of fine needlework, indigo-dyed textiles, and immortalized moments.
-              Crafted slowly by master artisans.
-            </p>
+        @keyframes animFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(28px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-            {/* Gallery CTAs */}
-            <div className="flex items-center justify-center gap-5 pointer-events-auto">
-              <Link
-                to="/custom-creations"
-                className="group relative inline-flex items-center gap-3 bg-[#ab5a46] text-[#f4ebd9] font-sans text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-3.5 hover:bg-[#c46b56] transition-all duration-300 shadow-xl"
-              >
-                <span>Begin Commission</span>
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Link>
+        @keyframes animLine {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
 
-              <Link
-                to="/shop"
-                className="inline-flex items-center gap-2 text-[#f4ebd9]/70 hover:text-[#f4ebd9] font-sans text-[11px] tracking-[0.2em] uppercase font-medium px-6 py-3.5 border border-[#f4ebd9]/20 hover:border-[#f4ebd9]/50 transition-all duration-300"
-              >
-                <span>Explore Store</span>
-              </Link>
-            </div>
-          </div>
-        </div>
+        @keyframes marqueeScroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
 
-        {/* Floating Artworks (Pinned on Museum Wall) */}
-        {EXHIBITS.map((exhibit, idx) => {
-          const isHovered = hoveredExhibit === exhibit.id;
-          return (
-            <Link
-              key={exhibit.id}
-              to={exhibit.link}
-              onMouseEnter={() => setHoveredExhibit(exhibit.id)}
-              onMouseLeave={() => setHoveredExhibit(null)}
-              className={`absolute ${exhibit.desktopPosition} group transition-all duration-700 ease-out z-10`}
-              style={{
-                opacity: isLoaded ? 1 : 0,
-                transform: isLoaded
-                  ? isHovered
-                    ? 'scale(1.04) translateY(-6px)'
-                    : 'scale(1) translateY(0)'
-                  : 'translateY(30px)',
-                transitionDelay: `${idx * 150}ms`,
-              }}
-            >
-              <div className="relative p-2 bg-[#221b16]/80 border border-[#f4ebd9]/10 shadow-2xl backdrop-blur-xs">
-                {/* Artwork Canvas */}
-                <div className={`relative w-full ${exhibit.aspect} overflow-hidden bg-[#16120e]`}>
-                  <img
-                    src={exhibit.image}
-                    alt={exhibit.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 filter brightness-95 contrast-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#16120e]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
+        .anim-fade-in {
+          animation: animFadeIn 1.2s ease-out both;
+        }
 
-                {/* Museum Exhibition Tag */}
-                <div className="mt-2.5 px-1 flex items-center justify-between font-sans">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono tracking-widest text-[#ab5a46]">
-                      [{exhibit.id}]
-                    </span>
-                    <span className="text-[10px] tracking-[0.18em] uppercase text-[#f4ebd9]/90 font-medium">
-                      {exhibit.category}
-                    </span>
-                  </div>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-[#f4ebd9]/40 group-hover:text-[#ab5a46] transition-colors" />
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+        .anim-rise-in {
+          animation: animRiseIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+        }
 
-        {/* Bottom subtle aesthetic note */}
-        <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3">
-          <div className="w-6 h-[1px] bg-[#ab5a46]" />
-          <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-[#f4ebd9]/40">
-            Curated Artisan Collection &bull; Studio Edition
+        .anim-fade-up {
+          animation: animFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .anim-line {
+          animation: animLine 1.1s cubic-bezier(0.76, 0, 0.24, 1) 1200ms both;
+        }
+
+        .marquee-track {
+          animation: marqueeScroll 30s linear infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .anim-fade-in,
+          .anim-rise-in,
+          .anim-fade-up,
+          .anim-line,
+          .marquee-track {
+            animation-duration: 0.01ms !important;
+            animation-delay: 0s !important;
+            animation-iteration-count: 1 !important;
+          }
+        }
+      `}</style>
+
+      {/* ── 1. Background Image (z-0 / default) ── */}
+      <img
+        src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover anim-fade-in"
+      />
+
+      {/* ── 2. Marquee Name (z-10) ── */}
+      <div
+        className="absolute inset-x-0 top-[16vh] sm:top-[14vh] z-10 overflow-hidden pointer-events-none anim-fade-up"
+        style={{ animationDelay: '500ms' }}
+      >
+        <div className="marquee-track flex w-max whitespace-nowrap font-hn text-[16vh] sm:text-[26vh] leading-none text-cream tracking-tight">
+          <span className="pr-[6vw]">
+            Marcus &mdash; Bennet
+          </span>
+          <span className="pr-[6vw]">
+            Marcus &mdash; Bennet
           </span>
         </div>
       </div>
 
-      {/* 
-        ════════════════════════════════════════
-        MOBILE EXPERIENCE: Vertical Editorial Story
-        ════════════════════════════════════════
-      */}
-      <div className="block md:hidden relative z-10 w-full px-6 py-12 space-y-16">
-        {/* Editorial Title Block */}
-        <div className="text-left pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ab5a46]/10 border border-[#ab5a46]/30">
-            <Sparkles className="w-3.5 h-3.5 text-[#ab5a46]" />
-            <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-[#e6cdc3] font-medium">
-              Artisan Exhibition
-            </span>
+      {/* ── 3. Horizontal Cream Rule (z-10) ── */}
+      <div
+        className="absolute inset-x-6 sm:inset-x-10 bottom-[5.5rem] sm:bottom-28 z-10 h-0.5 bg-cream origin-left anim-line"
+      />
+
+      {/* ── 4. Desktop Footer Copy (z-30 on mobile, sm:z-10 on desktop) ── */}
+      <footer className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 sm:px-10 sm:pb-8 text-xs sm:text-sm leading-relaxed font-hn text-cream z-30 sm:z-10">
+        {/* Footer Left (3 lines) */}
+        <div className="anim-fade-up" style={{ animationDelay: '1400ms' }}>
+          <p>Visuals Composer</p>
+          <p>Digital Crafter</p>
+          <p>Obsessed by The Office</p>
+        </div>
+
+        {/* Footer Right (right-aligned, 2 lines) */}
+        <div className="text-right anim-fade-up" style={{ animationDelay: '1550ms' }}>
+          <p>A homage to</p>
+          <p>Marcus Holloway</p>
+        </div>
+      </footer>
+
+      {/* ── 5. Front Portrait Cutout (z-20) ── */}
+      <img
+        src="https://stone-expand-60400629.figma.site/_assets/v11/8da570354e86aa0d44ac3e4aa335a72c8e750d68.png"
+        alt="Portrait"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none z-20 anim-rise-in"
+      />
+
+      {/* ── 6. Header Chrome (z-30) ── */}
+      <header className="absolute inset-x-0 top-0 z-30 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8">
+        {/* Brand / Logo */}
+        <a
+          href="#"
+          className="font-hn text-lg tracking-wide text-cream hover:opacity-80 transition-opacity duration-300 anim-fade-up"
+          style={{ animationDelay: '800ms' }}
+        >
+          Marcus
+        </a>
+
+        {/* Desktop Navigation Cluster */}
+        <div className="hidden sm:flex items-start gap-16 lg:gap-24">
+          {/* Year */}
+          <span
+            className="text-sm text-cream font-hn anim-fade-up"
+            style={{ animationDelay: '900ms' }}
+          >
+            2025
+          </span>
+
+          {/* Nav Column */}
+          <nav className="flex flex-col gap-0.5 text-sm font-hn" aria-label="Main Navigation">
+            {NAV_LINKS.map((link, i) => (
+              <a
+                key={link}
+                href="#"
+                className="text-cream hover:opacity-60 transition-opacity duration-300 anim-fade-up"
+                style={{ animationDelay: `${1000 + i * 80}ms` }}
+              >
+                {link}
+              </a>
+            ))}
+          </nav>
+
+          {/* Social Column */}
+          <div className="flex flex-col gap-0.5 text-sm font-hn" aria-label="Social Links">
+            {SOCIAL_LINKS.map((link, i) => (
+              <a
+                key={link}
+                href="#"
+                className="text-cream hover:opacity-60 transition-opacity duration-300 anim-fade-up"
+                style={{ animationDelay: `${1150 + i * 80}ms` }}
+              >
+                {link}
+              </a>
+            ))}
           </div>
-
-          <h1 className="font-serif text-[#f4ebd9] text-[42px] leading-[0.98] font-normal tracking-tight">
-            Handcrafted <br />
-            <span className="italic text-[#ab5a46]">Memories</span>
-          </h1>
-
-          <p className="font-sans text-xs text-[#d2c4bc]/75 leading-relaxed tracking-wide pt-1">
-            Walk through our gallery of bespoke textile portraits, wedding keepsakes, and heirloom craft.
-          </p>
         </div>
 
-        {/* Vertical Gallery Items with Overlapping Rhythm */}
-        <div className="space-y-16">
-          {EXHIBITS.map((exhibit, i) => (
-            <div key={exhibit.id} className="relative space-y-4">
-              {/* Exhibit Number & Label */}
-              <div className="flex items-center justify-between border-b border-[#f4ebd9]/10 pb-2">
-                <span className="font-sans text-xs font-mono tracking-widest text-[#ab5a46]">
-                  EXHIBIT {exhibit.id}
-                </span>
-                <span className="font-serif text-sm italic text-[#f4ebd9]/80">
-                  {exhibit.category}
-                </span>
-              </div>
+        {/* Mobile Hamburger Button (z-50) */}
+        <button
+          onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+          aria-label={isDrawerOpen ? 'Close Menu' : 'Open Menu'}
+          className="sm:hidden z-50 h-10 w-10 flex flex-col justify-center items-center gap-1.5 focus:outline-none cursor-pointer anim-fade-up"
+          style={{ animationDelay: '900ms' }}
+        >
+          <span
+            className={`h-0.5 w-6 bg-cream transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+              isDrawerOpen ? 'translate-y-[8px] rotate-45' : ''
+            }`}
+          />
+          <span
+            className={`h-0.5 w-6 bg-cream transition-all duration-300 ${
+              isDrawerOpen ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          <span
+            className={`h-0.5 w-6 bg-cream transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+              isDrawerOpen ? '-translate-y-[8px] -rotate-45' : ''
+            }`}
+          />
+        </button>
+      </header>
 
-              {/* Full Width Frame */}
-              <Link to={exhibit.link} className="block group relative">
-                <div className="p-2 bg-[#221b16] border border-[#f4ebd9]/10 shadow-2xl">
-                  <div className={`relative w-full ${exhibit.aspect} overflow-hidden bg-[#16120e]`}>
-                    <img
-                      src={exhibit.image}
-                      alt={exhibit.title}
-                      className="w-full h-full object-cover filter brightness-95"
-                    />
-                  </div>
-                </div>
+      {/* ── 7. Mobile Drawer Overlay & Panel (z-40) ── */}
+      {/* Backdrop */}
+      <div
+        onClick={() => setIsDrawerOpen(false)}
+        className={`sm:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-500 ease-in-out ${
+          isDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden="true"
+      />
 
-                {/* Overlapping Text Label */}
-                <div className="mt-3 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-serif text-lg text-[#f4ebd9] font-normal">
-                      {exhibit.title}
-                    </h3>
-                    <p className="font-sans text-[10px] text-[#d2c4bc]/60 tracking-wider">
-                      {exhibit.caption}
-                    </p>
-                  </div>
-                  <div className="p-2 rounded-full border border-[#f4ebd9]/20 text-[#ab5a46]">
-                    <ArrowUpRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
+      {/* Drawer Panel */}
+      <aside
+        className={`sm:hidden fixed right-0 top-0 bottom-0 z-40 w-[80%] max-w-sm bg-[#141414] px-8 py-10 flex flex-col justify-between transition-transform duration-600 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        aria-label="Mobile Navigation"
+      >
+        {/* Close Icon (Lucide X) */}
+        <button
+          onClick={() => setIsDrawerOpen(false)}
+          aria-label="Close Mobile Menu"
+          className={`absolute right-6 top-6 text-cream transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+            isDrawerOpen ? 'rotate-0 opacity-100 delay-300' : 'rotate-90 opacity-0'
+          }`}
+        >
+          <X size={26} strokeWidth={1.5} />
+        </button>
 
-        {/* Mobile Tactile CTAs */}
-        <div className="pt-8 border-t border-[#f4ebd9]/10 flex flex-col gap-4 text-center">
-          <Link
-            to="/custom-creations"
-            className="w-full inline-flex items-center justify-center gap-3 bg-[#ab5a46] text-[#f4ebd9] font-sans text-xs tracking-[0.2em] uppercase font-medium py-4 shadow-xl"
+        {/* Top Section: Site Index Links */}
+        <div className="mt-12">
+          {/* Label */}
+          <h2
+            className={`uppercase tracking-[0.2em] text-cream/50 text-xs font-hn mb-6 transition-all duration-500 ${
+              isDrawerOpen
+                ? 'translate-y-0 opacity-100 delay-250'
+                : 'translate-y-4 opacity-0'
+            }`}
           >
-            <span>Begin Commission</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
+            Site Index
+          </h2>
 
-          <Link
-            to="/shop"
-            className="w-full inline-flex items-center justify-center gap-2 text-[#f4ebd9]/80 font-sans text-xs tracking-[0.2em] uppercase font-medium py-3.5 border border-[#f4ebd9]/20"
-          >
-            <span>Explore Entire Collection</span>
-          </Link>
+          {/* Links Stack */}
+          <nav className="flex flex-col gap-4">
+            {NAV_LINKS.map((link, i) => (
+              <a
+                key={link}
+                href="#"
+                onClick={() => setIsDrawerOpen(false)}
+                className={`text-4xl font-hn text-cream hover:opacity-60 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                  isDrawerOpen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+                }`}
+                style={{
+                  transitionDelay: isDrawerOpen ? `${300 + i * 80}ms` : '0ms',
+                }}
+              >
+                {link}
+              </a>
+            ))}
+          </nav>
         </div>
-      </div>
+
+        {/* Bottom Section: Find Me Links */}
+        <div>
+          {/* Label */}
+          <h2
+            className={`uppercase tracking-[0.2em] text-cream/50 text-xs font-hn mb-4 transition-all duration-500 ${
+              isDrawerOpen
+                ? 'translate-y-0 opacity-100 delay-500'
+                : 'translate-y-4 opacity-0'
+            }`}
+          >
+            Find Me
+          </h2>
+
+          {/* Socials Row */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-hn text-cream">
+            {SOCIAL_LINKS.map((link, i) => (
+              <a
+                key={link}
+                href="#"
+                onClick={() => setIsDrawerOpen(false)}
+                className={`hover:opacity-60 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                  isDrawerOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
+                style={{
+                  transitionDelay: isDrawerOpen ? `${550 + i * 60}ms` : '0ms',
+                }}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
     </section>
   );
 }
+
