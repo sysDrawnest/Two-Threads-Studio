@@ -16,8 +16,8 @@ if (loggerConfig.pretty) {
         return formatErrorLog(log);
       }
 
-      // 2. Check if it's an HTTP request log
-      if (log.req) {
+      // 2. Check if it's an HTTP request log (final completion log)
+      if (log.req && log.responseTime !== undefined) {
         return formatHTTPLog(log);
       }
 
