@@ -3,16 +3,14 @@ import { HTTP_STATUS } from '../constants/httpStatus';
 import { categoryRepository } from '../repositories/category.repository';
 import type { CreateCategoryDto, UpdateCategoryDto } from '../validators/category.validator';
 import { generateSlug } from '../utils/slug';
-import { SimpleCache } from '../lib/cache';
-
-const categoriesCache = new SimpleCache<any>(120 * 1000); // 2 minutes TTL
+import { cacheService } from './cache.service';
 
 export const categoryService = {
   getAll: async () => {
-    const cached = categoriesCache.get('all_categories');
+    const cached = cacheService.get<any[]>('categories:all');
     if (cached) return cached;
     const categories = await categoryRepository.findAll();
-    categoriesCache.set('all_categories', categories);
+    cacheService.set('categories:all', categories, 600);
     return categories;
   },
 
@@ -25,7 +23,8 @@ export const categoryService = {
   },
 
   create: async (dto: CreateCategoryDto) => {
-    categoriesCache.clear();
+    cacheService.flushByPrefix('categories:');
+    cacheService.flushByPrefix('products:');
     // Check slug collision
     const slug = generateSlug(dto.name);
     const exists = await categoryRepository.slugExists(slug);
@@ -39,7 +38,8 @@ export const categoryService = {
   },
 
   update: async (id: string, dto: UpdateCategoryDto) => {
-    categoriesCache.clear();
+    cacheService.flushByPrefix('categories:');
+    cacheService.flushByPrefix('products:');
     const existing = await categoryRepository.findById(id);
     if (!existing) {
       throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
@@ -61,7 +61,8 @@ export const categoryService = {
   },
 
   delete: async (id: string) => {
-    categoriesCache.clear();
+    cacheService.flushByPrefix('categories:');
+    cacheService.flushByPrefix('products:');
     const existing = await categoryRepository.findById(id);
     if (!existing) {
       throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);

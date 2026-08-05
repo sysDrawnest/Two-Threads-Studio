@@ -5,7 +5,7 @@ import { productRepository } from '../repositories/product.repository';
 import { categoryRepository } from '../repositories/category.repository';
 import { collectionRepository } from '../repositories/collection.repository';
 import { generateSlug, makeSlugUnique } from '../utils/slug';
-import { SimpleCache } from '../lib/cache';
+import { cacheService } from './cache.service';
 import type {
   ListProductsQuery,
   AdminListProductsQuery,
@@ -20,16 +20,8 @@ import type {
   VariantUpsertDto
 } from '../validators/product.validator';
 
-const homepageCache = new SimpleCache<any>(60 * 1000); // 60 seconds TTL
-const featuredCache = new SimpleCache<any>(60 * 1000);
-const newArrivalsCache = new SimpleCache<any>(60 * 1000);
-const bestSellersCache = new SimpleCache<any>(60 * 1000);
-
 export const clearHomepageCache = () => {
-  homepageCache.clear();
-  featuredCache.clear();
-  newArrivalsCache.clear();
-  bestSellersCache.clear();
+  cacheService.flushByPrefix('products:');
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -133,35 +125,35 @@ export const productService = {
   // ─── Homepage Helpers ───
 
   getFeaturedProducts: async () => {
-    const cached = featuredCache.get('featured');
+    const cached = cacheService.get<any[]>('products:featured');
     if (cached) return cached;
     const products = await productRepository.findFeatured(8);
     const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
-    featuredCache.set('featured', result);
+    cacheService.set('products:featured', result, 300);
     return result;
   },
 
   getNewArrivals: async () => {
-    const cached = newArrivalsCache.get('new_arrivals');
+    const cached = cacheService.get<any[]>('products:new_arrivals');
     if (cached) return cached;
     const products = await productRepository.findNewArrivals(8);
     const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
-    newArrivalsCache.set('new_arrivals', result);
+    cacheService.set('products:new_arrivals', result, 300);
     return result;
   },
 
   getBestSellers: async () => {
-    const cached = bestSellersCache.get('bestsellers');
+    const cached = cacheService.get<any[]>('products:best_sellers');
     if (cached) return cached;
     const products = await productRepository.findBestSellers(8);
     const result = products.map(p => ({ ...p, tags: flattenTags(p.tags), reviewCount: p._count.reviews, _count: undefined }));
-    bestSellersCache.set('bestsellers', result);
+    cacheService.set('products:best_sellers', result, 300);
     return result;
   },
 
   getHomepageData: async () => {
-    const cacheKey = 'homepage_data';
-    const cached = homepageCache.get(cacheKey);
+    const cacheKey = 'products:homepage_data';
+    const cached = cacheService.get<any>(cacheKey);
     if (cached) return cached;
 
     const [featuredRaw, bestSellersRaw, newArrivalsRaw, categories, collections] = await Promise.all([
@@ -180,7 +172,7 @@ export const productService = {
       collections,
     };
 
-    homepageCache.set(cacheKey, data);
+    cacheService.set(cacheKey, data, 300);
     return data;
   },
 
