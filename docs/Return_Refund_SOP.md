@@ -56,5 +56,22 @@ In Razorpay's Payment list, a payment's status only changes to **"Refunded"** if
 - To find a partially refunded payment, check the **"Captured"** tab or the **"All"** tab.
 - If you want to see a list of actual refund transactions, do not use the "Payments" tab. Instead, navigate to **Transactions > Refunds** in the left-hand sidebar.
 
+
+## FAQ : When will the Refund Processed , Bank Credit Completed will complete ? 
+
+**When Refund Processed is completed:**
+
+Usually, if you process a refund via the **Two Threads Studio Admin Dashboard**, the "Refund Processed" status appears within a few minutes. This indicates that Razorpay has successfully debited the amount from our account.
+
+**When Bank Credit Completed is completed:**
+
+The "Bank Credit Completed" status can take anywhere from **2 to 7 working days**. This delay is managed by Razorpay and your bank, not by our system. Once our system shows "Refund Processed", the funds are officially on their way to the customer.
+
+**Timeline of what happens under the hood:**
+
+1. **Refund Initiated:** When you approve the refund in your Admin panel, our backend instantly pings the Razorpay API. The status becomes `REFUND_PROCESSING` ("Refund Initiated" in the UI).
+2. **Processing Time:** Razorpay routes this request to the customer's bank. Because this involves traditional banking networks (like NEFT, IMPS, or credit card networks), it generally takes **5 to 7 working days** for the bank to process the transaction.
+3. **Refund Processed:** Once the customer's bank confirms the funds have successfully landed in the customer's account, the bank gives Razorpay an **RRN (Retrieval Reference Number)**. Razorpay then immediately fires a secure webhook to your backend. Our system automatically catches this webhook and flips the status to `REFUNDED` ("Refund Processed" in the UI).
+
 ---
 *End of Document. For technical issues regarding refunds not processing, please escalate to the backend engineering team.*
