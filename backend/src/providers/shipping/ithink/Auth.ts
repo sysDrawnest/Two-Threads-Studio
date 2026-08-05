@@ -16,12 +16,12 @@ export class IThinkAuth {
    * Returns valid access token and secret key from environment configuration.
    */
   getCredentials(): IThinkCredentials {
-    const accessToken = env.ITHINK_ACCESS_TOKEN;
-    const secretKey = env.ITHINK_SECRET_KEY;
+    const accessToken = env.ITHINK_ACCESS_TOKEN || env.ITHINK_USERNAME || env.ITHINK_API_KEY;
+    const secretKey = env.ITHINK_SECRET_KEY || env.ITHINK_PASSWORD || env.ITHINK_API_KEY;
 
     if (!accessToken || !secretKey) {
       throw new Error(
-        '[IThinkAuth] ITHINK_ACCESS_TOKEN and ITHINK_SECRET_KEY must be set in .env to use the IThink Logistics provider.'
+        '[IThinkAuth] ITHINK_ACCESS_TOKEN / ITHINK_SECRET_KEY or ITHINK_USERNAME / ITHINK_PASSWORD must be set in .env to use the IThink Logistics provider.'
       );
     }
 
@@ -32,7 +32,11 @@ export class IThinkAuth {
   }
 
   get isAuthenticated(): boolean {
-    return Boolean(env.ITHINK_ACCESS_TOKEN && env.ITHINK_SECRET_KEY);
+    return Boolean(
+      (env.ITHINK_ACCESS_TOKEN && env.ITHINK_SECRET_KEY) ||
+      (env.ITHINK_USERNAME && env.ITHINK_PASSWORD) ||
+      env.ITHINK_API_KEY
+    );
   }
 }
 
