@@ -7,11 +7,12 @@
 
 import axios, { AxiosInstance } from 'axios';
 import logger from '../../../lib/logger';
+import { env } from '../../../config/env';
 import { IThinkAuth } from './Auth';
 
 const ITHINK_BASE_URL = process.env['ITHINK_SANDBOX'] === 'true'
   ? 'https://sandbox.ithinklogistics.com/api/v3'
-  : 'https://api.ithinklogistics.com/api/v3';
+  : (env.ITHINK_BASE_URL || 'https://api.ithinklogistics.com/api/v3');
 
 // ── Raw Response Interfaces ──────────────────────────────────────────────────
 
