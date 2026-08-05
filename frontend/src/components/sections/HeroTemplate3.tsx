@@ -125,7 +125,7 @@ export default function HeroTemplate3() {
       <img
         src={portraitCutout}
         alt="Two Threads Artisanal Portrait"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none z-20 anim-rise-in"
+        className="absolute inset-0 h-full w-full object-cover sm:object-contain sm:object-bottom pointer-events-none z-20 anim-rise-in"
       />
     </section>
   );
