@@ -7,6 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        "cream": "#efeee9",
         "inverse-on-surface": "#f5f0eb",
         "surface-dim": "#ded9d4",
         "inverse-surface": "#32302d",
@@ -65,6 +66,7 @@ module.exports = {
         "section-gap": "120px"
       },
       fontFamily: {
+        "hn": ["Helvetica Neue ME", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         "headline-lg": ["Cormorant Garamond", "serif"],
         "label-sm": ["Lato", "sans-serif"],
         "display-lg-mobile": ["Cormorant Garamond", "serif"],
