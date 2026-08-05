@@ -90,6 +90,7 @@ const AnalyticsDashboard = lazy(() => import('./pages/admin/AnalyticsDashboard')
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings').then(module => ({ default: module.AdminSettings })));
 const CouponsManagement = lazy(() => import('./pages/admin/CouponsManagement').then(module => ({ default: module.CouponsManagement })));
 const CouponForm = lazy(() => import('./pages/admin/CouponForm').then(module => ({ default: module.CouponForm })));
+const CMSDashboard = lazy(() => import('./pages/admin/CMSDashboard').then(module => ({ default: module.CMSDashboard })));
 
 
 import RequireAuth from './components/auth/RequireAuth';
@@ -198,6 +199,7 @@ const AdminRoutes: React.FC = () => (
         <Route path="coupons" element={<CouponsManagement />} />
         <Route path="coupons/new" element={<CouponForm />} />
         <Route path="coupons/edit/:id" element={<CouponForm />} />
+        <Route path="cms" element={<CMSDashboard />} />
       </Route>
 
     </Route>

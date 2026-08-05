@@ -1361,6 +1361,10 @@ model StudioSettings {
   orderConfirmationNote  String?
   shippingUpdateNote     String?
 
+  // ── CMS Configuration ────────────────────
+  /// Active hero template: 1 = Original, 2 = Editorial Slideshow, 3 = Split Spotlight
+  activeHeroTemplate     Int      @default(1)
+
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

@@ -86,6 +86,12 @@ router.use('/shipments',       customerShipmentRouter);
 router.use('/admin/shipments', adminShipmentRouter);
 router.use('/dev/shipping',    devShippingRouter);
 
+// CMS Engine (Phase 9 — CMS Phase 1)
+import { publicCmsRouter, adminCmsRouter } from './cms.routes';
+
+router.use('/cms',       publicCmsRouter);
+router.use('/admin/cms', adminCmsRouter);
+
 export default router;
 
 
