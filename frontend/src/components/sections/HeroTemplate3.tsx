@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const NAV_LINKS = ['Story', 'Jobs', 'Message'];
-const SOCIAL_LINKS = ['Instagram', 'TikTok', 'YouTube'];
+const NAV_LINKS = [
+  { label: 'Shop', href: '/shop' },
+  { label: 'Our Story', href: '/about' },
+  { label: 'Learning', href: '/learning' },
+];
+
+const SOCIAL_LINKS = [
+  { label: 'Instagram', href: '#' },
+  { label: 'Pinterest', href: '#' },
+  { label: 'YouTube', href: '#' },
+];
 
 export default function HeroTemplate3() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Set document title & lock body scroll on drawer open
   useEffect(() => {
-    document.title = 'Marcus \u2014 Bennet';
+    document.title = 'Two Threads Studio';
   }, []);
 
   useEffect(() => {
@@ -111,12 +121,12 @@ export default function HeroTemplate3() {
         className="absolute inset-x-0 top-[16vh] sm:top-[14vh] z-10 overflow-hidden pointer-events-none anim-fade-up"
         style={{ animationDelay: '500ms' }}
       >
-        <div className="marquee-track flex w-max whitespace-nowrap font-hn text-[16vh] sm:text-[26vh] leading-none text-cream tracking-tight">
+        <div className="marquee-track flex w-max whitespace-nowrap font-hn text-[16vh] sm:text-[24vh] leading-none text-cream tracking-tight">
           <span className="pr-[6vw]">
-            Marcus &mdash; Bennet
+            Two Threads &mdash; Studio
           </span>
           <span className="pr-[6vw]">
-            Marcus &mdash; Bennet
+            Two Threads &mdash; Studio
           </span>
         </div>
       </div>
@@ -130,35 +140,35 @@ export default function HeroTemplate3() {
       <footer className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 sm:px-10 sm:pb-8 text-xs sm:text-sm leading-relaxed font-hn text-cream z-30 sm:z-10">
         {/* Footer Left (3 lines) */}
         <div className="anim-fade-up" style={{ animationDelay: '1400ms' }}>
-          <p>Visuals Composer</p>
-          <p>Digital Crafter</p>
-          <p>Obsessed by The Office</p>
+          <p>Handcrafted Indigo</p>
+          <p>Mindful Slow Fashion</p>
+          <p>Artisanal Heritage</p>
         </div>
 
         {/* Footer Right (right-aligned, 2 lines) */}
         <div className="text-right anim-fade-up" style={{ animationDelay: '1550ms' }}>
-          <p>A homage to</p>
-          <p>Marcus Holloway</p>
+          <p>Crafted with Care</p>
+          <p>Two Threads Studio</p>
         </div>
       </footer>
 
       {/* ── 5. Front Portrait Cutout (z-20) ── */}
       <img
         src="https://stone-expand-60400629.figma.site/_assets/v11/8da570354e86aa0d44ac3e4aa335a72c8e750d68.png"
-        alt="Portrait"
+        alt="Artisanal Portrait"
         className="absolute inset-0 h-full w-full object-cover pointer-events-none z-20 anim-rise-in"
       />
 
       {/* ── 6. Header Chrome (z-30) ── */}
       <header className="absolute inset-x-0 top-0 z-30 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8">
         {/* Brand / Logo */}
-        <a
-          href="#"
+        <Link
+          to="/"
           className="font-hn text-lg tracking-wide text-cream hover:opacity-80 transition-opacity duration-300 anim-fade-up"
           style={{ animationDelay: '800ms' }}
         >
-          Marcus
-        </a>
+          Two Threads
+        </Link>
 
         {/* Desktop Navigation Cluster */}
         <div className="hidden sm:flex items-start gap-16 lg:gap-24">
@@ -167,33 +177,33 @@ export default function HeroTemplate3() {
             className="text-sm text-cream font-hn anim-fade-up"
             style={{ animationDelay: '900ms' }}
           >
-            2025
+            Est. 2026
           </span>
 
           {/* Nav Column */}
           <nav className="flex flex-col gap-0.5 text-sm font-hn" aria-label="Main Navigation">
-            {NAV_LINKS.map((link, i) => (
-              <a
-                key={link}
-                href="#"
+            {NAV_LINKS.map((item, i) => (
+              <Link
+                key={item.label}
+                to={item.href}
                 className="text-cream hover:opacity-60 transition-opacity duration-300 anim-fade-up"
                 style={{ animationDelay: `${1000 + i * 80}ms` }}
               >
-                {link}
-              </a>
+                {item.label}
+              </Link>
             ))}
           </nav>
 
           {/* Social Column */}
           <div className="flex flex-col gap-0.5 text-sm font-hn" aria-label="Social Links">
-            {SOCIAL_LINKS.map((link, i) => (
+            {SOCIAL_LINKS.map((item, i) => (
               <a
-                key={link}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="text-cream hover:opacity-60 transition-opacity duration-300 anim-fade-up"
                 style={{ animationDelay: `${1150 + i * 80}ms` }}
               >
-                {link}
+                {item.label}
               </a>
             ))}
           </div>
@@ -267,10 +277,10 @@ export default function HeroTemplate3() {
 
           {/* Links Stack */}
           <nav className="flex flex-col gap-4">
-            {NAV_LINKS.map((link, i) => (
-              <a
-                key={link}
-                href="#"
+            {NAV_LINKS.map((item, i) => (
+              <Link
+                key={item.label}
+                to={item.href}
                 onClick={() => setIsDrawerOpen(false)}
                 className={`text-4xl font-hn text-cream hover:opacity-60 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                   isDrawerOpen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
@@ -279,8 +289,8 @@ export default function HeroTemplate3() {
                   transitionDelay: isDrawerOpen ? `${300 + i * 80}ms` : '0ms',
                 }}
               >
-                {link}
-              </a>
+                {item.label}
+              </Link>
             ))}
           </nav>
         </div>
@@ -300,10 +310,10 @@ export default function HeroTemplate3() {
 
           {/* Socials Row */}
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-hn text-cream">
-            {SOCIAL_LINKS.map((link, i) => (
+            {SOCIAL_LINKS.map((item, i) => (
               <a
-                key={link}
-                href="#"
+                key={item.label}
+                href={item.href}
                 onClick={() => setIsDrawerOpen(false)}
                 className={`hover:opacity-60 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                   isDrawerOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -312,7 +322,7 @@ export default function HeroTemplate3() {
                   transitionDelay: isDrawerOpen ? `${550 + i * 60}ms` : '0ms',
                 }}
               >
-                {link}
+                {item.label}
               </a>
             ))}
           </div>
@@ -321,4 +331,5 @@ export default function HeroTemplate3() {
     </section>
   );
 }
+
 
