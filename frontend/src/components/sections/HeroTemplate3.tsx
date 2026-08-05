@@ -5,6 +5,7 @@
  * Uses Two Threads Studio design language (terracotta, cream, Cormorant Garamond).
  */
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 const ROTATING_WORDS = ['Crafted', 'Woven', 'Handmade', 'Curated'];
@@ -82,8 +83,9 @@ const SpotlightCard: React.FC<{ delay: number; index: number }> = ({ delay, inde
   const c = cards[index % cards.length];
 
   return (
-    <div
-      className={`relative rounded-sm overflow-hidden bg-gradient-to-br ${c.bg} p-5 flex flex-col justify-between`}
+    <Link
+      to="/shop"
+      className={`relative rounded-sm overflow-hidden bg-gradient-to-br ${c.bg} p-5 flex flex-col justify-between group hover:opacity-95 transition-opacity cursor-pointer block`}
       style={{
         opacity: 1,
         transform: 'translateY(0)',
@@ -126,7 +128,7 @@ const SpotlightCard: React.FC<{ delay: number; index: number }> = ({ delay, inde
         <h3 className="font-serif text-[#f4ebd9] text-base font-normal leading-tight mb-2">{c.name}</h3>
         <p className="font-sans font-semibold text-sm" style={{ color: c.accent }}>{c.price}</p>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -265,13 +267,13 @@ export default function HeroTemplate3() {
               transition: 'opacity 0.9s ease 0.35s, transform 0.9s ease 0.35s',
             }}
           >
-            <button className="group inline-flex items-center gap-3 bg-[#ab5a46] text-[#f4ebd9] font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-4 hover:bg-[#c46b56] transition-all duration-300">
+            <Link to="/shop" className="group inline-flex items-center gap-3 bg-[#ab5a46] text-[#f4ebd9] font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-4 hover:bg-[#c46b56] transition-all duration-300">
               Shop Collection
               <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-            </button>
-            <button className="inline-flex items-center gap-3 border border-[#f4ebd9]/20 text-[#f4ebd9]/70 font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-4 hover:border-[#f4ebd9]/50 hover:text-[#f4ebd9] transition-all duration-300">
+            </Link>
+            <Link to="/our-story" className="inline-flex items-center gap-3 border border-[#f4ebd9]/20 text-[#f4ebd9]/70 font-sans text-[10px] md:text-[11px] tracking-[0.2em] uppercase font-medium px-8 py-4 hover:border-[#f4ebd9]/50 hover:text-[#f4ebd9] transition-all duration-300">
               Our Story
-            </button>
+            </Link>
           </div>
 
           {/* Stats row */}
@@ -306,9 +308,9 @@ export default function HeroTemplate3() {
             <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-[#d2c4bc]/40">
               Featured Products
             </span>
-            <button className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#ab5a46] hover:text-[#c46b56] transition-colors">
+            <Link to="/shop" className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#ab5a46] hover:text-[#c46b56] transition-colors">
               View All →
-            </button>
+            </Link>
           </div>
 
           {/* Cards */}
