@@ -1,5 +1,5 @@
 /**
- * CMS Dashboard — Phase 9 (CMS Phase 1)
+ * CMS Dashboard — Phase 10 (CMS Phase 1)
  * Admin page for managing storefront content via the CMS engine.
  * Currently contains: Hero Section module.
  * Architecture is designed to expand with future modules (Banner, Collections, etc.)
