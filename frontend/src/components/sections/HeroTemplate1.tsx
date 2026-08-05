@@ -4,6 +4,7 @@
  * It is activated when activeHeroTemplate === 1 in CMS settings.
  */
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import heroMobile from '../../assets/hero section mobile.png';
 import heroPc from '../../assets/hero section pc.png';
@@ -119,9 +120,9 @@ export default function HeroTemplate1() {
              </ScrollReveal>
              
              <ScrollReveal direction="up" delay={0.4}>
-               <button className="bg-[#f4ebd9] text-[#ab5a46] border-none px-8 py-3 md:px-10 md:py-3.5 font-sans text-[10px] md:text-[11px] tracking-[0.15em] font-medium uppercase cursor-pointer hover:bg-white hover:shadow-lg transition-all duration-300 pointer-events-auto">
+               <Link to="/shop" className="inline-block bg-[#f4ebd9] text-[#ab5a46] border-none px-8 py-3 md:px-10 md:py-3.5 font-sans text-[10px] md:text-[11px] tracking-[0.15em] font-medium uppercase cursor-pointer hover:bg-white hover:shadow-lg transition-all duration-300 pointer-events-auto">
                  Shop Collection
-               </button>
+               </Link>
              </ScrollReveal>
            </div>
         </div>
