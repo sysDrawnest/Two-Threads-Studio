@@ -1,5 +1,5 @@
 /**
- * CMS Dashboard — Phase 10 (CMS Phase 1)
+ * CMS Dashboard — Phase 9 (CMS Phase 1)
  * Admin page for managing storefront content via the CMS engine.
  * Currently contains: Hero Section module.
  * Architecture is designed to expand with future modules (Banner, Collections, etc.)
@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   Image,
   Layers,
-  BookOpen,
+  Columns2,
   Clock,
 } from 'lucide-react';
 import { useAdminHeroConfig, useUpdateHeroConfig } from '../../hooks/useCms';
@@ -90,28 +90,19 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'The Open Sketchbook',
-    description: 'An artisan journal spread with process swatches, thread palettes, pencil notes & finished heirlooms.',
-    icon: BookOpen,
-    tag: 'Artisan',
+    name: 'The Floating Gallery',
+    description: 'Museum exhibition experience — floating asymmetrical textile artworks with organic typography flow.',
+    icon: Columns2,
+    tag: 'Exhibition',
     tagColor: 'bg-[#ab5a46]/20 text-[#ab5a46] dark:bg-[#ab5a46]/30 dark:text-[#f4ebd9]',
     preview: (
-      <div className="w-full h-full bg-[#f4efe8] relative overflow-hidden rounded-sm flex border border-[#d6caa4]/40 p-1">
-        <div className="w-1/2 bg-[#f9f6f0] p-1.5 flex flex-col justify-between border-r border-[#d6caa4]/50">
-          <span className="text-[7px] font-sans uppercase font-bold text-[#ab5a46]">Folio 01</span>
-          <div className="font-serif text-[10px] text-[#2c2724] leading-tight">Inspiration &rarr; Craft</div>
-          <div className="flex gap-1">
-            <div className="w-2 h-2 rounded-full bg-[#2b3a4e]" />
-            <div className="w-2 h-2 rounded-full bg-[#ab5a46]" />
-            <div className="w-2 h-2 rounded-full bg-[#c88a4b]" />
-          </div>
-        </div>
-        <div className="w-1/2 bg-[#faf7f2] p-1.5 flex flex-col justify-between">
-          <span className="text-[7px] font-sans uppercase font-bold text-[#8c7a6b]">Folio 02</span>
-          <div className="w-full h-8 bg-[#3d2317] rounded-xs flex items-center justify-center text-[7px] text-[#f4ebd9] font-serif">
-            Heirloom
-          </div>
-          <div className="w-full h-2.5 bg-[#ab5a46] rounded-xs" />
+      <div className="w-full h-full bg-[#16120e] relative overflow-hidden rounded-sm p-2 flex flex-col justify-between">
+        <div className="absolute top-2 left-2 w-8 h-10 bg-[#ab5a46]/30 border border-[#f4ebd9]/20 rounded-xs" />
+        <div className="absolute top-3 right-3 w-10 h-12 bg-[#7a9b5e]/30 border border-[#f4ebd9]/20 rounded-xs" />
+        <div className="absolute bottom-2 left-4 w-7 h-9 bg-[#8b7ab8]/30 border border-[#f4ebd9]/20 rounded-xs" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 pointer-events-none">
+          <span className="font-serif text-[#f4ebd9] text-[10px]">Handcrafted</span>
+          <span className="font-serif text-[#ab5a46] text-[11px] italic">Memories</span>
         </div>
       </div>
     ),
