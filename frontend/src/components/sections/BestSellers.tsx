@@ -6,9 +6,9 @@ import { productService } from '../../services/productService';
 import type { Product } from '../../data/products';
 import { ArrowRight } from 'lucide-react';
 
-type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Candles' | 'Gift Sets';
+type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Handkerchiefs' | 'Gift Sets';
 
-const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Candles', 'Gift Sets'];
+const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Handkerchiefs', 'Gift Sets'];
 
 export default function BestSellers() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('All');
@@ -84,7 +84,7 @@ export default function BestSellers() {
           ) : (
             filteredProducts.map((product, i) => (
               <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
-                <ProductCard product={product} />
+                <ProductCard product={product} isBestSeller={true} />
               </ScrollReveal>
             ))
           )}

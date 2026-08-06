@@ -16,8 +16,8 @@ export interface Product {
   name: string;
   price: number;
   mrp?: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Candles" | "Handbag";
-  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Candles" | "Handbags";
+  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Handkerchiefs" | "Handbag";
+  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Handkerchiefs" | "Handbags";
   collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
@@ -34,6 +34,8 @@ export interface Product {
   isHandmade?: boolean;
   isSustainable?: boolean;
   occasion?: string[];
+  hasCouponOffer?: boolean;
+  couponDiscountPct?: number;
 }
 
 export interface Category {
@@ -86,9 +88,9 @@ export const mockCategories: Category[] = [
   },
   {
     id: "cat5",
-    name: "Botanical Candles",
-    slug: "botanical-candles",
-    image: "https://images.unsplash.com/photo-1608405021200-e14fc75338cd?q=80&w=800&auto=format&fit=crop",
+    name: "Handkerchiefs",
+    slug: "handkerchiefs",
+    image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=800&auto=format&fit=crop",
     count: 21,
   },
   {

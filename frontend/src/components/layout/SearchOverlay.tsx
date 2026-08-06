@@ -59,7 +59,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
 
-  const suggestedTerms = ["Botanical Kits", "Beginner", "Crochet", "Lippan Art", "Candles"];
+  const suggestedTerms = ["Botanical Kits", "Beginner", "Crochet", "Lippan Art", "Handkerchiefs"];
 
   return (
     <AnimatePresence>

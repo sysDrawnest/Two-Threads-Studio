@@ -109,6 +109,8 @@ export function mapApiProductToFrontend(apiProd: any): Product {
     isPersonalizable: apiProd.isPersonalizable || false,
     isHandmade: apiProd.isHandmade ?? true,
     isSustainable: apiProd.isSustainable || false,
+    hasCouponOffer: apiProd.hasCouponOffer || false,
+    couponDiscountPct: apiProd.couponDiscountPct || 0,
   };
 }
 
