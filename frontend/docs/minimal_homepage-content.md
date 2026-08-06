@@ -81,14 +81,23 @@ This document provides a sequential, minimal reference of the homepage component
   * **Description**: "Inspired by India's living heritage—from temple carvings and sacred symbols to ancient embroidery traditions—this collection celebrates craftsmanship, culture, and stories passed through generations."
   * **CTA**: "Explore Collection"
 
-## 9. JustForYou
-* **Component**: `CuratedPicks`
-* **File**: `src/components/sections/CuratedPicks.tsx`
-* **Purpose**: Asymmetric layout showcasing specific individual products.
+## 9. Men's Collection
+* **Component**: `MensCollectionSection`
+* **File**: `src/components/sections/MensCollectionSection.tsx`
+* **Purpose**: Premium editorial section showcasing handcrafted menswear collections for global customers.
 * **Key Content**:
-  * **Overline**: "Just For You"
-  * **Title**: "Curated Picks"
-  * **Tiles**: Showcases five editorial product grids.
+  * **Overline**: "Men's Collection"
+  * **Title**: "Premium Menswear ★★★★★"
+  * **Products**: Premium Embroidered Shirts, Designer Denim Jackets, Artisan Denim Jeans, Premium Embroidered Caps.
+
+## 10. Women's Collection
+* **Component**: `WomensCollectionSection`
+* **File**: `src/components/sections/WomensCollectionSection.tsx`
+* **Purpose**: Premium editorial section showcasing handcrafted luxury women's fashion.
+* **Key Content**:
+  * **Overline**: "Women's Collection"
+  * **Title**: "Premium Womenswear ★★★★★"
+  * **Products**: Crochet Handbags, Crochet Tops, Crochet One-Piece Dresses, Luxury Crochet Bikinis.
 
 ## 10. SustainabilitySection
 * **Component**: `SustainabilitySection`
