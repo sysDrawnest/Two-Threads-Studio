@@ -10,8 +10,9 @@ The homepage renders in the following top-to-bottom sequence of components:
 6. `ShopByOccasion` (Lazy Loaded)
 7. `FeaturedCollections` (Lazy Loaded)
 8. `SacredTraditionsCollection` (Lazy Loaded - Sacred Traditions)
-9. `JustForYou` (Lazy Loaded - Curated Picks)
-10. `SustainabilitySection` (Lazy Loaded - Conscious Crafting) -- **NEW**
+9. `MensCollectionSection` (Lazy Loaded - Men's Collection)
+10. `WomensCollectionSection` (Lazy Loaded - Women's Collection)
+11. `SustainabilitySection` (Lazy Loaded - Conscious Crafting)
 11. `CustomCreations` (Lazy Loaded)
 12. `OurStory` (Lazy Loaded - Brand Story)
 13. `CraftingProcess` (Lazy Loaded)
@@ -482,56 +483,67 @@ An editorial campaign section highlighting Indian heritage, temple carvings, sac
 
 ---
 
-## Just For You
+## Men's Collection
 
 ### Component
 
-`CuratedPicks`
+`MensCollectionSection`
 
 ### File
 
-`src/components/sections/CuratedPicks.tsx`
+`src/components/sections/MensCollectionSection.tsx`
 
 ### Purpose
 
-Encourages catalog discovery using an asymmetric layout that highlights individual product items in a premium, editorial grid.
+Showcases handcrafted menswear collection designed for international customers.
 
 ### Content
 
-- **Overline Text**: "Just For You"
-- **Title**: "Curated Picks"
-- **Product Tiles**: Up to five tiles showing product image, price, and title.
+- **Overline Text**: "Men's Collection"
+- **Title**: "Premium Menswear ★★★★★"
+- **Products**: Premium Embroidered Shirts, Designer Denim Jackets, Artisan Denim Jeans, Premium Embroidered Caps.
 
 ### Layout
 
-- **Desktop**: 12-column grid layout with custom heights:
-  - First tile: `col-span-8`, height `340px` (large hero tile).
-  - Second tile: `col-span-4`, height `340px`.
-  - Third, Fourth, Fifth tiles: `col-span-4`, height `260px` each.
-- **Mobile/Tablet**: Grid collapses to typical 2-column or single column tracks with responsive tile heights.
+- **Desktop**: 12-column split layout with left editorial text panel and right 2-column, 2-row asymmetric image grid (`h-[640px]`).
+- **Mobile**: Vertical linear stack: overline -> heading -> description -> hero image -> 2x2 thumbnail grid -> CTA link.
 
 ### Styling
 
-- **Tile styling**: Soft cream background fallback (`#f4ebd9`).
-- **Product Tag Labels**: Rounded card container floating bottom-left inside each tile, built with off-white translucent glass (`#FAF9F7/95` and `backdrop-blur-sm`).
+- **Background**: Warm canvas linen (`#F5EFE7`).
+- **Typography**: Light serif display for headings, tracked sans-serif for meta labels and overlines.
 
-### Animations
+---
 
-- **Entrance**: Staggered scroll animation via `StaggerContainer`.
-- **Tile Hover**: Tiles scale up slightly (`scale-[1.02]`), background images zoom (`scale-105`), and tag labels translate upward with enhanced box-shadows.
+## Women's Collection
 
-### User Interaction
+### Component
 
-- **Navigation**: Tiles link directly to product pages.
+`WomensCollectionSection`
 
-### Backend Integration Readiness
+### File
 
-- **Product-Driven**: Renders a slice of the `mockProducts` array. Ready for API endpoint bindings.
+`src/components/sections/WomensCollectionSection.tsx`
 
-### Dependencies
+### Purpose
 
-- `mockProducts` data array.
-- `ScrollReveal` and `StaggerContainer` components.
+Showcases handcrafted luxury women's fashion and resort wear offerings.
+
+### Content
+
+- **Overline Text**: "Women's Collection"
+- **Title**: "Premium Womenswear ★★★★★"
+- **Products**: Crochet Handbags, Crochet Tops, Crochet One-Piece Dresses, Luxury Crochet Bikinis.
+
+### Layout
+
+- **Desktop**: 12-column split layout (mirrored rhythm) with left 2-column asymmetric image grid and right editorial text panel (`h-[640px]`).
+- **Mobile**: Vertical linear stack: overline -> heading -> description -> hero image -> 2x2 thumbnail grid -> CTA link.
+
+### Styling
+
+- **Background**: Soft warm taupe (`#EDE8DF`).
+- **Typography**: Light serif display for headings, tracked sans-serif for meta labels and overlines.
 
 ---
 
