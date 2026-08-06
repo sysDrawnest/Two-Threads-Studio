@@ -7,6 +7,7 @@ import type { Product } from '../../data/products';
 interface ProductCardProps {
   product: Product;
   className?: string;
+  isBestSeller?: boolean;
 }
 
 const badgeConfig: Record<string, { bg: string; text: string; label: string }> = {
@@ -23,12 +24,15 @@ const stockConfig = {
   'Out of Stock': { dot: 'bg-red-400', label: 'Out of Stock' },
 };
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '', isBestSeller = false }) => {
   const [wishlisted, setWishlisted] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const discountPct = product.mrp
+  const isBestSellerCard = isBestSeller || product.badge === 'Best Seller';
+
+  // Only calculate discount percentage if explicitly applied by admin from coupon/promotion
+  const discountPct = product.hasCouponOffer && product.mrp
     ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
     : 0;
 
@@ -45,6 +49,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '
     e.preventDefault();
     setWishlisted((prev) => !prev);
   };
+
+  const showBadges = !isBestSellerCard || product.hasCouponOffer;
 
   return (
     <Link
@@ -78,30 +84,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '
         </button>
 
         {/* Badges — top left stack */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1 z-20">
-          {product.badge && badgeConfig[product.badge] && (
-            <span
-              className={`${badgeConfig[product.badge].bg} ${badgeConfig[product.badge].text} text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium`}
-            >
-              {badgeConfig[product.badge].label}
-            </span>
-          )}
-          {product.isPersonalizable && (
-            <span className="bg-[#e8f0fe] text-[#1a56db] text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
-              Personalizable
-            </span>
-          )}
-          {product.isHandmade && !product.badge && (
-            <span className="bg-[#f4ebd9] text-[#A34A38] text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
-              Handmade
-            </span>
-          )}
-          {discountPct >= 10 && (
-            <span className="bg-[#A34A38] text-white text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
-              {discountPct}% off
-            </span>
-          )}
-        </div>
+        {showBadges && (
+          <div className="absolute top-3 left-3 flex flex-col gap-1 z-20">
+            {!isBestSellerCard && product.badge && badgeConfig[product.badge] && (
+              <span
+                className={`${badgeConfig[product.badge].bg} ${badgeConfig[product.badge].text} text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium`}
+              >
+                {badgeConfig[product.badge].label}
+              </span>
+            )}
+            {!isBestSellerCard && product.isPersonalizable && (
+              <span className="bg-[#e8f0fe] text-[#1a56db] text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
+                Personalizable
+              </span>
+            )}
+            {!isBestSellerCard && product.isHandmade && !product.badge && (
+              <span className="bg-[#f4ebd9] text-[#A34A38] text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
+                Handmade
+              </span>
+            )}
+            {discountPct >= 10 && (
+              <span className="bg-[#A34A38] text-white text-[8px] tracking-[0.12em] px-2 py-0.5 uppercase font-sans font-medium">
+                {discountPct}% off
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Hover action bar */}
         <AnimatePresence>
@@ -186,7 +194,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '
         {/* Trait pills */}
         {(product.isHandmade || product.isSustainable) && (
           <div className="flex flex-wrap gap-1 mt-2.5">
-            {product.isHandmade && (
+            {product.isHandmade && !isBestSellerCard && (
               <span className="font-sans text-[8px] tracking-wide text-[#735947] border border-[#d2c4bc] px-1.5 py-0.5 uppercase">
                 Handmade
               </span>

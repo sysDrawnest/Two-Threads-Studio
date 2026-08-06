@@ -10,7 +10,7 @@ import { successResponse } from '../utils/response';
 
 const SINGLETON_WHERE = { singleton: true };
 
-const VALID_HERO_TEMPLATES = [1, 2, 3] as const;
+const VALID_HERO_TEMPLATES = [1, 2, 3, 4] as const;
 type HeroTemplate = typeof VALID_HERO_TEMPLATES[number];
 
 export const cmsController = {

@@ -20,6 +20,7 @@ import { useHeroConfig } from '../../hooks/useCms';
 const HeroTemplate1 = lazy(() => import('./HeroTemplate1'));
 const HeroTemplate2 = lazy(() => import('./HeroTemplate2'));
 const HeroTemplate3 = lazy(() => import('./HeroTemplate3'));
+const HeroTemplate4 = lazy(() => import('./HeroTemplate4'));
 
 // Matches the hero height to avoid layout shift while loading
 const HeroSkeleton: React.FC = () => (
@@ -34,6 +35,7 @@ const TEMPLATE_MAP: Record<number, React.LazyExoticComponent<() => React.JSX.Ele
   1: HeroTemplate1,
   2: HeroTemplate2,
   3: HeroTemplate3,
+  4: HeroTemplate4,
 };
 
 export default function Hero() {

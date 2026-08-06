@@ -16,14 +16,16 @@ import {
   Layers,
   Columns2,
   Clock,
+  Sparkles,
 } from 'lucide-react';
+import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.png';
 import { useAdminHeroConfig, useUpdateHeroConfig } from '../../hooks/useCms';
 import { AdminSkeleton } from '../../components/admin/ui';
 
 // ─── Template metadata ────────────────────────────────────────────────────────
 
 interface TemplateOption {
-  id: 1 | 2 | 3;
+  id: 1 | 2 | 3 | 4;
   name: string;
   description: string;
   icon: React.ElementType;
@@ -58,70 +60,80 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 2,
-    name: 'Editorial Slideshow',
-    description: 'Full-screen 4-panel auto-advancing luxury slideshow with animated typography and progress bar.',
-    icon: Layers,
-    tag: 'Dynamic',
-    tagColor: 'bg-[#1e2a1a]/30 text-[#7a9b5e] dark:bg-[#1e2a1a] dark:text-[#7a9b5e]',
+    name: 'Immersive Portrait',
+    description: 'Quiet luxury layout — single full-bleed editorial photograph with elegant negative space typography and a single CTA.',
+    icon: Eye,
+    tag: 'Quiet Luxury',
+    tagColor: 'bg-[#ab5a46]/15 text-[#ab5a46]',
     preview: (
-      <div className="w-full h-full bg-gradient-to-br from-[#2a1a14] to-[#1a0f0a] relative overflow-hidden rounded-sm">
-        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-        <div className="absolute top-2 left-3">
-          <span className="font-serif text-[#f4ebd9]/20 text-xl">01</span>
-        </div>
-        <div className="absolute bottom-4 left-3 right-8">
-          <div className="w-10 h-0.5 bg-[#ab5a46] mb-2" />
-          <div className="font-serif text-[#f4ebd9]/70 text-xs leading-tight">
-            <span className="block">Indigo</span>
-            <span className="block italic text-[#ab5a46]">Embroidery</span>
-          </div>
-          <div className="mt-2 w-12 h-3 rounded border border-[#ab5a46]/40" />
-        </div>
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1">
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} className={`w-0.5 rounded-full ${i === 0 ? 'h-4 bg-[#ab5a46]' : 'h-2 bg-[#f4ebd9]/20'}`} />
-          ))}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f4ebd9]/10">
-          <div className="h-full w-1/3 bg-[#ab5a46]" />
+      <div className="w-full h-full bg-[#17110c] relative overflow-hidden rounded-sm flex items-center justify-start pl-3 pb-3">
+        <img
+          src="https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=300&q=80"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
+        />
+        <div className="relative z-10 text-[#fef8f3]">
+          <span className="block text-[6px] tracking-widest uppercase opacity-70">Two Threads Studio</span>
+          <span className="block font-serif text-xs font-normal leading-tight mt-1">Handcrafted,<br />One Stitch<br /><span className="italic">at a Time.</span></span>
+          <span className="block text-[6px] mt-2 border-b border-[#fef8f3]/60 w-max pb-0.5">Explore Collection →</span>
         </div>
       </div>
     ),
   },
   {
     id: 3,
-    name: 'Split Spotlight',
-    description: 'Asymmetric editorial layout — large animated serif headline left, curated product showcase right.',
-    icon: Columns2,
-    tag: 'Editorial',
-    tagColor: 'bg-[#1a1a2e]/30 text-[#8b7ab8] dark:bg-[#1a1a2e] dark:text-[#8b7ab8]',
+    name: 'Editorial Portfolio',
+    description: 'Black & cream luxury editorial layout with scrolling marquee typography, horizontal accent line, and center portrait cutout.',
+    icon: Sparkles,
+    tag: 'Portfolio',
+    tagColor: 'bg-[#efeee9]/20 text-[#efeee9] dark:bg-[#efeee9]/10 dark:text-[#efeee9]',
     preview: (
-      <div className="w-full h-full bg-[#120a05] relative overflow-hidden rounded-sm flex">
-        <div className="flex-1 flex flex-col justify-center pl-3 pr-2">
-          <div className="font-serif text-[#f4ebd9]/70 text-xs leading-tight">
-            <span className="block">Artisanally</span>
-            <span className="block italic text-[#ab5a46]">Crafted</span>
-            <span className="block">For You</span>
-          </div>
-          <div className="mt-2 flex gap-1">
-            <div className="w-10 h-3 bg-[#ab5a46]/80 rounded-sm" />
-            <div className="w-8 h-3 border border-[#f4ebd9]/20 rounded-sm" />
-          </div>
+      <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
+        {/* Background photo texture */}
+        <img
+          src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-50"
+        />
+        {/* Marquee representation */}
+        <div className="absolute inset-x-0 top-[20%] text-center text-[#efeee9]/40 font-hn text-[14px] sm:text-[16px] tracking-tighter whitespace-nowrap overflow-hidden font-bold select-none z-10">
+          Two Threads &mdash; Studio
         </div>
-        <div className="w-[45%] flex flex-col gap-1 pr-1 py-1">
-          {[
-            { bg: 'from-[#3d2317] to-[#2a1a14]', accent: '#ab5a46' },
-            { bg: 'from-[#1e2a1a] to-[#141c10]', accent: '#7a9b5e' },
-            { bg: 'from-[#2a1a2a] to-[#1a101a]', accent: '#8b7ab8' },
-          ].map((c, i) => (
-            <div key={i} className={`flex-1 rounded-sm bg-gradient-to-br ${c.bg} relative overflow-hidden`}>
-              <div className="absolute bottom-1 left-1">
-                <div className="w-6 h-0.5 mb-0.5" style={{ background: c.accent }} />
-                <div className="w-4 h-0.5" style={{ background: `${c.accent}60` }} />
-              </div>
-            </div>
-          ))}
+        {/* Horizontal rule line */}
+        <div className="absolute inset-x-3 bottom-5 h-[1px] bg-[#efeee9]/80 z-10" />
+        {/* Footer text preview */}
+        <div className="absolute inset-x-3 bottom-1.5 flex justify-between text-[6px] text-[#efeee9]/70 z-10 font-hn">
+          <span>Handcrafted Indigo</span>
+          <span>Two Threads Studio</span>
         </div>
+        {/* Cutout portrait in center */}
+        <img
+          src={portraitCutout}
+          alt="Preview"
+          className="absolute inset-0 h-full w-full object-contain object-bottom z-20"
+        />
+      </div>
+    ),
+  },
+  {
+    id: 4,
+    name: 'Editorial Window',
+    description: 'Quiet luxury framed image surrounded by generous whitespace, simple typography, and a single CTA.',
+    icon: Layout,
+    tag: 'Restraint',
+    tagColor: 'bg-[#efe0d8]/30 text-[#ab5a46] dark:bg-[#efe0d8]/10 dark:text-[#efe0d8]',
+    preview: (
+      <div className="w-full h-full bg-[#fef8f3] relative overflow-hidden rounded-sm flex flex-col items-center justify-center p-2 text-[#17110c]">
+        <span className="text-[7px] font-serif italic mb-1 text-[#ab5a46]">Handmade</span>
+        <div className="w-12 h-14 bg-[#e6e2dd] border border-[#17110c]/10 rounded-sm overflow-hidden mb-1 flex items-center justify-center">
+          <img
+            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=150&q=80"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <span className="text-[6px] font-serif text-center leading-tight">Crafted to become<br />tomorrow's heirloom.</span>
+        <span className="text-[6px] mt-1 border-b border-[#17110c]/40 pb-0.5">Shop →</span>
       </div>
     ),
   },
@@ -148,7 +160,7 @@ export const CMSDashboard: React.FC = () => {
   const { data, isLoading } = useAdminHeroConfig();
   const { mutate: updateHero, isPending: isSaving } = useUpdateHeroConfig();
 
-  const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | null>(null);
 
   // Sync selection from server once loaded
   const serverTemplate = data?.data?.activeTemplate ?? 1;
@@ -158,7 +170,7 @@ export const CMSDashboard: React.FC = () => {
 
   const handleSave = () => {
     if (!isDirty) return;
-    updateHero(activeSelection as 1 | 2 | 3, {
+    updateHero(activeSelection as 1 | 2 | 3 | 4, {
       onSuccess: () => setSelectedTemplate(null),
     });
   };

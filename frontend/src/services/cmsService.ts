@@ -6,7 +6,7 @@
 import { apiClient } from './apiClient';
 
 export interface HeroConfig {
-  activeTemplate: 1 | 2 | 3;
+  activeTemplate: 1 | 2 | 3 | 4;
 }
 
 export const cmsService = {
@@ -21,6 +21,6 @@ export const cmsService = {
    * Admin endpoint — updates the active hero template ID.
    * Requires ADMIN role.
    */
-  updateHeroConfig: (activeTemplate: 1 | 2 | 3): Promise<{ success: boolean; message: string; data: HeroConfig }> =>
+  updateHeroConfig: (activeTemplate: 1 | 2 | 3 | 4): Promise<{ success: boolean; message: string; data: HeroConfig }> =>
     apiClient.patch('/admin/cms/hero-config', { activeTemplate }),
 };
