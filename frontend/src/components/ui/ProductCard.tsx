@@ -192,18 +192,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className = '
         </div>
 
         {/* Trait pills */}
-        {(product.isHandmade || product.isSustainable) && (
+        {(product.isHandmade && !isBestSellerCard) && (
           <div className="flex flex-wrap gap-1 mt-2.5">
-            {product.isHandmade && !isBestSellerCard && (
-              <span className="font-sans text-[8px] tracking-wide text-[#735947] border border-[#d2c4bc] px-1.5 py-0.5 uppercase">
-                Handmade
-              </span>
-            )}
-            {product.isSustainable && (
-              <span className="font-sans text-[8px] tracking-wide text-[#3a6b3a] border border-[#c6d9c6] px-1.5 py-0.5 uppercase">
-                Sustainable
-              </span>
-            )}
+            <span className="font-sans text-[8px] tracking-wide text-[#735947] border border-[#d2c4bc] px-1.5 py-0.5 uppercase">
+              Handmade
+            </span>
           </div>
         )}
       </div>
