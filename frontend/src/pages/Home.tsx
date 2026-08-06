@@ -12,7 +12,8 @@ const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'
 const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
 const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
-const JustForYou = lazy(() => import('../components/sections/CuratedPicks'));
+const MensCollectionSection   = lazy(() => import('../components/sections/MensCollectionSection'));
+const WomensCollectionSection = lazy(() => import('../components/sections/WomensCollectionSection'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
 const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
@@ -38,24 +39,26 @@ const Home: React.FC = () => {
     <PageContainer disablePadding={true}>
       {/*
         ════════════════════════════════════════
-         HOMEPAGE SECTION ORDER — 16 Sections
+         HOMEPAGE SECTION ORDER — 17 Sections
         ════════════════════════════════════════
-        1.  Hero                   (KEEP)
-        2.  TrustBar               (NEW)
-        3.  BestSellers            (ENHANCED)
-        4.  VideoBanner            (KEEP)
-        5.  ShopByCategory         (NEW)
-        6.  ShopByOccasion         (NEW)
-        7.  FeaturedCollections    (NEW)
-        8.  Banner/ArtisanGuild    (RENAMED)
-        9.  JustForYou             (KEEP)
-        10. CustomCreations        (NEW)
-        11. OurStory/BrandStory    (REDUCED)
-        12. CraftingProcess        (NEW)
-        13. Reviews                (ENHANCED)
-        14. CommunityGallery       (NEW)
-        15. Learning               (KEEP)
-        16. CorporateBulkOrders    (NEW)
+        1.  Hero                    (KEEP)
+        2.  TrustBar                (NEW)
+        3.  BestSellers             (ENHANCED)
+        4.  VideoBanner             (KEEP)
+        5.  ShopByCategory          (NEW)
+        6.  ShopByOccasion          (NEW)
+        7.  FeaturedCollections     (NEW)
+        8.  SacredTraditionsCollection (KEEP)
+        9.  MensCollectionSection   (NEW — Men's Collection)
+        10. WomensCollectionSection (NEW — Women's Collection)
+        11. SustainabilitySection   (KEEP)
+        12. CustomCreations         (NEW)
+        13. OurStory/BrandStory     (REDUCED)
+        14. CraftingProcess         (NEW)
+        15. Reviews                 (ENHANCED)
+        16. CommunityGallery        (NEW)
+        17. Learning                (KEEP)
+        18. CorporateBulkOrders     (NEW)
       */}
 
       {/* ─── Above fold — eagerly loaded ─── */}
@@ -85,7 +88,11 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <JustForYou />
+        <MensCollectionSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <WomensCollectionSection />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
