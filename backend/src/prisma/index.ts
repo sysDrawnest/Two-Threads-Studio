@@ -18,11 +18,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 //     the pool is saturated.
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
-  max: 4,
-  idleTimeoutMillis: 5000,       // Evict idle connections quickly before Supabase drops them
-  connectionTimeoutMillis: 5000, // Fail-fast: 5 s instead of hanging for 30 s
+  max: 10,
+  idleTimeoutMillis: 30000,       // Evict idle connections after 30 seconds
+  connectionTimeoutMillis: 15000, // 15s instead of 5s to allow for connection spikes
   keepAlive: true,
-  keepAliveInitialDelayMillis: 2000,
+  keepAliveInitialDelayMillis: 10000,
   ssl: { rejectUnauthorized: false },
 });
 
