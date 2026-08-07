@@ -1,1 +1,0 @@
-import{f as r}from"./index-DpiPI0BN.js";const o={submitReview:async e=>await r.post("/reviews",e),getProductReviews:async(e,s)=>await r.get(`/reviews/product/${e}`,{params:s}),voteHelpful:async(e,s)=>await r.post(`/reviews/${e}/vote`,{isHelpful:s}),getMyReviews:async()=>await r.get("/reviews/my-reviews")};export{o as r};
