@@ -20,7 +20,7 @@
 4. **Framework Preset**: Vite
 5. **Build & Output Settings**:
    - Build Command: `npm run build`
-   - Output Directory: `build`
+   - Output Directory: `dist`
    - Install Command: `npm install`
 
 ### Required Frontend Environment Variables

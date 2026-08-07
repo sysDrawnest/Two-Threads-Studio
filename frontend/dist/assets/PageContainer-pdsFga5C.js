@@ -1,0 +1,1 @@
+import{j as e,m as i}from"./vendor-animation-DR8WaHXT.js";const s=({children:a,disablePadding:t=!1})=>e.jsx(i.div,{initial:{opacity:0,y:10},animate:{opacity:1,y:0},exit:{opacity:0,y:-10},transition:{duration:.6,ease:"easeOut"},className:"min-h-screen  flex flex-col",children:a});export{s as P};
