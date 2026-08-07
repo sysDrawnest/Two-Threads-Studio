@@ -1,0 +1,48 @@
+# Render Deployment Blueprint
+# Two Threads Studio Backend Service
+# Target Platform: Render Web Service (Node.js)
+
+services:
+  - type: web
+    name: twothreads-backend-staging
+    env: node
+    region: singapore # Choose closest region to users / DB
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        sync: false # Set in Render Dashboard (Supabase PostgreSQL Connection String)
+      - key: SUPABASE_URL
+        sync: false # Set in Render Dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true # Generates secure random 64-char string on Render
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false # Set to Vercel URL, e.g. https://two-threads-studio.vercel.app
+      - key: BACKEND_URL
+        sync: false # Set to Render URL, e.g. https://twothreads-backend.onrender.com
+      - key: RESEND_API_KEY
+        sync: false # Resend Email API Key
+      - key: RAZORPAY_KEY_ID
+        sync: false # Razorpay Sandbox Key ID (rzp_test_...)
+      - key: RAZORPAY_SECRET
+        sync: false # Razorpay Sandbox Secret Key
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false # Optional Cloudinary Cloud Name
+      - key: CLOUDINARY_API_KEY
+        sync: false # Optional Cloudinary API Key
+      - key: CLOUDINARY_API_SECRET
+        sync: false # Optional Cloudinary API Secret
+      - key: SHIPPING_PROVIDER
+        value: mock # Keep in development/mock mode for staging

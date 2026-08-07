@@ -43,7 +43,7 @@ export const CouponForm: React.FC = () => {
   const [eligibleProducts, setEligibleProducts] = useState<string[]>([]);
 
   // Fetch catalog options for multiselects
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+  const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
   const { data: categoryOptions = [] } = useQuery({
     queryKey: ['adminCategoryOptions'],
     queryFn: async () => {
