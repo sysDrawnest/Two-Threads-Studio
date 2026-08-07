@@ -4,6 +4,13 @@ import logger from '../lib/logger';
 
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
+import dns from 'dns';
+
+// Force Node.js DNS resolution to prioritize IPv4 addresses first.
+// Prevents ENETUNREACH errors on IPv4-only host environments (such as Render free-tier).
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // ─── Connection Pool ──────────────────────────────────────────────────────────
 // Prisma 7 uses a TypeScript-based ("Rust-free") client engine that requires a
