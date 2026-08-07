@@ -14,6 +14,7 @@ const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollectio
 const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
 const MensCollectionSection   = lazy(() => import('../components/sections/MensCollectionSection'));
 const WomensCollectionSection = lazy(() => import('../components/sections/WomensCollectionSection'));
+const NewArrivals             = lazy(() => import('../components/sections/NewArrivals'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
 const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
@@ -75,24 +76,23 @@ const Home: React.FC = () => {
         <ShopByCategory />
       </Suspense>
 
+      {/* Premium Clothing Collections */}
       <Suspense fallback={<SectionFallback />}>
-        <ShopByOccasion />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <FeaturedCollections />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <SacredTraditionsCollection />
+        <WomensCollectionSection />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
         <MensCollectionSection />
       </Suspense>
 
+      {/* Occasion Shopping moved below premium clothing sections */}
       <Suspense fallback={<SectionFallback />}>
-        <WomensCollectionSection />
+        <ShopByOccasion />
+      </Suspense>
+
+      {/* New Arrivals — UI Reference Design Section */}
+      <Suspense fallback={<SectionFallback />}>
+        <NewArrivals />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>

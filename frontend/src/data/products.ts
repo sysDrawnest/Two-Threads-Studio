@@ -16,8 +16,8 @@ export interface Product {
   name: string;
   price: number;
   mrp?: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Handkerchiefs" | "Handbag";
-  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Handkerchiefs" | "Handbags";
+  category: string;
+  productCategory?: string;
   collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
@@ -58,12 +58,27 @@ export interface Occasion {
 
 export const mockCategories: Category[] = [
   {
+    id: "cat-mens",
+    name: "Men's Clothing",
+    slug: "mens-clothing",
+    image: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop",
+    count: 36,
+    featured: true,
+  },
+  {
+    id: "cat-womens",
+    name: "Women's Clothing",
+    slug: "womens-clothing",
+    image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop",
+    count: 42,
+    featured: true,
+  },
+  {
     id: "cat1",
     name: "Embroidery Kits",
     slug: "embroidery-kits",
     image: "https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop",
     count: 48,
-    featured: true,
   },
   {
     id: "cat2",
@@ -94,25 +109,11 @@ export const mockCategories: Category[] = [
     count: 21,
   },
   {
-    id: "cat6",
-    name: "DIY Kits",
-    slug: "diy-kits",
-    image: "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop",
-    count: 15,
-  },
-  {
     id: "cat7",
     name: "Home Decor",
     slug: "home-decor",
     image: "https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=800&auto=format&fit=crop",
     count: 39,
-  },
-  {
-    id: "cat8",
-    name: "Gift Collection",
-    slug: "gifts",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop",
-    count: 27,
   },
 ];
 

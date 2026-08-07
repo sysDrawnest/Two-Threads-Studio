@@ -6,9 +6,9 @@ import { productService } from '../../services/productService';
 import type { Product } from '../../data/products';
 import { ArrowRight } from 'lucide-react';
 
-type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Handkerchiefs' | 'Gift Sets';
+type FilterKey = 'All' | "Men's Clothing" | "Women's Clothing" | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Handkerchiefs';
 
-const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Handkerchiefs', 'Gift Sets'];
+const filters: FilterKey[] = ['All', "Men's Clothing", "Women's Clothing", 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Handkerchiefs'];
 
 export default function BestSellers() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('All');
@@ -31,7 +31,13 @@ export default function BestSellers() {
     if (activeFilter === 'All') {
       return true;
     }
-    return p.productCategory === activeFilter;
+    if (activeFilter === "Men's Clothing") {
+      return p.category === 'mens-clothing' || p.category === "Men's Clothing" || p.productCategory === 'Clothing' || p.name.toLowerCase().includes('kurta') || p.name.toLowerCase().includes('shirt');
+    }
+    if (activeFilter === "Women's Clothing") {
+      return p.category === 'womens-clothing' || p.category === "Women's Clothing" || p.productCategory === 'Clothing' || p.name.toLowerCase().includes('dupatta') || p.name.toLowerCase().includes('sari');
+    }
+    return p.productCategory === activeFilter || p.category === activeFilter;
   }).slice(0, 8);
 
   return (
