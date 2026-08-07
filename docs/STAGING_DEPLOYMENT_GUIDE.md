@@ -45,7 +45,7 @@ Add the following key in Vercel **Environment Variables**:
    - **Environment**: `Node`
    - **Region**: Singapore (or region closest to Supabase PostgreSQL instance)
    - **Branch**: `main` (or active development branch)
-   - **Build Command**: `npm install && npx prisma generate && npm run build`
+   - **Build Command**: `npm install --legacy-peer-deps && npx prisma generate && npm run build`
    - **Start Command**: `npm start` (executes `node dist/server.js`)
 
 ### Required Backend Environment Variables
