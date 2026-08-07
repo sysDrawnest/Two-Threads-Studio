@@ -7,13 +7,17 @@
 import prisma from '../prisma';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
-
 import { promotionsEngine } from './PromotionsEngine';
+import { calculateCustomizedUnitPrice } from '../utils/pricing';
 
 export interface CartItemCalculationInput {
   productId: string;
   variantId?: string | null;
   quantity: number;
+  unitPrice?: number;
+  customization?: Record<string, any> | null;
+  giftWrap?: boolean | null;
+  engravingText?: string | null;
 }
 
 export interface PricingCalculationResult {
@@ -95,14 +99,16 @@ export const pricingEngine = {
         );
       }
 
-      let unitPrice = Number(product.price);
-
-      if (item.variantId) {
-        const variant = product.variants.find((v) => v.id === item.variantId);
-        if (variant && variant.priceAdjustment) {
-          unitPrice += Number(variant.priceAdjustment);
-        }
-      }
+      const variant = item.variantId ? product.variants.find((v) => v.id === item.variantId) : null;
+      const unitPrice = item.unitPrice !== undefined 
+        ? Number(item.unitPrice)
+        : calculateCustomizedUnitPrice({
+            basePrice: Number(product.price),
+            variantAdjustment: variant ? Number(variant.priceAdjustment) : 0,
+            customization: item.customization as Record<string, any> | null,
+            giftWrap: item.giftWrap,
+            engravingText: item.engravingText,
+          });
 
       const lineTotal = Number((unitPrice * item.quantity).toFixed(2));
       subtotal += lineTotal;

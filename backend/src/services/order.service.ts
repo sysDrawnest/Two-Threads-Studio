@@ -4,6 +4,7 @@ import { clearHomepageCache } from './product.service';
 import { cartService } from './cart.service';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
+import { calculateCustomizedUnitPrice } from '../utils/pricing';
 import {
   OrderStatus,
   PaymentStatus,
@@ -128,7 +129,7 @@ export const orderService = {
 
         let variantSku: string | null = product.sku;
         let variantName: string | null = null;
-        let finalUnitPrice = Number(product.price);
+        let variantAdjustment = 0;
 
         if (item.variantId) {
           const variant = product.variants.find((v) => v.id === item.variantId);
@@ -137,7 +138,7 @@ export const orderService = {
           }
           variantSku = variant.sku || product.sku;
           variantName = `${variant.name}: ${variant.value}`;
-          finalUnitPrice += Number(variant.priceAdjustment);
+          variantAdjustment = Number(variant.priceAdjustment);
 
           if (product.trackInventory) {
             if (variant.stockQuantity < item.quantity) {
@@ -159,6 +160,16 @@ export const orderService = {
             });
           }
         }
+
+        const finalUnitPrice = item.unitPrice !== undefined 
+          ? Number(item.unitPrice)
+          : calculateCustomizedUnitPrice({
+              basePrice: Number(product.price),
+              variantAdjustment,
+              customization: item.customization as Record<string, any> | null,
+              giftWrap: item.giftWrap,
+              engravingText: item.engravingText,
+            });
 
         // Increment sales count
         await tx.product.update({

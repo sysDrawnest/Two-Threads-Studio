@@ -2,6 +2,7 @@ import prisma from '../prisma';
 import { AppError } from '../utils/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
 import { Prisma } from '@prisma/client';
+import { calculateCustomizedUnitPrice } from '../utils/pricing';
 
 export const cartService = {
   /**
@@ -239,9 +240,18 @@ export const cartService = {
       }
     }
 
-    // 6. Formulate price snapshot
-    const priceAdjustment = variant ? Number(variant.priceAdjustment) : 0;
-    const finalPrice = Number(product.price) + priceAdjustment;
+    // 6. Formulate price snapshot incorporating custom option add-ons
+    const effectiveCustomization = customization !== undefined ? customization : existingItem?.customization;
+    const effectiveGiftWrap = giftWrap !== undefined ? giftWrap : existingItem?.giftWrap;
+    const effectiveEngravingText = engravingText !== undefined ? engravingText : existingItem?.engravingText;
+
+    const finalPrice = calculateCustomizedUnitPrice({
+      basePrice: Number(product.price),
+      variantAdjustment: variant ? Number(variant.priceAdjustment) : 0,
+      customization: effectiveCustomization as Record<string, any> | null,
+      giftWrap: effectiveGiftWrap,
+      engravingText: effectiveEngravingText,
+    });
     const primaryImage = product.images[0]?.url || '';
     const sku = variant?.sku || product.sku || '';
     const variantName = variant ? `${variant.name}: ${variant.value}` : null;
@@ -334,9 +344,18 @@ export const cartService = {
       }
     }
 
-    // Dynamic price snapshot refresh
-    const priceAdjustment = cartItem.variant ? Number(cartItem.variant.priceAdjustment) : 0;
-    const finalPrice = Number(cartItem.product.price) + priceAdjustment;
+    // Dynamic price snapshot refresh incorporating updated customization options
+    const updatedCustomization = customization !== undefined ? customization : cartItem.customization;
+    const updatedGiftWrap = giftWrap !== undefined ? giftWrap : cartItem.giftWrap;
+    const updatedEngravingText = engravingText !== undefined ? engravingText : cartItem.engravingText;
+
+    const finalPrice = calculateCustomizedUnitPrice({
+      basePrice: Number(cartItem.product.price),
+      variantAdjustment: cartItem.variant ? Number(cartItem.variant.priceAdjustment) : 0,
+      customization: updatedCustomization as Record<string, any> | null,
+      giftWrap: updatedGiftWrap,
+      engravingText: updatedEngravingText,
+    });
 
     return prisma.cartItem.update({
       where: { id: itemId },
