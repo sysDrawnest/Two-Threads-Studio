@@ -7,7 +7,6 @@ import {
 } from '../components/sections';
 
 // Lazy load all below-fold sections for performance
-const NewArrivals = lazy(() => import('../components/sections/NewArrivals'));
 const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
 const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
 const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
@@ -38,73 +37,80 @@ const SectionFallback = () => (
 const Home: React.FC = () => {
   return (
     <PageContainer disablePadding={true}>
+      {/*
+        ════════════════════════════════════════
+         HOMEPAGE SECTION ORDER — 17 Sections
+        ════════════════════════════════════════
+        1.  Hero                    (KEEP)
+        2.  TrustBar                (NEW)
+        3.  BestSellers             (ENHANCED)
+        4.  VideoBanner             (KEEP)
+        5.  ShopByCategory          (NEW)
+        6.  ShopByOccasion          (NEW)
+        7.  FeaturedCollections     (NEW)
+        8.  SacredTraditionsCollection (KEEP)
+        9.  MensCollectionSection   (NEW — Men's Collection)
+        10. WomensCollectionSection (NEW — Women's Collection)
+        11. SustainabilitySection   (KEEP)
+        12. CustomCreations         (NEW)
+        13. OurStory/BrandStory     (REDUCED)
+        14. CraftingProcess         (NEW)
+        15. Reviews                 (ENHANCED)
+        16. CommunityGallery        (NEW)
+        17. Learning                (KEEP)
+        18. CorporateBulkOrders     (NEW)
+      */}
+
       {/* ─── Above fold — eagerly loaded ─── */}
       <Hero />
       <TrustBar />
       <BestSellers />
 
-      {/* ─── Below fold — lazily loaded in optimized order ─── */}
-      {/* 1. New Arrivals */}
-      <Suspense fallback={<SectionFallback />}>
-        <NewArrivals />
-      </Suspense>
-
-      {/* 2. Premium Menswear Collection (Moved higher up) */}
-      <Suspense fallback={<SectionFallback />}>
-        <MensCollectionSection />
-      </Suspense>
-
-      {/* 3. Premium Womenswear Collection (Moved higher up) */}
-      <Suspense fallback={<SectionFallback />}>
-        <WomensCollectionSection />
-      </Suspense>
-
-      {/* 4. Video Showcase / Exclusive Collection */}
       <Suspense fallback={<SectionFallback />}>
         <VideoBanner />
       </Suspense>
 
-      {/* 5. Sacred Traditions Collection */}
-      <Suspense fallback={<SectionFallback />}>
-        <SacredTraditionsCollection />
-      </Suspense>
-
-      {/* 6. Shop by Occasion (Moved below Sacred Traditions Collection) */}
-      <Suspense fallback={<SectionFallback />}>
-        <ShopByOccasion />
-      </Suspense>
-
-      {/* 7. Shop by Category (Featured Menswear & Womenswear) */}
+      {/* ─── Below fold — lazily loaded ─── */}
       <Suspense fallback={<SectionFallback />}>
         <ShopByCategory />
       </Suspense>
 
-      {/* 8. Featured Collections */}
+      <Suspense fallback={<SectionFallback />}>
+        <ShopByOccasion />
+      </Suspense>
+
       <Suspense fallback={<SectionFallback />}>
         <FeaturedCollections />
       </Suspense>
 
-      {/* 9. Sustainability */}
+      <Suspense fallback={<SectionFallback />}>
+        <SacredTraditionsCollection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <MensCollectionSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <WomensCollectionSection />
+      </Suspense>
+
       <Suspense fallback={<SectionFallback />}>
         <SustainabilitySection />
       </Suspense>
 
-      {/* 10. Custom Bespoke Creations */}
       <Suspense fallback={<SectionFallback />}>
         <CustomCreations />
       </Suspense>
 
-      {/* 11. Our Brand Story */}
       <Suspense fallback={<SectionFallback />}>
         <OurStory />
       </Suspense>
 
-      {/* 12. Crafting Process */}
       <Suspense fallback={<SectionFallback />}>
         <CraftingProcess />
       </Suspense>
 
-      {/* 13. Customer Reviews & Community */}
       <Suspense fallback={<SectionFallback />}>
         <Reviews />
       </Suspense>
@@ -113,7 +119,6 @@ const Home: React.FC = () => {
         <CommunityGallery />
       </Suspense>
 
-      {/* 14. Learning & Corporate Orders */}
       <Suspense fallback={<SectionFallback />}>
         <Learning />
       </Suspense>

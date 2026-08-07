@@ -1364,8 +1364,6 @@ model StudioSettings {
   // ── CMS Configuration ────────────────────
   /// Active hero template: 1 = Original, 2 = Editorial Slideshow, 3 = Split Spotlight
   activeHeroTemplate     Int      @default(1)
-  /// Dynamic homepage merchandising configuration (sections order, section settings, product selections)
-  homepageMerchandising Json?
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

@@ -23,16 +23,4 @@ export const cmsService = {
    */
   updateHeroConfig: (activeTemplate: 1 | 2 | 3 | 4): Promise<{ success: boolean; message: string; data: HeroConfig }> =>
     apiClient.patch('/admin/cms/hero-config', { activeTemplate }),
-
-  /**
-   * Public endpoint — fetches homepage merchandising configuration.
-   */
-  getHomepageMerchandising: (): Promise<{ success: boolean; data: { merchandising: any } }> =>
-    apiClient.get('/cms/homepage-merchandising'),
-
-  /**
-   * Admin endpoint — updates homepage merchandising configuration.
-   */
-  updateHomepageMerchandising: (merchandisingData: any): Promise<{ success: boolean; message: string; data: { merchandising: any } }> =>
-    apiClient.patch('/admin/cms/homepage-merchandising', merchandisingData),
 };

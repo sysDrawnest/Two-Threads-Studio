@@ -4,7 +4,7 @@
  * Currently contains: Hero Section module.
  * Architecture is designed to expand with future modules (Banner, Collections, etc.)
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   AlertTriangle,
   Layout,
@@ -17,20 +17,9 @@ import {
   Columns2,
   Clock,
   Sparkles,
-  Sliders,
-  Grid,
-  ShoppingBag,
-  ListOrdered,
-  Plus,
-  Trash2,
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.png';
-import {
-  useAdminHeroConfig,
-  useUpdateHeroConfig,
-  useHomepageMerchandising,
-  useUpdateHomepageMerchandising,
-} from '../../hooks/useCms';
+import { useAdminHeroConfig, useUpdateHeroConfig } from '../../hooks/useCms';
 import { AdminSkeleton } from '../../components/admin/ui';
 
 // ─── Template metadata ────────────────────────────────────────────────────────
@@ -100,19 +89,24 @@ const TEMPLATES: TemplateOption[] = [
     tagColor: 'bg-[#efeee9]/20 text-[#efeee9] dark:bg-[#efeee9]/10 dark:text-[#efeee9]',
     preview: (
       <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
+        {/* Background photo texture */}
         <img
           src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-50"
         />
+        {/* Marquee representation */}
         <div className="absolute inset-x-0 top-[20%] text-center text-[#efeee9]/40 font-hn text-[14px] sm:text-[16px] tracking-tighter whitespace-nowrap overflow-hidden font-bold select-none z-10">
           Two Threads &mdash; Studio
         </div>
+        {/* Horizontal rule line */}
         <div className="absolute inset-x-3 bottom-5 h-[1px] bg-[#efeee9]/80 z-10" />
+        {/* Footer text preview */}
         <div className="absolute inset-x-3 bottom-1.5 flex justify-between text-[6px] text-[#efeee9]/70 z-10 font-hn">
           <span>Handcrafted Indigo</span>
           <span>Two Threads Studio</span>
         </div>
+        {/* Cutout portrait in center */}
         <img
           src={portraitCutout}
           alt="Preview"
@@ -145,63 +139,47 @@ const TEMPLATES: TemplateOption[] = [
   },
 ];
 
-export const CMSDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'hero' | 'merchandising'>('merchandising');
+// ─── Future module placeholder ────────────────────────────────────────────────
 
-  // Hero config query & mutation
-  const { data: heroData, isLoading: isHeroLoading } = useAdminHeroConfig();
-  const { mutate: updateHero, isPending: isSavingHero } = useUpdateHeroConfig();
+const FUTURE_MODULES = [
+  'Homepage',
+  'Banners',
+  'Collections',
+  'Product Sections',
+  'Learning Studio',
+  'Blog',
+  'Footer',
+  'Navigation',
+  'SEO',
+  'Landing Pages',
+];
+
+// ─── Main Component ────────────────────────────────────────────────────────────
+
+export const CMSDashboard: React.FC = () => {
+  const { data, isLoading } = useAdminHeroConfig();
+  const { mutate: updateHero, isPending: isSaving } = useUpdateHeroConfig();
+
   const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | null>(null);
 
-  // Merchandising query & mutation
-  const { data: merchData, isLoading: isMerchLoading } = useHomepageMerchandising();
-  const { mutate: updateMerch, isPending: isSavingMerch } = useUpdateHomepageMerchandising();
-
-  // Local Merchandising Form State
-  const [merchState, setMerchState] = useState({
-    bestSellersTitle: 'Curated Masterpieces',
-    bestSellersSubtitle: 'Best Sellers',
-    bestSellersMax: 8,
-    newArrivalsTitle: 'New Arrivals',
-    newArrivalsSubtitle: 'Fresh Off The Loom',
-    newArrivalsMax: 8,
-    menswearTitle: 'Tailored Elegance',
-    menswearSubtitle: 'Premium Menswear Collection',
-    womenswearTitle: 'Grace in Every Stitch',
-    womenswearSubtitle: 'Premium Womenswear Collection',
-    sectionsOrder: ['hero', 'trustBar', 'bestSellers', 'newArrivals', 'menswear', 'womenswear', 'videoBanner', 'sacredTraditions', 'shopByOccasion', 'shopByCategory'],
-  });
-
-  useEffect(() => {
-    if (merchData?.data?.merchandising) {
-      const m = merchData.data.merchandising;
-      setMerchState(prev => ({
-        ...prev,
-        ...m,
-      }));
-    }
-  }, [merchData]);
-
-  const serverTemplate = heroData?.data?.activeTemplate ?? 1;
+  // Sync selection from server once loaded
+  const serverTemplate = data?.data?.activeTemplate ?? 1;
   const activeSelection = selectedTemplate ?? serverTemplate;
-  const isHeroDirty = selectedTemplate !== null && selectedTemplate !== serverTemplate;
 
-  const handleSaveHero = () => {
-    if (!isHeroDirty) return;
+  const isDirty = selectedTemplate !== null && selectedTemplate !== serverTemplate;
+
+  const handleSave = () => {
+    if (!isDirty) return;
     updateHero(activeSelection as 1 | 2 | 3 | 4, {
       onSuccess: () => setSelectedTemplate(null),
     });
-  };
-
-  const handleSaveMerchandising = () => {
-    updateMerch(merchState);
   };
 
   const handlePreview = () => {
     window.open('/', '_blank', 'noopener,noreferrer');
   };
 
-  if (isHeroLoading || isMerchLoading) {
+  if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto space-y-4">
         <AdminSkeleton className="h-28 w-full" />
@@ -212,6 +190,7 @@ export const CMSDashboard: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
+
       {/* ── Page header ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -220,220 +199,220 @@ export const CMSDashboard: React.FC = () => {
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold text-[#1f1610] dark:text-white">
-              Content & Merchandising CMS
+              Content Management
             </h1>
             <p className="text-sm text-[#786455] dark:text-[#ccb08a] mt-0.5">
-              Control live storefront sections, hero templates, and product merchandising
+              Manage live storefront content — CMS Phase 1
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handlePreview}
-            className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-md border border-[#c8b5aa]/60 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors"
-          >
-            <Eye className="h-3.5 w-3.5" />
-            Preview Live Website
-          </button>
-        </div>
       </div>
 
-      {/* ── Tab Switcher ─── */}
-      <div className="flex border-b border-[#c8b5aa]/40 dark:border-[#3d332b] gap-6">
-        <button
-          onClick={() => setActiveTab('merchandising')}
-          className={`pb-3 text-xs font-mono uppercase tracking-widest font-semibold transition-all cursor-pointer border-b-2 ${
-            activeTab === 'merchandising'
-              ? 'border-[#ab5a46] text-[#ab5a46]'
-              : 'border-transparent text-[#786455] hover:text-[#1f1610] dark:text-[#ccb08a]'
-          }`}
-        >
-          Homepage Merchandising & Sections
-        </button>
-        <button
-          onClick={() => setActiveTab('hero')}
-          className={`pb-3 text-xs font-mono uppercase tracking-widest font-semibold transition-all cursor-pointer border-b-2 ${
-            activeTab === 'hero'
-              ? 'border-[#ab5a46] text-[#ab5a46]'
-              : 'border-transparent text-[#786455] hover:text-[#1f1610] dark:text-[#ccb08a]'
-          }`}
-        >
-          Hero Layout Templates
-        </button>
-      </div>
+      {/* ── Enterprise Warning Panel ─── */}
+      <div className="relative overflow-hidden rounded-md border border-amber-500/40 bg-amber-950/10 dark:bg-amber-950/25 p-5 sm:p-6">
+        {/* Gradient accent bar */}
+        <div className="absolute left-0 inset-y-0 w-1 bg-gradient-to-b from-amber-500 via-orange-500 to-amber-600" />
 
-      {/* ── TAB 1: Merchandising & Section Controls ─── */}
-      {activeTab === 'merchandising' && (
-        <div className="space-y-6">
-          <div className="rounded-md border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-[#c8b5aa]/40 pb-4">
-              <div>
-                <h2 className="font-serif text-lg font-bold text-[#1f1610] dark:text-white flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-[#ab5a46]" />
-                  Section Titles & Display Settings
-                </h2>
-                <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70">
-                  Configure headings, item limits, and featured product displays across key storefront sections.
-                </p>
-              </div>
-              <button
-                onClick={handleSaveMerchandising}
-                disabled={isSavingMerch}
-                className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40"
-              >
-                <Save className="h-3.5 w-3.5" />
-                {isSavingMerch ? 'Saving…' : 'Save Merchandising Config'}
-              </button>
-            </div>
-
-            {/* Best Sellers Settings */}
-            <div className="p-4 rounded border border-[#c8b5aa]/30 bg-white/50 dark:bg-black/20 space-y-3">
-              <h3 className="font-sans text-xs uppercase font-bold tracking-widest text-[#ab5a46]">
-                Best Sellers Section Configuration
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Section Title</label>
-                  <input
-                    type="text"
-                    value={merchState.bestSellersTitle}
-                    onChange={e => setMerchState({ ...merchState, bestSellersTitle: e.target.value })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Subtitle / Badge</label>
-                  <input
-                    type="text"
-                    value={merchState.bestSellersSubtitle}
-                    onChange={e => setMerchState({ ...merchState, bestSellersSubtitle: e.target.value })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Max Displayed Items</label>
-                  <input
-                    type="number"
-                    value={merchState.bestSellersMax}
-                    onChange={e => setMerchState({ ...merchState, bestSellersMax: Number(e.target.value) })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* New Arrivals Settings */}
-            <div className="p-4 rounded border border-[#c8b5aa]/30 bg-white/50 dark:bg-black/20 space-y-3">
-              <h3 className="font-sans text-xs uppercase font-bold tracking-widest text-[#ab5a46]">
-                New Arrivals Section Configuration
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Section Title</label>
-                  <input
-                    type="text"
-                    value={merchState.newArrivalsTitle}
-                    onChange={e => setMerchState({ ...merchState, newArrivalsTitle: e.target.value })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Subtitle / Badge</label>
-                  <input
-                    type="text"
-                    value={merchState.newArrivalsSubtitle}
-                    onChange={e => setMerchState({ ...merchState, newArrivalsSubtitle: e.target.value })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-mono text-[#786455] mb-1">Max Displayed Items</label>
-                  <input
-                    type="number"
-                    value={merchState.newArrivalsMax}
-                    onChange={e => setMerchState({ ...merchState, newArrivalsMax: Number(e.target.value) })}
-                    className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Menswear & Womenswear Titles */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded border border-[#c8b5aa]/30 bg-white/50 dark:bg-black/20 space-y-3">
-                <h3 className="font-sans text-xs uppercase font-bold tracking-widest text-[#ab5a46]">
-                  Premium Menswear Banner Title
-                </h3>
-                <input
-                  type="text"
-                  value={merchState.menswearTitle}
-                  onChange={e => setMerchState({ ...merchState, menswearTitle: e.target.value })}
-                  className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                />
-              </div>
-
-              <div className="p-4 rounded border border-[#c8b5aa]/30 bg-white/50 dark:bg-black/20 space-y-3">
-                <h3 className="font-sans text-xs uppercase font-bold tracking-widest text-[#ab5a46]">
-                  Premium Womenswear Banner Title
-                </h3>
-                <input
-                  type="text"
-                  value={merchState.womenswearTitle}
-                  onChange={e => setMerchState({ ...merchState, womenswearTitle: e.target.value })}
-                  className="w-full p-2 border rounded border-[#c8b5aa]/40 text-xs"
-                />
-              </div>
+        <div className="flex gap-4 pl-2">
+          <div className="shrink-0 mt-0.5">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="font-sans text-sm font-semibold text-amber-600 dark:text-amber-400 tracking-wide uppercase">
+              Live Storefront Content — Handle With Care
+            </h2>
+            <div className="space-y-1.5 text-sm text-[#5c4a3a] dark:text-[#d4b896]/80 leading-relaxed">
+              <p>
+                Changes made here are applied <strong className="text-amber-600 dark:text-amber-400">immediately</strong> to
+                the live customer-facing website. There is no staging buffer.
+              </p>
+              <p>
+                Incorrect settings may disrupt the customer experience for all active visitors.
+                Only authorized administrators should modify CMS settings.
+              </p>
+              <p className="font-medium text-[#4a3828] dark:text-[#ccb08a]">
+                Do not make changes unless you fully understand their visual and business impact.
+              </p>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* ── TAB 2: Hero Layout Selector ─── */}
-      {activeTab === 'hero' && (
-        <div className="rounded-md border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8b5aa]/40 dark:border-[#3d332b]">
-            <div className="flex items-center gap-3">
-              <Image className="h-4 w-4 text-[#786455] dark:text-[#ccb08a]" />
-              <h2 className="font-sans text-sm font-semibold text-[#1f1610] dark:text-white tracking-wide">
-                Hero Section Template Selector
-              </h2>
-            </div>
+      {/* ── Hero Section Module ─── */}
+      <div className="rounded-md border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] overflow-hidden">
+
+        {/* Module header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8b5aa]/40 dark:border-[#3d332b]">
+          <div className="flex items-center gap-3">
+            <Image className="h-4 w-4 text-[#786455] dark:text-[#ccb08a]" />
+            <h2 className="font-sans text-sm font-semibold text-[#1f1610] dark:text-white tracking-wide">
+              Hero Section
+            </h2>
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Current active label */}
+            {!isDirty && (
+              <span className="hidden sm:flex items-center gap-1.5 text-xs text-[#786455] dark:text-[#ccb08a]/70">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                Template {serverTemplate} active
+              </span>
+            )}
+            {isDirty && (
+              <span className="hidden sm:flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                <Clock className="w-3.5 h-3.5" />
+                Unsaved changes
+              </span>
+            )}
+
             <button
-              onClick={handleSaveHero}
-              disabled={!isHeroDirty || isSavingHero}
-              className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40"
+              onClick={handlePreview}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded border border-[#c8b5aa]/60 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              Preview Live
+            </button>
+
+            <button
+              onClick={handleSave}
+              disabled={!isDirty || isSaving}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Save className="h-3.5 w-3.5" />
-              {isSavingHero ? 'Saving…' : 'Save Hero Template'}
+              {isSaving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
+        </div>
 
-          <div className="p-6 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {TEMPLATES.map(template => {
-                const Icon = template.icon;
-                const isSelected = activeSelection === template.id;
-                return (
-                  <button
-                    key={template.id}
-                    onClick={() => setSelectedTemplate(template.id)}
-                    className={`text-left rounded-md border-2 p-4 transition-all ${
-                      isSelected ? 'border-[#ab5a46] bg-white' : 'border-[#c8b5aa]/30 hover:border-[#ab5a46]/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-serif text-sm font-semibold">{template.name}</span>
-                      <Icon className="w-4 h-4 text-[#ab5a46]" />
+        {/* Module body — template selector */}
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-[#786455] dark:text-[#ccb08a]/70">
+            Select the hero layout displayed at the top of the homepage. Changes take effect immediately for all visitors.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {TEMPLATES.map(template => {
+              const Icon = template.icon;
+              const isSelected = activeSelection === template.id;
+              const isCurrentServer = serverTemplate === template.id;
+
+              return (
+                <button
+                  key={template.id}
+                  onClick={() => setSelectedTemplate(template.id)}
+                  className={`
+                    group relative text-left rounded-md border-2 overflow-hidden transition-all duration-200
+                    ${isSelected
+                      ? 'border-[#ab5a46] shadow-md shadow-[#ab5a46]/20'
+                      : 'border-[#c8b5aa]/40 dark:border-[#3d332b] hover:border-[#ab5a46]/50'
+                    }
+                  `}
+                  aria-pressed={isSelected}
+                  aria-label={`Select ${template.name}`}
+                >
+                  {/* Preview thumbnail */}
+                  <div className="aspect-video w-full bg-[#2a1a14] overflow-hidden">
+                    {template.preview}
+                  </div>
+
+                  {/* Card body */}
+                  <div className="p-4 bg-[#fef8f3] dark:bg-[#1e1610]">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-[#ab5a46]' : 'text-[#786455] dark:text-[#ccb08a]'}`} />
+                        <span className={`font-sans text-xs font-semibold ${isSelected ? 'text-[#ab5a46]' : 'text-[#1f1610] dark:text-white'}`}>
+                          {template.name}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <span className={`text-[9px] font-medium tracking-wide px-1.5 py-0.5 rounded-full ${template.tagColor}`}>
+                          {template.tag}
+                        </span>
+                        {isCurrentServer && (
+                          <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            ✓ Active
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-xs text-neutral-500">{template.description}</p>
-                  </button>
-                );
-              })}
+                    <p className="font-sans text-[11px] text-[#786455] dark:text-[#ccb08a]/70 leading-relaxed">
+                      {template.description}
+                    </p>
+                  </div>
+
+                  {/* Selected indicator ring */}
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#ab5a46] flex items-center justify-center shadow-md">
+                      <CheckCircle2 className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Save / action footer */}
+          {isDirty && (
+            <div className="flex items-center justify-between pt-4 border-t border-[#c8b5aa]/30 dark:border-[#3d332b]">
+              <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Template {activeSelection} will go live immediately for all customers on save
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSelectedTemplate(null)}
+                  className="text-xs px-3 py-1.5 rounded border border-[#c8b5aa]/50 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors"
+                >
+                  Discard
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="text-xs px-4 py-1.5 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40"
+                >
+                  {isSaving ? 'Saving…' : `Publish Template ${activeSelection}`}
+                </button>
+              </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Future Modules ─── */}
+      <div className="rounded-md border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#c8b5aa]/30 dark:border-[#3d332b] flex items-center justify-between">
+          <div>
+            <h2 className="font-sans text-sm font-semibold text-[#1f1610] dark:text-white">
+              Upcoming CMS Modules
+            </h2>
+            <p className="text-xs text-[#786455] dark:text-[#ccb08a]/60 mt-0.5">
+              Additional content areas will be added in future CMS phases
+            </p>
+          </div>
+          <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-[#d1c4bd]/30 dark:bg-[#2c231c] text-[#786455] dark:text-[#ccb08a]">
+            Phase 2+
+          </span>
+        </div>
+
+        <div className="p-6">
+          <div className="flex flex-wrap gap-2">
+            {FUTURE_MODULES.map(mod => (
+              <div
+                key={mod}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded border border-[#c8b5aa]/30 dark:border-[#3d332b] text-xs text-[#786455]/60 dark:text-[#ccb08a]/40 select-none"
+              >
+                <ChevronRight className="w-3 h-3" />
+                {mod}
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
+
     </div>
   );
 };

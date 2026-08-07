@@ -70,48 +70,4 @@ export const cmsController = {
       next(err);
     }
   },
-
-  /**
-   * GET /api/v1/cms/homepage-merchandising
-   * Public endpoint — returns dynamic homepage merchandising configuration.
-   */
-  getHomepageMerchandising: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      let settings = await prisma.studioSettings.findUnique({ where: SINGLETON_WHERE });
-
-      if (!settings) {
-        settings = await prisma.studioSettings.create({ data: {} });
-      }
-
-      return successResponse(res, {
-        merchandising: settings.homepageMerchandising || null,
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  /**
-   * PATCH /api/v1/admin/cms/homepage-merchandising
-   * Admin only — updates dynamic homepage merchandising layout and section settings.
-   */
-  updateHomepageMerchandising: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const merchandising = req.body;
-
-      const settings = await prisma.studioSettings.upsert({
-        where: SINGLETON_WHERE,
-        create: { homepageMerchandising: merchandising },
-        update: { homepageMerchandising: merchandising },
-      });
-
-      return successResponse(
-        res,
-        { merchandising: settings.homepageMerchandising },
-        'Homepage merchandising configuration updated successfully'
-      );
-    } catch (err) {
-      next(err);
-    }
-  },
 };
