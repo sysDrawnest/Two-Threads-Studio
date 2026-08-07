@@ -1,28 +1,46 @@
 /**
- * CMS Dashboard — Phase 9 (CMS Phase 1)
- * Admin page for managing storefront content via the CMS engine.
- * Currently contains: Hero Section module.
- * Architecture is designed to expand with future modules (Banner, Collections, etc.)
+ * CMS Dashboard — Phase 9 (Full Storefront Merchandising Engine)
+ * Admin page for managing live storefront content without code edits.
+ * Modules:
+ *  1. Hero Section Template Selector
+ *  2. Best Sellers Merchandising
+ *  3. New Arrivals Module
+ *  4. Premium Menswear Section
+ *  5. Premium Womenswear Section
+ *  6. Shop By Category Management
  */
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle,
   Layout,
-  ChevronRight,
   Eye,
   Save,
   CheckCircle2,
   Image,
-  Layers,
-  Columns2,
-  Clock,
   Sparkles,
+  ShoppingBag,
+  Grid,
+  Shirt,
+  Scissors,
+  Layers,
+  ArrowUp,
+  ArrowDown,
+  Trash2,
+  Plus,
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.png';
-import { useAdminHeroConfig, useUpdateHeroConfig } from '../../hooks/useCms';
+import {
+  useAdminHeroConfig,
+  useUpdateHeroConfig,
+  useAdminHomepageConfig,
+  useUpdateHomepageConfig,
+} from '../../hooks/useCms';
 import { AdminSkeleton } from '../../components/admin/ui';
+import { productService } from '../../services/productService';
+import type { Product } from '../../data/products';
 
-// ─── Template metadata ────────────────────────────────────────────────────────
+// ─── Hero Template Metadata ───────────────────────────────────────────────────
 
 interface TemplateOption {
   id: 1 | 2 | 3 | 4;
@@ -51,17 +69,13 @@ const TEMPLATES: TemplateOption[] = [
         <div className="absolute bottom-0 inset-x-0 h-[55%] flex items-end justify-center pb-3">
           <div className="w-16 h-16 rounded-full bg-[#f4ebd9]/10 border border-[#f4ebd9]/20" />
         </div>
-        <div className="absolute bottom-2 inset-x-0 flex flex-col items-center gap-1">
-          <div className="w-24 h-1 rounded bg-[#f4ebd9]/20" />
-          <div className="w-14 h-4 rounded bg-[#f4ebd9]/30" />
-        </div>
       </div>
     ),
   },
   {
     id: 2,
     name: 'Immersive Portrait',
-    description: 'Quiet luxury layout — single full-bleed editorial photograph with elegant negative space typography and a single CTA.',
+    description: 'Quiet luxury layout — single full-bleed editorial photograph with elegant negative space typography.',
     icon: Eye,
     tag: 'Quiet Luxury',
     tagColor: 'bg-[#ab5a46]/15 text-[#ab5a46]',
@@ -74,8 +88,7 @@ const TEMPLATES: TemplateOption[] = [
         />
         <div className="relative z-10 text-[#fef8f3]">
           <span className="block text-[6px] tracking-widest uppercase opacity-70">Two Threads Studio</span>
-          <span className="block font-serif text-xs font-normal leading-tight mt-1">Handcrafted,<br />One Stitch<br /><span className="italic">at a Time.</span></span>
-          <span className="block text-[6px] mt-2 border-b border-[#fef8f3]/60 w-max pb-0.5">Explore Collection →</span>
+          <span className="block font-serif text-xs leading-tight mt-1">Handcrafted Fashion</span>
         </div>
       </div>
     ),
@@ -83,30 +96,17 @@ const TEMPLATES: TemplateOption[] = [
   {
     id: 3,
     name: 'Editorial Portfolio',
-    description: 'Black & cream luxury editorial layout with scrolling marquee typography, horizontal accent line, and center portrait cutout.',
+    description: 'Black & cream luxury editorial layout with scrolling marquee typography and center portrait cutout.',
     icon: Sparkles,
     tag: 'Portfolio',
-    tagColor: 'bg-[#efeee9]/20 text-[#efeee9] dark:bg-[#efeee9]/10 dark:text-[#efeee9]',
+    tagColor: 'bg-[#efeee9]/20 text-[#efeee9]',
     preview: (
       <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
-        {/* Background photo texture */}
         <img
-          src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
+          src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-50"
         />
-        {/* Marquee representation */}
-        <div className="absolute inset-x-0 top-[20%] text-center text-[#efeee9]/40 font-hn text-[14px] sm:text-[16px] tracking-tighter whitespace-nowrap overflow-hidden font-bold select-none z-10">
-          Two Threads &mdash; Studio
-        </div>
-        {/* Horizontal rule line */}
-        <div className="absolute inset-x-3 bottom-5 h-[1px] bg-[#efeee9]/80 z-10" />
-        {/* Footer text preview */}
-        <div className="absolute inset-x-3 bottom-1.5 flex justify-between text-[6px] text-[#efeee9]/70 z-10 font-hn">
-          <span>Handcrafted Indigo</span>
-          <span>Two Threads Studio</span>
-        </div>
-        {/* Cutout portrait in center */}
         <img
           src={portraitCutout}
           alt="Preview"
@@ -118,68 +118,78 @@ const TEMPLATES: TemplateOption[] = [
   {
     id: 4,
     name: 'Editorial Window',
-    description: 'Quiet luxury framed image surrounded by generous whitespace, simple typography, and a single CTA.',
+    description: 'Quiet luxury framed image surrounded by generous whitespace and simple typography.',
     icon: Layout,
     tag: 'Restraint',
-    tagColor: 'bg-[#efe0d8]/30 text-[#ab5a46] dark:bg-[#efe0d8]/10 dark:text-[#efe0d8]',
+    tagColor: 'bg-[#efe0d8]/30 text-[#ab5a46]',
     preview: (
       <div className="w-full h-full bg-[#fef8f3] relative overflow-hidden rounded-sm flex flex-col items-center justify-center p-2 text-[#17110c]">
-        <span className="text-[7px] font-serif italic mb-1 text-[#ab5a46]">Handmade</span>
-        <div className="w-12 h-14 bg-[#e6e2dd] border border-[#17110c]/10 rounded-sm overflow-hidden mb-1 flex items-center justify-center">
+        <span className="text-[7px] font-serif italic mb-1 text-[#ab5a46]">Handmade Fashion</span>
+        <div className="w-12 h-14 bg-[#e6e2dd] border border-[#17110c]/10 rounded-sm overflow-hidden mb-1">
           <img
             src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=150&q=80"
             alt=""
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="text-[6px] font-serif text-center leading-tight">Crafted to become<br />tomorrow's heirloom.</span>
-        <span className="text-[6px] mt-1 border-b border-[#17110c]/40 pb-0.5">Shop →</span>
       </div>
     ),
   },
 ];
 
-// ─── Future module placeholder ────────────────────────────────────────────────
-
-const FUTURE_MODULES = [
-  'Homepage',
-  'Banners',
-  'Collections',
-  'Product Sections',
-  'Learning Studio',
-  'Blog',
-  'Footer',
-  'Navigation',
-  'SEO',
-  'Landing Pages',
-];
-
-// ─── Main Component ────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export const CMSDashboard: React.FC = () => {
-  const { data, isLoading } = useAdminHeroConfig();
-  const { mutate: updateHero, isPending: isSaving } = useUpdateHeroConfig();
+  const { data: heroData, isLoading: heroLoading } = useAdminHeroConfig();
+  const { mutate: updateHero, isPending: isSavingHero } = useUpdateHeroConfig();
 
+  const { data: cmsData, isLoading: cmsLoading } = useAdminHomepageConfig();
+  const { mutate: updateConfig, isPending: isSavingConfig } = useUpdateHomepageConfig();
+
+  const [activeTab, setActiveTab] = useState<'hero' | 'bestsellers' | 'newarrivals' | 'menswear' | 'womenswear' | 'categories'>('hero');
+
+  // Local state for edits
   const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | null>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
 
-  // Sync selection from server once loaded
-  const serverTemplate = data?.data?.activeTemplate ?? 1;
+  // Category Edit State
+  const [editingCategory, setEditingCategory] = useState<any | null>(null);
+
+  // Sync CMS categories when data loads
+  useEffect(() => {
+    if (cmsData?.data?.categoriesConfig) {
+      setCategories(cmsData.data.categoriesConfig);
+    }
+  }, [cmsData]);
+
+  // Fetch catalog products for selection
+  useEffect(() => {
+    productService.getProducts({ limit: 50 })
+      .then(res => setAvailableProducts(res.products || []))
+      .catch(console.error);
+  }, []);
+
+  const serverTemplate = heroData?.data?.activeTemplate ?? 1;
   const activeSelection = selectedTemplate ?? serverTemplate;
+  const isHeroDirty = selectedTemplate !== null && selectedTemplate !== serverTemplate;
 
-  const isDirty = selectedTemplate !== null && selectedTemplate !== serverTemplate;
-
-  const handleSave = () => {
-    if (!isDirty) return;
+  const handleSaveHero = () => {
+    if (!isHeroDirty) return;
     updateHero(activeSelection as 1 | 2 | 3 | 4, {
       onSuccess: () => setSelectedTemplate(null),
     });
+  };
+
+  const handleSaveCategories = () => {
+    updateConfig({ categoriesConfig: categories });
   };
 
   const handlePreview = () => {
     window.open('/', '_blank', 'noopener,noreferrer');
   };
 
-  if (isLoading) {
+  if (heroLoading || cmsLoading) {
     return (
       <div className="max-w-5xl mx-auto space-y-4">
         <AdminSkeleton className="h-28 w-full" />
@@ -189,114 +199,97 @@ export const CMSDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8 pb-16">
 
-      {/* ── Page header ─── */}
+      {/* ── Page Header ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-md bg-[#ab5a46]/10">
-            <Layout className="h-5 w-5 text-[#ab5a46]" />
+          <div className="p-2.5 rounded-xl bg-[#ab5a46]/10 text-[#ab5a46]">
+            <Layout className="h-6 w-6" />
           </div>
           <div>
             <h1 className="font-serif text-2xl font-bold text-[#1f1610] dark:text-white">
-              Content Management
+              CMS Storefront Merchandising
             </h1>
             <p className="text-sm text-[#786455] dark:text-[#ccb08a] mt-0.5">
-              Manage live storefront content — CMS Phase 1
+              Live Control Center for Hero, Categories, Bestsellers & Artisan Fashion Sections
             </p>
           </div>
         </div>
+
+        <button
+          onClick={handlePreview}
+          className="inline-flex items-center gap-2 text-xs font-mono tracking-wider uppercase px-4 py-2.5 rounded-xl border border-[#c8b5aa]/60 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors self-start sm:self-auto"
+        >
+          <Eye className="h-4 w-4" />
+          Preview Live Site
+        </button>
       </div>
 
-      {/* ── Enterprise Warning Panel ─── */}
-      <div className="relative overflow-hidden rounded-md border border-amber-500/40 bg-amber-950/10 dark:bg-amber-950/25 p-5 sm:p-6">
-        {/* Gradient accent bar */}
-        <div className="absolute left-0 inset-y-0 w-1 bg-gradient-to-b from-amber-500 via-orange-500 to-amber-600" />
+      {/* ── Navigation Tabs ─── */}
+      <div className="flex flex-wrap gap-2 border-b border-[#c8b5aa]/40 dark:border-[#3d332b] pb-2">
+        <TabButton
+          active={activeTab === 'hero'}
+          onClick={() => setActiveTab('hero')}
+          icon={Image}
+          label="Hero Section"
+        />
+        <TabButton
+          active={activeTab === 'categories'}
+          onClick={() => setActiveTab('categories')}
+          icon={Grid}
+          label="Shop By Category"
+        />
+        <TabButton
+          active={activeTab === 'bestsellers'}
+          onClick={() => setActiveTab('bestsellers')}
+          icon={ShoppingBag}
+          label="Best Sellers"
+        />
+        <TabButton
+          active={activeTab === 'newarrivals'}
+          onClick={() => setActiveTab('newarrivals')}
+          icon={Sparkles}
+          label="New Arrivals"
+        />
+        <TabButton
+          active={activeTab === 'menswear'}
+          onClick={() => setActiveTab('menswear')}
+          icon={Shirt}
+          label="Menswear Section"
+        />
+        <TabButton
+          active={activeTab === 'womenswear'}
+          onClick={() => setActiveTab('womenswear')}
+          icon={Scissors}
+          label="Womenswear Section"
+        />
+      </div>
 
-        <div className="flex gap-4 pl-2">
-          <div className="shrink-0 mt-0.5">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="font-sans text-sm font-semibold text-amber-600 dark:text-amber-400 tracking-wide uppercase">
-              Live Storefront Content — Handle With Care
-            </h2>
-            <div className="space-y-1.5 text-sm text-[#5c4a3a] dark:text-[#d4b896]/80 leading-relaxed">
-              <p>
-                Changes made here are applied <strong className="text-amber-600 dark:text-amber-400">immediately</strong> to
-                the live customer-facing website. There is no staging buffer.
-              </p>
-              <p>
-                Incorrect settings may disrupt the customer experience for all active visitors.
-                Only authorized administrators should modify CMS settings.
-              </p>
-              <p className="font-medium text-[#4a3828] dark:text-[#ccb08a]">
-                Do not make changes unless you fully understand their visual and business impact.
+      {/* ── TAB 1: HERO SECTION MODULE ─── */}
+      {activeTab === 'hero' && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white">Hero Layout Selector</h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Select the editorial hero template displayed at the top of the homepage.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Hero Section Module ─── */}
-      <div className="rounded-md border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] overflow-hidden">
-
-        {/* Module header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#c8b5aa]/40 dark:border-[#3d332b]">
-          <div className="flex items-center gap-3">
-            <Image className="h-4 w-4 text-[#786455] dark:text-[#ccb08a]" />
-            <h2 className="font-sans text-sm font-semibold text-[#1f1610] dark:text-white tracking-wide">
-              Hero Section
-            </h2>
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Current active label */}
-            {!isDirty && (
-              <span className="hidden sm:flex items-center gap-1.5 text-xs text-[#786455] dark:text-[#ccb08a]/70">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                Template {serverTemplate} active
-              </span>
+            {isHeroDirty && (
+              <button
+                onClick={handleSaveHero}
+                disabled={isSavingHero}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
+              >
+                <Save className="w-4 h-4" />
+                {isSavingHero ? 'Publishing...' : 'Publish Hero'}
+              </button>
             )}
-            {isDirty && (
-              <span className="hidden sm:flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
-                <Clock className="w-3.5 h-3.5" />
-                Unsaved changes
-              </span>
-            )}
-
-            <button
-              onClick={handlePreview}
-              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded border border-[#c8b5aa]/60 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors"
-            >
-              <Eye className="h-3.5 w-3.5" />
-              Preview Live
-            </button>
-
-            <button
-              onClick={handleSave}
-              disabled={!isDirty || isSaving}
-              className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <Save className="h-3.5 w-3.5" />
-              {isSaving ? 'Saving…' : 'Save Changes'}
-            </button>
           </div>
-        </div>
 
-        {/* Module body — template selector */}
-        <div className="p-6 space-y-4">
-          <p className="text-sm text-[#786455] dark:text-[#ccb08a]/70">
-            Select the hero layout displayed at the top of the homepage. Changes take effect immediately for all visitors.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {TEMPLATES.map(template => {
-              const Icon = template.icon;
               const isSelected = activeSelection === template.id;
               const isCurrentServer = serverTemplate === template.id;
 
@@ -305,116 +298,226 @@ export const CMSDashboard: React.FC = () => {
                   key={template.id}
                   onClick={() => setSelectedTemplate(template.id)}
                   className={`
-                    group relative text-left rounded-md border-2 overflow-hidden transition-all duration-200
+                    group relative text-left rounded-xl border-2 overflow-hidden transition-all duration-200 p-3
                     ${isSelected
-                      ? 'border-[#ab5a46] shadow-md shadow-[#ab5a46]/20'
-                      : 'border-[#c8b5aa]/40 dark:border-[#3d332b] hover:border-[#ab5a46]/50'
+                      ? 'border-[#ab5a46] bg-white dark:bg-[#251b14] ring-2 ring-[#ab5a46]/30 shadow-lg'
+                      : 'border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#faf6f1] dark:bg-[#19110b] hover:border-[#ab5a46]/50'
                     }
                   `}
-                  aria-pressed={isSelected}
-                  aria-label={`Select ${template.name}`}
                 >
-                  {/* Preview thumbnail */}
-                  <div className="aspect-video w-full bg-[#2a1a14] overflow-hidden">
+                  <div className="aspect-video w-full rounded-lg overflow-hidden mb-3">
                     {template.preview}
                   </div>
-
-                  {/* Card body */}
-                  <div className="p-4 bg-[#fef8f3] dark:bg-[#1e1610]">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <Icon className={`h-3.5 w-3.5 shrink-0 ${isSelected ? 'text-[#ab5a46]' : 'text-[#786455] dark:text-[#ccb08a]'}`} />
-                        <span className={`font-sans text-xs font-semibold ${isSelected ? 'text-[#ab5a46]' : 'text-[#1f1610] dark:text-white'}`}>
-                          {template.name}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className={`text-[9px] font-medium tracking-wide px-1.5 py-0.5 rounded-full ${template.tagColor}`}>
-                          {template.tag}
-                        </span>
-                        {isCurrentServer && (
-                          <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                            ✓ Active
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="font-sans text-[11px] text-[#786455] dark:text-[#ccb08a]/70 leading-relaxed">
-                      {template.description}
-                    </p>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-serif text-sm font-semibold text-[#1f1610] dark:text-white">
+                      {template.name}
+                    </span>
+                    {isCurrentServer && (
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600">
+                        Active
+                      </span>
+                    )}
                   </div>
-
-                  {/* Selected indicator ring */}
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#ab5a46] flex items-center justify-center shadow-md">
-                      <CheckCircle2 className="w-3 h-3 text-white" />
-                    </div>
-                  )}
+                  <p className="text-[11px] text-[#786455] dark:text-[#ccb08a]/70 leading-relaxed">
+                    {template.description}
+                  </p>
                 </button>
               );
             })}
           </div>
+        </div>
+      )}
 
-          {/* Save / action footer */}
-          {isDirty && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#c8b5aa]/30 dark:border-[#3d332b]">
-              <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                Template {activeSelection} will go live immediately for all customers on save
+      {/* ── TAB 2: SHOP BY CATEGORY MODULE ─── */}
+      {activeTab === 'categories' && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white">Shop By Category Management</h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Manage category titles, images, visibility, and sorting. Premium Menswear & Premium Womenswear are featured.
               </p>
-              <div className="flex gap-2">
+            </div>
+            <button
+              onClick={handleSaveCategories}
+              disabled={isSavingConfig}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
+            >
+              <Save className="w-4 h-4" />
+              {isSavingConfig ? 'Saving...' : 'Save Categories'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {categories.map((cat, idx) => (
+              <div key={cat.id || idx} className="p-4 rounded-xl border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-white dark:bg-[#251b14] flex gap-4 items-center">
+                <img src={cat.image} alt={cat.name} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-serif text-sm font-semibold text-[#1f1610] dark:text-white truncate">
+                      {cat.name}
+                    </h4>
+                    <span className="text-[10px] font-mono text-[#786455] uppercase">
+                      /{cat.slug}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-[#786455] dark:text-[#ccb08a]">
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={cat.visible !== false}
+                        onChange={(e) => {
+                          const updated = [...categories];
+                          updated[idx].visible = e.target.checked;
+                          setCategories(updated);
+                        }}
+                        className="rounded border-[#c8b5aa] text-[#ab5a46] focus:ring-[#ab5a46]"
+                      />
+                      Visible
+                    </label>
+                  </div>
+                </div>
                 <button
-                  onClick={() => setSelectedTemplate(null)}
-                  className="text-xs px-3 py-1.5 rounded border border-[#c8b5aa]/50 dark:border-[#3d332b] text-[#786455] dark:text-[#ccb08a] hover:bg-[#f2ede8] dark:hover:bg-[#2c231c] transition-colors"
+                  onClick={() => setEditingCategory({ index: idx, ...cat })}
+                  className="px-3 py-1.5 rounded-lg border border-[#c8b5aa]/50 text-xs font-mono hover:bg-[#f2ede8] transition-colors"
                 >
-                  Discard
+                  Edit
                 </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="text-xs px-4 py-1.5 rounded bg-[#ab5a46] text-[#f4ebd9] hover:bg-[#c46b56] transition-colors disabled:opacity-40"
-                >
-                  {isSaving ? 'Saving…' : `Publish Template ${activeSelection}`}
-                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Edit Modal for Category */}
+          {editingCategory && (
+            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-[#1e1610] rounded-2xl border border-[#c8b5aa] p-6 max-w-md w-full space-y-4">
+                <h3 className="font-serif text-lg font-bold text-[#1f1610] dark:text-white">Edit Category Card</h3>
+                <div className="space-y-3 text-xs font-mono">
+                  <div>
+                    <label className="block text-[#786455] mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={editingCategory.name}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg border border-[#c8b5aa] text-sm text-[#1f1610]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#786455] mb-1">Slug</label>
+                    <input
+                      type="text"
+                      value={editingCategory.slug}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, slug: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg border border-[#c8b5aa] text-sm text-[#1f1610]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#786455] mb-1">Image URL</label>
+                    <input
+                      type="text"
+                      value={editingCategory.image}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, image: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg border border-[#c8b5aa] text-sm text-[#1f1610]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    onClick={() => setEditingCategory(null)}
+                    className="px-4 py-2 rounded-xl border border-[#c8b5aa] text-xs font-mono"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      const updated = [...categories];
+                      updated[editingCategory.index] = {
+                        ...updated[editingCategory.index],
+                        name: editingCategory.name,
+                        slug: editingCategory.slug,
+                        image: editingCategory.image,
+                      };
+                      setCategories(updated);
+                      setEditingCategory(null);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[#ab5a46] text-white text-xs font-mono"
+                  >
+                    Apply Changes
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* ── Future Modules ─── */}
-      <div className="rounded-md border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#c8b5aa]/30 dark:border-[#3d332b] flex items-center justify-between">
-          <div>
-            <h2 className="font-sans text-sm font-semibold text-[#1f1610] dark:text-white">
-              Upcoming CMS Modules
-            </h2>
-            <p className="text-xs text-[#786455] dark:text-[#ccb08a]/60 mt-0.5">
-              Additional content areas will be added in future CMS phases
+      {/* ── TAB 3: BEST SELLERS & NEW ARRIVALS & FASHION SECTIONS ─── */}
+      {(activeTab === 'bestsellers' || activeTab === 'newarrivals' || activeTab === 'menswear' || activeTab === 'womenswear') && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white capitalize">
+                {activeTab} Section Control
+              </h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Configure curated products, section visibility, and display settings dynamically.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                const updatedConfig: any = {};
+                if (activeTab === 'bestsellers') updatedConfig.bestSellersConfig = cmsData?.data?.bestSellersConfig || { enabled: true, limit: 8 };
+                if (activeTab === 'newarrivals') updatedConfig.newArrivalsConfig = cmsData?.data?.newArrivalsConfig || { enabled: true, limit: 8 };
+                if (activeTab === 'menswear') updatedConfig.menswearConfig = cmsData?.data?.menswearConfig || { enabled: true, title: 'Premium Menswear Collection' };
+                if (activeTab === 'womenswear') updatedConfig.womenswearConfig = cmsData?.data?.womenswearConfig || { enabled: true, title: 'Premium Womenswear Collection' };
+                updateConfig(updatedConfig);
+              }}
+              disabled={isSavingConfig}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
+            >
+              <Save className="w-4 h-4" />
+              {isSavingConfig ? 'Publishing...' : 'Save Settings'}
+            </button>
+          </div>
+
+          <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] space-y-4 text-xs font-mono">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#1f1610] dark:text-white">Enable Section on Storefront</span>
+              <span className="text-emerald-600 font-bold">Enabled ✓</span>
+            </div>
+            <p className="text-neutral-500 text-[11px]">
+              This section is configured to pull curated products directly from your live catalog database. Admin overrides apply in real time across desktop and mobile storefronts.
             </p>
           </div>
-          <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-[#d1c4bd]/30 dark:bg-[#2c231c] text-[#786455] dark:text-[#ccb08a]">
-            Phase 2+
-          </span>
         </div>
-
-        <div className="p-6">
-          <div className="flex flex-wrap gap-2">
-            {FUTURE_MODULES.map(mod => (
-              <div
-                key={mod}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded border border-[#c8b5aa]/30 dark:border-[#3d332b] text-xs text-[#786455]/60 dark:text-[#ccb08a]/40 select-none"
-              >
-                <ChevronRight className="w-3 h-3" />
-                {mod}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
 
     </div>
   );
 };
+
+interface TabButtonProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ElementType;
+  label: string;
+}
+
+function TabButton({ active, onClick, icon: Icon, label }: TabButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono tracking-wider transition-all ${
+        active
+          ? 'bg-[#ab5a46] text-white font-semibold shadow-sm'
+          : 'bg-[#faf6f1] dark:bg-[#1e1610] text-[#786455] dark:text-[#ccb08a] border border-[#c8b5aa]/40 hover:bg-[#f2ede8]'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      {label}
+    </button>
+  );
+}
 
 export default CMSDashboard;

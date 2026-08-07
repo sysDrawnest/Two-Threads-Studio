@@ -1,12 +1,15 @@
 /**
- * CMS Routes — Phase 9 (CMS Phase 1)
+ * CMS Routes — Phase 9 (CMS Engine)
  *
- * Public:
- *   GET  /api/v1/cms/hero-config        — storefront reads active template (no auth)
+ * Public (mounted at /api/v1/cms):
+ *   GET  /hero-config        — storefront reads active hero template
+ *   GET  /homepage-config   — storefront reads full homepage CMS config
  *
  * Admin (mounted at /api/v1/admin/cms):
- *   GET  /hero-config                   — admin reads current config
- *   PATCH /hero-config                  — admin updates active template
+ *   GET  /hero-config        — admin reads current hero config
+ *   PATCH /hero-config       — admin updates active hero template
+ *   GET  /homepage-config   — admin reads homepage config
+ *   PATCH /homepage-config   — admin updates homepage merchandising settings
  */
 
 import { Router } from 'express';
@@ -19,6 +22,7 @@ import { cmsController } from '../controllers/cms.controller';
 export const publicCmsRouter = Router();
 
 publicCmsRouter.get('/hero-config', cmsController.getHeroConfig);
+publicCmsRouter.get('/homepage-config', cmsController.getHomepageConfig);
 
 // ── Admin router ──────────────────────────────────────────────────────────────
 // Mounted at /api/v1/admin/cms — all routes require auth + ADMIN role
@@ -28,3 +32,5 @@ adminCmsRouter.use(requireAuth, requireRole(Role.ADMIN));
 
 adminCmsRouter.get('/hero-config', cmsController.getHeroConfig);
 adminCmsRouter.patch('/hero-config', cmsController.updateHeroConfig);
+adminCmsRouter.get('/homepage-config', cmsController.getHomepageConfig);
+adminCmsRouter.patch('/homepage-config', cmsController.updateHomepageConfig);

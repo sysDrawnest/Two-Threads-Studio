@@ -1362,8 +1362,13 @@ model StudioSettings {
   shippingUpdateNote     String?
 
   // ── CMS Configuration ────────────────────
-  /// Active hero template: 1 = Original, 2 = Editorial Slideshow, 3 = Split Spotlight
-  activeHeroTemplate     Int      @default(1)
+  /// Active hero template: 1 = Original, 2 = Editorial Slideshow, 3 = Split Spotlight, 4 = Editorial Window
+  activeHeroTemplate          Int      @default(1)
+  homepageBestSellersConfig   Json?
+  homepageNewArrivalsConfig   Json?
+  homepageMenswearConfig      Json?
+  homepageWomenswearConfig    Json?
+  homepageCategoriesConfig    Json?
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

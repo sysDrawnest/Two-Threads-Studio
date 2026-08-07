@@ -67,10 +67,10 @@ export const mockCategories: Category[] = [
   },
   {
     id: "cat2",
-    name: "Crochet",
-    slug: "crochet",
-    image: "https://images.unsplash.com/photo-1617896848219-aab8a02eed8c?q=80&w=800&auto=format&fit=crop",
-    count: 32,
+    name: "Premium Menswear",
+    slug: "menswear",
+    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop",
+    count: 35,
   },
   {
     id: "cat3",
@@ -95,10 +95,10 @@ export const mockCategories: Category[] = [
   },
   {
     id: "cat6",
-    name: "DIY Kits",
-    slug: "diy-kits",
-    image: "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop",
-    count: 15,
+    name: "Premium Womenswear",
+    slug: "womenswear",
+    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
+    count: 42,
   },
   {
     id: "cat7",

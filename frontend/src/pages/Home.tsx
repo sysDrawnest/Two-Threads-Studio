@@ -6,14 +6,15 @@ import {
   BestSellers,
 } from '../components/sections';
 
-// Lazy load all below-fold sections for performance
-const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
-const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
-const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
+// Lazy load below-fold sections for optimal initial page load performance
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
-const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
-const MensCollectionSection   = lazy(() => import('../components/sections/MensCollectionSection'));
+const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
+const NewArrivalsSection = lazy(() => import('../components/sections/NewArrivalsSection'));
 const WomensCollectionSection = lazy(() => import('../components/sections/WomensCollectionSection'));
+const MensCollectionSection   = lazy(() => import('../components/sections/MensCollectionSection'));
+const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
+const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
+const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
 const CustomCreations = lazy(() => import('../components/sections/CustomCreations'));
 const OurStory = lazy(() => import('../components/sections/OurStory'));
 const CraftingProcess = lazy(() => import('../components/sections/CraftingProcess'));
@@ -39,26 +40,27 @@ const Home: React.FC = () => {
     <PageContainer disablePadding={true}>
       {/*
         ════════════════════════════════════════
-         HOMEPAGE SECTION ORDER — 17 Sections
+         HOMEPAGE SECTION ORDER (FINAL)
         ════════════════════════════════════════
-        1.  Hero                    (KEEP)
-        2.  TrustBar                (NEW)
-        3.  BestSellers             (ENHANCED)
-        4.  VideoBanner             (KEEP)
-        5.  ShopByCategory          (NEW)
-        6.  ShopByOccasion          (NEW)
-        7.  FeaturedCollections     (NEW)
-        8.  SacredTraditionsCollection (KEEP)
-        9.  MensCollectionSection   (NEW — Men's Collection)
-        10. WomensCollectionSection (NEW — Women's Collection)
-        11. SustainabilitySection   (KEEP)
-        12. CustomCreations         (NEW)
-        13. OurStory/BrandStory     (REDUCED)
-        14. CraftingProcess         (NEW)
-        15. Reviews                 (ENHANCED)
-        16. CommunityGallery        (NEW)
-        17. Learning                (KEEP)
-        18. CorporateBulkOrders     (NEW)
+        1.  Hero                     (Eagerly Loaded)
+        2.  TrustBar                 (Eagerly Loaded)
+        3.  BestSellers              (Eagerly Loaded)
+        4.  VideoBanner              (Lazy Loaded)
+        5.  ShopByCategory           (Lazy Loaded — Updated Categories)
+        6.  NewArrivalsSection       (Lazy Loaded — New Arrivals)
+        7.  WomensCollectionSection  (Lazy Loaded — Premium Womenswear Collection)
+        8.  MensCollectionSection    (Lazy Loaded — Premium Menswear Collection)
+        9.  FeaturedCollections      (Lazy Loaded)
+        10. SacredTraditionsCollection (Lazy Loaded)
+        11. ShopByOccasion           (Lazy Loaded — Moved below Sacred Traditions)
+        12. SustainabilitySection    (Lazy Loaded)
+        13. CustomCreations          (Lazy Loaded)
+        14. OurStory                 (Lazy Loaded)
+        15. CraftingProcess          (Lazy Loaded)
+        16. Reviews                  (Lazy Loaded)
+        17. CommunityGallery         (Lazy Loaded)
+        18. Learning                 (Lazy Loaded)
+        19. CorporateBulkOrders      (Lazy Loaded)
       */}
 
       {/* ─── Above fold — eagerly loaded ─── */}
@@ -66,17 +68,25 @@ const Home: React.FC = () => {
       <TrustBar />
       <BestSellers />
 
+      {/* ─── Below fold — lazily loaded ─── */}
       <Suspense fallback={<SectionFallback />}>
         <VideoBanner />
       </Suspense>
 
-      {/* ─── Below fold — lazily loaded ─── */}
       <Suspense fallback={<SectionFallback />}>
         <ShopByCategory />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <ShopByOccasion />
+        <NewArrivalsSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <WomensCollectionSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <MensCollectionSection />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
@@ -88,11 +98,7 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <MensCollectionSection />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <WomensCollectionSection />
+        <ShopByOccasion />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
