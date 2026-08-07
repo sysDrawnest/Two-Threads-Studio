@@ -3,8 +3,8 @@
  * Admin page for managing live storefront content without code edits.
  * Modules:
  *  1. Hero Section Template Selector
- *  2. Best Sellers Merchandising
- *  3. New Arrivals Module
+ *  2. Best Sellers Merchandising (Auto catalog or Manual product picker)
+ *  3. New Arrivals Module (Auto catalog or Manual product picker)
  *  4. Premium Menswear Section
  *  5. Premium Womenswear Section
  *  6. Shop By Category Management
@@ -23,11 +23,7 @@ import {
   Grid,
   Shirt,
   Scissors,
-  Layers,
-  ArrowUp,
-  ArrowDown,
-  Trash2,
-  Plus,
+  Check,
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.png';
 import {
@@ -153,13 +149,28 @@ export const CMSDashboard: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
 
+  // Section config local states
+  const [bestSellersConfig, setBestSellersConfig] = useState<{ enabled: boolean; limit: number; productIds: string[] }>({
+    enabled: true,
+    limit: 8,
+    productIds: [],
+  });
+
+  const [newArrivalsConfig, setNewArrivalsConfig] = useState<{ enabled: boolean; limit: number; productIds: string[] }>({
+    enabled: true,
+    limit: 8,
+    productIds: [],
+  });
+
   // Category Edit State
   const [editingCategory, setEditingCategory] = useState<any | null>(null);
 
-  // Sync CMS categories when data loads
+  // Sync CMS config when data loads
   useEffect(() => {
-    if (cmsData?.data?.categoriesConfig) {
-      setCategories(cmsData.data.categoriesConfig);
+    if (cmsData?.data) {
+      if (cmsData.data.categoriesConfig) setCategories(cmsData.data.categoriesConfig);
+      if (cmsData.data.bestSellersConfig) setBestSellersConfig({ enabled: true, limit: 8, productIds: [], ...cmsData.data.bestSellersConfig });
+      if (cmsData.data.newArrivalsConfig) setNewArrivalsConfig({ enabled: true, limit: 8, productIds: [], ...cmsData.data.newArrivalsConfig });
     }
   }, [cmsData]);
 
@@ -183,6 +194,10 @@ export const CMSDashboard: React.FC = () => {
 
   const handleSaveCategories = () => {
     updateConfig({ categoriesConfig: categories });
+  };
+
+  const handleSaveSectionConfig = (key: 'bestSellersConfig' | 'newArrivalsConfig', payload: any) => {
+    updateConfig({ [key]: payload });
   };
 
   const handlePreview = () => {
@@ -452,32 +467,219 @@ export const CMSDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* ── TAB 3: BEST SELLERS & NEW ARRIVALS & FASHION SECTIONS ─── */}
-      {(activeTab === 'bestsellers' || activeTab === 'newarrivals' || activeTab === 'menswear' || activeTab === 'womenswear') && (
+      {/* ── TAB 3: BEST SELLERS CONTROL ─── */}
+      {activeTab === 'bestsellers' && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white">Best Sellers Merchandising</h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Toggle section visibility, display limits, or manually pick specific products to feature.
+              </p>
+            </div>
+            <button
+              onClick={() => handleSaveSectionConfig('bestSellersConfig', bestSellersConfig)}
+              disabled={isSavingConfig}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
+            >
+              <Save className="w-4 h-4" />
+              {isSavingConfig ? 'Saving...' : 'Save Settings'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] flex items-center justify-between">
+              <span className="text-xs font-mono font-semibold text-[#1f1610] dark:text-white">Enable Section</span>
+              <input
+                type="checkbox"
+                checked={bestSellersConfig.enabled}
+                onChange={(e) => setBestSellersConfig({ ...bestSellersConfig, enabled: e.target.checked })}
+                className="w-5 h-5 rounded text-[#ab5a46] focus:ring-[#ab5a46]"
+              />
+            </div>
+            <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] flex items-center justify-between">
+              <span className="text-xs font-mono font-semibold text-[#1f1610] dark:text-white">Display Limit</span>
+              <select
+                value={bestSellersConfig.limit}
+                onChange={(e) => setBestSellersConfig({ ...bestSellersConfig, limit: Number(e.target.value) })}
+                className="px-3 py-1.5 rounded-lg border border-[#c8b5aa] text-xs font-mono"
+              >
+                <option value={4}>4 Products</option>
+                <option value={8}>8 Products</option>
+                <option value={12}>12 Products</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Product Manual Override Picker */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-mono text-xs uppercase font-bold text-[#786455] dark:text-[#ccb08a]">
+                Manual Product Override ({bestSellersConfig.productIds.length} Selected)
+              </h3>
+              {bestSellersConfig.productIds.length > 0 && (
+                <button
+                  onClick={() => setBestSellersConfig({ ...bestSellersConfig, productIds: [] })}
+                  className="text-[11px] font-mono text-red-600 underline"
+                >
+                  Clear Selection (Reset to Auto System)
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-[#786455]/80">
+              Check specific products below to override automatic system sorting. Leave empty for automatic catalog selection.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[320px] overflow-y-auto p-1">
+              {availableProducts.map(product => {
+                const isSelected = bestSellersConfig.productIds.includes(product.id);
+                return (
+                  <div
+                    key={product.id}
+                    onClick={() => {
+                      const updated = isSelected
+                        ? bestSellersConfig.productIds.filter(id => id !== product.id)
+                        : [...bestSellersConfig.productIds, product.id];
+                      setBestSellersConfig({ ...bestSellersConfig, productIds: updated });
+                    }}
+                    className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-3 cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-[#ab5a46] bg-[#ab5a46]/10 text-[#ab5a46] font-bold'
+                        : 'border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] text-[#1f1610] dark:text-white'
+                    }`}
+                  >
+                    <div className={`w-5 h-5 rounded flex items-center justify-center border ${isSelected ? 'bg-[#ab5a46] border-[#ab5a46] text-white' : 'border-[#c8b5aa]'}`}>
+                      {isSelected && <Check className="w-3.5 h-3.5" />}
+                    </div>
+                    <img src={product.images[0]} alt="" className="w-10 h-10 rounded object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{product.name}</p>
+                      <p className="text-[10px] opacity-70">₹{product.price}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 4: NEW ARRIVALS CONTROL ─── */}
+      {activeTab === 'newarrivals' && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white">New Arrivals Control</h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Configure newest release limits or manually feature handpicked items.
+              </p>
+            </div>
+            <button
+              onClick={() => handleSaveSectionConfig('newArrivalsConfig', newArrivalsConfig)}
+              disabled={isSavingConfig}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
+            >
+              <Save className="w-4 h-4" />
+              {isSavingConfig ? 'Saving...' : 'Save Settings'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] flex items-center justify-between">
+              <span className="text-xs font-mono font-semibold text-[#1f1610] dark:text-white">Enable Section</span>
+              <input
+                type="checkbox"
+                checked={newArrivalsConfig.enabled}
+                onChange={(e) => setNewArrivalsConfig({ ...newArrivalsConfig, enabled: e.target.checked })}
+                className="w-5 h-5 rounded text-[#ab5a46] focus:ring-[#ab5a46]"
+              />
+            </div>
+            <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] flex items-center justify-between">
+              <span className="text-xs font-mono font-semibold text-[#1f1610] dark:text-white">Display Limit</span>
+              <select
+                value={newArrivalsConfig.limit}
+                onChange={(e) => setNewArrivalsConfig({ ...newArrivalsConfig, limit: Number(e.target.value) })}
+                className="px-3 py-1.5 rounded-lg border border-[#c8b5aa] text-xs font-mono"
+              >
+                <option value={4}>4 Products</option>
+                <option value={8}>8 Products</option>
+                <option value={12}>12 Products</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Product Manual Override Picker */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-mono text-xs uppercase font-bold text-[#786455] dark:text-[#ccb08a]">
+                Featured New Release Selection ({newArrivalsConfig.productIds.length} Selected)
+              </h3>
+              {newArrivalsConfig.productIds.length > 0 && (
+                <button
+                  onClick={() => setNewArrivalsConfig({ ...newArrivalsConfig, productIds: [] })}
+                  className="text-[11px] font-mono text-red-600 underline"
+                >
+                  Clear Selection (Reset to Auto System)
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[320px] overflow-y-auto p-1">
+              {availableProducts.map(product => {
+                const isSelected = newArrivalsConfig.productIds.includes(product.id);
+                return (
+                  <div
+                    key={product.id}
+                    onClick={() => {
+                      const updated = isSelected
+                        ? newArrivalsConfig.productIds.filter(id => id !== product.id)
+                        : [...newArrivalsConfig.productIds, product.id];
+                      setNewArrivalsConfig({ ...newArrivalsConfig, productIds: updated });
+                    }}
+                    className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-3 cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-[#ab5a46] bg-[#ab5a46]/10 text-[#ab5a46] font-bold'
+                        : 'border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] text-[#1f1610] dark:text-white'
+                    }`}
+                  >
+                    <div className={`w-5 h-5 rounded flex items-center justify-center border ${isSelected ? 'bg-[#ab5a46] border-[#ab5a46] text-white' : 'border-[#c8b5aa]'}`}>
+                      {isSelected && <Check className="w-3.5 h-3.5" />}
+                    </div>
+                    <img src={product.images[0]} alt="" className="w-10 h-10 rounded object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold">{product.name}</p>
+                      <p className="text-[10px] opacity-70">₹{product.price}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 5 & 6: MENSWEAR & WOMENSWEAR SECTIONS ─── */}
+      {(activeTab === 'menswear' || activeTab === 'womenswear') && (
         <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white capitalize">
-                {activeTab} Section Control
+                {activeTab === 'menswear' ? "Premium Menswear" : "Premium Womenswear"} Collection Control
               </h2>
               <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
-                Configure curated products, section visibility, and display settings dynamically.
+                Manage section visibility and feature key fashion items.
               </p>
             </div>
             <button
               onClick={() => {
-                const updatedConfig: any = {};
-                if (activeTab === 'bestsellers') updatedConfig.bestSellersConfig = cmsData?.data?.bestSellersConfig || { enabled: true, limit: 8 };
-                if (activeTab === 'newarrivals') updatedConfig.newArrivalsConfig = cmsData?.data?.newArrivalsConfig || { enabled: true, limit: 8 };
-                if (activeTab === 'menswear') updatedConfig.menswearConfig = cmsData?.data?.menswearConfig || { enabled: true, title: 'Premium Menswear Collection' };
-                if (activeTab === 'womenswear') updatedConfig.womenswearConfig = cmsData?.data?.womenswearConfig || { enabled: true, title: 'Premium Womenswear Collection' };
-                updateConfig(updatedConfig);
+                const key = activeTab === 'menswear' ? 'menswearConfig' : 'womenswearConfig';
+                updateConfig({ [key]: { enabled: true, title: activeTab === 'menswear' ? 'Premium Menswear Collection' : 'Premium Womenswear Collection' } });
               }}
               disabled={isSavingConfig}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all"
             >
               <Save className="w-4 h-4" />
-              {isSavingConfig ? 'Publishing...' : 'Save Settings'}
+              {isSavingConfig ? 'Saving...' : 'Save Settings'}
             </button>
           </div>
 
@@ -487,7 +689,7 @@ export const CMSDashboard: React.FC = () => {
               <span className="text-emerald-600 font-bold">Enabled ✓</span>
             </div>
             <p className="text-neutral-500 text-[11px]">
-              This section is configured to pull curated products directly from your live catalog database. Admin overrides apply in real time across desktop and mobile storefronts.
+              This section displays artisan fashion pieces (Shirts, Denim, Crochet Tops, One Pieces, Bikinis) from your catalog.
             </p>
           </div>
         </div>
