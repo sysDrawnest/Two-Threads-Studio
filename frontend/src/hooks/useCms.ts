@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 export const cmsKeys = {
   all: ['cms'] as const,
   heroConfig: () => [...cmsKeys.all, 'heroConfig'] as const,
+  merchandising: () => [...cmsKeys.all, 'merchandising'] as const,
 };
 
 /**
@@ -23,6 +24,18 @@ export const useHeroConfig = () =>
     queryKey: cmsKeys.heroConfig(),
     queryFn: cmsService.getHeroConfig,
     staleTime: 5 * 60 * 1000, // 5 min — reduces round-trips on every page visit
+    gcTime: 10 * 60 * 1000,
+    retry: 1,
+  });
+
+/**
+ * Storefront hook — fetches homepage merchandising layout configuration.
+ */
+export const useHomepageMerchandising = () =>
+  useQuery({
+    queryKey: cmsKeys.merchandising(),
+    queryFn: cmsService.getHomepageMerchandising,
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 1,
   });
@@ -54,6 +67,23 @@ export const useUpdateHeroConfig = () => {
     },
     onError: (err: any) => {
       toast.error(err?.message || 'Failed to save hero template');
+    },
+  });
+};
+
+/**
+ * Admin write hook — updates homepage merchandising configuration.
+ */
+export const useUpdateHomepageMerchandising = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => cmsService.updateHomepageMerchandising(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: cmsKeys.merchandising() });
+      toast.success(data.message || 'Homepage merchandising saved');
+    },
+    onError: (err: any) => {
+      toast.error(err?.message || 'Failed to save merchandising config');
     },
   });
 };

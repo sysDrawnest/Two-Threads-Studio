@@ -58,16 +58,31 @@ export interface Occasion {
 
 export const mockCategories: Category[] = [
   {
+    id: "cat_menswear",
+    name: "Premium Menswear",
+    slug: "menswear",
+    image: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800&auto=format&fit=crop",
+    count: 42,
+    featured: true,
+  },
+  {
+    id: "cat_womenswear",
+    name: "Premium Womenswear",
+    slug: "womenswear",
+    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
+    count: 56,
+    featured: true,
+  },
+  {
     id: "cat1",
     name: "Embroidery Kits",
     slug: "embroidery-kits",
     image: "https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=800&auto=format&fit=crop",
     count: 48,
-    featured: true,
   },
   {
     id: "cat2",
-    name: "Crochet",
+    name: "Crochet Collection",
     slug: "crochet",
     image: "https://images.unsplash.com/photo-1617896848219-aab8a02eed8c?q=80&w=800&auto=format&fit=crop",
     count: 32,
@@ -81,7 +96,7 @@ export const mockCategories: Category[] = [
   },
   {
     id: "cat4",
-    name: "Macramé",
+    name: "Macramé Decor",
     slug: "macrame",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=800&auto=format&fit=crop",
     count: 26,
@@ -94,25 +109,11 @@ export const mockCategories: Category[] = [
     count: 21,
   },
   {
-    id: "cat6",
-    name: "DIY Kits",
-    slug: "diy-kits",
-    image: "https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop",
-    count: 15,
-  },
-  {
     id: "cat7",
     name: "Home Decor",
     slug: "home-decor",
     image: "https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=800&auto=format&fit=crop",
     count: 39,
-  },
-  {
-    id: "cat8",
-    name: "Gift Collection",
-    slug: "gifts",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop",
-    count: 27,
   },
 ];
 

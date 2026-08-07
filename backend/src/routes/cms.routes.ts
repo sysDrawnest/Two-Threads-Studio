@@ -19,6 +19,7 @@ import { cmsController } from '../controllers/cms.controller';
 export const publicCmsRouter = Router();
 
 publicCmsRouter.get('/hero-config', cmsController.getHeroConfig);
+publicCmsRouter.get('/homepage-merchandising', cmsController.getHomepageMerchandising);
 
 // ── Admin router ──────────────────────────────────────────────────────────────
 // Mounted at /api/v1/admin/cms — all routes require auth + ADMIN role
@@ -28,3 +29,6 @@ adminCmsRouter.use(requireAuth, requireRole(Role.ADMIN));
 
 adminCmsRouter.get('/hero-config', cmsController.getHeroConfig);
 adminCmsRouter.patch('/hero-config', cmsController.updateHeroConfig);
+
+adminCmsRouter.get('/homepage-merchandising', cmsController.getHomepageMerchandising);
+adminCmsRouter.patch('/homepage-merchandising', cmsController.updateHomepageMerchandising);
