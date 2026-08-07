@@ -15,4 +15,3 @@ export { default as CommunityGallery } from './CommunityGallery';
 export { default as Learning } from './Learning';
 export { default as CorporateBulkOrders } from './CorporateOrders';
 export { default as SustainabilitySection } from './SustainabilitySection';
-export { default as NewArrivals } from './NewArrivals';
