@@ -23,8 +23,11 @@ if (dns.setDefaultResultOrder) {
 //     instances don't exhaust the limit.
 //   • connectionTimeoutMillis=5000 → fail-fast (not 30 second hangs) when
 //     the pool is saturated.
+// Clean DATABASE_URL to remove strict sslmode query parameters that override ssl.rejectUnauthorized = false in pg
+const dbUrl = env.DATABASE_URL.replace(/([?&])sslmode=[^&]*(&|$)/, '$1').replace(/[?&]$/, '');
+
 const pool = new Pool({
-  connectionString: env.DATABASE_URL,
+  connectionString: dbUrl,
   max: 10,
   idleTimeoutMillis: 30000,       // Evict idle connections after 30 seconds
   connectionTimeoutMillis: 15000, // 15s instead of 5s to allow for connection spikes
