@@ -36,7 +36,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
               className="w-16 h-16 object-cover opacity-60"
             />
             <p className="font-sans text-xs text-white/50 uppercase tracking-widest">
-              Premium Artisan Embroidery<br />Est. 2019 • Portland, OR
+              Premium Artisan Embroidery<br />Est. 2019 • Jaipur, India
             </p>
           </div>
         </div>

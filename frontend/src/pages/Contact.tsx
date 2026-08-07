@@ -109,8 +109,8 @@ const Contact: React.FC = () => {
               
               <p className="font-sans text-sm text-primary-container font-medium mb-1">Studio Address (By Appointment)</p>
               <p className="font-sans text-sm text-[#5a4a3f] mb-6">
-                124 Artisan Way, Suite 300<br/>
-                Portland, OR 97209
+                124 Artisan Enclave, Sector 5<br/>
+                Jaipur, Rajasthan 302022, India
               </p>
 
               <div className="border-t border-primary-container/10 pt-4 flex justify-between text-[10px] font-sans text-neutral-500 uppercase tracking-widest">

@@ -38,9 +38,9 @@ const Sustainability: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-16">
             <ScrollReveal direction="left" className="order-2 md:order-1">
-              <h3 className="font-serif text-2xl text-primary-container mb-4">Unbleached Belgian Linen</h3>
+              <h3 className="font-serif text-2xl text-primary-container mb-4">Unbleached Organic Indian Linen</h3>
               <p className="font-sans text-sm text-[#5a4a3f] leading-loose mb-6">
-                Flax requires significantly less water and pesticides than cotton. We source our linen from a carbon-neutral mill in Belgium that has been weaving for five generations. We leave it unbleached to avoid introducing harsh chemicals into local watersheds.
+                Flax requires significantly less water and pesticides than cotton. We source our linen from a carbon-neutral mill in India that has been weaving for five generations. We leave it unbleached to avoid introducing harsh chemicals into local watersheds.
               </p>
             </ScrollReveal>
             <ScrollReveal direction="right" className="order-1 md:order-2 aspect-[4/3] bg-surface-container overflow-hidden">

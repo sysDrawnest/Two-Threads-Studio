@@ -316,7 +316,7 @@ export const mockProducts: Product[] = [
     ],
     description: "Three half-yard cuts of our signature unbleached linen.",
     story:
-      "Sourced from a multi-generational mill in Belgium, our linen offers the perfect tension and weave for precision embroidery.",
+      "Sourced from an organic heritage mill in India, our linen offers the perfect tension and weave for precision embroidery.",
     materialsIncluded: ["3x Half-yard pure linen cuts (Oat, Sage, Natural)"],
     estimatedTime: "N/A",
     reviews: [

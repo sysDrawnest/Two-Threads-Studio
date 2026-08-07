@@ -44,7 +44,7 @@ const OurStory: React.FC = () => {
 
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { num: "01", title: "Sourcing", img: aboutImg1, text: "We start with the fabric. Our unbleached linen is woven in a zero-waste facility in Belgium, ensuring perfect tension and a natural, earthy texture." },
+              { num: "01", title: "Sourcing", img: aboutImg1, text: "We start with the fabric. Our unbleached linen is woven in a zero-waste facility in India, ensuring perfect tension and a natural, earthy texture." },
               { num: "02", title: "Design", img: aboutImg2, text: "Every pattern is hand-drawn and designed right here in our studio. We digitize these drawings carefully to retain the organic feel of every original sketch." },
               { num: "03", title: "Curation", img: aboutImg3, text: "Threads are color-matched by eye. Every box is assembled and packed individually by hand in our studio with recycled paper and care." }
             ].map((step, i) => (
@@ -135,7 +135,7 @@ const OurStory: React.FC = () => {
           <StaggerContainer className="flex flex-col gap-16">
             {[
               { year: "2019", title: "The First Stitch", text: "Elara creates the first 'Botanical Meadow' pattern, sharing it on a small blog." },
-              { year: "2020", title: "Sourcing Quality", text: "Partnered with a multi-generational mill in Belgium to secure the finest, sustainable unbleached linen." },
+              { year: "2020", title: "Sourcing Quality", text: "Partnered with a multi-generational mill in India to secure the finest, sustainable unbleached linen." },
               { year: "2022", title: "Handcrafted Kits", text: "Introduced our first limited-batch embroidery kits, designed and stitched entirely in-house." },
               { year: "2024", title: "Digital Stitch Guides", text: "Introduced digital courses, allowing anyone to learn embroidery techniques from our studio." },
               { year: "Today", title: "An Independent Studio", text: "Continuing to create timeless, handcrafted pieces with patience, intention, and love." }

@@ -24,7 +24,7 @@ export default function Careers() {
       id: 'job-1',
       title: 'Senior Textile & Pattern Designer',
       department: 'Design & Artistry',
-      location: 'Portland, OR (Hybrid)',
+      location: 'Jaipur, India (Hybrid)',
       type: 'Full-time',
       description: 'Two Threads Studio, a brand operated by SYS Pvt. Ltd., is hiring a Senior Textile & Pattern Designer. In this role, you will lead the creative conceptualization and hand-drawn drafting of our upcoming seasonal embroidery kits, bridging classical botanical illustrations with modern stitching guides.',
       requirements: [
