@@ -175,7 +175,7 @@ export default function WomensCollectionSection() {
 
             {/* CTA */}
             <Link
-              to="/shop?collection=womenswear"
+              to="/collection/womenswear"
               className="group inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.22em] uppercase text-[#1C1C1B] font-medium self-start"
             >
               <span className="relative py-1">
@@ -247,7 +247,7 @@ export default function WomensCollectionSection() {
           {/* Mobile CTA */}
           <ScrollReveal direction="up">
             <Link
-              to="/shop?collection=womenswear"
+              to="/collection/womenswear"
               className="group inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.22em] uppercase text-[#A34A38] no-underline border-b border-[#A34A38]/40 pb-0.5"
             >
               Explore the Collection

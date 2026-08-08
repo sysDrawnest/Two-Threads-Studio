@@ -44,8 +44,8 @@ const Navbar: React.FC = () => {
 
   const shopCategories = [
     { name: 'All Products', path: '/shop' },
-    { name: 'Menswear', path: '/shop?category=menswear' },
-    { name: 'Womenswear', path: '/shop?category=womenswear' },
+    { name: 'Menswear', path: '/collection/menswear' },
+    { name: 'Womenswear', path: '/collection/womenswear' },
     { name: 'Home Decor', path: '/shop?category=decor' },
     { name: 'Embroidery Kits', path: '/shop?category=kit' },
     { name: 'DIY Craft Kits', path: '/shop?category=diy' },
@@ -339,13 +339,13 @@ const Navbar: React.FC = () => {
               Collections
             </Link>
             <Link 
-              to="/shop?category=menswear" 
+              to="/collection/menswear" 
               className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Menswear
             </Link>
             <Link 
-              to="/shop?category=womenswear" 
+              to="/collection/womenswear" 
               className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Womenswear

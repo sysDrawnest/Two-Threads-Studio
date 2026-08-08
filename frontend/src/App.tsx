@@ -41,6 +41,7 @@ const ElegantLoader: React.FC = () => (
 // Lazy Storefront Pages
 const Home = lazy(() => import('./pages/Home'));
 const Shop = lazy(() => import('./pages/Shop'));
+const PremiumCollection = lazy(() => import('./pages/PremiumCollection'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Collections = lazy(() => import('./pages/Collections'));
 const Learning = lazy(() => import('./pages/Learning'));
@@ -106,6 +107,7 @@ const StorefrontRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/:id" element={<ProductDetail />} />
+        <Route path="/collection/:id" element={<PremiumCollection />} />
         <Route path="/collections" element={<Collections />} />
         <Route path="/learning" element={<Learning />} />
         <Route path="/learning/:id" element={<TutorialDetail />} />
