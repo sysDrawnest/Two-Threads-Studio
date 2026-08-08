@@ -61,6 +61,18 @@ export const categoryRepository = {
     });
   },
 
+  hasProducts: async (id: string): Promise<boolean> => {
+    const count = await prisma.product.count({
+      where: {
+        OR: [
+          { categoryId: id },
+          { secondaryCategories: { some: { categoryId: id } } }
+        ]
+      }
+    });
+    return count > 0;
+  },
+
   delete: async (id: string) => {
     return prisma.category.delete({ where: { id } });
   },

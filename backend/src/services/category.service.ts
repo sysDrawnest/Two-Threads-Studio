@@ -67,6 +67,13 @@ export const categoryService = {
     if (!existing) {
       throw new AppError('Category not found', HTTP_STATUS.NOT_FOUND);
     }
+    const hasProducts = await categoryRepository.hasProducts(id);
+    if (hasProducts) {
+      throw new AppError(
+        'Cannot delete category: one or more products are currently assigned to it',
+        HTTP_STATUS.BAD_REQUEST
+      );
+    }
     return categoryRepository.delete(id);
   },
 };
