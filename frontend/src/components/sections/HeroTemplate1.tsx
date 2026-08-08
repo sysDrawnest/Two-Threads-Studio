@@ -6,8 +6,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
-import heroMobile from '../../assets/hero section mobile.png';
-import heroPc from '../../assets/hero section pc.png';
+import heroMobile from '../../assets/hero section mobile.webp';
+import heroPc from '../../assets/hero section pc.webp';
 
 export default function HeroTemplate1() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -96,20 +96,28 @@ export default function HeroTemplate1() {
       <div className="absolute bottom-0 left-0 w-full flex justify-center z-10 pointer-events-none">
         <div className="relative w-full max-w-[1200px] flex justify-center pointer-events-auto">
            
-           <img 
-             ref={imageRef}
-             src={heroMobile} 
-             alt="Artisanal Creations" 
-             className="w-full max-w-[480px] h-[62vh] object-contain object-bottom block md:hidden drop-shadow-2xl transition-transform duration-100 will-change-transform" 
-             style={{ transform: 'scale(1)' }}
-           />
-           <img 
-             ref={imageRef}
-             src={heroPc} 
-             alt="Two Thread Studio Kits" 
-             className="w-full max-w-[900px] h-[68vh] md:h-[70vh] object-contain object-bottom hidden md:block drop-shadow-2xl transition-transform duration-100 will-change-transform" 
-             style={{ transform: 'scale(1)' }}
-           />
+           {/* Single <picture> element — browser picks only one source.
+            * Desktop (>=768px): heroPc is downloaded, heroMobile is NOT.
+            * Mobile (<768px):   heroMobile is downloaded, heroPc is NOT.
+            * fetchpriority="high" tells Chrome to prioritise this as the LCP.
+            */}
+           <picture>
+             {/* Desktop source */}
+             <source
+               media="(min-width: 768px)"
+               srcSet={heroPc}
+             />
+             {/* Mobile fallback (also the default <img>) */}
+             <img
+               ref={imageRef}
+               src={heroMobile}
+               alt="Artisanal Creations by Two Threads Studio"
+               // @ts-ignore — fetchpriority is a valid HTML attribute; TS types lag behind
+               fetchpriority="high"
+               className="w-full max-w-[900px] h-[62vh] md:h-[70vh] object-contain object-bottom drop-shadow-2xl transition-transform duration-100 will-change-transform"
+               style={{ transform: 'scale(1)' }}
+             />
+           </picture>
 
            {/* Text and Button Overlaying the Rock */}
            <div className="absolute bottom-[5%] md:bottom-[6%] left-1/2 transform -translate-x-1/2 w-full text-center flex flex-col items-center z-20 px-4">

@@ -1,9 +1,9 @@
-import botanicalImg from '../assets/botanical e…_202607141252.png';
-import heritageImg from '../assets/portrait_of_a_heritage_collection_for_a_luxury.png';
-import minimalImg from '../assets/portrait_of_a_modern_minimal_collection_for_a_luxury.png';
-import handbagsImg from '../assets/Woman_holding_wool_handbag_2K_202607141448.jpeg';
-import weddingImg from '../assets/portrait_of_wedding_keepsakes_for_a_luxury_em.png';
-import seasonalImg from '../assets/portrait_of_seasonal_editions_for_a_luxury_em.png';
+import botanicalImg from '../assets/botanical e…_202607141252.webp';
+import heritageImg from '../assets/portrait_of_a_heritage_collection_for_a_luxury.webp';
+import minimalImg from '../assets/portrait_of_a_modern_minimal_collection_for_a_luxury.webp';
+import handbagsImg from '../assets/Woman_holding_wool_handbag_2K_202607141448.webp';
+import weddingImg from '../assets/portrait_of_wedding_keepsakes_for_a_luxury_em.webp';
+import seasonalImg from '../assets/portrait_of_seasonal_editions_for_a_luxury_em.webp';
 
 export interface FeaturedCollection {
   id: string;

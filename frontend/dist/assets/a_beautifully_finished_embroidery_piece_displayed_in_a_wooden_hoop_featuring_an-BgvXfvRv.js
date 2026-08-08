@@ -1,1 +1,0 @@
-const a="/assets/an_artistic_flat_lay_of_embroidery_materials_linen_fabric_sharp_vintage-ybNB8BY8.png",_="/assets/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an-s-bv9Dz1.png";export{a,_ as g};

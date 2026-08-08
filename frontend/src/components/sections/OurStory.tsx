@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
-import ourStoryImg from '../../assets/our_story_section.png';
+import ourStoryImg from '../../assets/our_story_section.webp';
 
 export default function OurStory() {
   return (

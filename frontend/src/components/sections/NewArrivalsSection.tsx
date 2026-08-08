@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * NewArrivalsSection
+ *
+ * PERFORMANCE FIX (Phase 7):
+ * - Replaced useState + useEffect + productService.getProducts()
+ *   with useQuery so results are cached in React Query.
+ * - staleTime: 5 min  \u2014 navigating away and back shows cached data instantly.
+ * - gcTime:   10 min
+ * - No visual change: same section layout, cards, animations.
+ */
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { ProductCard } from '../ui/ProductCard';
 import { productService } from '../../services/productService';
@@ -11,21 +22,17 @@ export default function NewArrivalsSection() {
   const { data: cmsData } = useHomepageConfig();
   const cmsConfig = cmsData?.data?.newArrivalsConfig;
   const isEnabled = cmsConfig?.enabled ?? true;
+  const limit = cmsConfig?.limit || 4;
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ['new-arrivals', limit],
+    queryFn: () => productService.getProducts({ limit, sort: 'newest' }),
+    staleTime: 5 * 60 * 1000,
+    gcTime:    10 * 60 * 1000,
+    enabled: isEnabled,
+  });
 
-  useEffect(() => {
-    productService.getProducts({ limit: cmsConfig?.limit || 4, sort: 'newest' })
-      .then(res => {
-        setProducts(res.products || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching new arrivals:', err);
-        setLoading(false);
-      });
-  }, [cmsConfig?.limit]);
+  const products: Product[] = data?.products || [];
 
   if (!isEnabled) return null;
 
@@ -42,13 +49,13 @@ export default function NewArrivalsSection() {
             New Arrivals
           </h2>
           <p className="font-sans text-xs sm:text-sm text-neutral-500 mt-2">
-            Fresh handcrafted releases directly from our studio looms & ateliers
+            Fresh handcrafted releases directly from our studio looms &amp; ateliers
           </p>
         </ScrollReveal>
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-          {loading ? (
+          {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="animate-pulse bg-white border border-neutral-100 p-4">
                 <div className="aspect-[4/5] bg-neutral-200 mb-4" />
@@ -61,7 +68,7 @@ export default function NewArrivalsSection() {
               No new arrivals available at the moment.
             </div>
           ) : (
-            products.slice(0, cmsConfig?.limit || 4).map((product, i) => (
+            products.slice(0, limit).map((product, i) => (
               <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
                 <ProductCard product={product} />
               </ScrollReveal>

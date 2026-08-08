@@ -11,16 +11,49 @@
     />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <!-- Add Google Fonts here -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+    <!--
+      PERFORMANCE FIX (Phase 9): Google Fonts via <link> instead of CSS @import.
+
+      Why this matters:
+      - CSS @import is render-blocking: the browser must finish downloading index.css
+        before it can even START fetching the font stylesheet.
+      - <link rel="stylesheet"> tags in HTML are discovered by the preload scanner
+        immediately and downloaded in parallel with the main CSS bundle.
+      - preconnect hints tell the browser to open TCP+TLS connections to Google's
+        CDN servers as early as possible, shaving ~100-200ms per font domain.
+    -->
+
+    <!-- Preconnect to Google Fonts CDN for DNS/TLS warm-up -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Body fonts: EB Garamond (serif) + DM Sans (sans) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Display font: Cormorant Garamond (editorial headings) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icon font: Material Symbols Outlined -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+
     <title>TwoThreads Studio</title>
-    <script type="module" crossorigin src="/assets/index-CX6-1q6k.js"></script>
+    <script type="module" crossorigin src="/assets/index-6F4qv6js.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-react-DsEnD8Av.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-animation-DR8WaHXT.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-query-CPvIhWzu.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-charts-D_uKL-PY.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-icons-e116d_Vt.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-Dv0eCLDY.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CUOumDi_.css">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

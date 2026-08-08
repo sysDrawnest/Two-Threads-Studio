@@ -1,5 +1,5 @@
 import React from 'react';
-import portraitCutout from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.png';
+import portraitCutout from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.webp';
 
 export default function HeroTemplate3() {
   return (

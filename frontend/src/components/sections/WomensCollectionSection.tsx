@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 
-import imgCrochetTop from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.png';
-import imgHandbag    from '../../assets/Woman_carrying_wool_handbag_2K_202607141446.jpeg';
-import imgHandbag2   from '../../assets/Woman_holding_wool_handbag_2K_202607141448.jpeg';
+import imgCrochetTop from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.webp';
+import imgHandbag    from '../../assets/Woman_carrying_wool_handbag_2K_202607141446.webp';
+import imgHandbag2   from '../../assets/Woman_holding_wool_handbag_2K_202607141448.webp';
 
 const products = [
   {

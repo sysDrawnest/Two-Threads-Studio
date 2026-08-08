@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { ScrollReveal, StaggerContainer } from '../components/ui/ScrollReveal';
 
 // Assets
-import aboutImg1 from '../assets/stitch/close_up_of_high_quality_unbleached_linen_fabric_texture_natural_beige_tones.png';
-import aboutImg2 from '../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.png';
-import aboutImg3 from '../assets/stitch/close_up_of_hands_carefully_packing_an_embroidery_kit_with_recycled_paper_and.png';
+import aboutImg1 from '../assets/stitch/close_up_of_high_quality_unbleached_linen_fabric_texture_natural_beige_tones.webp';
+import aboutImg2 from '../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.webp';
+import aboutImg3 from '../assets/stitch/close_up_of_hands_carefully_packing_an_embroidery_kit_with_recycled_paper_and.webp';
 
 const OurStory: React.FC = () => {
   return (

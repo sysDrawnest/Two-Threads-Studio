@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollReveal } from '../ui/ScrollReveal';
-import sacredTraditionsImg from '../../assets/Temple_relief_with_floral_mandalas_202607141319.jpeg';
+import sacredTraditionsImg from '../../assets/Temple_relief_with_floral_mandalas_202607141319.webp';
 
 export default function SacredTraditionsCollection() {
   return (

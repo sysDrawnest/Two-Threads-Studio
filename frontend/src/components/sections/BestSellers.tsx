@@ -1,36 +1,39 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * BestSellers
+ *
+ * PERFORMANCE FIX (Phase 7):
+ * - Replaced raw useState + useEffect + productService.getBestSellers()
+ *   with a useQuery hook so results are cached in React Query.
+ * - staleTime: 5 min  \u2014 data is served from cache on re-mounts/navigation.
+ * - gcTime:   10 min  \u2014 cache is kept alive for the whole session.
+ * - No visual change: same section layout, card design, filter pills.
+ */
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { ProductCard } from '../ui/ProductCard';
 import { productService } from '../../services/productService';
 import type { Product } from '../../data/products';
 import { ArrowRight } from 'lucide-react';
 
-type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macramé' | 'Lippan Art' | 'Handkerchiefs' | 'Gift Sets';
+type FilterKey = 'All' | 'Embroidery' | 'Crochet' | 'Macram\u00e9' | 'Lippan Art' | 'Handkerchiefs' | 'Gift Sets';
 
-const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macramé', 'Lippan Art', 'Handkerchiefs', 'Gift Sets'];
+const filters: FilterKey[] = ['All', 'Embroidery', 'Crochet', 'Macram\u00e9', 'Lippan Art', 'Handkerchiefs', 'Gift Sets'];
 
 export default function BestSellers() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>('All');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    productService.getBestSellers()
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching best sellers:', err);
-        setLoading(false);
-      });
-  }, []);
+  const { data: productsData, isLoading } = useQuery({
+    queryKey: ['best-sellers'],
+    queryFn: (): Promise<Product[]> => productService.getBestSellers(),
+    staleTime: 5 * 60 * 1000,   // 5 minutes
+    gcTime:    10 * 60 * 1000,  // 10 minutes
+  });
+  const products: Product[] = productsData ?? [];
 
-  const filteredProducts = products.filter((p) => {
-    if (activeFilter === 'All') {
-      return true;
-    }
+  const filteredProducts = products.filter((p: Product) => {
+    if (activeFilter === 'All') return true;
     return p.productCategory === activeFilter;
   }).slice(0, 8);
 
@@ -69,7 +72,7 @@ export default function BestSellers() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-          {loading ? (
+          {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="animate-pulse bg-white border border-neutral-100 p-4">
                 <div className="aspect-[4/5] bg-neutral-200 mb-4" />
@@ -82,7 +85,7 @@ export default function BestSellers() {
               No best sellers found in this category.
             </div>
           ) : (
-            filteredProducts.map((product, i) => (
+            filteredProducts.map((product: Product, i: number) => (
               <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
                 <ProductCard product={product} isBestSeller={true} />
               </ScrollReveal>

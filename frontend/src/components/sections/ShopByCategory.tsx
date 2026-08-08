@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { mockCategories, Category } from '../../data/products';
 import { productService } from '../../services/productService';
 import { ArrowRight } from 'lucide-react';
 
 export default function ShopByCategory() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
-  const [loading, setLoading] = useState(true);
+  // PERFORMANCE FIX: useQuery with a 10-min staleTime.
+  // Categories change infrequently — this eliminates redundant fetches
+  // on every re-mount while still reflecting admin changes within 10 min.
+  const { data: fetchedCategories, isLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: (): Promise<Category[]> => productService.getCategories(),
+    staleTime:  10 * 60 * 1000,  // 10 minutes
+    gcTime:     20 * 60 * 1000,  // 20 minutes
+    placeholderData: mockCategories as Category[], // show mock data instantly while loading
+  });
 
-  useEffect(() => {
-    productService.getCategories()
-      .then(data => {
-        if (data && data.length > 0) {
-          setCategories(data);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching categories:', err);
-        setLoading(false);
-      });
-  }, []);
+  const categories: Category[] = (fetchedCategories && fetchedCategories.length > 0)
+    ? fetchedCategories
+    : mockCategories;
 
   const featured = categories[0] || mockCategories[0];
   const topRow = categories.slice(1, 4);

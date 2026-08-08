@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 
 // Assets representing the physical objects on the desk
-import imgPhoto from '../../assets/portrait_of_personalized_portraits_for_a_luxur.png';
-import imgSketch from '../../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.png';
-import imgThread from '../../assets/stitch/an_artistic_flat_lay_of_embroidery_materials_linen_fabric_sharp_vintage.png';
-import imgHeirloom from '../../assets/stitch/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an.png';
+import imgPhoto from '../../assets/portrait_of_personalized_portraits_for_a_luxur.webp';
+import imgSketch from '../../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.webp';
+import imgThread from '../../assets/stitch/an_artistic_flat_lay_of_embroidery_materials_linen_fabric_sharp_vintage.webp';
+import imgHeirloom from '../../assets/stitch/a_beautifully_finished_embroidery_piece_displayed_in_a_wooden_hoop_featuring_an.webp';
 
 const Annotation = ({ step, title, desc, className = '' }: { step: string, title: string, desc: string, className?: string }) => (
   <div className={`max-w-[200px] flex flex-col bg-white/80 backdrop-blur-md p-4 shadow-lg border border-white/60 ${className}`}>

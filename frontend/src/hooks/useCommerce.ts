@@ -95,6 +95,12 @@ export const useCart = () => {
       const response = await apiClient.get('/cart');
       return response.cart;
     },
+    // PERFORMANCE FIX: 5-min staleTime so the cart is not re-fetched on
+    // every page mount. Cart mutations (add/remove/clear/checkout) already
+    // call queryClient.invalidateQueries(['cart']), so counts stay accurate
+    // after every user action — correctness is NOT sacrificed.
+    staleTime: 5 * 60 * 1000,  // 5 minutes
+    gcTime:    10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 };

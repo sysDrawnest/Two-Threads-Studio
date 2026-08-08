@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import bgPc from '../../assets/Authentication page pc .jpeg';
-import bgMobile from '../../assets/Authentication page mobile.jpeg';
+import bgPc from '../../assets/Authentication page pc .webp';
+import bgMobile from '../../assets/Authentication page mobile.webp';
 
 const Login: React.FC = () => {
   const { login, isLoading, isAuthenticated, user } = useAuth();

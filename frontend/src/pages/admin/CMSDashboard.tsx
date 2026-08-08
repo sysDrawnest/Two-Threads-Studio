@@ -25,7 +25,7 @@ import {
   Scissors,
   Check,
 } from 'lucide-react';
-import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.png';
+import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,

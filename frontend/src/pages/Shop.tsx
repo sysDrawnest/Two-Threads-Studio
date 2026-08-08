@@ -7,7 +7,7 @@ import { useCartStore } from '../store/cartStore';
 import { useAddToCart } from '../hooks/useCommerce';
 import { ScrollReveal } from '../components/ui/ScrollReveal';
 import { ChevronDown, SlidersHorizontal, X, RotateCcw, ShoppingBag, Check } from 'lucide-react';
-import shopBannerImg from '../assets/Handcrafted_embroidery_in_artisa…_2K_202607291522.jpeg';
+import shopBannerImg from '../assets/Handcrafted_embroidery_in_artisa…_2K_202607291522.webp';
 
 export default function Shop() {
   const location = useLocation();
