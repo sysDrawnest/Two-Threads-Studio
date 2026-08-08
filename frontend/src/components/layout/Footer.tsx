@@ -78,10 +78,11 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
   };
 
   return (
-    <>
-      <div className={`w-full overflow-hidden leading-none ${resolvedTopBg}`}>
+    <footer className="relative bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8">
+      {/* SVG Wave Divider Overlay — Positioned absolutely to overlap the bottom of the section above */}
+      <div className="absolute left-0 top-0 w-full overflow-hidden leading-none transform -translate-y-full pointer-events-none z-10">
         <svg 
-          className="w-full h-[60px] md:h-[100px] lg:h-[140px] block" 
+          className="w-full h-[50px] sm:h-[80px] md:h-[110px] lg:h-[140px] block" 
           viewBox="0 0 1440 120" 
           preserveAspectRatio="none" 
           xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +93,6 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
           />
         </svg>
       </div>
-      <footer className="bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Grid Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
@@ -194,7 +194,6 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
           </div>
         </div>
       </footer>
-    </>
   );
 };
 
