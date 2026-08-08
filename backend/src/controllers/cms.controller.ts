@@ -161,7 +161,7 @@ export const cmsController = {
       return successResponse(res, {
         activeHeroTemplate: settings.activeHeroTemplate ?? 1,
         bestSellersConfig: settings.homepageBestSellersConfig || { productIds: [], limit: 8, enabled: true },
-        newArrivalsConfig: settings.homepageNewArrivalsConfig || { productIds: [], limit: 8, enabled: true },
+        newArrivalsConfig: settings.homepageNewArrivalsConfig || { productIds: [], limit: 4, enabled: true },
         menswearConfig: settings.homepageMenswearConfig || { productIds: [], title: 'Premium Menswear Collection', enabled: true },
         womenswearConfig: settings.homepageWomenswearConfig || { productIds: [], title: 'Premium Womenswear Collection', enabled: true },
         categoriesConfig: settings.homepageCategoriesConfig || DEFAULT_CATEGORIES,
