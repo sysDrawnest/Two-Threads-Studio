@@ -5,7 +5,7 @@ import { Product } from '../data/products';
 import { productService } from '../services/productService';
 import { useAddToCart } from '../hooks/useCommerce';
 import { ScrollReveal } from '../components/ui/ScrollReveal';
-import { ArrowRight, Heart, ShoppingBag, Check, Sparkles, SlidersHorizontal, ChevronRight } from 'lucide-react';
+import { ArrowRight, Heart, ShoppingBag, Check, ArrowDown, ChevronRight } from 'lucide-react';
 
 import imgCrochetTop from '../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.png';
 import imgHandbag from '../assets/Woman_carrying_wool_handbag_2K_202607141446.jpeg';
@@ -14,60 +14,48 @@ import imgHandbag2 from '../assets/Woman_holding_wool_handbag_2K_202607141448.jp
 // Collection Configurations
 interface CollectionConfig {
   id: string;
-  title: string;
-  subtitle: string;
-  season: string;
-  description: string;
+  tag: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  introTitle: string;
+  introBody: string;
   heroImage: string;
-  craftHighlights: {
+  quote: string;
+  heroPiece: {
     title: string;
-    subtitle: string;
+    price: number;
+    mrp?: number;
+    fabric: string;
     description: string;
     image: string;
-    fabric: string;
-    craftTime: string;
-  }[];
+    id: string;
+  };
   fallbackProducts: Product[];
 }
 
 const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
   menswear: {
     id: 'menswear',
-    title: "The Artisan Menswear Collection",
-    subtitle: "REFINED TAILORING · ORGANIC FABRICS · EMBROIDERED ACCENTS",
-    season: "AUTUMN / WINTER 2026",
-    description: "Designed for the modern connoisseur. Each piece in our Menswear capsule bridges traditional Indian hand-loom craftsmanship with contemporary, relaxed silhouettes. Hand-stitched in limited studio batches.",
+    tag: 'MENSWEAR',
+    heroTitle: 'THE MODERN ARTISAN',
+    heroSubtitle: 'Crafted for those who appreciate the uncommon.',
+    introTitle: 'Crafted with intention.',
+    introBody: 'A considered collection of handmade pieces, where traditional textile techniques meet contemporary everyday dressing.',
     heroImage: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=1600&auto=format&fit=crop',
-    craftHighlights: [
-      {
-        title: "The Threaded Indigo Jacket",
-        subtitle: "Hand-embroidered Motif Detail",
-        description: "Crafted from 14oz raw selvedge denim, featuring intricate resham thread embroidery across the back yolk. Over 32 hours of manual artisan needlework.",
-        image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop',
-        fabric: "Raw Organic Selvedge Denim",
-        craftTime: "32 Hours Needlework",
-      },
-      {
-        title: "Artisan Linen Kurta Shirt",
-        subtitle: "Handloom Organic Linen",
-        description: "Woven in Bhagalpur using hand-spun organic linen yarn. Breathable, relaxed tailored cut with hand-carved wooden buttons.",
-        image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop',
-        fabric: "100% Handloom Linen",
-        craftTime: "18 Hours Handloom",
-      },
-      {
-        title: "Studio Cut Embroidered Cap",
-        subtitle: "Botanical Crest Stitching",
-        description: "Structured cotton twill cap featuring hand-guided botanical embroidery accents. Designed to complement our denim and outerwear capsule.",
-        image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?q=80&w=800&auto=format&fit=crop',
-        fabric: "Heavyweight Cotton Twill",
-        craftTime: "8 Hours Stitching",
-      }
-    ],
+    quote: '"Made slowly. Worn for years."',
+    heroPiece: {
+      id: 'mens-hero-piece',
+      title: 'Handwoven Indigo Linen Shirt',
+      price: 3499,
+      mrp: 4499,
+      fabric: '100% Organic Handloom Linen',
+      description: 'Relaxed fit shirt featuring hand-threaded botanical motif embroidery on chest pocket.',
+      image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=1000&auto=format&fit=crop',
+    },
     fallbackProducts: [
       {
         id: 'mens-prod-1',
-        name: 'Hand-Embroidered Studio Shirt in Natural Indigo',
+        name: 'Handwoven Indigo Linen Shirt',
         price: 3499,
         mrp: 4499,
         category: 'Kit' as any,
@@ -75,7 +63,7 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
         collection: 'Linen',
         difficulty: 'Advanced',
         badge: 'Best Seller',
-        images: ['https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=800&auto=format&fit=crop'],
+        images: ['https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop'],
         description: 'Relaxed fit shirt featuring hand-threaded botanical motif embroidery on chest pocket.',
         story: 'Woven by master weavers in Bengal and finished by our in-house embroidery artisans.',
         materialsIncluded: ['100% Organic Linen', 'Resham Silk Threads'],
@@ -154,37 +142,22 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
   },
   womenswear: {
     id: 'womenswear',
-    title: "The Artisan Womenswear Collection",
-    subtitle: "CROCHET LUXE · SILK EMBROIDERIES · RESORT & ARTISAN APPAREL",
-    season: "SPRING / SUMMER 2026",
-    description: "An ode to feminine grace and tactile artistry. Featuring intricate open-weave crochet tops, handmade luxury wool & cotton handbags, and ethereal embroidered heirloom garments.",
+    tag: 'WOMENSWEAR',
+    heroTitle: 'THE ARTISAN MUSE',
+    heroSubtitle: 'Handcrafted pieces for quiet expression.',
+    introTitle: 'Tactile elegance & slow craft.',
+    introBody: 'An ethereal collection of open-weave crochet tops, handmade wool totes, and resort apparel woven by master women artisans.',
     heroImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1600&auto=format&fit=crop',
-    craftHighlights: [
-      {
-        title: "The Hand-Knotted Crochet Top",
-        subtitle: "Signature Open-Weave Silhouette",
-        description: "Intricately hand-crocheted using 100% mercerized organic cotton yarn. Designed for breathable resort luxury with custom scalloped hems.",
-        image: imgCrochetTop,
-        fabric: "Mercerized Organic Cotton",
-        craftTime: "28 Hours Hand Crochet",
-      },
-      {
-        title: "Artisan Wool & Leather Tote",
-        subtitle: "Hand-Knitted Wool Exterior",
-        description: "Handcrafted structured handbag combining hand-loomed wool tapestry weave with veg-tanned genuine leather handles.",
-        image: imgHandbag,
-        fabric: "Pure Wool & Genuine Leather",
-        craftTime: "22 Hours Artisan Looming",
-      },
-      {
-        title: "Heirloom One-Piece Crochet Dress",
-        subtitle: "Full-Length Resort Silhouette",
-        description: "Floor-length open knit dress woven with metallic shimmer threads and pure organic cotton. Includes a matching slip dress.",
-        image: imgHandbag2,
-        fabric: "Cotton & Metallic Filament",
-        craftTime: "40 Hours Master Crochet",
-      }
-    ],
+    quote: '"Woven by hand, made to cherish."',
+    heroPiece: {
+      id: 'womens-hero-piece',
+      title: 'Hand-Knotted Open Weave Crochet Top',
+      price: 4299,
+      mrp: 5499,
+      fabric: '100% Mercerized Organic Cotton',
+      description: 'Ethereal open-knit crochet jacket top with scalloped hem and tie-front closure.',
+      image: imgCrochetTop,
+    },
     fallbackProducts: [
       {
         id: 'womens-prod-1',
@@ -282,7 +255,6 @@ export default function PremiumCollection() {
   const { id } = useParams<{ id: string }>();
   const collectionKey = (id || 'womenswear').toLowerCase();
   
-  // Default to menswear or womenswear config
   const config = COLLECTION_CONFIGS[collectionKey] || COLLECTION_CONFIGS['womenswear'];
   
   const [products, setProducts] = useState<Product[]>([]);
@@ -300,7 +272,6 @@ export default function PremiumCollection() {
     setLoading(true);
     productService.getProducts({ limit: 100 })
       .then((res) => {
-        // Filter products matching collection category
         const matches = res.products.filter(p => {
           const catStr = (p.category + ' ' + (p.productCategory || '') + ' ' + p.name + ' ' + (p.description || '')).toLowerCase();
           if (collectionKey === 'menswear') {
@@ -324,7 +295,7 @@ export default function PremiumCollection() {
       });
   }, [collectionKey, config.fallbackProducts]);
 
-  const handleQuickAdd = async (product: Product, e: React.MouseEvent) => {
+  const handleQuickAdd = async (product: { id: string; name: string; price: number }, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -353,116 +324,327 @@ export default function PremiumCollection() {
   const otherConfig = COLLECTION_CONFIGS[otherCollectionKey];
 
   return (
-    <PageContainer>
+    <PageContainer disablePadding={true}>
       {/* ─────────────────────────────────────────────────────────────────────────────
-          1. CINEMATIC HERO SECTION
+          01 — CINEMATIC COLLECTION HERO (Full Viewport Height)
          ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[80vh] md:min-h-[85vh] flex items-center justify-center bg-[#1C1C1B] text-[#FAF9F7] overflow-hidden">
-        {/* Background Image with Vignette Overlay */}
+      <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center bg-[#1C1C1B] text-[#FAF9F7] overflow-hidden">
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
             src={config.heroImage}
-            alt={config.title}
-            className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-1000"
+            alt={config.heroTitle}
+            className="w-full h-full object-cover object-center opacity-50 scale-100 transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B] via-[#1C1C1B]/40 to-[#1C1C1B]/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B] via-[#1C1C1B]/30 to-transparent" />
         </div>
 
-        {/* Hero Text Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-20">
+        {/* Hero Content — Minimal & Spacious */}
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center py-20">
           <ScrollReveal direction="up">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#FAF9F7]/25 bg-white/5 backdrop-blur-md text-[10px] font-sans tracking-[0.3em] uppercase text-[#A34A38] font-semibold mb-6">
-              <Sparkles size={12} />
-              {config.season}
+            <span className="inline-block font-sans text-[10px] tracking-[0.35em] uppercase text-[#A34A38] font-bold mb-4">
+              {config.tag}
             </span>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.1}>
-            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[76px] font-light leading-[1.08] tracking-tight mb-6 text-white">
-              {config.title}
+            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-light leading-[1.05] tracking-tight mb-6 text-white">
+              {config.heroTitle}
             </h1>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.2}>
-            <p className="font-sans text-[11px] sm:text-xs tracking-[0.25em] uppercase text-[#FAF9F7]/70 font-medium mb-8 max-w-2xl mx-auto">
-              {config.subtitle}
+            <p className="font-sans text-xs sm:text-sm tracking-[0.2em] uppercase text-neutral-300 font-light mb-10 max-w-xl mx-auto">
+              {config.heroSubtitle}
             </p>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.3}>
-            <p className="font-sans text-sm sm:text-base text-neutral-300 font-light leading-relaxed max-w-2xl mx-auto mb-10">
-              {config.description}
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" delay={0.4}>
             <a
-              href="#shoppable-catalog"
-              className="inline-flex items-center gap-3 bg-[#A34A38] text-white px-8 py-3.5 rounded-full font-sans text-xs tracking-[0.2em] uppercase font-semibold hover:bg-[#8B3E2E] transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              href="#collection-intro"
+              className="inline-flex items-center gap-2 bg-[#FAF9F7] text-[#1C1C1B] px-8 py-3.5 rounded-full font-sans text-xs tracking-[0.22em] uppercase font-semibold hover:bg-[#A34A38] hover:text-white transition-all shadow-lg"
             >
-              Shop Collection Below
-              <ArrowRight size={15} />
+              DISCOVER
+              <ArrowDown size={14} />
             </a>
           </ScrollReveal>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/50 text-[9px] font-sans tracking-[0.3em] uppercase flex flex-col items-center gap-2">
-          <span>Scroll to Discover</span>
-          <div className="w-px h-8 bg-gradient-to-b from-white/50 to-transparent animate-pulse" />
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          2. CRAFTSMANSHIP & EDITORIAL LOOKBOOK HIGHLIGHTS
+          02 — SMALL COLLECTION INTRODUCTION (10-15% Viewport)
          ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 px-6 md:px-14 bg-[#FAF9F7]">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center max-w-2xl mx-auto mb-16">
+      <section id="collection-intro" className="py-16 md:py-20 px-6 bg-[#FAF9F7] text-center border-b border-[#E8E4DF]">
+        <div className="max-w-2xl mx-auto">
+          <ScrollReveal direction="up">
             <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold">
-              Atelier Highlights
+              {config.tag}
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-[#1C1C1B] mt-2 mb-4">
-              Mastery in Every Stitch
+            <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1C1C1B] mt-2 mb-4">
+              {config.introTitle}
             </h2>
-            <div className="w-12 h-0.5 bg-[#A34A38] mx-auto opacity-40" />
+            <p className="font-sans text-xs sm:text-sm text-neutral-600 font-light leading-relaxed mb-6">
+              {config.introBody}
+            </p>
+            <a
+              href="#featured-look"
+              className="inline-flex items-center gap-1.5 font-sans text-[11px] tracking-[0.2em] uppercase text-[#1C1C1B] font-medium border-b border-[#1C1C1B]/40 pb-0.5 hover:text-[#A34A38] hover:border-[#A34A38] transition-colors"
+            >
+              Explore the Edit <ChevronRight size={13} />
+            </a>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          03 — FEATURED LOOK / HERO PIECE (60/40 Asymmetric Split)
+         ───────────────────────────────────────────────────────────────────────────── */}
+      <section id="featured-look" className="py-16 md:py-24 px-6 md:px-14 bg-[#F5EFE7]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* 60% Large Editorial Image */}
+            <div className="lg:col-span-7 aspect-[4/5] rounded-sm overflow-hidden bg-[#FAF9F7] relative shadow-md">
+              <img
+                src={config.heroPiece.image}
+                alt={config.heroPiece.title}
+                className="w-full h-full object-cover object-center"
+              />
+              <div className="absolute top-4 left-4 bg-[#1C1C1B] text-white text-[9px] font-sans tracking-[0.2em] uppercase px-3 py-1 rounded-sm">
+                THE HERO PIECE
+              </div>
+            </div>
+
+            {/* 40% Featured Product Card */}
+            <div className="lg:col-span-5 flex flex-col justify-center p-6 lg:p-8 bg-white border border-[#E8E4DF] rounded-sm shadow-sm">
+              <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#A34A38] font-bold mb-2">
+                Signature Creation
+              </span>
+              <h3 className="font-serif text-2xl sm:text-3xl font-normal text-[#1C1C1B] mb-3">
+                {config.heroPiece.title}
+              </h3>
+              <p className="font-sans text-xs text-neutral-500 mb-4">
+                Fabric: <strong className="text-[#1C1C1B]">{config.heroPiece.fabric}</strong>
+              </p>
+              <p className="font-sans text-xs text-neutral-600 font-light leading-relaxed mb-6">
+                {config.heroPiece.description}
+              </p>
+
+              <div className="flex items-center justify-between pt-6 border-t border-neutral-100">
+                <div>
+                  <span className="font-sans text-xl font-semibold text-[#1C1C1B]">
+                    ₹{config.heroPiece.price.toLocaleString()}
+                  </span>
+                  {config.heroPiece.mrp && (
+                    <span className="font-sans text-xs text-neutral-400 line-through ml-2">
+                      ₹{config.heroPiece.mrp.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={(e) => handleQuickAdd({ id: config.heroPiece.id, name: config.heroPiece.title, price: config.heroPiece.price }, e)}
+                  disabled={addedProductId === config.heroPiece.id}
+                  className={`px-5 py-2.5 rounded-sm font-sans text-[10px] tracking-[0.2em] uppercase font-semibold flex items-center gap-2 transition-all ${
+                    addedProductId === config.heroPiece.id
+                      ? 'bg-emerald-700 text-white'
+                      : 'bg-[#1C1C1B] text-white hover:bg-[#A34A38]'
+                  }`}
+                >
+                  {addedProductId === config.heroPiece.id ? (
+                    <>
+                      <Check size={14} /> Added
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag size={14} /> View Piece
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          04 — CONTROLLED ASYMMETRIC PRODUCT SHOWCASE
+         ───────────────────────────────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 md:px-14 bg-[#FAF9F7]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-xl mx-auto mb-16">
+            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold">
+              Controlled Edit
+            </span>
+            <h2 className="font-serif text-3xl font-light text-[#1C1C1B] mt-1">
+              Curated Statements
+            </h2>
           </div>
 
-          {/* Highlights Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            {config.craftHighlights.map((item, idx) => (
-              <ScrollReveal key={item.title} direction="up" delay={idx * 0.15}>
-                <div className="group bg-white rounded-sm border border-[#E8E4DF] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-[#F5EFE7]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                    <div className="absolute top-4 left-4 bg-[#1C1C1B]/90 backdrop-blur-md text-white text-[9px] font-sans tracking-[0.2em] uppercase px-3 py-1 rounded-sm">
-                      {item.craftTime}
+          {/* Staggered 3-Product Rhythm */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            {sortedProducts.slice(0, 3).map((product, idx) => {
+              // Asymmetric column span per item index
+              const colSpan = idx === 0 ? 'md:col-span-5' : idx === 1 ? 'md:col-span-7' : 'md:col-span-12';
+              const aspect = idx === 0 ? 'aspect-[3/4]' : idx === 1 ? 'aspect-[4/3]' : 'aspect-[16/9] md:aspect-[21/9]';
+
+              return (
+                <ScrollReveal key={product.id} direction="up" delay={idx * 0.1} className={colSpan}>
+                  <div className="group relative bg-white border border-[#E8E4DF] rounded-sm overflow-hidden flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-shadow">
+                    <Link to={`/shop/${product.id}`} className={`block relative ${aspect} overflow-hidden bg-[#F5EFE7]`}>
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                      />
+                      {product.badge && (
+                        <div className="absolute top-3 left-3 bg-[#1C1C1B] text-white text-[9px] font-sans tracking-[0.2em] uppercase px-2.5 py-1 rounded-sm">
+                          {product.badge}
+                        </div>
+                      )}
+                    </Link>
+
+                    <div className="p-6 flex items-center justify-between">
+                      <div>
+                        <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#A34A38] font-medium mb-1">
+                          {product.collection || 'Studio'} Collection
+                        </p>
+                        <Link to={`/shop/${product.id}`}>
+                          <h3 className="font-serif text-xl font-normal text-[#1C1C1B] hover:text-[#A34A38] transition-colors">
+                            {product.name}
+                          </h3>
+                        </Link>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="font-sans text-base font-semibold text-[#1C1C1B] block">
+                          ₹{product.price.toLocaleString()}
+                        </span>
+                        <Link
+                          to={`/shop/${product.id}`}
+                          className="inline-flex items-center gap-1 font-sans text-[10px] tracking-[0.15em] uppercase text-[#A34A38] font-semibold mt-1"
+                        >
+                          View Piece <ArrowRight size={12} />
+                        </Link>
+                      </div>
                     </div>
                   </div>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                  <div className="p-6 flex flex-col justify-between flex-1">
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          05 — SECOND EDITORIAL MOMENT (Quote Break)
+         ───────────────────────────────────────────────────────────────────────────── */}
+      <section className="relative py-24 md:py-32 px-6 bg-[#1C1C1B] text-[#FAF9F7] overflow-hidden text-center">
+        <div className="absolute inset-0 z-0">
+          <img
+            src={config.heroImage}
+            alt="Editorial Quote Background"
+            className="w-full h-full object-cover object-center opacity-25"
+          />
+        </div>
+
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <ScrollReveal direction="up">
+            <span className="font-sans text-[10px] tracking-[0.35em] uppercase text-[#A34A38] font-bold block mb-4">
+              ATELIER PHILOSOPHY
+            </span>
+            <p className="font-serif text-3xl sm:text-5xl font-light italic leading-snug text-white mb-6">
+              {config.quote}
+            </p>
+            <div className="w-10 h-0.5 bg-[#A34A38] mx-auto opacity-50" />
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          06 — THE COMPLETE COLLECTION (Clean Shopping Grid)
+         ───────────────────────────────────────────────────────────────────────────── */}
+      <section className="py-20 px-6 md:px-14 bg-[#F5EFE7]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 mb-12 border-b border-[#1C1C1B]/15 gap-4">
+            <div>
+              <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold">
+                FULL CATALOG
+              </span>
+              <h2 className="font-serif text-3xl font-light text-[#1C1C1B] mt-1">
+                The Complete {collectionKey === 'menswear' ? 'Menswear' : 'Womenswear'} Collection
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="font-sans text-xs text-neutral-500 font-medium">
+                {sortedProducts.length} Pieces
+              </span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-transparent font-sans text-xs text-[#1C1C1B] font-semibold uppercase tracking-wider focus:outline-none border-b border-[#1C1C1B]/30 pb-0.5 cursor-pointer"
+              >
+                <option value="newest">Newest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {sortedProducts.map((product, idx) => (
+              <ScrollReveal key={product.id} direction="up" delay={idx * 0.05}>
+                <div className="group bg-white rounded-sm border border-[#E8E4DF] overflow-hidden flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all">
+                  <div className="relative aspect-[3/4] bg-[#FAF9F7] overflow-hidden">
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <button
+                      className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-neutral-600 hover:text-[#A34A38] hover:bg-white transition-all shadow-sm"
+                      aria-label="Add to Wishlist"
+                    >
+                      <Heart size={15} />
+                    </button>
+                  </div>
+
+                  <div className="p-5 flex flex-col justify-between flex-1">
                     <div>
-                      <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#A34A38] font-medium mb-1">
-                        {item.subtitle}
+                      <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-neutral-400 mb-1">
+                        {product.collection || 'Artisan'}
                       </p>
-                      <h3 className="font-serif text-xl font-normal text-[#1C1C1B] mb-3">
-                        {item.title}
-                      </h3>
-                      <p className="font-sans text-xs text-neutral-600 leading-relaxed font-light mb-4">
-                        {item.description}
-                      </p>
+                      <Link to={`/shop/${product.id}`}>
+                        <h3 className="font-serif text-lg font-normal text-[#1C1C1B] hover:text-[#A34A38] transition-colors leading-snug mb-2 line-clamp-2">
+                          {product.name}
+                        </h3>
+                      </Link>
                     </div>
 
-                    <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-[11px] font-sans text-neutral-500">
-                      <span className="font-medium text-[#1C1C1B]">{item.fabric}</span>
-                      <span className="text-[#A34A38] group-hover:translate-x-1 transition-transform flex items-center gap-1 font-semibold text-[10px] tracking-widest uppercase">
-                        Explore <ChevronRight size={12} />
+                    <div className="pt-4 border-t border-neutral-100 flex items-center justify-between mt-3">
+                      <span className="font-sans text-base font-semibold text-[#1C1C1B]">
+                        ₹{product.price.toLocaleString()}
                       </span>
+
+                      <button
+                        onClick={(e) => handleQuickAdd(product, e)}
+                        disabled={addedProductId === product.id}
+                        className={`px-3.5 py-2 rounded-sm font-sans text-[10px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5 transition-all ${
+                          addedProductId === product.id
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-[#1C1C1B] text-white hover:bg-[#A34A38]'
+                        }`}
+                      >
+                        {addedProductId === product.id ? (
+                          <>
+                            <Check size={13} /> Added
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingBag size={13} /> Add
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -473,175 +655,25 @@ export default function PremiumCollection() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          3. SHOPPABLE CATALOG GRID
+          CROSS-COLLECTION PROMPT
          ───────────────────────────────────────────────────────────────────────────── */}
-      <section id="shoppable-catalog" className="py-16 md:py-24 px-6 md:px-14 bg-[#F5EFE7]">
-        <div className="max-w-7xl mx-auto">
-          {/* Header & Controls Bar */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 mb-12 border-b border-[#1C1C1B]/15 gap-6">
-            <div>
-              <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold">
-                Curated Catalog
-              </span>
-              <h2 className="font-serif text-3xl md:text-4xl font-light text-[#1C1C1B] mt-1">
-                Shop the {collectionKey === 'menswear' ? 'Menswear' : 'Womenswear'} Pieces
-              </h2>
-            </div>
-
-            {/* Sort & Counter Controls */}
-            <div className="flex items-center justify-between md:justify-end gap-6">
-              <span className="font-sans text-xs text-neutral-600 font-medium">
-                Showing <strong className="text-[#1C1C1B]">{sortedProducts.length}</strong> creations
-              </span>
-
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal size={14} className="text-neutral-500" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-transparent font-sans text-xs text-[#1C1C1B] font-medium uppercase tracking-wider focus:outline-none border-b border-[#1C1C1B]/30 pb-0.5 cursor-pointer"
-                >
-                  <option value="newest">Newest Arrivals</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Product Grid */}
-          {loading ? (
-            <div className="py-20 text-center">
-              <div className="inline-block w-8 h-8 border-2 border-[#A34A38] border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="font-serif text-sm text-neutral-600 tracking-widest uppercase">
-                Loading Studio Collection...
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {sortedProducts.map((product, idx) => (
-                <ScrollReveal key={product.id} direction="up" delay={idx * 0.08}>
-                  <div className="group relative bg-white rounded-sm border border-[#E8E4DF] overflow-hidden flex flex-col justify-between h-full hover:shadow-lg transition-all duration-300">
-                    {/* Badge */}
-                    {product.badge && (
-                      <div className="absolute top-3 left-3 z-10 bg-[#1C1C1B] text-white text-[9px] font-sans tracking-[0.2em] uppercase px-2.5 py-1 rounded-sm shadow-sm font-semibold">
-                        {product.badge}
-                      </div>
-                    )}
-
-                    {/* Wishlist Button */}
-                    <button
-                      className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-neutral-600 hover:text-[#A34A38] hover:bg-white transition-all shadow-sm"
-                      aria-label="Add to Wishlist"
-                    >
-                      <Heart size={15} />
-                    </button>
-
-                    {/* Image Container */}
-                    <Link to={`/shop/${product.id}`} className="block relative aspect-[3/4] overflow-hidden bg-[#FAF9F7]">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-                      />
-                    </Link>
-
-                    {/* Details Container */}
-                    <div className="p-5 flex flex-col justify-between flex-1">
-                      <div>
-                        <div className="flex items-center justify-between mb-1.5 text-[10px] font-sans tracking-widest uppercase text-neutral-400">
-                          <span>{product.collection || 'Artisan'} Collection</span>
-                          {product.rating && (
-                            <span className="text-amber-700 font-medium">★ {product.rating}</span>
-                          )}
-                        </div>
-
-                        <Link to={`/shop/${product.id}`}>
-                          <h3 className="font-serif text-lg font-normal text-[#1C1C1B] hover:text-[#A34A38] transition-colors leading-snug mb-2 line-clamp-2">
-                            {product.name}
-                          </h3>
-                        </Link>
-                      </div>
-
-                      <div className="pt-4 border-t border-neutral-100 flex items-center justify-between mt-3">
-                        <div>
-                          <span className="font-sans text-base font-semibold text-[#1C1C1B]">
-                            ₹{product.price.toLocaleString()}
-                          </span>
-                          {product.mrp && product.mrp > product.price && (
-                            <span className="font-sans text-xs text-neutral-400 line-through ml-2">
-                              ₹{product.mrp.toLocaleString()}
-                            </span>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={(e) => handleQuickAdd(product, e)}
-                          disabled={addedProductId === product.id}
-                          className={`px-3.5 py-2 rounded-sm font-sans text-[10px] tracking-[0.15em] uppercase font-semibold flex items-center gap-1.5 transition-all ${
-                            addedProductId === product.id
-                              ? 'bg-emerald-700 text-white'
-                              : 'bg-[#1C1C1B] text-white hover:bg-[#A34A38]'
-                          }`}
-                        >
-                          {addedProductId === product.id ? (
-                            <>
-                              <Check size={13} /> Added
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingBag size={13} /> Add
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          4. CROSS-COLLECTION EDITORIAL PROMPT BANNER
-         ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 md:px-14 bg-[#1C1C1B] text-[#FAF9F7] relative overflow-hidden">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold">
-              Explore Next
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-light text-white mt-2 mb-4 leading-tight">
-              {otherConfig.title}
-            </h2>
-            <p className="font-sans text-sm text-neutral-300 font-light leading-relaxed mb-8">
-              {otherConfig.description}
-            </p>
-            <Link
-              to={`/collection/${otherCollectionKey}`}
-              className="inline-flex items-center gap-3 bg-[#FAF9F7] text-[#1C1C1B] px-7 py-3 rounded-full font-sans text-xs tracking-[0.2em] uppercase font-semibold hover:bg-[#A34A38] hover:text-white transition-all shadow-md"
-            >
-              Discover {otherCollectionKey === 'menswear' ? 'Menswear' : 'Womenswear'}
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-
-          <div className="relative aspect-[4/3] rounded-sm overflow-hidden border border-white/10 shadow-2xl">
-            <img
-              src={otherConfig.heroImage}
-              alt={otherConfig.title}
-              className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B]/80 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 text-white">
-              <span className="text-[10px] font-sans tracking-[0.2em] uppercase text-[#A34A38] font-semibold">
-                {otherConfig.season}
-              </span>
-              <p className="font-serif text-lg font-light">{otherConfig.subtitle}</p>
-            </div>
-          </div>
+      <section className="py-16 px-6 bg-[#1C1C1B] text-white text-center">
+        <div className="max-w-2xl mx-auto">
+          <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold block mb-2">
+            CROSS COLLECTION
+          </span>
+          <h2 className="font-serif text-3xl font-light mb-4">
+            Discover {otherConfig.tag}
+          </h2>
+          <p className="font-sans text-xs text-neutral-400 mb-6">
+            {otherConfig.heroSubtitle}
+          </p>
+          <Link
+            to={`/collection/${otherCollectionKey}`}
+            className="inline-flex items-center gap-2 bg-[#FAF9F7] text-[#1C1C1B] px-7 py-3 rounded-full font-sans text-xs tracking-[0.2em] uppercase font-semibold hover:bg-[#A34A38] hover:text-white transition-all"
+          >
+            Explore {otherConfig.tag} <ArrowRight size={14} />
+          </Link>
         </div>
       </section>
     </PageContainer>

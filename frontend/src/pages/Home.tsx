@@ -10,8 +10,7 @@ import {
 const VideoBanner = lazy(() => import('../components/sections/ExclusiveCollection'));
 const ShopByCategory = lazy(() => import('../components/sections/ShopByCategory'));
 const NewArrivalsSection = lazy(() => import('../components/sections/NewArrivalsSection'));
-const WomensCollectionSection = lazy(() => import('../components/sections/WomensCollectionSection'));
-const MensCollectionSection   = lazy(() => import('../components/sections/MensCollectionSection'));
+const FashionSplitEntrance = lazy(() => import('../components/sections/FashionSplitEntrance'));
 const FeaturedCollections = lazy(() => import('../components/sections/FeaturedCollections'));
 const SacredTraditionsCollection = lazy(() => import('../components/sections/SacredTraditionsCollection'));
 const ShopByOccasion = lazy(() => import('../components/sections/ShopByOccasion'));
@@ -82,11 +81,7 @@ const Home: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <WomensCollectionSection />
-      </Suspense>
-
-      <Suspense fallback={<SectionFallback />}>
-        <MensCollectionSection />
+        <FashionSplitEntrance />
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
