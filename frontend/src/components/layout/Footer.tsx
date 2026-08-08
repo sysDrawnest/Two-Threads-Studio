@@ -77,26 +77,22 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
     }
   };
 
-  const showCurve = location.pathname === '/' || location.pathname === '/shop';
-
   return (
     <>
-      {showCurve && (
-        <div className={`w-full overflow-hidden leading-none ${resolvedTopBg}`}>
-          <svg 
-            className="w-full h-[60px] md:h-[100px] lg:h-[140px] block" 
-            viewBox="0 0 1440 120" 
-            preserveAspectRatio="none" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path 
-              fill="#1e1812" 
-              d="M0,120 L1440,120 L1440,40 C1100,140 800,0 400,80 C200,120 100,60 0,40 Z"
-            />
-          </svg>
-        </div>
-      )}
-      <footer className={`bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8 ${!showCurve ? 'border-t border-[#FAF9F7]/10' : ''}`}>
+      <div className={`w-full overflow-hidden leading-none ${resolvedTopBg}`}>
+        <svg 
+          className="w-full h-[60px] md:h-[100px] lg:h-[140px] block" 
+          viewBox="0 0 1440 120" 
+          preserveAspectRatio="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path 
+            fill="#1e1812" 
+            d="M0,120 L1440,120 L1440,40 C1100,140 800,0 400,80 C200,120 100,60 0,40 Z"
+          />
+        </svg>
+      </div>
+      <footer className="bg-[#1e1812] pt-8 md:pt-12 px-6 md:px-16 pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Grid Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
