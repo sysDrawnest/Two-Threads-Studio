@@ -44,19 +44,24 @@ const Navbar: React.FC = () => {
 
   const shopCategories = [
     { name: 'All Products', path: '/shop' },
+    { name: 'Menswear', path: '/shop?category=menswear' },
+    { name: 'Womenswear', path: '/shop?category=womenswear' },
+    { name: 'Home Decor', path: '/shop?category=decor' },
     { name: 'Embroidery Kits', path: '/shop?category=kit' },
-    { name: 'Home & Wall Decor', path: '/shop?category=decor' },
-    { name: 'DIY Craft Sets', path: '/shop?category=diy' },
+    { name: 'DIY Craft Kits', path: '/shop?category=diy' },
+    { isDivider: true },
     { name: 'Best Sellers', path: '/shop?sort=best_sellers' },
     { name: 'New Arrivals', path: '/shop?sort=newest' },
+    { name: 'Sale', path: '/shop?sort=sale' },
   ];
 
   const collectionsList = [
-    { name: 'All Collections', path: '/collections' },
-    { name: 'Botanical Series', path: '/collections?name=Botanical' },
-    { name: 'Heritage Collection', path: '/collections?name=Heritage' },
-    { name: 'Artisan Studio', path: '/collections?name=Artisan' },
-    { name: 'Miniature Embroidery', path: '/collections?name=Miniature' },
+    { name: 'Botanical', path: '/collections?name=Botanical' },
+    { name: 'Sacred Traditions', path: '/collections?name=Sacred%20Traditions' },
+    { name: 'Heritage', path: '/collections?name=Heritage' },
+    { name: 'Minimal Living', path: '/collections?name=Minimal%20Living' },
+    { name: 'Festival', path: '/collections?name=Festival' },
+    { name: 'Seasonal', path: '/collections?name=Seasonal' },
   ];
 
   return (
@@ -104,14 +109,18 @@ const Navbar: React.FC = () => {
                     Shop Categories
                   </div>
                   <div className="flex flex-col gap-2.5">
-                    {shopCategories.map((cat) => (
-                      <Link
-                        key={cat.name}
-                        to={cat.path}
-                        className="font-sans text-xs text-neutral-700 hover:text-[#A34A38] hover:translate-x-1 transition-all py-0.5"
-                      >
-                        {cat.name}
-                      </Link>
+                    {shopCategories.map((cat, idx) => (
+                      cat.isDivider ? (
+                        <div key={`divider-${idx}`} className="my-1.5 border-t border-[#E8E4DF]" />
+                      ) : (
+                        <Link
+                          key={cat.name}
+                          to={cat.path!}
+                          className="font-sans text-xs text-neutral-700 hover:text-[#A34A38] hover:translate-x-1 transition-all py-0.5"
+                        >
+                          {cat.name}
+                        </Link>
+                      )
                     ))}
                   </div>
                 </div>
@@ -157,7 +166,7 @@ const Navbar: React.FC = () => {
               to="/our-story#custom-creations" 
               className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium flex items-center gap-1.5"
             >
-              Custom
+              Custom Orders
               <span className="w-1.5 h-1.5 rounded-full bg-[#A34A38] animate-pulse" />
             </Link>
 
@@ -174,7 +183,7 @@ const Navbar: React.FC = () => {
               to="/our-story" 
               className="font-sans text-[11px] tracking-[0.2em] text-[#1C1C1B] uppercase hover:text-[#A34A38] py-1 transition-colors font-medium"
             >
-              About
+              Our Story
             </Link>
 
           </div>
@@ -328,6 +337,18 @@ const Navbar: React.FC = () => {
               className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
             >
               Collections
+            </Link>
+            <Link 
+              to="/shop?category=menswear" 
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+            >
+              Menswear
+            </Link>
+            <Link 
+              to="/shop?category=womenswear" 
+              className="font-serif text-3xl leading-tight tracking-wide text-[#1C1C1B] hover:text-[#A34A38] transition-colors"
+            >
+              Womenswear
             </Link>
             <Link 
               to="/learning" 
