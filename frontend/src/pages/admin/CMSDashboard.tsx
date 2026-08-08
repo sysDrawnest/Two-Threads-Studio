@@ -170,7 +170,7 @@ export const CMSDashboard: React.FC = () => {
     if (cmsData?.data) {
       if (cmsData.data.categoriesConfig) setCategories(cmsData.data.categoriesConfig);
       if (cmsData.data.bestSellersConfig) setBestSellersConfig({ enabled: true, limit: 8, productIds: [], ...cmsData.data.bestSellersConfig });
-      if (cmsData.data.newArrivalsConfig) setNewArrivalsConfig({ enabled: true, limit: 8, productIds: [], ...cmsData.data.newArrivalsConfig });
+      if (cmsData.data.newArrivalsConfig) setNewArrivalsConfig({ enabled: true, limit: 4, productIds: [], ...cmsData.data.newArrivalsConfig });
     }
   }, [cmsData]);
 
