@@ -14,6 +14,7 @@ async function main() {
     prisma.category.upsert({ where: { slug: 'diy-kits' }, create: { id: 'cat6', name: 'DIY Kits', slug: 'diy-kits', image: 'https://images.unsplash.com/photo-1611486212557-88be5ff6f941?q=80&w=800&auto=format&fit=crop', isActive: true, sortOrder: 6 }, update: {} }),
     prisma.category.upsert({ where: { slug: 'home-decor' }, create: { id: 'cat7', name: 'Home Decor', slug: 'home-decor', image: 'https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=800&auto=format&fit=crop', isActive: true, sortOrder: 7 }, update: {} }),
     prisma.category.upsert({ where: { slug: 'gifts' }, create: { id: 'cat8', name: 'Gift Collection', slug: 'gifts', image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop', isActive: true, sortOrder: 8 }, update: {} }),
+    prisma.category.upsert({ where: { slug: 'clothing' }, create: { id: 'cat9', name: 'Clothing', slug: 'clothing', description: 'Clothing and handcrafted wearable pieces.', image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=800&auto=format&fit=crop', isActive: true, sortOrder: 9 }, update: {} }),
   ]);
   console.log(`✅ ${categories.length} categories seeded`);
 
@@ -48,7 +49,7 @@ async function main() {
     categoryId: string; collectionId?: string; price: number; comparePrice?: number;
     stockQuantity: number; status: ProductStatus; type: ProductType;
     badge?: BadgeType; difficulty?: DifficultyLevel;
-    featured: boolean; isHandmade: boolean; isSustainable: boolean;
+    isFeatured: boolean; isHandmade: boolean; isSustainable: boolean;
     isPersonalizable?: boolean; estimatedTime?: string;
     materialsIncluded: string[]; origin: string;
     images: { url: string; isPrimary: boolean; sortOrder: number }[];
@@ -246,9 +247,12 @@ async function main() {
         trackInventory:   true,
         status:           p.status,
         type:             p.type,
-        badge:            p.badge,
         difficulty:       p.difficulty,
-        featured:         p.featured,
+        isFeatured:       p.isFeatured,
+        isBestSeller:     p.badge === BadgeType.BEST_SELLER,
+        isNewArrival:     p.badge === BadgeType.NEW,
+        isLimitedEdition: p.badge === BadgeType.LIMITED,
+        isExclusive:      p.badge === BadgeType.EDITORS_CHOICE,
         isHandmade:       p.isHandmade,
         isSustainable:    p.isSustainable,
         isPersonalizable: p.isPersonalizable ?? false,
