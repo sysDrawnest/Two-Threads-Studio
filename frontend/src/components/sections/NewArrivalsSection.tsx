@@ -16,7 +16,7 @@ export default function NewArrivalsSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    productService.getProducts({ limit: cmsConfig?.limit || 8, sort: 'newest' })
+    productService.getProducts({ limit: cmsConfig?.limit || 4, sort: 'newest' })
       .then(res => {
         setProducts(res.products || []);
         setLoading(false);
@@ -61,7 +61,7 @@ export default function NewArrivalsSection() {
               No new arrivals available at the moment.
             </div>
           ) : (
-            products.slice(0, cmsConfig?.limit || 8).map((product, i) => (
+            products.slice(0, cmsConfig?.limit || 4).map((product, i) => (
               <ScrollReveal key={product.id} direction="up" distance={20} delay={0.07 * i}>
                 <ProductCard product={product} />
               </ScrollReveal>
