@@ -37,7 +37,7 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
   menswear: {
     id: 'menswear',
     tag: 'MENSWEAR',
-    heroTitle: 'THE MODERN ARTISAN',
+    heroTitle: 'MENSWEAR COLLECTION',
     heroSubtitle: 'Crafted for those who appreciate the uncommon.',
     introTitle: 'Crafted with intention.',
     introBody: 'A considered collection of handmade pieces, where traditional textile techniques meet contemporary everyday dressing.',
@@ -143,7 +143,7 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
   womenswear: {
     id: 'womenswear',
     tag: 'WOMENSWEAR',
-    heroTitle: 'THE ARTISAN MUSE',
+    heroTitle: 'WOMENSWEAR COLLECTION',
     heroSubtitle: 'Handcrafted pieces for quiet expression.',
     introTitle: 'Tactile elegance & slow craft.',
     introBody: 'An ethereal collection of open-weave crochet tops, handmade wool totes, and resort apparel woven by master women artisans.',
