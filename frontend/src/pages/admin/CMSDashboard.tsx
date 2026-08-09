@@ -41,7 +41,7 @@ import type { Product } from '../../data/products';
 // ─── Hero Template Metadata ───────────────────────────────────────────────────
 
 interface TemplateOption {
-  id: 1 | 2 | 3 | 4;
+  id: 1 | 2 | 3 | 4 | 5;
   name: string;
   description: string;
   icon: React.ElementType;
@@ -141,6 +141,27 @@ const TEMPLATES: TemplateOption[] = [
       </div>
     ),
   },
+  {
+    id: 5,
+    name: 'Artisan Monogram Heritage',
+    description: 'Heritage line-art design — giant watermark "T" monogram with superimposed serif typography & organic wavy category thread.',
+    icon: Sparkles,
+    tag: 'Monogram Heritage',
+    tagColor: 'bg-[#8C6F5A]/20 text-[#8C6F5A]',
+    preview: (
+      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex flex-col items-center justify-center p-2 text-[#2D2520] text-center">
+        <span className="absolute font-serif italic text-[54px] text-[#8C6F5A]/25 select-none font-normal">T</span>
+        <div className="relative z-10 space-y-0.5">
+          <span className="block font-serif text-[7px] uppercase tracking-widest font-bold">TWO THREADS</span>
+          <span className="block font-serif text-[12px] uppercase tracking-wider font-bold leading-none">STUDIO</span>
+          <span className="block text-[5px] text-[#5A4A3F] font-serif">Artisan Luxury. Est. 2023</span>
+          <div className="mt-1 mx-auto w-[65px] py-0.5 bg-[#85634B] text-[#FAF7F2] text-[4px] font-sans tracking-widest uppercase rounded-[1px]">
+            EXPLORE
+          </div>
+        </div>
+      </div>
+    ),
+  },
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -155,7 +176,7 @@ export const CMSDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hero' | 'bestsellers' | 'newarrivals' | 'menswear' | 'womenswear' | 'categories'>('hero');
 
   // Local state for edits
-  const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
 
