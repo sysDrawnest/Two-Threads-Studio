@@ -10,7 +10,7 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import heroVideo from '../../assets/Craftsmanship_embroidery_in_heri._202607141530.mp4';
+import heroVideo from '../../assets/hero_template2_video.mp4';
 
 export default function HeroTemplate2() {
   return (
