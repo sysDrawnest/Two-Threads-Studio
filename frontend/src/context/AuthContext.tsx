@@ -65,32 +65,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // Optimistic auth: Decode JWT synchronously so the UI unblocks instantly
-      const decoded = parseJwt(token);
-      if (decoded && decoded.sub) {
-        setUser({
-          id: decoded.sub,
-          name: decoded.name || decoded.email?.split('@')[0] || 'User',
-          email: decoded.email || '',
-          role: (decoded.role?.toLowerCase() || 'customer') as UserRole,
-          membershipTier: 'none'
-        });
-        setIsLoading(false); // Unblock the UI!
+      // 1. Instant sync load from cached user profile (if available)
+      const cachedUserStr = localStorage.getItem('tt_user_data');
+      let cachedUser: AuthUser | null = null;
+      if (cachedUserStr) {
+        try {
+          cachedUser = JSON.parse(cachedUserStr);
+          setUser(cachedUser);
+          setIsLoading(false); // Instantly render page!
+        } catch (e) {
+          // ignore corrupted cache
+        }
       }
 
+      // 2. Fallback to JWT payload decode if cached user string wasn't found
+      if (!cachedUser) {
+        const decoded = parseJwt(token);
+        if (decoded && decoded.sub) {
+          setUser({
+            id: decoded.sub,
+            name: decoded.name || decoded.email?.split('@')[0] || 'User',
+            email: decoded.email || '',
+            role: (decoded.role?.toLowerCase() || 'customer') as UserRole,
+            membershipTier: 'none'
+          });
+          setIsLoading(false); // Unblock the UI instantly!
+        }
+      }
+
+      // 3. Silent background revalidation with backend
       try {
         const result = await apiClient.get('/auth/me');
         if (result.success && result.data?.user) {
-          setUser(mapBackendUserToAuthUser(result.data.user));
+          const authUser = mapBackendUserToAuthUser(result.data.user);
+          setUser(authUser);
+          localStorage.setItem('tt_user_data', JSON.stringify(authUser));
         } else {
           localStorage.removeItem('tt_access_token');
           localStorage.removeItem('tt_refresh_token');
+          localStorage.removeItem('tt_user_data');
           setUser(null);
         }
       } catch (err) {
         console.error('Failed to restore auth session:', err);
         localStorage.removeItem('tt_access_token');
         localStorage.removeItem('tt_refresh_token');
+        localStorage.removeItem('tt_user_data');
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -137,6 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const authUser = mapBackendUserToAuthUser(backendUser);
       setUser(authUser);
+      localStorage.setItem('tt_user_data', JSON.stringify(authUser));
       return { success: true };
     } catch (err: any) {
       return { success: false, error: getFriendlyErrorMessage(err, 'login') };
@@ -173,6 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     localStorage.removeItem('tt_access_token');
     localStorage.removeItem('tt_refresh_token');
+    localStorage.removeItem('tt_user_data');
     setUser(null);
   }, []);
 
