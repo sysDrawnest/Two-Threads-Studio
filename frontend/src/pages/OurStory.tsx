@@ -115,9 +115,9 @@ const OurStory: React.FC = () => {
           </ScrollReveal>
           <ScrollReveal direction="right" className="w-full lg:w-7/12 order-1 lg:order-2 relative">
             <div className="aspect-[3/4] md:aspect-square lg:aspect-[3/4] overflow-hidden bg-surface-container">
-              <img 
-                src="https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=1200&auto=format&fit=crop" 
-                alt="Studio craft workspace" 
+              <img
+                src="https://images.unsplash.com/photo-1600335895229-6f755ef92cbf?q=80&w=1200&auto=format&fit=crop"
+                alt="Studio craft workspace"
                 className="w-full h-full object-cover grayscale opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-1000"
               />
             </div>
@@ -222,7 +222,7 @@ const OurStory: React.FC = () => {
           <h2 className="font-serif text-3xl md:text-4xl font-light text-primary-container mb-6">
             Ready to start your own story?
           </h2>
-          <Link 
+          <Link
             to="/shop"
             className="inline-block bg-primary-container text-inverse-on-surface px-9 py-4 font-sans text-sm tracking-[0.15em] uppercase cursor-pointer hover:bg-[#5a3d2b] transition-colors no-underline mt-4 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-container"
           >
