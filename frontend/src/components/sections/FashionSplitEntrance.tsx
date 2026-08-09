@@ -28,7 +28,7 @@ export default function FashionSplitEntrance() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=1400&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=800&auto=format&fit=crop"
               alt="Menswear Collection"
               className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-60 group-hover:opacity-75"
             />
@@ -65,7 +65,7 @@ export default function FashionSplitEntrance() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1400&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
               alt="Womenswear Collection"
               className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-60 group-hover:opacity-75"
             />
