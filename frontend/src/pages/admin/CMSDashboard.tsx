@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import heroLippanImg from '../../assets/hero_lippan_ref.webp';
+import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -71,21 +72,26 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 2,
-    name: 'Immersive Portrait',
-    description: 'Quiet luxury layout — single full-bleed editorial photograph with elegant negative space typography.',
+    name: 'Artisan Textile Studio',
+    description: 'Reference design — full-bleed macramé & embroidery artwork top header with warm linen typography card below.',
     icon: Eye,
-    tag: 'Quiet Luxury',
-    tagColor: 'bg-[#ab5a46]/15 text-[#ab5a46]',
+    tag: 'Reference Hero',
+    tagColor: 'bg-[#8B6F5C]/20 text-[#8B6F5C]',
     preview: (
-      <div className="w-full h-full bg-[#17110c] relative overflow-hidden rounded-sm flex items-center justify-start pl-3 pb-3">
-        <img
-          src="https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=300&q=80"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
-        />
-        <div className="relative z-10 text-[#fef8f3]">
-          <span className="block text-[6px] tracking-widest uppercase opacity-70">Two Threads Studio</span>
-          <span className="block font-serif text-xs leading-tight mt-1">Handcrafted Fashion</span>
+      <div className="w-full h-full bg-[#F5F0EB] relative overflow-hidden rounded-sm flex flex-col justify-between">
+        <div className="w-full h-[50%] overflow-hidden bg-[#EDE6DE]">
+          <img
+            src={heroMacrameImg}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="w-full h-[50%] p-2 flex flex-col items-center justify-center text-center">
+          <span className="block font-serif text-[10px] text-[#2D2520] font-normal leading-tight">Two Threads Studio</span>
+          <span className="block text-[6px] text-[#786455] leading-tight mt-0.5 max-w-[120px] truncate">Handcrafted Textile Décor</span>
+          <div className="mt-1 px-2 py-0.5 bg-[#2D2520] text-[#F5F0EB] text-[5px] font-sans tracking-widest uppercase rounded-[1px]">
+            EXPLORE
+          </div>
         </div>
       </div>
     ),
