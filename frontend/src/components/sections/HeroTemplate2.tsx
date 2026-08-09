@@ -10,20 +10,21 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
+import heroVideo from '../../assets/Craftsmanship_embroidery_in_heri._202607141530.mp4';
 
 export default function HeroTemplate2() {
   return (
     <section className="relative w-full min-h-[calc(100vh-65px)] md:min-h-[calc(100vh-70px)] bg-[#F5F0EB] text-[#2D2520] flex flex-col justify-between overflow-hidden">
       
-      {/* ─── TOP SECTION: Full-Width High-Res Textile Artwork ─── */}
+      {/* ─── TOP SECTION: Full-Width High-Res Textile Video ─── */}
       <div className="w-full relative h-[42vh] sm:h-[48vh] md:h-[52vh] max-h-[560px] min-h-[260px] overflow-hidden bg-[#EDE6DE]">
-        <img
-          src={heroMacrameImg}
-          alt="Handcrafted Embroidery, Macramé and Lippan Art — Two Threads Studio"
+        <video
+          src={heroVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-full object-cover object-center filter brightness-[0.98] contrast-[1.02]"
-          // @ts-ignore
-          fetchpriority="high"
         />
       </div>
 
