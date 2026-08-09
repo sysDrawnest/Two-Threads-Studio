@@ -1,8 +1,7 @@
 /**
- * HeroTemplate5 — "The Artisan Monogram & Heritage Lineage" (Video Enhanced)
+ * HeroTemplate5 — "The Artisan Monogram & Heritage Lineage" (Pixel-Perfect Reference Implementation)
  *
- * Exact reproduction of the approved reference design, enhanced with high-res ambient video:
- * - Background Video: Craftsmanship embroidery video looping subtly in the background
+ * Recreates the approved reference image with maximum visual fidelity:
  * - Palette: Warm Linen Paper (#FAF7F2 / #F7F4EF), Deep Charcoal (#2D2520), Artisan Clay (#8C5A3E / #85634B), Muted Thread Line (#C8B8AA)
  * - Monogram: Giant italic serif "T" watermark with trailing thread line
  * - Typography: Bold Cormorant Garamond / Georgia display serif for "TWO THREADS STUDIO"
@@ -13,29 +12,13 @@
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import heroVideo from '../../assets/Craftsmanship_embroidery_in_heri…_202607141530.mp4';
 
 export default function HeroTemplate5() {
   return (
     <section className="relative w-full min-h-[calc(100vh-65px)] md:min-h-[calc(100vh-70px)] bg-[#FAF7F2] text-[#2D2520] flex flex-col justify-between overflow-hidden select-none">
       
-      {/* ─── BACKGROUND AMBIENT CRAFTSMANSHIP VIDEO ─── */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover opacity-25 md:opacity-30 filter brightness-[0.95] contrast-[1.05] saturate-[0.85]"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
-        {/* Soft Linen Tint Overlay for High Text Readability & Contrast */}
-        <div className="absolute inset-0 bg-[#FAF7F2]/65 backdrop-blur-[0.5px]" />
-      </div>
-
       {/* ─── BACKGROUND VECTOR LINE ART: LEFT SIDE ─── */}
-      <div className="absolute left-0 top-0 bottom-0 w-48 sm:w-64 md:w-80 pointer-events-none opacity-40 md:opacity-65 z-10 flex flex-col justify-between p-4 sm:p-6">
+      <div className="absolute left-0 top-0 bottom-0 w-48 sm:w-64 md:w-80 pointer-events-none opacity-40 md:opacity-65 z-0 flex flex-col justify-between p-4 sm:p-6">
         {/* Top Left: Embroidery Hoop & Needle Line Art */}
         <div className="w-36 h-36 sm:w-48 sm:h-48">
           <svg viewBox="0 0 160 160" fill="none" stroke="#8C6F5A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
@@ -91,7 +74,7 @@ export default function HeroTemplate5() {
       </div>
 
       {/* ─── BACKGROUND VECTOR LINE ART: RIGHT SIDE ─── */}
-      <div className="absolute right-0 top-0 bottom-0 w-48 sm:w-64 md:w-80 pointer-events-none opacity-40 md:opacity-65 z-10 flex flex-col justify-between items-end p-4 sm:p-6">
+      <div className="absolute right-0 top-0 bottom-0 w-48 sm:w-64 md:w-80 pointer-events-none opacity-40 md:opacity-65 z-0 flex flex-col justify-between items-end p-4 sm:p-6">
         {/* Top Right: Macramé Tapestry */}
         <div className="w-40 h-48 sm:w-56 sm:h-64 -mr-2">
           <svg viewBox="0 0 200 240" fill="none" stroke="#8C6F5A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
@@ -198,7 +181,7 @@ export default function HeroTemplate5() {
       </div>
 
       {/* ─── BOTTOM CATEGORY BAR WITH ORGANIC WAVY THREAD ─── */}
-      <div className="relative z-10 w-full pt-4 pb-6 sm:pb-8 px-4 sm:px-8 border-t border-[#8C6F5A]/15 bg-[#FAF7F2]/90 backdrop-blur-[2px]">
+      <div className="relative z-10 w-full pt-4 pb-6 sm:pb-8 px-4 sm:px-8 border-t border-[#8C6F5A]/15 bg-[#FAF7F2]">
         
         {/* Wavy Thread Connecting SVG Line */}
         <div className="absolute top-0 left-0 right-0 h-10 pointer-events-none overflow-hidden -translate-y-1/2">
