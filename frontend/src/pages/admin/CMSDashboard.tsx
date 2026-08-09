@@ -26,6 +26,7 @@ import {
   Check,
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
+import heroLippanImg from '../../assets/hero_lippan_ref.webp';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -113,17 +114,20 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 4,
-    name: 'Editorial Window',
-    description: 'Quiet luxury framed image surrounded by generous whitespace and simple typography.',
+    name: 'Soul of Handmade',
+    description: 'Contemporary quiet luxury editorial — torn paper artwork layer, serif typography & double-ring pill CTA.',
     icon: Layout,
-    tag: 'Restraint',
-    tagColor: 'bg-[#efe0d8]/30 text-[#ab5a46]',
+    tag: 'Editorial Refined',
+    tagColor: 'bg-[#8C5A3E]/15 text-[#8C5A3E]',
     preview: (
-      <div className="w-full h-full bg-[#fef8f3] relative overflow-hidden rounded-sm flex flex-col items-center justify-center p-2 text-[#17110c]">
-        <span className="text-[7px] font-serif italic mb-1 text-[#ab5a46]">Handmade Fashion</span>
-        <div className="w-12 h-14 bg-[#e6e2dd] border border-[#17110c]/10 rounded-sm overflow-hidden mb-1">
+      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex items-center justify-between p-2 text-[#2D2520]">
+        <div className="space-y-0.5 max-w-[55%]">
+          <span className="block text-[6px] font-serif uppercase tracking-tight">UNVEILING <span className="italic lowercase">the</span></span>
+          <span className="block text-[6px] font-serif uppercase font-bold text-[#8C5A3E]">SOUL <span className="italic font-normal text-[#2D2520] lowercase">of</span> HANDMADE</span>
+        </div>
+        <div className="w-12 h-10 bg-[#EDE6DE] border border-[#2D2520]/10 rounded-sm overflow-hidden flex-shrink-0">
           <img
-            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=150&q=80"
+            src={heroLippanImg}
             alt=""
             className="w-full h-full object-cover"
           />
