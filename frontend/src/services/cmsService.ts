@@ -6,7 +6,7 @@
 import { apiClient } from './apiClient';
 
 export interface HeroConfig {
-  activeTemplate: 1 | 2 | 3 | 4;
+  activeTemplate: 1 | 2 | 3 | 4 | 5;
 }
 
 export interface CMSSectionConfig {
@@ -28,7 +28,7 @@ export interface CMSCategoryConfig {
 }
 
 export interface HomepageCMSConfig {
-  activeHeroTemplate: 1 | 2 | 3 | 4;
+  activeHeroTemplate: 1 | 2 | 3 | 4 | 5;
   bestSellersConfig: CMSSectionConfig;
   newArrivalsConfig: CMSSectionConfig;
   menswearConfig: CMSSectionConfig;
@@ -46,7 +46,7 @@ export const cmsService = {
   /**
    * Admin endpoint — updates active hero template.
    */
-  updateHeroConfig: (activeTemplate: 1 | 2 | 3 | 4): Promise<{ success: boolean; message: string; data: HeroConfig }> =>
+  updateHeroConfig: (activeTemplate: 1 | 2 | 3 | 4 | 5): Promise<{ success: boolean; message: string; data: HeroConfig }> =>
     apiClient.patch('/admin/cms/hero-config', { activeTemplate }),
 
   /**
