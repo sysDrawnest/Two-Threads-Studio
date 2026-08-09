@@ -45,7 +45,7 @@ export const useAdminHeroConfig = () => {
 export const useUpdateHeroConfig = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (activeTemplate: 1 | 2 | 3 | 4) => cmsService.updateHeroConfig(activeTemplate),
+    mutationFn: (activeTemplate: 1 | 2 | 3 | 4 | 5) => cmsService.updateHeroConfig(activeTemplate),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: cmsKeys.heroConfig() });
       queryClient.invalidateQueries({ queryKey: cmsKeys.homepageConfig() });
