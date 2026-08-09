@@ -10,6 +10,8 @@ import { ArrowRight, Heart, ShoppingBag, Check, ArrowDown, ChevronRight } from '
 import imgCrochetTop from '../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.webp';
 import imgHandbag from '../assets/Woman_carrying_wool_handbag_2K_202607141446.webp';
 import imgHandbag2 from '../assets/Woman_holding_wool_handbag_2K_202607141448.webp';
+import imgMenswearHero from '../assets/Man_wearing_linen_shirt_in_202608100224.jpeg';
+import imgWomenswearHero from '../assets/Woman02608100225.jpeg';
 
 // Collection Configurations
 interface CollectionConfig {
@@ -41,7 +43,7 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
     heroSubtitle: 'Crafted for those who appreciate the uncommon.',
     introTitle: 'Crafted with intention.',
     introBody: 'A considered collection of handmade pieces, where traditional textile techniques meet contemporary everyday dressing.',
-    heroImage: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=1600&auto=format&fit=crop',
+    heroImage: imgMenswearHero,
     quote: '"Made slowly. Worn for years."',
     heroPiece: {
       id: 'mens-hero-piece',
@@ -147,7 +149,7 @@ const COLLECTION_CONFIGS: Record<string, CollectionConfig> = {
     heroSubtitle: 'Handcrafted pieces for quiet expression.',
     introTitle: 'Tactile elegance & slow craft.',
     introBody: 'An ethereal collection of open-weave crochet tops, handmade wool totes, and resort apparel woven by master women artisans.',
-    heroImage: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1600&auto=format&fit=crop',
+    heroImage: imgWomenswearHero,
     quote: '"Woven by hand, made to cherish."',
     heroPiece: {
       id: 'womens-hero-piece',
