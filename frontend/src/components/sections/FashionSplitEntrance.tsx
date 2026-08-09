@@ -42,7 +42,7 @@ export default function FashionSplitEntrance() {
                 Menswear
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white leading-tight mb-3">
-                The Modern Artisan
+                Menswear Collection
               </h2>
               <p className="font-sans text-xs sm:text-sm text-neutral-300 font-light max-w-md mb-8 leading-relaxed">
                 Crafted for those who appreciate the uncommon. Heritage craftsmanship, relaxed silhouettes.
@@ -79,7 +79,7 @@ export default function FashionSplitEntrance() {
                 Womenswear
               </span>
               <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white leading-tight mb-3">
-                The Artisan Muse
+                Womenswear Collection
               </h2>
               <p className="font-sans text-xs sm:text-sm text-neutral-300 font-light max-w-md mb-8 leading-relaxed">
                 Handcrafted pieces for quiet expression. Ethereal open-knits, silk thread accents.
