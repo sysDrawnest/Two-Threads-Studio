@@ -169,14 +169,14 @@ const ProductImportModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
         </div>
 
         {/* Step indicator */}
-        <div className="flex border-b border-gray-100 px-6 py-2 gap-1">
+        <div className="flex border-b border-gray-100 px-6 py-2 gap-1 overflow-x-auto whitespace-nowrap scrollbar-none">
           {(['upload', 'validate', 'progress', 'summary'] as Step[]).map((s, i) => (
-            <div key={s} className="flex items-center gap-1">
+            <div key={s} className="flex items-center gap-1 shrink-0">
               <div className={`w-6 h-6 rounded-full text-xs font-medium flex items-center justify-center ${step === s ? 'bg-amber-600 text-white' : ['validate', 'progress', 'summary'].indexOf(s) < ['upload', 'validate', 'progress', 'summary'].indexOf(step) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
                 {i + 1}
               </div>
               <span className={`text-xs capitalize ${step === s ? 'text-amber-700 font-medium' : 'text-gray-400'}`}>{s}</span>
-              {i < 3 && <div className="w-6 h-px bg-gray-200 mx-1" />}
+              {i < 3 && <div className="w-6 h-px bg-gray-200 mx-1 shrink-0" />}
             </div>
           ))}
         </div>

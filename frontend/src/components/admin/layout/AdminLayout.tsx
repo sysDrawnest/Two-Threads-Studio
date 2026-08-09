@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminTopBar } from './AdminTopBar';
@@ -10,6 +10,18 @@ import { cn } from '../ui/AdminBadge';
 export const AdminLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Prevent body scrolling when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   return (
     <div className="min-h-screen bg-[#fef8f3] dark:bg-[#171311] font-sans text-[#2d2520] dark:text-[#f4efe9] selection:bg-[#d1c4bd]/20 transition-colors duration-200">

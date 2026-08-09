@@ -5,10 +5,10 @@ interface AdminTableProps extends React.TableHTMLAttributes<HTMLTableElement> {}
 
 export const AdminTable = React.forwardRef<HTMLTableElement, AdminTableProps>(
   ({ className, ...props }, ref) => (
-    <div className="w-full overflow-auto rounded-md border border-outline-variant bg-surface-container/30">
+    <div className="w-full overflow-x-auto overflow-y-hidden rounded-md border border-outline-variant bg-surface-container/30 [-webkit-overflow-scrolling:touch]">
       <table
         ref={ref}
-        className={cn('w-full caption-bottom text-sm', className)}
+        className={cn('w-full caption-bottom text-sm whitespace-nowrap md:whitespace-normal', className)}
         {...props}
       />
     </div>

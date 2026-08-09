@@ -265,17 +265,9 @@ export const AdminDashboard: React.FC = () => {
 
       {/* 5. KPI Cards */}
       <div>
-        <div 
-          className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto snap-x snap-mandatory pb-2 md:pb-0 scrollbar-none"
-          onScroll={(e) => {
-            const width = e.currentTarget.clientWidth;
-            const scrollLeft = e.currentTarget.scrollLeft;
-            const tabIndex = Math.round(scrollLeft / width);
-            setMobileActiveTab(tabIndex);
-          }}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Revenue */}
-          <div className="min-w-[85%] md:min-w-0 snap-center rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
+          <div className="rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
             <div>
               <div className="text-xs uppercase font-medium tracking-wider text-[#786455] dark:text-[#a8998c]">Revenue</div>
               <div className="text-2xl font-serif font-semibold tracking-tight text-[#1f1610] dark:text-[#ffffff] mt-1 font-mono">
@@ -296,7 +288,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Card 2: Orders */}
-          <div className="min-w-[85%] md:min-w-0 snap-center rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
+          <div className="rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
             <div>
               <div className="text-xs uppercase font-medium tracking-wider text-[#786455] dark:text-[#a8998c]">Orders Count</div>
               <div className="text-2xl font-serif font-semibold tracking-tight text-[#1f1610] dark:text-[#ffffff] mt-1 font-mono">
@@ -317,7 +309,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Card 3: Customers */}
-          <div className="min-w-[85%] md:min-w-0 snap-center rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
+          <div className="rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
             <div>
               <div className="text-xs uppercase font-medium tracking-wider text-[#786455] dark:text-[#a8998c]">Customers</div>
               <div className="text-2xl font-serif font-semibold tracking-tight text-[#1f1610] dark:text-[#ffffff] mt-1 font-mono">
@@ -338,7 +330,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Card 4: Avg Order Value */}
-          <div className="min-w-[85%] md:min-w-0 snap-center rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
+          <div className="rounded-lg border border-[#c8b5aa]/50 dark:border-[#3d332b] bg-white dark:bg-[#211c18] p-4 flex flex-col justify-between h-28 relative overflow-hidden transition-colors duration-200">
             <div>
               <div className="text-xs uppercase font-medium tracking-wider text-[#786455] dark:text-[#a8998c]">Avg. Order Value</div>
               <div className="text-2xl font-serif font-semibold tracking-tight text-[#1f1610] dark:text-[#ffffff] mt-1 font-mono">
@@ -357,16 +349,6 @@ export const AdminDashboard: React.FC = () => {
               <MiniSparkline type="down" />
             </div>
           </div>
-        </div>
-
-        {/* Mobile dots indicators */}
-        <div className="flex md:hidden justify-center gap-1.5 mt-2">
-          {[0, 1, 2, 3].map((idx) => (
-            <div 
-              key={idx}
-              className={`h-1.5 rounded-full transition-all duration-200 ${mobileActiveTab === idx ? 'bg-[#1f1610] dark:bg-[#ffffff] w-4' : 'bg-[#c8b5aa]/50 w-1.5'}`}
-            />
-          ))}
         </div>
       </div>
 
