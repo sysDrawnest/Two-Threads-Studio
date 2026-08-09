@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
+import imgMenswear from '../../assets/Man_wearing_linen_shirt_in_202608100224.jpeg';
+import imgWomenswear from '../../assets/Woman02608100225.jpeg';
 
 const ArrowIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg
@@ -28,9 +30,9 @@ export default function FashionSplitEntrance() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?q=80&w=800&auto=format&fit=crop"
+              src={imgMenswear}
               alt="Menswear Collection"
-              className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-60 group-hover:opacity-75"
+              className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-65 group-hover:opacity-80"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B] via-[#1C1C1B]/30 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-500" />
           </div>
@@ -65,9 +67,9 @@ export default function FashionSplitEntrance() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <img
-              src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop"
+              src={imgWomenswear}
               alt="Womenswear Collection"
-              className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-60 group-hover:opacity-75"
+              className="w-full h-full object-cover object-center scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out opacity-65 group-hover:opacity-80"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B] via-[#1C1C1B]/30 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-500" />
           </div>
