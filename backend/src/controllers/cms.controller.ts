@@ -10,7 +10,7 @@ import { successResponse } from '../utils/response';
 
 const SINGLETON_WHERE = { singleton: true };
 
-const VALID_HERO_TEMPLATES = [1, 2, 3, 4] as const;
+const VALID_HERO_TEMPLATES = [1, 2, 3, 4, 5] as const;
 type HeroTemplate = typeof VALID_HERO_TEMPLATES[number];
 
 // Default categories featuring Premium Menswear and Premium Womenswear
