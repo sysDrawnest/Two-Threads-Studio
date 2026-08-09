@@ -29,6 +29,7 @@ import HeroTemplate1Default from './HeroTemplate1';
 const HeroTemplate2 = lazy(() => import('./HeroTemplate2'));
 const HeroTemplate3 = lazy(() => import('./HeroTemplate3'));
 const HeroTemplate4 = lazy(() => import('./HeroTemplate4'));
+const HeroTemplate5 = lazy(() => import('./HeroTemplate5'));
 
 // Minimal inline skeleton only used as Suspense fallback while a
 // *non-default* lazy template chunk is being downloaded.
@@ -44,6 +45,7 @@ const LAZY_TEMPLATE_MAP: Record<number, React.LazyExoticComponent<() => React.JS
   2: HeroTemplate2,
   3: HeroTemplate3,
   4: HeroTemplate4,
+  5: HeroTemplate5,
 };
 
 export default function Hero() {
