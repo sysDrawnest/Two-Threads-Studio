@@ -55,9 +55,9 @@ export const AdminTopBar: React.FC<AdminTopBarProps> = ({
           to="/" 
           target="_blank"
           aria-label="Open storefront in new tab"
-          className="hidden sm:flex items-center space-x-1.5 text-sm font-semibold text-[#4e3c30] dark:text-[#ccb08a] hover:text-[#1f1610] dark:hover:text-[#ffffff] transition-colors"
+          className="flex items-center space-x-1.5 text-sm font-semibold text-[#4e3c30] dark:text-[#ccb08a] hover:text-[#1f1610] dark:hover:text-[#ffffff] transition-colors"
         >
-          <span>Storefront</span>
+          <span className="hidden sm:inline">Storefront</span>
           <ExternalLink className="h-4 w-4" />
         </Link>
         
