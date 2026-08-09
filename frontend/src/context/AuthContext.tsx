@@ -39,6 +39,19 @@ const mapBackendUserToAuthUser = (backendUser: any): AuthUser => {
   };
 };
 
+const parseJwt = (token: string) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,6 +63,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!token) {
         setIsLoading(false);
         return;
+      }
+
+      // Optimistic auth: Decode JWT synchronously so the UI unblocks instantly
+      const decoded = parseJwt(token);
+      if (decoded && decoded.sub) {
+        setUser({
+          id: decoded.sub,
+          name: decoded.name || decoded.email?.split('@')[0] || 'User',
+          email: decoded.email || '',
+          role: (decoded.role?.toLowerCase() || 'customer') as UserRole,
+          membershipTier: 'none'
+        });
+        setIsLoading(false); // Unblock the UI!
       }
 
       try {
