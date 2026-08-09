@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ScrollReveal, StaggerContainer } from '../components/ui/ScrollReveal';
 
 // Assets
+import aboutBannerImg from '../assets/about page banner .jpeg';
 import aboutImg1 from '../assets/stitch/close_up_of_high_quality_unbleached_linen_fabric_texture_natural_beige_tones.webp';
 import aboutImg2 from '../assets/stitch/hand_drawn_embroidery_patterns_and_sketches_on_paper_charcoal_pencil_artistic.webp';
 import aboutImg3 from '../assets/stitch/close_up_of_hands_carefully_packing_an_embroidery_kit_with_recycled_paper_and.webp';
@@ -11,24 +12,63 @@ import aboutImg3 from '../assets/stitch/close_up_of_hands_carefully_packing_an_e
 const OurStory: React.FC = () => {
   return (
     <PageContainer>
-      {/* Mission Statement Hero (from About.tsx) */}
-      <section className="bg-primary-container text-inverse-on-surface pt-8 md:pt-16 pb-12 md:pb-20 px-6 md:px-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <ScrollReveal direction="up" delay={0.15}>
-            <p className="font-sans text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-8">
-              Our Mission
-            </p>
+      {/* Mission Statement Hero Header */}
+      <section className="relative w-full min-h-[500px] md:min-h-[600px] bg-[#F5F0EB] text-[#2D2520] flex flex-col justify-between overflow-hidden py-12 md:py-16 px-6 md:px-16 text-center">
+        {/* Background Banner Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={aboutBannerImg}
+            alt="Two Threads Studio Banner"
+            className="w-full h-full object-cover object-center filter brightness-[0.96] contrast-[1.02]"
+          />
+          {/* Radial Ambient Soft Overlay for text legibility */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(circle at 50% 50%, rgba(245, 240, 235, 0.90) 0%, rgba(245, 240, 235, 0.78) 55%, rgba(245, 240, 235, 0.88) 100%)
+              `
+            }}
+          />
+        </div>
+
+        {/* Content Container */}
+        <div className="relative z-10 max-w-4xl mx-auto flex-1 flex flex-col items-center justify-center my-auto py-6">
+          {/* Top Logo / Studio Badge */}
+          <ScrollReveal direction="up" delay={0.1}>
+            <div className="flex flex-col items-center mb-5">
+              <span className="font-sans text-[10px] sm:text-xs tracking-[0.35em] uppercase text-[#8B6F5C] font-semibold">
+                Two Threads Studio
+              </span>
+            </div>
           </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.3}>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-7xl font-light leading-tight mb-10 text-white">
+
+          {/* Main Headline (Kept exact) */}
+          <ScrollReveal direction="up" delay={0.25}>
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal leading-[1.18] text-[#2D2520] mb-6 max-w-3xl mx-auto">
               We believe in the beauty of the handmade, and the peace found in the process.
             </h1>
           </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.45}>
-            <p className="font-sans text-sm text-white/70 leading-loose max-w-2xl mx-auto">
+
+          {/* Body Paragraph (Kept exact) */}
+          <ScrollReveal direction="up" delay={0.4}>
+            <p className="font-sans text-xs sm:text-sm md:text-base text-[#5A3D2B] font-medium leading-relaxed max-w-2xl mx-auto">
               TwoThreads Studio is the story of two people creating something meaningful together. We build the technology, design the patterns, and handcraft every piece individually with patience, intention, and love.
             </p>
           </ScrollReveal>
+        </div>
+
+        {/* Feature Badges Footer Bar */}
+        <div className="relative z-10 w-full pt-6 border-t border-[#8B6F5C]/25 flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-[11px] sm:text-xs font-medium text-[#4E3C30] uppercase tracking-wider">
+          <span className="flex items-center gap-2">
+            <span>🍃</span> Sustainable Materials
+          </span>
+          <span className="flex items-center gap-2">
+            <span>🪡</span> Handcrafted in Studio
+          </span>
+          <span className="flex items-center gap-2">
+            <span>🌐</span> Global Shipping
+          </span>
         </div>
       </section>
 
