@@ -19,7 +19,7 @@ export type CreateCategoryDto = z.infer<typeof createCategorySchema>['body'];
 // ─── Update ───────────────────────────────────────────────────────────────────
 export const updateCategorySchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid category ID'),
+    id: z.string().min(1, 'Category ID is required'),
   }),
   body: categoryBaseSchema.partial(),
 });
@@ -29,6 +29,6 @@ export type UpdateCategoryDto = z.infer<typeof updateCategorySchema>['body'];
 // ─── ID Param ─────────────────────────────────────────────────────────────────
 export const categoryIdParamsSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid category ID'),
+    id: z.string().min(1, 'Category ID is required'),
   }),
 });
