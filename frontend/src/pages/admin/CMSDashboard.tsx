@@ -28,6 +28,7 @@ import {
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import heroLippanImg from '../../assets/hero_lippan_ref.webp';
 import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
+import heroStudioBg from '../../assets/hero_textile_studio.jpg';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -44,7 +45,7 @@ interface TemplateOption {
   id: 1 | 2 | 3 | 4 | 5;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   tag: string;
   tagColor: string;
   preview: React.ReactNode;
@@ -98,29 +99,27 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'Wavy Split-Screen Hero',
-    description: 'Split-screen hero — background campaign photo top with cream wavy-edge overlay canvas below & CTA.',
+    name: 'Parabolic Arch Cutout',
+    description: 'Split-screen hero with full-bleed studio background and parabolic cream arch overlay housing typography & pill CTA.',
     icon: Sparkles,
-    tag: 'Wavy Canvas',
-    tagColor: 'bg-[#A66A4F]/20 text-[#A66A4F]',
+    tag: 'Arch Cutout',
+    tagColor: 'bg-[#A65A38]/20 text-[#A65A38]',
     preview: (
-      <div className="w-full h-full bg-[#1C1C1B] relative overflow-hidden rounded-sm flex flex-col justify-end">
+      <div className="w-full h-full bg-[#1E1812] relative overflow-hidden rounded-sm flex items-center justify-center">
         <img
-          src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80"
+          src={heroStudioBg}
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
-        <div
-          className="relative z-10 w-full h-[65%] bg-[#FCFCF0] flex flex-col items-center justify-center p-2 text-center"
-          style={{
-            clipPath: 'polygon(0% 18%, 20% 8%, 40% 0%, 60% 8%, 80% 18%, 100% 8%, 100% 100%, 0% 100%)'
-          }}
+        <svg
+          viewBox="0 0 100 50"
+          className="absolute bottom-0 inset-x-0 w-full h-[55%] z-10"
+          preserveAspectRatio="none"
         >
-          <span className="block text-[5px] font-sans tracking-widest uppercase text-[#4A4A4A]">WOMENSWEAR</span>
-          <span className="block font-serif text-[9px] font-bold text-[#333333] leading-tight">Womenswear</span>
-          <div className="mt-1 px-2 py-0.5 bg-[#A66A4F] text-white text-[4px] font-sans tracking-wider uppercase rounded-[2px]">
-            EXPLORE →
-          </div>
+          <path d="M 0,50 L 0,30 Q 50,0 100,30 L 100,50 Z" fill="#FAF7F2" />
+        </svg>
+        <div className="absolute bottom-2 z-20 text-center text-[#1E1812]">
+          <span className="block text-[6px] font-serif uppercase tracking-widest font-bold">WOMENSWEAR</span>
         </div>
       </div>
     ),
