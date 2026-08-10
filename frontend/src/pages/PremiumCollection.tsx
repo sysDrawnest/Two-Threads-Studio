@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import { Product } from '../data/products';
 import { productService } from '../services/productService';
@@ -284,8 +284,10 @@ const FashionProductCard: React.FC<FashionProductCardProps> = ({
 };
 
 export default function PremiumCollection() {
-  const { category = 'menswear' } = useParams<{ category: string }>();
-  const collectionKey = category.toLowerCase() === 'womenswear' ? 'womenswear' : 'menswear';
+  const location = useLocation();
+  const params = useParams<{ id?: string; category?: string }>();
+  const rawParam = params.id || params.category || location.pathname;
+  const collectionKey = rawParam.toLowerCase().includes('women') ? 'womenswear' : 'menswear';
   const config = COLLECTION_CONFIGS[collectionKey];
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -319,12 +321,18 @@ export default function PremiumCollection() {
   // Fetch catalog products or fallback
   useEffect(() => {
     let isMounted = true;
-    productService.getProducts({ limit: 20 })
+    productService.getProducts({ limit: 30 })
       .then((res) => {
         if (!isMounted) return;
         if (res.products && res.products.length > 0) {
-          // Filter by menswear or womenswear if collection tag matches, or show catalog products
-          setProducts(res.products);
+          const matching = res.products.filter((p) => {
+            const str = (p.name + ' ' + (p.collection || '') + ' ' + (p.productCategory || '') + ' ' + (p.category || '')).toLowerCase();
+            if (collectionKey === 'menswear') {
+              return str.includes('men') || str.includes('shirt') || str.includes('jacket') || str.includes('trouser') || str.includes('cap');
+            }
+            return str.includes('women') || str.includes('dress') || str.includes('crochet') || str.includes('handbag') || str.includes('top') || str.includes('bikini');
+          });
+          setProducts(matching.length > 0 ? matching : config.fallbackProducts);
         } else {
           setProducts(config.fallbackProducts);
         }
