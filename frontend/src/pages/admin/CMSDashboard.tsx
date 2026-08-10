@@ -99,10 +99,10 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'Parabolic Arch Cutout',
-    description: 'Split-screen hero with full-bleed studio background and parabolic cream arch overlay housing typography & pill CTA.',
+    name: 'Asymmetric Wave Overlay',
+    description: 'Split-screen hero with full-bleed studio background and asymmetrical fluid SVG wave overlay housing typography & pill CTA.',
     icon: Sparkles,
-    tag: 'Arch Cutout',
+    tag: 'Asymmetric Wave',
     tagColor: 'bg-[#A65A38]/20 text-[#A65A38]',
     preview: (
       <div className="w-full h-full bg-[#1E1812] relative overflow-hidden rounded-sm flex items-center justify-center">
@@ -111,15 +111,15 @@ const TEMPLATES: TemplateOption[] = [
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
-        <svg
-          viewBox="0 0 100 50"
-          className="absolute bottom-0 inset-x-0 w-full h-[55%] z-10"
-          preserveAspectRatio="none"
-        >
-          <path d="M 0,50 L 0,30 Q 50,0 100,30 L 100,50 Z" fill="#FAF7F2" />
-        </svg>
-        <div className="absolute bottom-2 z-20 text-center text-[#1E1812]">
-          <span className="block text-[6px] font-serif uppercase tracking-widest font-bold">WOMENSWEAR</span>
+        <div className="absolute bottom-0 inset-x-0 h-[50%] bg-[#FCFCF0] z-10 flex items-center justify-center">
+          <svg
+            viewBox="0 0 100 30"
+            className="absolute top-0 inset-x-0 w-full -translate-y-[98%]"
+            preserveAspectRatio="none"
+          >
+            <path d="M 0,20 C 25,5 45,0 60,3 C 80,7 95,15 100,20 L 100,30 L 0,30 Z" fill="#FCFCF0" />
+          </svg>
+          <span className="block text-[6px] font-serif uppercase tracking-widest font-bold text-[#2D2520]">WOMENSWEAR</span>
         </div>
       </div>
     ),
