@@ -488,4 +488,24 @@ The system guarantees that for initial launch, the storefront presents a polishe
 
 - **Production Readiness**: **100% (Enterprise SaaS Ready)**
 - **Engineering Maturity Level**: **Shopify / Stripe Standard**
-- **Final Score**: **10 / 10**
+- **Final Score**: **10 / 10** 
+
+
+# 25.How to Launch Tutorial Videos
+
+The video tutorial feature (also called the **Learning Hub**) is already fully built and integrated into your CMS! It is currently guarded by a safe "feature flag" so it remains completely hidden from your customers until you are ready.
+
+When you are ready to launch it, you don't need to write any code. You can enable it directly from your admin dashboard:
+
+1. Log into your account as an **Administrator**.
+2. Go to your **Admin Dashboard**.
+3. Navigate to the **Settings** tab.
+4. You will see a toggle/button there labeled **"Enable Learning Hub"**. 
+
+Once you click that button:
+* The database will instantly update (`learningHubEnabled = true`).
+* The "Learning" links will automatically appear in your main Navbar and Footer.
+* The video tutorial section will show up on the Homepage.
+* Users will be able to access the `/learning` and `/instructor/:id` pages.
+
+If you ever need to take it down for maintenance, you can simply go back to Admin Settings and click **"Disable Learning Hub"** to hide it again!
