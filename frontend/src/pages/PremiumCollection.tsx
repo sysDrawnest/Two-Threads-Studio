@@ -533,46 +533,38 @@ export default function PremiumCollection() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          04 — COLLECTION DISCOVERY (Cinematic Luxury Fashion House Ending)
+          04 — COLLECTION DISCOVERY (Understated Fashion House Ending)
          ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="py-20 md:py-32 px-6 md:px-14 bg-[#1C1C1B] text-[#FAF9F7] relative overflow-hidden">
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+      <section className="pt-20 md:pt-28 pb-32 md:pb-40 px-6 md:px-14 bg-[#1e1812] text-[#FAF9F7]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            {/* Left: High-Impact Editorial Image */}
-            <div className="lg:col-span-6 aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5] rounded-sm overflow-hidden bg-[#2D2520] shadow-2xl relative group">
+            {/* Editorial Image Side */}
+            <div className="md:col-span-6 aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-[#2a221b] shadow-xl">
               <img
                 src={otherConfig.heroImage}
                 alt={otherConfig.tag}
-                className="w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.05] group-hover:scale-105 transition-transform duration-1000 ease-out"
+                className="w-full h-full object-cover object-center opacity-90"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1B]/60 via-transparent to-transparent opacity-60" />
             </div>
 
-            {/* Right: Refined Editorial Typography & Pill CTA */}
-            <div className="lg:col-span-6 flex flex-col items-start justify-center py-4 lg:py-0">
-              <span className="font-sans text-[10px] tracking-[0.35em] uppercase text-[#A34A38] font-bold mb-3">
-                EXPLORE THE ATELIER
+            {/* Editorial Text Side */}
+            <div className="md:col-span-6 md:pl-8 flex flex-col items-start justify-center">
+              <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold mb-2">
+                EXPLORE THE OTHER COLLECTION
               </span>
-
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light text-[#FAF9F7] leading-tight tracking-tight mb-3">
+              <h2 className="font-serif text-3xl md:text-5xl font-light text-white mb-3">
                 {otherConfig.tag}
               </h2>
-
-              <p className="font-serif italic text-xl sm:text-2xl text-[#A34A38] font-normal mb-4">
-                "{otherConfig.statementHeadline}"
+              <p className="font-serif text-base text-neutral-300 font-normal leading-relaxed mb-6 max-w-md">
+                {otherConfig.statementHeadline} {otherConfig.heroSubtitle}
               </p>
-
-              <p className="font-sans text-sm sm:text-base text-neutral-300 font-light leading-relaxed max-w-md mb-8">
-                {otherConfig.heroSubtitle} Discover handloom linen, heirloom crochet, and bespoke embroidery crafted for the discerning.
-              </p>
-
               <Link
                 to={`/collection/${otherCollectionKey}`}
-                className="group inline-flex items-center gap-3 bg-[#FAF9F7] text-[#1C1C1B] hover:bg-[#A34A38] hover:text-white px-8 py-3.5 rounded-full font-sans text-xs tracking-[0.2em] uppercase font-semibold transition-all duration-300 shadow-lg"
+                className="inline-flex items-center gap-3 font-sans text-xs tracking-[0.22em] uppercase font-semibold text-white border-b border-white/60 pb-1 hover:text-[#A34A38] hover:border-[#A34A38] transition-colors"
               >
-                <span>EXPLORE {otherConfig.tag}</span>
-                <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform duration-300" />
+                <span>Explore {otherConfig.tag}</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
 
