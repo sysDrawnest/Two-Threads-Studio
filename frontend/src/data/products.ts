@@ -16,11 +16,11 @@ export interface Product {
   name: string;
   price: number;
   mrp?: number;
-  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Handkerchiefs" | "Handbag" | (string & {});
-  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Handkerchiefs" | "Handbags" | (string & {});
-  collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness" | "Heritage" | (string & {});
+  category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Handkerchiefs" | "Handbag";
+  productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Handkerchiefs" | "Handbags";
+  collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
   difficulty: "Beginner" | "Intermediate" | "Advanced";
-  badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending" | "Masterpiece" | (string & {});
+  badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
   images: string[];
   description: string;
   story: string;
