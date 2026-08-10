@@ -45,15 +45,15 @@ export const productSlugParamsSchema = z.object({
 });
 
 export const productIdParamsSchema = z.object({
-  params: z.object({ id: z.string().cuid('Invalid product ID') }),
+  params: z.object({ id: z.string().min(1, 'Product ID is required') }),
 });
 
 export const mediaIdParamsSchema = z.object({
-  params: z.object({ mediaId: z.string().cuid('Invalid media ID') }),
+  params: z.object({ mediaId: z.string().min(1, 'Media ID is required') }),
 });
 
 export const variantIdParamsSchema = z.object({
-  params: z.object({ variantId: z.string().cuid('Invalid variant ID') }),
+  params: z.object({ variantId: z.string().min(1, 'Variant ID is required') }),
 });
 
 // ─── Body: Create/Update Product Base ─────────────────────────────────────────
@@ -165,9 +165,9 @@ const productBaseSchema = z.object({
     isPrimary: z.boolean().optional(),
     sortOrder: z.coerce.number().optional(),
   })).optional().default([]),
-  tagIds: z.array(z.string().cuid()).optional().default([]),
-  secondaryCategoryIds: z.array(z.string().cuid()).optional().default([]),
-  additionalCollectionIds: z.array(z.string().cuid()).optional().default([]),
+  tagIds: z.array(z.string().min(1)).optional().default([]),
+  secondaryCategoryIds: z.array(z.string().min(1)).optional().default([]),
+  additionalCollectionIds: z.array(z.string().min(1)).optional().default([]),
 });
 
 export const createProductSchema = z.object({
@@ -178,7 +178,7 @@ export type CreateProductDto = z.infer<typeof createProductSchema>['body'];
 
 export const updateProductSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.preprocess(
     (obj: any) => {
@@ -200,7 +200,7 @@ export type UpdateProductDto = z.infer<typeof updateProductSchema>['body'];
 // ─── Status & Inventory Patch ──────────────────────────────────────────────────
 export const patchStatusSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
     status: z.nativeEnum(ProductStatus),
@@ -211,7 +211,7 @@ export type PatchStatusDto = z.infer<typeof patchStatusSchema>['body'];
 
 export const patchInventorySchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
     stockQuantity: z.number().int().nonnegative().optional(),
@@ -231,7 +231,7 @@ export const bulkActionSchema = z.object({
       'mark_best_seller', 'mark_new_arrival', 'change_category',
       'change_collection', 'add_homepage_section', 'remove_homepage_section'
     ]),
-    ids: z.array(z.string().cuid()).min(1),
+    ids: z.array(z.string().min(1)).min(1),
     extra: z.any().optional(), // Used for passing categoryId, section, etc.
   }),
 });
@@ -241,7 +241,7 @@ export type BulkActionDto = z.infer<typeof bulkActionSchema>['body'];
 // ─── Duplicate ────────────────────────────────────────────────────────────────
 export const duplicateProductSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
     withImages: z.boolean().default(true),
@@ -254,7 +254,7 @@ export type DuplicateProductDto = z.infer<typeof duplicateProductSchema>['body']
 // ─── Media Management ─────────────────────────────────────────────────────────
 export const mediaUpsertSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
     type:      z.nativeEnum(MediaType).default(MediaType.IMAGE),
@@ -273,11 +273,11 @@ export type MediaUpsertDto = z.infer<typeof mediaUpsertSchema>['body'];
 
 export const reorderSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
     items: z.array(z.object({
-      id: z.string().cuid(),
+      id: z.string().min(1),
       sortOrder: z.number().int().nonnegative(),
     })),
   }),
@@ -288,10 +288,10 @@ export type ReorderDto = z.infer<typeof reorderSchema>['body'];
 // ─── Variant Management ───────────────────────────────────────────────────────
 export const variantUpsertSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid product ID'),
+    id: z.string().min(1, 'Invalid product ID'),
   }),
   body: z.object({
-    id:              z.string().cuid().optional(), // If missing, create new
+    id:              z.string().min(1).optional(), // If missing, create new
     name:            z.string().min(1).max(100),
     value:           z.string().min(1).max(100),
     sku:             z.string().max(100).optional(),
