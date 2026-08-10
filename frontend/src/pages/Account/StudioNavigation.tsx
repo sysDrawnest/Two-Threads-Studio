@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
+import { useFeatures } from '../../hooks/useFeatures';
 
 interface StudioNavigationProps {
   activeTab: string;
@@ -12,11 +13,13 @@ export const StudioNavigation: React.FC<StudioNavigationProps> = ({
   setActiveTab,
   onLogout,
 }) => {
+  const { features } = useFeatures();
+
   const tabs = [
     { id: 'overview', label: 'Studio' },
     { id: 'orders', label: 'Orders' },
     { id: 'wishlist', label: 'Inspiration' },
-    { id: 'learning', label: 'Learning' },
+    ...(features.LEARNING_HUB ? [{ id: 'learning', label: 'Learning' }] : []),
     { id: 'addresses', label: 'Addresses' },
     { id: 'profile', label: 'Profile' },
     { id: 'security', label: 'Security' },

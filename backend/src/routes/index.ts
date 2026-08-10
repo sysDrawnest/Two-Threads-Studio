@@ -92,6 +92,12 @@ import { publicCmsRouter, adminCmsRouter } from './cms.routes';
 router.use('/cms',       publicCmsRouter);
 router.use('/admin/cms', adminCmsRouter);
 
+// Feature Flags Launch Control
+import { publicFeatureRouter, adminFeatureRouter } from './feature.routes';
+
+router.use('/features',       publicFeatureRouter);
+router.use('/admin/features', adminFeatureRouter);
+
 export default router;
 
 

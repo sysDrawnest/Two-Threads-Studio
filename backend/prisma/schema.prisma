@@ -1342,6 +1342,7 @@ model StudioSettings {
   tier3LifetimeSpendINR  Decimal  @default(40000) @db.Decimal(10, 2)
 
   // Feature Flags
+  learningHubEnabled       Boolean @default(false)
   allowFirstOrderCod       Boolean @default(true)
   requirePhoneVerification Boolean @default(true)
   requireEmailVerification Boolean @default(false)

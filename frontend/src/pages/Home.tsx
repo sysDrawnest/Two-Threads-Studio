@@ -25,6 +25,7 @@ const Reviews = lazy(() => import('../components/sections/Reviews'));
 const CommunityGallery = lazy(() => import('../components/sections/CommunityGallery'));
 const Learning = lazy(() => import('../components/sections/Learning'));
 const CorporateBulkOrders = lazy(() => import('../components/sections/CorporateOrders'));
+import { useFeatures } from '../hooks/useFeatures';
 
 // Lightweight fallback skeleton for lazy-loaded sections
 const SectionFallback = () => (
@@ -38,6 +39,8 @@ const SectionFallback = () => (
 );
 
 const Home: React.FC = () => {
+  const { features } = useFeatures();
+
   return (
     <PageContainer disablePadding={true}>
       {/*
@@ -152,11 +155,13 @@ const Home: React.FC = () => {
         </Suspense>
       </ViewportSection>
 
-      <ViewportSection rootMargin="600px 0px" minHeight={400} fallback={<SectionFallback />}>
-        <Suspense fallback={<SectionFallback />}>
-          <Learning />
-        </Suspense>
-      </ViewportSection>
+      {features.LEARNING_HUB && (
+        <ViewportSection rootMargin="600px 0px" minHeight={400} fallback={<SectionFallback />}>
+          <Suspense fallback={<SectionFallback />}>
+            <Learning />
+          </Suspense>
+        </ViewportSection>
+      )}
 
       <ViewportSection rootMargin="600px 0px" minHeight={400} fallback={<SectionFallback />}>
         <Suspense fallback={<SectionFallback />}>

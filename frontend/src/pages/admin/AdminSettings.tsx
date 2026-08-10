@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Store, Truck, Building, FileText, CreditCard, Mail, ShieldCheck } from 'lucide-react';
+import { Save, Store, Truck, Building, FileText, CreditCard, Mail, ShieldCheck, ToggleLeft } from 'lucide-react';
 import { useAdminSettings, useUpdateSettings } from '../../hooks/useAdminData';
 import { AdminSkeleton, AdminBadge } from '../../components/admin/ui';
+import { useFeatures } from '../../hooks/useFeatures';
 
 export const AdminSettings: React.FC = () => {
   const { data: response, isLoading } = useAdminSettings();
   const { mutate: updateSettings, isPending: isUpdating } = useUpdateSettings();
+  const { features, updateFeature, isUpdating: isUpdatingFeature } = useFeatures();
 
-  const [activeTab, setActiveTab] = useState('company');
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') || 'company';
+  });
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
@@ -34,6 +39,7 @@ export const AdminSettings: React.FC = () => {
   };
 
   const tabs = [
+    { id: 'features', label: 'Feature Flags', icon: ToggleLeft },
     { id: 'company', label: 'Company Profile', icon: Store },
     { id: 'gst', label: 'Tax & GST', icon: Building },
     { id: 'shipping', label: 'Shipping & Delivery', icon: Truck },
@@ -286,6 +292,49 @@ export const AdminSettings: React.FC = () => {
                       onChange={(e) => handleInputChange('invoice', 'prefix', e.target.value)}
                       className="w-full rounded-md border border-outline-variant px-3.5 py-2 text-sm font-mono focus:ring-1 focus:ring-primary-container outline-none" 
                     />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Feature Flags & Launch Control */}
+            {activeTab === 'features' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-xl font-medium text-primary-container border-b border-outline-variant pb-4">
+                    Feature Flags & Launch Control
+                  </h2>
+                  <p className="text-xs text-on-secondary-container mt-2">
+                    Centrally enable or disable platform modules for launch. Changes update the database and sync globally across the storefront instantly.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-5 rounded-lg bg-surface-container/30 border border-outline-variant flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="space-y-1 max-w-xl">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-primary-container text-base">Learning / Tutorial Hub</span>
+                        <AdminBadge variant={features.LEARNING_HUB ? 'success' : 'default'}>
+                          {features.LEARNING_HUB ? 'ON' : 'OFF'}
+                        </AdminBadge>
+                      </div>
+                      <p className="text-xs text-on-secondary-container leading-relaxed">
+                        Enable the Learning Hub, tutorial videos, instructor profiles, and related customer-facing Learning content across navigation, homepage, and routes.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={isUpdatingFeature}
+                      onClick={() => updateFeature('LEARNING_HUB', !features.LEARNING_HUB)}
+                      className={`px-4 py-2 text-xs font-sans tracking-wider uppercase font-semibold rounded-md border transition-all disabled:opacity-50 flex-shrink-0 cursor-pointer ${
+                        features.LEARNING_HUB
+                          ? 'bg-[#e8f4e8] text-[#3a6b3a] border-[#3a6b3a]/30 hover:bg-[#d8ebd8]'
+                          : 'bg-primary-container text-white border-primary-container hover:bg-primary-container/90'
+                      }`}
+                    >
+                      {isUpdatingFeature ? 'Updating...' : features.LEARNING_HUB ? 'Disable Learning Hub' : 'Enable Learning Hub'}
+                    </button>
                   </div>
                 </div>
               </div>

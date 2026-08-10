@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
+import { useFeatures } from '../../hooks/useFeatures';
 
 interface FooterProps {
   topBgClass?: string;
 }
 
 const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
+  const { features } = useFeatures();
   const location = useLocation();
 
   // Determine top background class dynamically based on prop or route
@@ -65,6 +67,11 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
+  const activeCols = cols.map(col => ({
+    ...col,
+    links: col.links.filter(l => features.LEARNING_HUB || l.path !== '/learning')
+  })).filter(col => col.links.length > 0);
+
   const toggleCol = (i: number) => {
     setOpenCol(openCol === i ? null : i);
   };
@@ -112,7 +119,7 @@ const Footer: React.FC<FooterProps> = ({ topBgClass }) => {
               </div>
             </div>
             
-            {cols.map((col, i) => (
+            {activeCols.map((col, i) => (
               <div key={i} className="border-b border-inverse-on-surface/10 md:border-none pb-4 md:pb-0">
                 <button 
                   type="button"

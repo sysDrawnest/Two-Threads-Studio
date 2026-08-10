@@ -95,6 +95,8 @@ const CMSDashboard = lazy(() => import('./pages/admin/CMSDashboard').then(module
 
 
 import RequireAuth from './components/auth/RequireAuth';
+import { FeatureProvider } from './context/FeatureContext';
+import { FeatureRoute } from './components/common/FeatureRoute';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Storefront wrapper (with Navbar, Footer, page transitions)
@@ -109,9 +111,9 @@ const StorefrontRoutes = () => {
         <Route path="/shop/:id" element={<ProductDetail />} />
         <Route path="/collection/:id" element={<PremiumCollection />} />
         <Route path="/collections" element={<Collections />} />
-        <Route path="/learning" element={<Learning />} />
-        <Route path="/learning/:id" element={<TutorialDetail />} />
-        <Route path="/instructor/:id" element={<InstructorProfile />} />
+        <Route path="/learning" element={<FeatureRoute feature="LEARNING_HUB"><Learning /></FeatureRoute>} />
+        <Route path="/learning/:id" element={<FeatureRoute feature="LEARNING_HUB"><TutorialDetail /></FeatureRoute>} />
+        <Route path="/instructor/:id" element={<FeatureRoute feature="LEARNING_HUB"><InstructorProfile /></FeatureRoute>} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/about" element={<OurStory />} />
         <Route path="/our-story" element={<OurStory />} />
@@ -224,11 +226,13 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Router>
-            <Suspense fallback={<ElegantLoader />}>
-              <AppRoutes />
-            </Suspense>
-          </Router>
+          <FeatureProvider>
+            <Router>
+              <Suspense fallback={<ElegantLoader />}>
+                <AppRoutes />
+              </Suspense>
+            </Router>
+          </FeatureProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

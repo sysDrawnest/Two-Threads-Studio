@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/ui/Modal';
 import { mockAdminTutorials, AdminTutorial } from '../../data/adminData';
+import { useFeatures } from '../../hooks/useFeatures';
 
 const TutorialsManagement: React.FC = () => {
+  const { features } = useFeatures();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTutorial, setEditTutorial] = useState<AdminTutorial | null>(null);
   const [form, setForm] = useState({ title: '', instructor: '', difficulty: 'Beginner', duration: '', description: '', videoUrl: '', status: 'draft' });
@@ -47,6 +50,30 @@ const TutorialsManagement: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Feature Flag Status Banner */}
+      <div className={`p-4 rounded-md border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+        features.LEARNING_HUB
+          ? 'bg-[#e8f4e8]/60 border-[#3a6b3a]/30 text-[#3a6b3a]'
+          : 'bg-[#fff8e6] border-[#e0a100]/30 text-[#8a6500]'
+      }`}>
+        <div className="flex items-center gap-2.5">
+          <span className="font-semibold text-xs tracking-wider uppercase px-2 py-0.5 rounded bg-white/80 border border-current">
+            Learning Hub: {features.LEARNING_HUB ? 'ON' : 'OFF'}
+          </span>
+          <span className="text-xs font-sans">
+            {features.LEARNING_HUB
+              ? 'Tutorial content is currently LIVE and visible to storefront customers.'
+              : 'Tutorial content is hidden from customers. You can prepare and edit courses here before launch.'}
+          </span>
+        </div>
+        <Link
+          to="/admin/settings?tab=features"
+          className="text-xs font-sans font-semibold underline tracking-wider uppercase hover:opacity-80 flex-shrink-0"
+        >
+          Manage Feature Flags →
+        </Link>
+      </div>
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-serif text-3xl font-light text-primary-container">Tutorials</h1>

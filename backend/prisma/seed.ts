@@ -276,6 +276,14 @@ async function main() {
     process.stdout.write(`  ✓ ${p.name}\n`);
   }
 
+  // ─── Studio Settings Default Feature Flags ─────────────────────────────────
+  await prisma.studioSettings.upsert({
+    where: { singleton: true },
+    create: { learningHubEnabled: false },
+    update: {},
+  });
+  console.log('✅ StudioSettings default feature flags initialized (learningHubEnabled = false)');
+
   console.log(`✅ ${productSeeds.length} products seeded`);
   console.log('🎉 Phase 3 seed complete.');
 }
