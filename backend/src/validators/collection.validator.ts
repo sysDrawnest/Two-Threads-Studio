@@ -19,7 +19,7 @@ export type CreateCollectionDto = z.infer<typeof createCollectionSchema>['body']
 // ─── Update ───────────────────────────────────────────────────────────────────
 export const updateCollectionSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid collection ID'),
+    id: z.string().min(1, 'Collection ID is required'),
   }),
   body: collectionBaseSchema.partial(),
 });
@@ -29,6 +29,6 @@ export type UpdateCollectionDto = z.infer<typeof updateCollectionSchema>['body']
 // ─── ID Param ─────────────────────────────────────────────────────────────────
 export const collectionIdParamsSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid collection ID'),
+    id: z.string().min(1, 'Collection ID is required'),
   }),
 });
