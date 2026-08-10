@@ -98,23 +98,30 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'Editorial Portfolio',
-    description: 'Black & cream luxury editorial layout with scrolling marquee typography and center portrait cutout.',
+    name: 'Wavy Split-Screen Hero',
+    description: 'Split-screen hero — background campaign photo top with cream wavy-edge overlay canvas below & CTA.',
     icon: Sparkles,
-    tag: 'Portfolio',
-    tagColor: 'bg-[#efeee9]/20 text-[#efeee9]',
+    tag: 'Wavy Canvas',
+    tagColor: 'bg-[#A66A4F]/20 text-[#A66A4F]',
     preview: (
-      <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
+      <div className="w-full h-full bg-[#1C1C1B] relative overflow-hidden rounded-sm flex flex-col justify-end">
         <img
           src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-50"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
-        <img
-          src={portraitCutout}
-          alt="Preview"
-          className="absolute inset-0 h-full w-full object-contain object-bottom z-20"
-        />
+        <div
+          className="relative z-10 w-full h-[65%] bg-[#FCFCF0] flex flex-col items-center justify-center p-2 text-center"
+          style={{
+            clipPath: 'polygon(0% 18%, 20% 8%, 40% 0%, 60% 8%, 80% 18%, 100% 8%, 100% 100%, 0% 100%)'
+          }}
+        >
+          <span className="block text-[5px] font-sans tracking-widest uppercase text-[#4A4A4A]">WOMENSWEAR</span>
+          <span className="block font-serif text-[9px] font-bold text-[#333333] leading-tight">Womenswear</span>
+          <div className="mt-1 px-2 py-0.5 bg-[#A66A4F] text-white text-[4px] font-sans tracking-wider uppercase rounded-[2px]">
+            EXPLORE →
+          </div>
+        </div>
       </div>
     ),
   },

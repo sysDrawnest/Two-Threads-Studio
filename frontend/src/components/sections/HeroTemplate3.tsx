@@ -1,135 +1,79 @@
 import React from 'react';
-import portraitCutout from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.webp';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import bgImage from '../../assets/Embroidery_collection_flat_lay_2K_202607141328.webp';
 
 export default function HeroTemplate3() {
   return (
-    <section className="relative h-[100dvh] w-full overflow-hidden bg-black font-hn text-cream select-none">
-      {/* ── Webfont & CSS Animations ── */}
-      <style>{`
-        @import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
-
-        @keyframes animFadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-
-        @keyframes animRiseIn {
-          from {
-            opacity: 0;
-            transform: translateY(4vh) scale(1.03);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        @keyframes animFadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(28px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes animLine {
-          from { transform: scaleX(0); }
-          to   { transform: scaleX(1); }
-        }
-
-        @keyframes marqueeScroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
-        .anim-fade-in {
-          animation: animFadeIn 1.2s ease-out both;
-        }
-
-        .anim-rise-in {
-          animation: animRiseIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
-        }
-
-        .anim-fade-up {
-          animation: animFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-
-        .anim-line {
-          animation: animLine 1.1s cubic-bezier(0.76, 0, 0.24, 1) 1200ms both;
-        }
-
-        .marquee-track {
-          animation: marqueeScroll 30s linear infinite;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .anim-fade-in,
-          .anim-rise-in,
-          .anim-fade-up,
-          .anim-line,
-          .marquee-track {
-            animation-duration: 0.01ms !important;
-            animation-delay: 0s !important;
-            animation-iteration-count: 1 !important;
-          }
-        }
-      `}</style>
-
-      {/* ── 1. Background Image (z-0 / default) ── */}
-      <img
-        src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover anim-fade-in"
-      />
-
-      {/* ── 2. Marquee Name (z-10) ── */}
-      <div
-        className="absolute inset-x-0 top-[16vh] sm:top-[14vh] z-10 overflow-hidden pointer-events-none anim-fade-up"
-        style={{ animationDelay: '500ms' }}
-      >
-        <div className="marquee-track flex w-max whitespace-nowrap font-hn text-[16vh] sm:text-[24vh] leading-none text-cream tracking-tight">
-          <span className="pr-[6vw]">
-            Two Threads &mdash; Studio
-          </span>
-          <span className="pr-[6vw]">
-            Two Threads &mdash; Studio
-          </span>
-        </div>
+    <section className="relative min-h-[90vh] md:min-h-screen w-full bg-[#FCFCF0] overflow-hidden select-none flex flex-col justify-end">
+      {/* ── 1. Top Background Photo with Darkening Overlay ── */}
+      <div className="absolute inset-0 z-0 h-full w-full">
+        <img
+          src={bgImage}
+          alt="Two Threads Studio Artisan Campaign"
+          className="w-full h-full object-cover object-center scale-100 transition-transform duration-1000"
+        />
+        {/* Darkening gradient overlay for rich contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
       </div>
 
-      {/* ── 3. Horizontal Cream Rule (z-10) ── */}
+      {/* ── 2. Light Cream Overlay Canvas with Decorative Wavy Edge ── */}
       <div
-        className="absolute inset-x-6 sm:inset-x-10 bottom-[5.5rem] sm:bottom-28 z-10 h-0.5 bg-cream origin-left anim-line"
-      />
+        className="relative z-10 w-full bg-[#FCFCF0] flex flex-col items-center justify-center pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-14 px-6 text-center shadow-2xl mt-[25vh] sm:mt-[20vh]"
+        style={{
+          clipPath:
+            'polygon(0% 12%, 15% 6%, 30% 0%, 45% 6%, 60% 12%, 75% 6%, 90% 0%, 100% 6%, 100% 100%, 0% 100%)',
+        }}
+      >
+        {/* Text Content Area */}
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+          {/* Section Sub-Title / Tag */}
+          <span className="font-sans text-xs sm:text-sm tracking-[0.25em] uppercase text-[#4A4A4A] font-medium mb-3 sm:mb-4">
+            EXPLORE THE OTHER COLLECTION
+          </span>
 
-      {/* ── 4. Desktop Footer Copy (z-30 on mobile, sm:z-10 on desktop) ── */}
-      <footer className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 sm:px-10 sm:pb-8 text-xs sm:text-sm leading-relaxed font-hn text-cream z-30 sm:z-10">
-        {/* Footer Left (3 lines) */}
-        <div className="anim-fade-up" style={{ animationDelay: '1400ms' }}>
-          <p>Handcrafted Indigo</p>
-          <p>Mindful Slow Fashion</p>
-          <p>Artisanal Heritage</p>
+          {/* Main Title */}
+          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-[#333333] tracking-tight leading-[1.08] mb-3 sm:mb-4">
+            WOMENSWEAR
+          </h1>
+
+          {/* Description */}
+          <p className="font-serif italic text-base sm:text-xl md:text-2xl text-[#555555] max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed font-normal">
+            Made to be remembered. Contemporary heirloom pieces woven with grace.
+          </p>
+
+          {/* Primary CTA Button */}
+          <Link
+            to="/collection/womenswear"
+            className="inline-flex items-center gap-3 bg-[#A66A4F] hover:bg-[#8C5A42] text-white uppercase text-xs sm:text-sm tracking-[0.1em] font-medium px-8 sm:px-10 py-3.5 sm:py-4 rounded-[5px] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 mb-8 sm:mb-10"
+          >
+            <span>EXPLORE WOMENSWEAR</span>
+            <ArrowRight size={16} />
+          </Link>
+
+          {/* Footer Navigation Links */}
+          <nav className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 mb-6 font-sans text-xs sm:text-sm tracking-[0.08em] uppercase text-[#4A4A4A]">
+            <Link to="/about" className="hover:text-[#A66A4F] transition-colors">
+              About
+            </Link>
+            <Link to="/journal" className="hover:text-[#A66A4F] transition-colors">
+              Journal
+            </Link>
+            <Link to="/sustainability" className="hover:text-[#A66A4F] transition-colors">
+              Ethics
+            </Link>
+            <Link to="/contact" className="hover:text-[#A66A4F] transition-colors">
+              Contact
+            </Link>
+          </nav>
+
+          {/* Copyright & Branding Footer */}
+          <div className="space-y-1 font-sans text-[11px] tracking-[0.08em] text-[#777777]">
+            <p>@twothreadsstudio</p>
+            <p>&copy; TWO THREADS STUDIO 2026</p>
+          </div>
         </div>
-
-        {/* Footer Right (right-aligned, 2 lines) */}
-        <div className="text-right anim-fade-up" style={{ animationDelay: '1550ms' }}>
-          <p>Crafted with Care</p>
-          <p>Two Threads Studio</p>
-        </div>
-      </footer>
-
-      {/* ── 5. Front Portrait Cutout (z-20) ── */}
-      <img
-        src={portraitCutout}
-        alt="Two Threads Artisanal Portrait"
-        className="absolute inset-0 h-full w-full object-cover sm:object-contain sm:object-bottom pointer-events-none z-20 anim-rise-in"
-      />
+      </div>
     </section>
   );
 }
-
-
-
