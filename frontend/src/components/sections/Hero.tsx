@@ -51,9 +51,20 @@ const LAZY_TEMPLATE_MAP: Record<number, React.LazyExoticComponent<() => React.JS
 export default function Hero() {
   const { data, isError } = useHeroConfig();
 
-  // While loading or on error, always show Template 1 immediately —
-  // no blank page, no skeleton, no waiting for the backend.
-  const activeTemplate = (!isError && data?.data?.activeTemplate) ? data.data.activeTemplate : 1;
+  // 1. Read cached template from localStorage for instant render on refresh
+  const cachedTemplateRaw = typeof window !== 'undefined' ? localStorage.getItem('tts_hero_template_id') : null;
+  const cachedTemplate = cachedTemplateRaw ? parseInt(cachedTemplateRaw, 10) : null;
+
+  // 2. Sync incoming API data into localStorage
+  React.useEffect(() => {
+    if (data?.data?.activeTemplate) {
+      localStorage.setItem('tts_hero_template_id', String(data.data.activeTemplate));
+    }
+  }, [data]);
+
+  // 3. Resolve active template — preference order: API data > cached localStorage > default 1
+  const serverTemplate = (!isError && data?.data?.activeTemplate) ? data.data.activeTemplate : null;
+  const activeTemplate = serverTemplate ?? cachedTemplate ?? 1;
 
   // Template 1 is the default — render it eagerly (no Suspense needed).
   if (activeTemplate === 1) {

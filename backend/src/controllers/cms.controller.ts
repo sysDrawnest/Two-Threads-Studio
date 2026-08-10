@@ -97,16 +97,25 @@ export const cmsController = {
    */
   getHeroConfig: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let settings = await prisma.studioSettings.findUnique({ where: SINGLETON_WHERE });
+      let settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: { activeHeroTemplate: true },
+      });
       if (!settings) {
-        settings = await prisma.studioSettings.create({ data: {} });
+        settings = await prisma.studioSettings.create({
+          data: {},
+          select: { activeHeroTemplate: true },
+        });
       }
 
       return successResponse(res, {
         activeTemplate: settings.activeHeroTemplate ?? 1,
       });
     } catch (err) {
-      next(err);
+      // Graceful fallback for storefront: Return default Template 1 instead of HTTP 400 error
+      return successResponse(res, {
+        activeTemplate: 1,
+      });
     }
   },
 
@@ -135,6 +144,7 @@ export const cmsController = {
         where: SINGLETON_WHERE,
         create: { activeHeroTemplate: activeTemplate },
         update: { activeHeroTemplate: activeTemplate },
+        select: { activeHeroTemplate: true },
       });
 
       return successResponse(
@@ -153,9 +163,29 @@ export const cmsController = {
    */
   getHomepageConfig: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let settings = await prisma.studioSettings.findUnique({ where: SINGLETON_WHERE });
+      let settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: {
+          activeHeroTemplate: true,
+          homepageBestSellersConfig: true,
+          homepageNewArrivalsConfig: true,
+          homepageMenswearConfig: true,
+          homepageWomenswearConfig: true,
+          homepageCategoriesConfig: true,
+        },
+      });
       if (!settings) {
-        settings = await prisma.studioSettings.create({ data: {} });
+        settings = await prisma.studioSettings.create({
+          data: {},
+          select: {
+            activeHeroTemplate: true,
+            homepageBestSellersConfig: true,
+            homepageNewArrivalsConfig: true,
+            homepageMenswearConfig: true,
+            homepageWomenswearConfig: true,
+            homepageCategoriesConfig: true,
+          },
+        });
       }
 
       return successResponse(res, {
@@ -167,7 +197,15 @@ export const cmsController = {
         categoriesConfig: settings.homepageCategoriesConfig || DEFAULT_CATEGORIES,
       });
     } catch (err) {
-      next(err);
+      // Graceful fallback: Return default configuration instead of HTTP 400
+      return successResponse(res, {
+        activeHeroTemplate: 1,
+        bestSellersConfig: { productIds: [], limit: 8, enabled: true },
+        newArrivalsConfig: { productIds: [], limit: 4, enabled: true },
+        menswearConfig: { productIds: [], title: 'Premium Menswear Collection', enabled: true },
+        womenswearConfig: { productIds: [], title: 'Premium Womenswear Collection', enabled: true },
+        categoriesConfig: DEFAULT_CATEGORIES,
+      });
     }
   },
 
