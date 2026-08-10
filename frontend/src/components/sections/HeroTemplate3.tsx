@@ -1,108 +1,135 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useHeroConfig } from '../../hooks/useCms';
-import heroStudioBg from '../../assets/hero_textile_studio.jpg';
+import portraitCutout from '../../assets/Woman_wearing_crochet_jacket_2K_202608051414-Recovered.webp';
 
 export default function HeroTemplate3() {
-  const { data } = useHeroConfig();
-  const config = data?.data;
-
-  // Use CMS configuration if provided, otherwise default to reference design
-  const sectionTitle = config?.subtitle || 'EXPLORE THE OTHER COLLECTION';
-  const mainTitle = config?.title || 'WOMENSWEAR';
-  const description = config?.description || 'Made to be remembered. Contemporary heirloom pieces woven with grace.';
-  const ctaText = config?.ctaText || 'EXPLORE WOMENSWEAR';
-  const ctaLink = config?.ctaLink || '/collection/womenswear';
-  const bgImage = config?.backgroundImageUrl || heroStudioBg;
-
   return (
-    <section className="relative w-full h-[100dvh] min-h-[680px] bg-[#FCFCF0] overflow-hidden select-none font-sans flex flex-col justify-between">
-      {/* ── 1. Full-Bleed Background Image ── */}
-      <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
-        <img
-          src={bgImage}
-          alt="Artisan Textile Studio"
-          className="w-full h-full object-cover object-center scale-100 transition-transform duration-1000"
-          loading="eager"
-        />
-        {/* Subtle Darkening Overlay for Depth */}
-        <div className="absolute inset-0 bg-black/25" />
+    <section className="relative h-[100dvh] w-full overflow-hidden bg-black font-hn text-cream select-none">
+      {/* ── Webfont & CSS Animations ── */}
+      <style>{`
+        @import url('https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME');
+
+        @keyframes animFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        @keyframes animRiseIn {
+          from {
+            opacity: 0;
+            transform: translateY(4vh) scale(1.03);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes animFadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(28px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes animLine {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
+
+        @keyframes marqueeScroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .anim-fade-in {
+          animation: animFadeIn 1.2s ease-out both;
+        }
+
+        .anim-rise-in {
+          animation: animRiseIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+        }
+
+        .anim-fade-up {
+          animation: animFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .anim-line {
+          animation: animLine 1.1s cubic-bezier(0.76, 0, 0.24, 1) 1200ms both;
+        }
+
+        .marquee-track {
+          animation: marqueeScroll 30s linear infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .anim-fade-in,
+          .anim-rise-in,
+          .anim-fade-up,
+          .anim-line,
+          .marquee-track {
+            animation-duration: 0.01ms !important;
+            animation-delay: 0s !important;
+            animation-iteration-count: 1 !important;
+          }
+        }
+      `}</style>
+
+      {/* ── 1. Background Image (z-0 / default) ── */}
+      <img
+        src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260729_022513_486985a2-ac8c-4278-91a8-071dcd9fcaff.png&w=1280&q=85"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover anim-fade-in"
+      />
+
+      {/* ── 2. Marquee Name (z-10) ── */}
+      <div
+        className="absolute inset-x-0 top-[16vh] sm:top-[14vh] z-10 overflow-hidden pointer-events-none anim-fade-up"
+        style={{ animationDelay: '500ms' }}
+      >
+        <div className="marquee-track flex w-max whitespace-nowrap font-hn text-[16vh] sm:text-[24vh] leading-none text-cream tracking-tight">
+          <span className="pr-[6vw]">
+            Two Threads &mdash; Studio
+          </span>
+          <span className="pr-[6vw]">
+            Two Threads &mdash; Studio
+          </span>
+        </div>
       </div>
 
-      {/* Spacer pushing content to bottom */}
-      <div className="flex-1 pointer-events-none" />
+      {/* ── 3. Horizontal Cream Rule (z-10) ── */}
+      <div
+        className="absolute inset-x-6 sm:inset-x-10 bottom-[5.5rem] sm:bottom-28 z-10 h-0.5 bg-cream origin-left anim-line"
+      />
 
-      {/* ── 2. Off-White Text Container with Asymmetrical SVG Shape Divider ── */}
-      <div className="relative z-10 w-full bg-[#FCFCF0] text-center pt-2 sm:pt-4 pb-8 sm:pb-10 px-6 mt-auto">
-        
-        {/* ── Asymmetrical Organic Sweeping Wave SVG Divider (Top Boundary) ── */}
-        <div className="absolute left-0 right-0 top-0 -translate-y-[99%] overflow-hidden leading-none pointer-events-none z-10">
-          <svg
-            viewBox="0 0 1440 320"
-            className="w-full h-[18vw] min-h-[120px] max-h-[300px] block"
-            preserveAspectRatio="none"
-          >
-            {/* Asymmetrical wave: peaking slightly to left-center (x: 580), gently sloping down to the right */}
-            <path
-              d="M 0,220 C 300,40 560,0 720,28 C 960,60 1240,150 1440,220 L 1440,320 L 0,320 Z"
-              fill="#FCFCF0"
-            />
-          </svg>
+      {/* ── 4. Desktop Footer Copy (z-30 on mobile, sm:z-10 on desktop) ── */}
+      <footer className="absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 sm:px-10 sm:pb-8 text-xs sm:text-sm leading-relaxed font-hn text-cream z-30 sm:z-10">
+        {/* Footer Left (3 lines) */}
+        <div className="anim-fade-up" style={{ animationDelay: '1400ms' }}>
+          <p>Handcrafted Indigo</p>
+          <p>Mindful Slow Fashion</p>
+          <p>Artisanal Heritage</p>
         </div>
 
-        {/* ── 3. Centered Content Inside Off-White Area ── */}
-        <div className="relative z-20 max-w-xl mx-auto flex flex-col items-center">
-          
-          {/* Section Subtitle / Tag */}
-          <p className="font-serif italic text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase text-[#4A4A4A] mb-2 sm:mb-3">
-            {sectionTitle}
-          </p>
-
-          {/* Main Title Headline */}
-          <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-[#2D2520] tracking-tight leading-[1.05] mb-3 sm:mb-4">
-            {mainTitle}
-          </h1>
-
-          {/* Description */}
-          <p className="font-serif italic text-xs sm:text-sm md:text-base text-[#555555] font-normal leading-relaxed max-w-sm sm:max-w-md mx-auto mb-6 sm:mb-8">
-            {description}
-          </p>
-
-          {/* Pill-Shaped CTA Button */}
-          <Link
-            to={ctaLink}
-            className="inline-flex items-center gap-2 bg-[#A65A38] hover:bg-[#8C5A42] text-white font-sans text-xs sm:text-sm tracking-wider uppercase font-semibold py-3.5 px-9 rounded-full shadow-md transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] mb-6 sm:mb-8"
-          >
-            <span>{ctaText}</span>
-            <span className="text-sm font-bold">→</span>
-          </Link>
-
-          {/* Footer Navigation */}
-          <nav className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 mb-3">
-            <Link to="/about" className="font-sans text-[11px] sm:text-xs tracking-[0.08em] uppercase text-[#4A4A4A] hover:text-[#A65A38] transition-colors font-medium">
-              About
-            </Link>
-            <Link to="/journal" className="font-sans text-[11px] sm:text-xs tracking-[0.08em] uppercase text-[#4A4A4A] hover:text-[#A65A38] transition-colors font-medium">
-              Journal
-            </Link>
-            <Link to="/sustainability" className="font-sans text-[11px] sm:text-xs tracking-[0.08em] uppercase text-[#4A4A4A] hover:text-[#A65A38] transition-colors font-medium">
-              Ethics
-            </Link>
-            <Link to="/contact" className="font-sans text-[11px] sm:text-xs tracking-[0.08em] uppercase text-[#4A4A4A] hover:text-[#A65A38] transition-colors font-medium">
-              Contact
-            </Link>
-          </nav>
-
-          {/* Handles & Copyright */}
-          <p className="font-sans text-[10px] text-[#777777] tracking-wider mb-0.5">
-            @twothreadsstudio
-          </p>
-          <p className="font-sans text-[9px] text-[#888888] tracking-widest uppercase">
-            &copy; TWO THREADS STUDIO 2026
-          </p>
-
+        {/* Footer Right (right-aligned, 2 lines) */}
+        <div className="text-right anim-fade-up" style={{ animationDelay: '1550ms' }}>
+          <p>Crafted with Care</p>
+          <p>Two Threads Studio</p>
         </div>
-      </div>
+      </footer>
+
+      {/* ── 5. Front Portrait Cutout (z-20) ── */}
+      <img
+        src={portraitCutout}
+        alt="Two Threads Artisanal Portrait"
+        className="absolute inset-0 h-full w-full object-cover sm:object-contain sm:object-bottom pointer-events-none z-20 anim-rise-in"
+      />
     </section>
   );
 }
+
+
+

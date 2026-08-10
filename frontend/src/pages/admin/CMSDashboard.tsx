@@ -28,7 +28,6 @@ import {
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import heroLippanImg from '../../assets/hero_lippan_ref.webp';
 import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
-import heroStudioBg from '../../assets/hero_textile_studio.jpg';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -45,7 +44,7 @@ interface TemplateOption {
   id: 1 | 2 | 3 | 4 | 5;
   name: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
   tag: string;
   tagColor: string;
   preview: React.ReactNode;
@@ -99,28 +98,23 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'Asymmetric Wave Overlay',
-    description: 'Split-screen hero with full-bleed studio background and asymmetrical fluid SVG wave overlay housing typography & pill CTA.',
+    name: 'Editorial Portfolio',
+    description: 'Black & cream luxury editorial layout with scrolling marquee typography and center portrait cutout.',
     icon: Sparkles,
-    tag: 'Asymmetric Wave',
-    tagColor: 'bg-[#A65A38]/20 text-[#A65A38]',
+    tag: 'Portfolio',
+    tagColor: 'bg-[#efeee9]/20 text-[#efeee9]',
     preview: (
-      <div className="w-full h-full bg-[#1E1812] relative overflow-hidden rounded-sm flex items-center justify-center">
+      <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
         <img
-          src={heroStudioBg}
+          src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 h-full w-full object-cover opacity-50"
         />
-        <div className="absolute bottom-0 inset-x-0 h-[50%] bg-[#FCFCF0] z-10 flex items-center justify-center">
-          <svg
-            viewBox="0 0 100 30"
-            className="absolute top-0 inset-x-0 w-full -translate-y-[98%]"
-            preserveAspectRatio="none"
-          >
-            <path d="M 0,20 C 25,5 45,0 60,3 C 80,7 95,15 100,20 L 100,30 L 0,30 Z" fill="#FCFCF0" />
-          </svg>
-          <span className="block text-[6px] font-serif uppercase tracking-widest font-bold text-[#2D2520]">WOMENSWEAR</span>
-        </div>
+        <img
+          src={portraitCutout}
+          alt="Preview"
+          className="absolute inset-0 h-full w-full object-contain object-bottom z-20"
+        />
       </div>
     ),
   },
