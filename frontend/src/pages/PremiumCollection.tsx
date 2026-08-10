@@ -533,18 +533,18 @@ export default function PremiumCollection() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          04 — COLLECTION DISCOVERY (Understated Fashion House Ending)
+          04 — COLLECTION DISCOVERY (Understated Fashion House Ending with Footer Breathing Room)
          ───────────────────────────────────────────────────────────────────────────── */}
-      <section className="pt-20 md:pt-28 pb-32 md:pb-40 px-6 md:px-14 bg-[#1e1812] text-[#FAF9F7]">
+      <section className="pt-20 pb-32 md:pt-28 md:pb-44 px-6 md:px-14 bg-[#FAF9F7] border-t border-[#E8E4DF]">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            {/* Editorial Image Side */}
-            <div className="md:col-span-6 aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-[#2a221b] shadow-xl">
+            {/* Editorial Image Side with Softened Rounded Edges & Breathing Room */}
+            <div className="md:col-span-6 aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-[#F5EFE7] rounded-2xl shadow-sm border border-[#E8E4DF]/80">
               <img
                 src={otherConfig.heroImage}
                 alt={otherConfig.tag}
-                className="w-full h-full object-cover object-center opacity-90"
+                className="w-full h-full object-cover object-center"
               />
             </div>
 
@@ -553,15 +553,15 @@ export default function PremiumCollection() {
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#A34A38] font-bold mb-2">
                 EXPLORE THE OTHER COLLECTION
               </span>
-              <h2 className="font-serif text-3xl md:text-5xl font-light text-white mb-3">
+              <h2 className="font-serif text-3xl md:text-5xl font-light text-[#1C1C1B] mb-3">
                 {otherConfig.tag}
               </h2>
-              <p className="font-serif text-base text-neutral-300 font-normal leading-relaxed mb-6 max-w-md">
+              <p className="font-serif text-base text-neutral-600 font-normal leading-relaxed mb-6 max-w-md">
                 {otherConfig.statementHeadline} {otherConfig.heroSubtitle}
               </p>
               <Link
                 to={`/collection/${otherCollectionKey}`}
-                className="inline-flex items-center gap-3 font-sans text-xs tracking-[0.22em] uppercase font-semibold text-white border-b border-white/60 pb-1 hover:text-[#A34A38] hover:border-[#A34A38] transition-colors"
+                className="inline-flex items-center gap-3 font-sans text-xs tracking-[0.22em] uppercase font-semibold text-[#1C1C1B] border-b border-[#1C1C1B] pb-1 hover:text-[#A34A38] hover:border-[#A34A38] transition-colors"
               >
                 <span>Explore {otherConfig.tag}</span>
                 <ArrowRight size={14} />
