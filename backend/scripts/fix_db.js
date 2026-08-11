@@ -11,6 +11,7 @@ async function main() {
     // List of columns in Prisma schema for studio_settings that might be missing in DB
     const expectedColumns = [
       { name: 'learningHubEnabled', type: 'BOOLEAN DEFAULT false' },
+      { name: 'maintenanceMode', type: 'BOOLEAN DEFAULT false' },
       { name: 'allowFirstOrderCod', type: 'BOOLEAN DEFAULT true' },
       { name: 'requirePhoneVerification', type: 'BOOLEAN DEFAULT true' },
       { name: 'requireEmailVerification', type: 'BOOLEAN DEFAULT false' },

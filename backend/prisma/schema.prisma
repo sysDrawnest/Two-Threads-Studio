@@ -1343,6 +1343,7 @@ model StudioSettings {
 
   // Feature Flags
   learningHubEnabled       Boolean @default(false)
+  maintenanceMode          Boolean @default(false)
   allowFirstOrderCod       Boolean @default(true)
   requirePhoneVerification Boolean @default(true)
   requireEmailVerification Boolean @default(false)

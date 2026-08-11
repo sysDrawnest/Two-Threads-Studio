@@ -119,6 +119,10 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
+// Maintenance Protection Middleware
+import { checkMaintenanceMode } from './middleware/maintenance.middleware';
+app.use(BASE_API_PATH, checkMaintenanceMode);
+
 // API Routes (versioned)
 app.use(BASE_API_PATH, routes);
 

@@ -7,8 +7,10 @@
 
 export interface FeatureFlags {
   LEARNING_HUB: boolean;
+  MAINTENANCE_MODE: boolean;
 }
 
 export const DEFAULT_FEATURES: FeatureFlags = {
   LEARNING_HUB: false,
+  MAINTENANCE_MODE: false,
 };

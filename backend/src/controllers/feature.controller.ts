@@ -1,8 +1,8 @@
 /**
- * Feature Flags Controller — Launch Control & Module Visibility
+ * Feature Flags & Maintenance Controller
  *
- * Provides public read access to active feature flags (e.g. LEARNING_HUB)
- * and admin-authenticated mutation access to enable/disable features in DB.
+ * Provides public read access to active feature flags (LEARNING_HUB, MAINTENANCE_MODE)
+ * and dedicated public/admin maintenance mode endpoints.
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -20,24 +20,85 @@ export const featureController = {
     try {
       let settings = await prisma.studioSettings.findUnique({
         where: SINGLETON_WHERE,
-        select: { learningHubEnabled: true },
+        select: { learningHubEnabled: true, maintenanceMode: true },
       });
 
       if (!settings) {
         settings = await prisma.studioSettings.create({
           data: {},
-          select: { learningHubEnabled: true },
+          select: { learningHubEnabled: true, maintenanceMode: true },
         });
       }
 
       return successResponse(res, {
         LEARNING_HUB: Boolean(settings.learningHubEnabled),
+        MAINTENANCE_MODE: Boolean(settings.maintenanceMode),
       });
     } catch (err) {
-      // Safe Fallback: In case of database error, return LEARNING_HUB: false
+      // Safe Fallback: Fail open on database error
       return successResponse(res, {
         LEARNING_HUB: false,
+        MAINTENANCE_MODE: false,
       });
+    }
+  },
+
+  /**
+   * Public: Get standalone public maintenance mode status
+   * Light, unauthenticated, fail-open status check.
+   */
+  getMaintenanceStatus: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: { maintenanceMode: true },
+      });
+
+      if (!settings) {
+        settings = await prisma.studioSettings.create({
+          data: {},
+          select: { maintenanceMode: true },
+        });
+      }
+
+      return res.status(200).json({
+        maintenanceMode: Boolean(settings.maintenanceMode),
+      });
+    } catch (err) {
+      // Safe Fail-Open Strategy: DB/API error -> maintenanceMode = false
+      return res.status(200).json({
+        maintenanceMode: false,
+      });
+    }
+  },
+
+  /**
+   * Admin: Update maintenance mode status
+   * Requires Admin JWT Authentication.
+   */
+  updateMaintenanceMode: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { maintenanceMode } = req.body;
+
+      if (typeof maintenanceMode !== 'boolean') {
+        return errorResponse(res, 'Field "maintenanceMode" must be a boolean (true/false)', 400);
+      }
+
+      const updated = await prisma.studioSettings.upsert({
+        where: SINGLETON_WHERE,
+        create: { maintenanceMode },
+        update: { maintenanceMode },
+      });
+
+      console.log(`[LOG] ADMIN ${req.user?.id || 'session'} set Maintenance Mode to: ${updated.maintenanceMode}`);
+
+      return res.status(200).json({
+        success: true,
+        maintenanceMode: Boolean(updated.maintenanceMode),
+        message: `Website Maintenance Mode has been turned ${updated.maintenanceMode ? 'ON' : 'OFF'}`,
+      });
+    } catch (err) {
+      next(err);
     }
   },
 
@@ -65,6 +126,20 @@ export const featureController = {
           res,
           { LEARNING_HUB: Boolean(updated.learningHubEnabled) },
           `Learning Hub feature has been turned ${enabled ? 'ON' : 'OFF'}`
+        );
+      }
+
+      if (key === 'MAINTENANCE_MODE') {
+        const updated = await prisma.studioSettings.upsert({
+          where: SINGLETON_WHERE,
+          create: { maintenanceMode: enabled },
+          update: { maintenanceMode: enabled },
+        });
+
+        return successResponse(
+          res,
+          { MAINTENANCE_MODE: Boolean(updated.maintenanceMode) },
+          `Maintenance Mode has been turned ${enabled ? 'ON' : 'OFF'}`
         );
       }
 

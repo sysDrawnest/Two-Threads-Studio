@@ -94,9 +94,12 @@ router.use('/admin/cms', adminCmsRouter);
 
 // Feature Flags Launch Control
 import { publicFeatureRouter, adminFeatureRouter } from './feature.routes';
+import { publicMaintenanceRouter, adminMaintenanceRouter } from './maintenance.routes';
 
-router.use('/features',       publicFeatureRouter);
-router.use('/admin/features', adminFeatureRouter);
+router.use('/features',                   publicFeatureRouter);
+router.use('/admin/features',             adminFeatureRouter);
+router.use('/maintenance',                publicMaintenanceRouter);
+router.use('/admin/settings/maintenance', adminMaintenanceRouter);
 
 export default router;
 

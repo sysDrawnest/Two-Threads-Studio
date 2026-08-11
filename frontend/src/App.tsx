@@ -210,6 +210,9 @@ const AdminRoutes: React.FC = () => (
   </Routes>
 );
 
+import { MaintenanceProvider } from './context/MaintenanceContext';
+import { MaintenanceGate } from './components/common/MaintenanceGate';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Root App — decides which section to render based on the path
 // ─────────────────────────────────────────────────────────────────────────────
@@ -227,11 +230,15 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <FeatureProvider>
-            <Router>
-              <Suspense fallback={<ElegantLoader />}>
-                <AppRoutes />
-              </Suspense>
-            </Router>
+            <MaintenanceProvider>
+              <Router>
+                <MaintenanceGate>
+                  <Suspense fallback={<ElegantLoader />}>
+                    <AppRoutes />
+                  </Suspense>
+                </MaintenanceGate>
+              </Router>
+            </MaintenanceProvider>
           </FeatureProvider>
         </AuthProvider>
       </ThemeProvider>
