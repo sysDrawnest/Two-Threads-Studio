@@ -1,12 +1,16 @@
 /**
- * HeroTemplate4 — "Unveiling the Soul of Handmade" (Pixel-Perfect Reference Implementation)
+ * HeroTemplate4 — "Unveiling the Soul of Handmade" (Pixel-Perfect Reference Reconstruction)
  *
- * Implements a luxurious two-column grid layout with:
- * - Left column: Light cream background, custom inline SVG swashes, Cormorant Garamond typography,
- *   brushed-gold bordered CTA button, scrolling indicator, and Lippan mirror-work mandala corner graphic.
- * - Right column: Warm tan background separated by an organic wave curve, wirework monogram logo,
- *   and an overlapping cluster of four professional craft photos with soft shadows.
- * - Mobile support: Responsively stacks layout, scaling typography and the image cluster beautifully.
+ * Reconstructs the hero template to match the visual reference precisely:
+ * - Proportions: Wide editorial banner layout with a height of exactly 540px on desktop (preventing vertical stretching).
+ * - Background split: Soft wave divider SVG creating the organic ivory/tan transition.
+ * - Typography: Compact typography with custom swashes matching the reference swashes.
+ * - Headline layout: Breaks precisely as "UNVEILING the" (row 1) / "SOUL of HANDMADE" (row 2).
+ * - Overlapping Collage: 4-image cluster placed exactly as shown in the reference.
+ * - Decorative detail: Top-left gold monogram logo, upper-right monogram/needle/tassel SVG,
+ *   and bottom-left Lippan mirror-work star.
+ * - CTA Button: Compact terracotta pill with brushed gold gradient border and separate long-line arrow.
+ * - Scroll indicator: Absolute-centered at the bottom of the entire screen width.
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -19,175 +23,152 @@ import heroLippanImg from '../../assets/hero_lippan.jpg';
 
 export default function HeroTemplate4() {
   return (
-    <section className="relative w-full min-h-[calc(100vh-65px)] md:min-h-[calc(100vh-70px)] bg-[#FAF7F2] text-[#1E1812] flex flex-col justify-between overflow-hidden">
+    <section className="relative w-full h-[520px] lg:h-[580px] xl:h-[600px] bg-[#FAF7F2] text-[#1E1812] overflow-hidden select-none">
       
       {/* ─── DESKTOP VIEW (Two-Column Layout) ─── */}
-      <div className="hidden lg:flex w-full min-h-[calc(100vh-70px)] items-stretch relative">
+      <div className="hidden lg:flex w-full h-full items-stretch relative">
         
-        {/* Left Column: Brand Typography, Swashes, CTA & Corner Mandala */}
-        <div className="w-[55%] xl:w-[58%] bg-[#FAF7F2] flex flex-col justify-between px-12 xl:px-20 py-12 relative z-10">
+        {/* Left Column: Typography, Swashes, CTA & Corner Mandala (58% width) */}
+        <div className="w-[58%] bg-[#FAF7F2] flex flex-col justify-between pl-16 xl:pl-24 pr-8 py-10 relative z-10">
           
-          {/* Logo / Monogram top-left */}
-          <div className="w-12 h-12">
+          {/* Top-Left Monogram Logo (Asset 10) */}
+          <div className="w-10 h-10 mt-1">
             <svg viewBox="0 0 100 100" fill="none" className="w-full h-full text-[#8B6F5C]">
-              {/* Elegant Calligraphic Logo "TTS" */}
+              {/* Elegant script monogram shape */}
               <path
-                d="M30 35 C35 25, 45 20, 55 25 C65 30, 60 45, 50 50 C40 55, 35 70, 45 75 C55 80, 65 75, 70 65"
+                d="M32 30 C38 18, 48 14, 58 20 C68 26, 62 40, 50 46 C38 52, 32 68, 44 74 C56 80, 68 74, 72 62"
                 stroke="currentColor"
                 strokeWidth="2.5"
                 strokeLinecap="round"
-                strokeLinejoin="round"
               />
               <path
-                d="M50 25 C50 15, 30 15, 30 25 C30 35, 70 35, 70 45 C70 55, 50 55, 50 45"
+                d="M50 20 C50 10, 32 10, 32 20 C32 30, 68 30, 68 40 C68 50, 50 50, 50 40"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity="0.6"
+                opacity="0.5"
               />
             </svg>
           </div>
 
-          {/* Main Headline & Text Block */}
-          <div className="my-auto relative max-w-2xl">
-            {/* SVG Flourish/Swash Behind Text (Asset 8) */}
-            <svg
-              className="absolute -left-10 top-2 w-72 h-36 text-[#8B6F5C]/20 pointer-events-none -z-10"
-              viewBox="0 0 300 150"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M10 90 C 80 120, 150 70, 200 110 C 250 150, 290 80, 260 50 C 230 20, 180 50, 160 80" />
-              <path d="M50 30 C 120 10, 180 40, 240 20" strokeWidth="1" strokeDasharray="3 3" />
-            </svg>
+          {/* Centered Headline Content */}
+          <div className="my-auto relative py-6">
+            
+            {/* Elegant SVG Swashes (Asset 8) */}
+            <div className="absolute left-[-20px] top-[10px] w-[500px] h-[160px] pointer-events-none -z-10 opacity-80">
+              <svg viewBox="0 0 500 160" fill="none" className="w-full h-full text-[#8B6F5C]/45">
+                {/* Under-swash curving behind SOUL */}
+                <path d="M12 75 C 90 105, 140 100, 190 75 C 240 50, 275 80, 260 105 C 240 130, 180 110, 160 85" strokeWidth="1" />
+                {/* Swash wrapping the word 'the' */}
+                <path d="M210 25 C 265 15, 345 35, 385 20 C 405 10, 395 -5, 375 5" strokeWidth="1.2" />
+                {/* Left side flourish under UNVEILING */}
+                <path d="M5 42 C 45 42, 85 58, 125 58" strokeWidth="0.8" strokeDasharray="3 3" />
+              </svg>
+            </div>
 
-            {/* Headline with Serif and Calligraphic Italic details */}
-            <h1 className="font-serif text-[#1E1812] tracking-tight leading-[1.05] font-light">
-              <span className="block text-5xl xl:text-6xl tracking-[0.03em] uppercase">
-                UNVEILING{' '}
-                <span className="font-serif italic font-light lowercase text-[#8B6F5C] tracking-wide relative">
+            {/* Headline */}
+            <h1 className="font-serif text-[#1E1812] tracking-tight leading-[1.06] font-light">
+              <span className="block text-4xl xl:text-5xl uppercase tracking-[0.03em]">
+                <span className="text-[#8B6F5C] font-normal">UNVEILING </span>
+                <span className="font-serif italic font-light lowercase text-[#8B6F5C] tracking-wide relative inline-block ml-1">
                   the
-                  {/* Small script connector swash */}
-                  <svg className="absolute -right-16 top-4 w-14 h-6 text-[#8B6F5C]/50" viewBox="0 0 60 20" fill="none" stroke="currentColor" strokeWidth="1.2">
-                    <path d="M5 10 C 25 5, 45 15, 55 10" />
-                  </svg>
                 </span>
               </span>
-              <span className="block text-5xl xl:text-7xl mt-2">
+              <span className="block text-4xl xl:text-5xl mt-1">
                 <span className="uppercase font-normal text-[#2D2520] tracking-[0.04em]">SOUL </span>
-                <span className="font-serif italic font-light lowercase text-[#8B6F5C] tracking-wide pr-3">of</span>
+                <span className="font-serif italic font-light lowercase text-[#8B6F5C] tracking-wide mx-2">of</span>
                 <span className="uppercase font-normal text-[#2D2520] tracking-[0.04em]">HANDMADE</span>
               </span>
             </h1>
 
-            {/* Subtext Descriptors */}
-            <p className="font-sans text-xs xl:text-sm tracking-[0.15em] text-[#2D2520]/80 uppercase font-medium mt-8 leading-relaxed max-w-lg">
-              Contemporary Embroidery <span className="text-[#8B6F5C]/50 mx-1">|</span> Crochet{' '}
-              <span className="text-[#8B6F5C]/50 mx-1">|</span> Macramé{' '}
-              <span className="text-[#8B6F5C]/50 mx-1">|</span> Lippan Art.
+            {/* Subtext Description (Matches wrapping exactly) */}
+            <p className="font-sans text-[11px] xl:text-xs tracking-[0.14em] text-[#2D2520]/80 uppercase mt-6 leading-relaxed max-w-xl">
+              Contemporary Embroidery <span className="text-[#8B6F5C]/50 mx-1.5">|</span> Crochet{' '}
+              <span className="text-[#8B6F5C]/50 mx-1.5">|</span> Macramé <span className="text-[#8B6F5C]/50 mx-1.5">|</span> Lippan Art.
               <br />
               <span className="text-[#8B6F5C] font-semibold">Crafted for the Discerning.</span>
             </p>
 
-            {/* CTA Button Block */}
-            <div className="flex items-center gap-6 mt-10">
-              {/* Premium Brushed Gold Metallic Border Wrapper (Asset 17) */}
-              <div className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] p-[2.5px] rounded-full shadow-[0_10px_25px_rgba(191,149,63,0.15)] hover:shadow-[0_15px_30px_rgba(191,149,63,0.25)] transition-all duration-300 transform hover:-translate-y-0.5">
+            {/* Compact CTA & Arrow */}
+            <div className="flex items-center gap-5 mt-8">
+              {/* Premium Brushed Gold Metallic Border Wrapper */}
+              <div className="bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] p-[1.5px] rounded-full shadow-md transition-all duration-300 hover:shadow-lg">
                 <Link
                   to="/shop"
-                  className="inline-flex items-center justify-center bg-[#8C5A3E] hover:bg-[#764930] text-white px-8 py-3.5 rounded-full font-serif text-xs sm:text-sm tracking-[0.18em] transition-colors duration-300 uppercase font-semibold"
+                  className="inline-flex items-center justify-center bg-[#8C5A3E] hover:bg-[#764930] text-white px-7 py-2.5 rounded-full font-serif text-xs tracking-[0.15em] transition-colors duration-300 uppercase font-semibold"
                 >
-                  EXPLORE <span className="font-serif italic font-light lowercase mx-1.5 text-[#EDE6DE]">the</span> COLLECTION
+                  EXPLORE <span className="font-serif italic font-light lowercase mx-1 text-[#EDE6DE]">the</span> COLLECTION
                 </Link>
               </div>
 
               {/* Hand-drawn elegant line arrow (Asset 13) */}
-              <svg className="w-12 h-6 text-[#8B6F5C]" viewBox="0 0 48 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 12 L44 12" />
-                <path d="M36 6 L44 12 L36 18" />
+              <svg className="w-10 h-5 text-[#8B6F5C] transform translate-y-0.5" viewBox="0 0 40 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 10 L38 10" />
+                <path d="M30 4 L38 10 L30 16" />
               </svg>
             </div>
+
           </div>
 
-          {/* Bottom Row: Mirror-work Star Corner & Scroll Indicator */}
-          <div className="flex items-end justify-between w-full mt-6">
-            {/* Scroll to Discover (Asset 14) */}
-            <div className="flex flex-col items-center gap-2 mx-auto lg:translate-x-12">
-              <div className="w-5 h-8 border border-[#2D2520]/40 rounded-full flex justify-center p-1">
-                <motion.span
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                  className="w-1 h-1.5 bg-[#8B6F5C] rounded-full"
-                />
-              </div>
-              <span className="font-sans text-[10px] tracking-[0.25em] uppercase text-[#2D2520]/60">
-                Scroll to Discover
-              </span>
-            </div>
-          </div>
+          {/* Empty spacer to align content properly */}
+          <div className="h-6" />
 
           {/* Bottom-Left Multi-pointed Lippan Star Corner Graphic (Asset 11) */}
-          <div className="absolute -bottom-8 -left-8 w-44 h-44 opacity-80 pointer-events-none select-none -z-10">
-            <svg viewBox="0 0 100 100" className="w-full h-full text-[#8B6F5C]/30 fill-current">
-              {/* Complex geometric mandala matching Lippan art pattern */}
-              <circle cx="50" cy="50" r="45" stroke="#8B6F5C" strokeWidth="0.7" strokeDasharray="2 2" fill="none" />
-              <path d="M50 5 L55 35 L85 30 L60 45 L80 75 L50 55 L20 75 L40 45 L15 30 L45 35 Z" stroke="#8B6F5C" strokeWidth="0.8" fill="#EDE6DE"/ >
-              {/* Outer mirror polygons */}
-              <polygon points="50,15 52,25 48,25" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="75,25 67,30 70,33" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="85,50 75,48 75,52" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="70,68 67,70 75,75" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="50,85 52,75 48,75" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="30,68 33,70 25,75" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="15,50 25,48 25,52" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
-              <polygon points="25,25 33,30 30,33" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.5" />
+          <div className="absolute -bottom-8 -left-8 w-40 h-40 opacity-70 pointer-events-none select-none -z-10">
+            <svg viewBox="0 0 100 100" className="w-full h-full text-[#8B6F5C]/35 fill-current">
+              <circle cx="50" cy="50" r="44" stroke="#8B6F5C" strokeWidth="0.6" strokeDasharray="2 2" fill="none" />
+              <path d="M50 5 L54 34 L82 28 L58 44 L78 72 L50 53 L22 72 L42 44 L18 28 L46 34 Z" stroke="#8B6F5C" strokeWidth="0.8" fill="#EDE6DE"/ >
+              {/* Mirrors */}
+              <polygon points="50,14 52,24 48,24" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="73,24 65,28 68,31" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="82,48 73,46 73,50" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="68,66 65,68 73,73" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="50,82 51,73 49,73" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="32,66 35,68 27,73" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="18,48 27,46 27,50" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
+              <polygon points="27,24 35,28 32,31" fill="#FAF7F2" stroke="#8B6F5C" strokeWidth="0.4" />
             </svg>
           </div>
 
         </div>
 
-        {/* Right Column: Tan background, Wave separator, Monogram logo, Image Cluster */}
-        <div className="w-[45%] xl:w-[42%] bg-[#EDE6DE] relative flex items-center justify-center p-12">
+        {/* Right Column: Tan panel separated by wave curve with Image Cluster (42% width) */}
+        <div className="w-[42%] bg-[#EDE6DE] relative flex items-center justify-center p-6 xl:p-10">
           
-          {/* Smooth organic wave divider path separating colors */}
+          {/* Smooth organic wave divider separating ivory and tan panels */}
           <svg
             className="absolute top-0 bottom-0 -left-[47px] h-full w-12 text-[#EDE6DE] fill-current pointer-events-none z-20"
             viewBox="0 0 50 800"
             preserveAspectRatio="none"
           >
-            <path d="M50 0 C 32 180, 12 320, 25 480 C 38 640, 48 720, 50 800 Z" />
+            <path d="M50 0 C 35 150, 10 250, 20 400 C 30 550, 45 650, 50 800 Z" />
           </svg>
 
-          {/* Large Stylized Monogram Logo & Tassel (Asset 12) */}
-          <div className="absolute top-8 right-8 w-28 h-56 opacity-60 pointer-events-none select-none z-10 flex flex-col items-center">
+          {/* Upper-right Monogram Logo with Needle & Hanging Tassel (Asset 12) */}
+          <div className="absolute top-6 right-6 w-24 h-48 opacity-50 pointer-events-none select-none z-10 flex flex-col items-center">
             <svg viewBox="0 0 100 160" fill="none" className="w-full h-full text-[#8B6F5C]">
-              {/* Intersecting H and S curves */}
-              <path d="M30 20 L30 100" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M70 20 L70 100" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M30 60 L70 60" stroke="currentColor" strokeWidth="1.5" />
-              {/* Stylized S curvature */}
-              <path d="M40 30 C 60 20, 80 40, 50 60 C 20 80, 40 100, 60 90" stroke="currentColor" strokeWidth="1.2" />
-              {/* Diagonal Needle */}
-              <line x1="85" x2="20" y1="10" y2="110" stroke="#A34A38" strokeWidth="1.2" strokeLinecap="round" />
-              <ellipse cx="80" cy="18" rx="1" ry="3" fill="#EDE6DE" transform="rotate(-45 80 18)" />
-
-              {/* Hanging Macramé Hanger & Tassel Cords */}
-              <path d="M50 100 L50 120" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M42 120 L58 120 L50 135 Z" fill="currentColor" />
-              {/* Cords */}
-              <path d="M46 135 L40 160" stroke="currentColor" strokeWidth="1" />
-              <path d="M50 135 L50 160" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M54 135 L60 160" stroke="currentColor" strokeWidth="1" />
+              {/* Intersecting wireframe lines */}
+              <path d="M30 15 L30 90" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M70 15 L70 90" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M30 50 L70 50" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M35 25 C 55 15, 75 35, 50 50 C 25 65, 45 85, 65 75" stroke="currentColor" strokeWidth="1" />
+              {/* Needle passing through */}
+              <line x1="82" x2="20" y1="8" y2="100" stroke="#A34A38" strokeWidth="1" strokeLinecap="round" />
+              <ellipse cx="78" cy="14" rx="0.8" ry="2.5" fill="#EDE6DE" transform="rotate(-45 78 14)" />
+              {/* Hanging Tassel */}
+              <path d="M50 90 L50 110" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M44 110 L56 110 L50 124 Z" fill="currentColor" />
+              <path d="M46 124 L42 145" stroke="currentColor" strokeWidth="0.8" />
+              <path d="M50 124 L50 145" stroke="currentColor" strokeWidth="1" />
+              <path d="M54 124 L58 145" stroke="currentColor" strokeWidth="0.8" />
             </svg>
           </div>
 
-          {/* Overlapping Image Cluster Container (Asset 1, 2, 3, 4) */}
-          <div className="relative w-[380px] h-[380px] xl:w-[420px] xl:h-[420px] z-10 flex items-center justify-center">
+          {/* Overlapping Image Cluster (Precisely sized and overlapping as in reference) */}
+          <div className="relative w-[340px] h-[340px] xl:w-[380px] xl:h-[380px] z-10 flex items-center justify-center">
             
-            {/* Asset 1: Gold Thread Embroidery (Top-Left) */}
-            <div className="absolute left-0 top-0 w-[170px] h-[170px] xl:w-[190px] xl:h-[190px] rounded-2xl overflow-hidden shadow-[0_10px_25px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-105">
+            {/* Asset 1: Gold Thread Embroidery (Top-Left of cluster) */}
+            <div className="absolute left-[20px] top-[10px] w-[130px] h-[130px] xl:w-[150px] xl:h-[150px] rounded-xl overflow-hidden shadow-[0_8px_20px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-[1.03]">
               <img
                 src={heroEmbroideryImg}
                 alt="Intricate Gold Thread Embroidery with Mirrors"
@@ -195,8 +176,8 @@ export default function HeroTemplate4() {
               />
             </div>
 
-            {/* Asset 3: Crochet Lace (Top-Right) */}
-            <div className="absolute right-0 top-[20px] w-[160px] h-[160px] xl:w-[180px] xl:h-[180px] rounded-2xl overflow-hidden shadow-[0_10px_25px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-105">
+            {/* Asset 3: Crochet Lace (Right side of cluster) */}
+            <div className="absolute right-0 top-[40px] w-[130px] h-[130px] xl:w-[155px] xl:h-[155px] rounded-xl overflow-hidden shadow-[0_8px_20px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-[1.03]">
               <img
                 src={heroCrochetImg}
                 alt="Delicate Crochet Lace Details"
@@ -204,8 +185,8 @@ export default function HeroTemplate4() {
               />
             </div>
 
-            {/* Asset 2: Macrame Knotting (Bottom-Left) */}
-            <div className="absolute left-[10px] bottom-[10px] w-[165px] h-[165px] xl:w-[185px] xl:h-[185px] rounded-2xl overflow-hidden shadow-[0_10px_25px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-105">
+            {/* Asset 2: Macrame Knotting (Bottom-Left of cluster) */}
+            <div className="absolute left-[5px] bottom-[25px] w-[130px] h-[130px] xl:w-[150px] xl:h-[150px] rounded-xl overflow-hidden shadow-[0_8px_20px_rgba(45,37,32,0.12)] border border-[#FAF7F2]/10 transition-transform duration-500 hover:scale-[1.03]">
               <img
                 src={heroMacrameImg}
                 alt="Detailed Patterned Macramé Knotting"
@@ -213,8 +194,8 @@ export default function HeroTemplate4() {
               />
             </div>
 
-            {/* Asset 4: Circular Lippan Art Piece (Center-Front Overlay) */}
-            <div className="absolute w-[200px] h-[200px] xl:w-[220px] xl:h-[220px] rounded-full overflow-hidden border-[6px] border-[#FAF7F2] shadow-[0_20px_45px_rgba(45,37,32,0.22)] z-30 transition-transform duration-500 hover:scale-105">
+            {/* Asset 4: Circular Lippan Art Piece (Center-Front Highlight) */}
+            <div className="absolute w-[160px] h-[160px] xl:w-[190px] xl:h-[190px] rounded-full overflow-hidden border-[5px] border-[#FAF7F2] shadow-[0_15px_35px_rgba(45,37,32,0.22)] z-30 transition-transform duration-500 hover:scale-[1.03]">
               <img
                 src={heroLippanImg}
                 alt="Circular Lippan Art Mandala Disc"
@@ -224,78 +205,84 @@ export default function HeroTemplate4() {
 
           </div>
 
+          {/* Tiny accent diamond element at the very bottom right (Asset 9) */}
+          <div className="absolute bottom-6 right-6 w-3 h-3 text-[#8B6F5C] opacity-40">
+            <svg viewBox="0 0 10 10" fill="currentColor" className="w-full h-full">
+              <polygon points="5,0 10,5 5,10 0,5" />
+            </svg>
+          </div>
+
         </div>
 
       </div>
 
-      {/* ─── MOBILE VIEW (Stacked Layout for smaller screens) ─── */}
-      <div className="lg:hidden w-full flex flex-col px-6 py-8 sm:px-10">
+      {/* ─── MOBILE VIEW (Compact Stacked Layout) ─── */}
+      <div className="lg:hidden w-full h-full flex flex-col justify-between px-6 py-6 overflow-y-auto">
         
-        {/* Monogram Top Header */}
-        <div className="w-full flex justify-between items-center mb-6">
-          <svg viewBox="0 0 100 100" fill="none" className="w-10 h-10 text-[#8B6F5C]">
+        {/* Brand Header */}
+        <div className="w-full flex justify-start items-center">
+          <svg viewBox="0 0 100 100" fill="none" className="w-9 h-9 text-[#8B6F5C]">
             <path
               d="M30 35 C35 25, 45 20, 55 25 C65 30, 60 45, 50 50 C40 55, 35 70, 45 75 C55 80, 65 75, 70 65"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
           </svg>
         </div>
 
-        {/* Overlapping Image Cluster (Compact for Mobile) */}
-        <div className="relative w-full aspect-[4/3] max-w-[400px] mx-auto mb-10 flex items-center justify-center">
-          
-          {/* Embroidery Background Left */}
+        {/* Scaled Image Cluster for Mobile */}
+        <div className="relative w-full max-w-[280px] aspect-square mx-auto my-3 flex items-center justify-center">
           <div className="absolute left-0 top-0 w-[42%] aspect-square rounded-xl overflow-hidden shadow-md">
             <img src={heroEmbroideryImg} alt="Embroidery" className="w-full h-full object-cover" />
           </div>
-
-          {/* Crochet Background Right */}
           <div className="absolute right-0 top-[10%] w-[40%] aspect-square rounded-xl overflow-hidden shadow-md">
             <img src={heroCrochetImg} alt="Crochet" className="w-full h-full object-cover" />
           </div>
-
-          {/* Macrame Bottom Left */}
           <div className="absolute left-[8%] bottom-0 w-[40%] aspect-square rounded-xl overflow-hidden shadow-md">
             <img src={heroMacrameImg} alt="Macrame" className="w-full h-full object-cover" />
           </div>
-
-          {/* Lippan Center Overlay */}
           <div className="absolute w-[50%] aspect-square rounded-full overflow-hidden border-[4px] border-[#FAF7F2] shadow-xl z-20">
-            <img src={heroLippanImg} alt="Lippan Art" className="w-full h-full object-cover" />
+            <img src={heroLippanImg} alt="Lippan" className="w-full h-full object-cover" />
           </div>
-
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col text-center items-center max-w-md mx-auto">
-          {/* Headline */}
-          <h1 className="font-serif text-[#1E1812] tracking-tight leading-[1.1] font-light text-3xl sm:text-4xl">
-            <span className="block uppercase tracking-[0.03em]">UNVEILING</span>
-            <span className="block mt-1 font-serif italic text-[#8B6F5C] lowercase">the</span>
-            <span className="block mt-1 uppercase font-normal tracking-[0.04em]">SOUL of HANDMADE</span>
+        <div className="flex flex-col text-center items-center max-w-sm mx-auto pb-4">
+          <h1 className="font-serif text-[#1E1812] tracking-tight leading-[1.1] font-light text-2xl sm:text-3xl">
+            <span className="block uppercase tracking-[0.03em]"><span className="text-[#8B6F5C]">UNVEILING</span> the</span>
+            <span className="block mt-0.5 uppercase font-normal tracking-[0.04em]">SOUL of HANDMADE</span>
           </h1>
 
-          {/* Subtext */}
-          <p className="font-sans text-xs tracking-[0.12em] text-[#2D2520]/80 uppercase mt-5 leading-relaxed">
-            Contemporary Embroidery <span className="text-[#8B6F5C]/40 mx-0.5">|</span> Crochet{' '}
-            <span className="text-[#8B6F5C]/40 mx-0.5">|</span> Macramé{' '}
-            <span className="text-[#8B6F5C]/40 mx-0.5">|</span> Lippan Art.
+          <p className="font-sans text-[10px] tracking-[0.1em] text-[#2D2520]/80 uppercase mt-4 leading-relaxed">
+            Contemporary Embroidery | Crochet | Macramé | Lippan Art.
           </p>
 
-          {/* CTA Button Wrapper */}
-          <div className="mt-8 bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] p-[2px] rounded-full shadow-md w-full max-w-[280px]">
+          {/* CTA wrapper */}
+          <div className="mt-5 bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] p-[1.5px] rounded-full shadow-md w-full max-w-[240px]">
             <Link
               to="/shop"
-              className="flex items-center justify-center bg-[#8C5A3E] text-white py-3 rounded-full font-serif text-xs tracking-[0.15em] uppercase font-semibold w-full"
+              className="flex items-center justify-center bg-[#8C5A3E] text-white py-2 rounded-full font-serif text-xs tracking-[0.12em] uppercase font-semibold w-full"
             >
-              EXPLORE <span className="font-serif italic lowercase mx-1 text-[#EDE6DE]">the</span> COLLECTION
+              EXPLORE the COLLECTION
             </Link>
           </div>
         </div>
 
+      </div>
+
+      {/* ─── Scroll to Discover (Absolute-centered relative to the ENTIRE Hero screen width) ─── */}
+      <div className="hidden lg:flex absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1">
+        <div className="w-4 h-7 border border-[#2D2520]/45 rounded-full flex justify-center p-0.5">
+          <motion.span
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+            className="w-0.5 h-1 bg-[#8B6F5C] rounded-full"
+          />
+        </div>
+        <span className="font-sans text-[9px] tracking-[0.25em] uppercase text-[#2D2520]/65">
+          Scroll to Discover
+        </span>
       </div>
 
     </section>
