@@ -18,7 +18,7 @@ export interface Product {
   mrp?: number;
   category: "Kit" | "Pattern" | "Bundle" | "Material" | "Finished Hoop" | "Crochet" | "Macramé" | "Lippan Art" | "Gift Set" | "Handkerchiefs" | "Handbag";
   productCategory?: "Embroidery" | "Crochet" | "Macramé" | "Gift Sets" | "Lippan Art" | "Home Decor" | "Handkerchiefs" | "Handbags";
-  collection: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness";
+  collection?: "Botanical" | "Cottage" | "Linen" | "Seasonal" | "Wellness" | string;
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   badge?: "New" | "Best Seller" | "Limited" | "Editor's Choice" | "Trending";
   images: string[];
@@ -31,6 +31,9 @@ export interface Product {
   reviewCount?: number;
   stock?: "In Stock" | "Low Stock" | "Out of Stock";
   isPersonalizable?: boolean;
+  isCustomizable?: boolean;
+  studioType?: string;
+  hasHoop?: boolean;
   isHandmade?: boolean;
   isSustainable?: boolean;
   occasion?: string[];

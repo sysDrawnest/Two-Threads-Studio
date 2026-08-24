@@ -66,8 +66,9 @@ export const ProductForm: React.FC = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
 
-  // Category State
+  // Category & Collection State
   const [categories, setCategories] = useState<any[]>([]);
+  const [collectionsList, setCollectionsList] = useState<any[]>([]);
   const [isQuickCatOpen, setIsQuickCatOpen] = useState(false);
   const [quickCatName, setQuickCatName] = useState('');
   const [quickCatDesc, setQuickCatDesc] = useState('');
@@ -83,6 +84,9 @@ export const ProductForm: React.FC = () => {
     description: '',
     status: ProductStatus.DRAFT,
     type: ProductType.PHYSICAL,
+    studioType: undefined,
+    isCustomizable: false,
+    isPersonalizable: false,
     price: undefined,
     comparePrice: undefined,
     costPrice: undefined,
@@ -132,6 +136,16 @@ export const ProductForm: React.FC = () => {
     }
   };
 
+  const fetchCollections = async () => {
+    try {
+      const res = await adminService.listCollectionsAdmin();
+      const list = res?.collections || (Array.isArray(res) ? res : []);
+      setCollectionsList(list);
+    } catch (err) {
+      console.error('Failed to load collections', err);
+    }
+  };
+
   const fetchUploadStatus = async () => {
     try {
       const res = await adminService.getUploadStatus();
@@ -145,6 +159,7 @@ export const ProductForm: React.FC = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchCollections();
     fetchUploadStatus();
 
     if (isEdit && id) {
@@ -360,6 +375,8 @@ export const ProductForm: React.FC = () => {
         status: statusOverride || product.status || ProductStatus.DRAFT,
         difficulty,
         studioType,
+        isCustomizable: Boolean(product.isCustomizable),
+        isPersonalizable: Boolean(product.isPersonalizable),
         price: num(product.price),
         comparePrice: num(product.comparePrice),
         costPrice: num(product.costPrice),
@@ -369,7 +386,7 @@ export const ProductForm: React.FC = () => {
         gstPercent: num(product.gstPercent),
         estimatedProductionDays: num(product.estimatedProductionDays),
         estimatedShippingDays: num(product.estimatedShippingDays),
-        collectionId: product.collectionId?.trim() ? product.collectionId : undefined,
+        collectionId: product.collectionId?.trim() ? product.collectionId.trim() : (isEdit ? null : undefined),
         sku: product.sku?.trim() ? product.sku : undefined,
         ogImageUrl: cleanUrl(galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl),
         canonicalUrl: cleanUrl(product.canonicalUrl),
@@ -380,10 +397,10 @@ export const ProductForm: React.FC = () => {
         })),
       };
 
-      // Strip null and empty string values so Zod optional schema validation passes
+      // Strip empty string values so Zod optional schema validation passes, preserving null for explicit collection disconnect
       Object.keys(payload).forEach(key => {
-        if (payload[key] === null || (typeof payload[key] === 'string' && payload[key].trim() === '')) {
-          payload[key] = undefined;
+        if (payload[key] === '' || (typeof payload[key] === 'string' && payload[key].trim() === '')) {
+          payload[key] = key === 'collectionId' && isEdit ? null : undefined;
         }
       });
 
@@ -856,16 +873,42 @@ export const ProductForm: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
-                      Collection UUID / ID
+                      Collection (Optional)
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="collectionId"
                       value={product.collectionId || ''}
                       onChange={handleChange}
-                      placeholder="Optional collection ID..."
-                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
-                    />
+                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
+                    >
+                      <option value="">— Standalone / No Collection —</option>
+                      {collectionsList.map((c: any) => (
+                        <option key={c.id} value={c.id}>{c.name || c.title}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                      Studio Product Type
+                    </label>
+                    <select
+                      name="studioType"
+                      value={product.studioType || ''}
+                      onChange={handleChange}
+                      className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-white dark:bg-[#1a1613] px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none"
+                    >
+                      <option value="">Default / Standard Item</option>
+                      <option value="ACCESSORY">Handcrafted Accessory / Handkerchief</option>
+                      <option value="EMBROIDERY_KIT">Embroidery Kit (With Hoop Option)</option>
+                      <option value="FINISHED_HOOP">Finished Hoop Art</option>
+                      <option value="HOME_DECOR">Home Decor / Textile Piece</option>
+                      <option value="DIGITAL_PATTERN">Digital Pattern</option>
+                      <option value="DIY_KIT">DIY Craft Kit</option>
+                      <option value="FABRIC">Linen &amp; Fabric</option>
+                      <option value="WORKSHOP">Workshop</option>
+                      <option value="GIFT_CARD">Gift Card</option>
+                    </select>
                   </div>
 
                   <div>
@@ -882,6 +925,41 @@ export const ProductForm: React.FC = () => {
                       <option value="INTERMEDIATE">Intermediate</option>
                       <option value="ADVANCED">Advanced</option>
                     </select>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#c8b5aa]/30">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-3">
+                    Bespoke Customization Capabilities
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <label className="flex items-start gap-2.5 p-3 rounded border border-[#c8b5aa]/40 bg-surface-container/20 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="isCustomizable"
+                        checked={Boolean(product.isCustomizable)}
+                        onChange={handleChange}
+                        className="mt-0.5 rounded text-[#4e3c30]"
+                      />
+                      <div>
+                        <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Hoop Finish Selection</span>
+                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Allow customers to select Walnut or Bamboo hoop finish (+₹500 for Walnut)</span>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start gap-2.5 p-3 rounded border border-[#c8b5aa]/40 bg-surface-container/20 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="isPersonalizable"
+                        checked={Boolean(product.isPersonalizable)}
+                        onChange={handleChange}
+                        className="mt-0.5 rounded text-[#4e3c30]"
+                      />
+                      <div>
+                        <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Engraved Brass Plate</span>
+                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Allow customers to add a custom engraved brass plate / message (+₹500)</span>
+                      </div>
+                    </label>
                   </div>
                 </div>
 

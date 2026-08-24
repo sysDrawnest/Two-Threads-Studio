@@ -237,7 +237,9 @@ export const productRepository = {
       ...(dto.description !== undefined && { description: dto.description }),
       ...(dto.sku !== undefined && { sku: dto.sku }),
       ...(dto.categoryId !== undefined && { category: { connect: { id: dto.categoryId } } }),
-      ...(dto.collectionId !== undefined && { collection: { connect: { id: dto.collectionId } } }),
+      ...(dto.collectionId !== undefined && {
+        collection: dto.collectionId ? { connect: { id: dto.collectionId } } : { disconnect: true },
+      }),
       ...(dto.price !== undefined && { price: dto.price }),
       ...(dto.comparePrice !== undefined && { comparePrice: dto.comparePrice }),
       ...(dto.costPrice !== undefined && { costPrice: dto.costPrice }),

@@ -119,7 +119,15 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const finishPrice = hoopFinish === 'walnut' ? 500 : 0;
+  const isHoopProduct = Boolean(
+    product.hasHoop ||
+    product.studioType === 'FINISHED_HOOP' ||
+    (product.isCustomizable && product.studioType === 'EMBROIDERY_KIT') ||
+    (product.isCustomizable && /hoop/i.test(`${product.name} ${product.category || ''} ${(product.materialsIncluded || []).join(' ')}`)) ||
+    (/hoop/i.test(`${product.name}`) && !/handkerchief|fabric|cloth|apparel|accessory|tote|bag|pattern/i.test(`${product.name} ${product.category || ''}`))
+  );
+
+  const finishPrice = isHoopProduct && hoopFinish === 'walnut' ? 500 : 0;
   const engravingPrice = hasEngraving ? 500 : 0;
   const giftPrice = hasGiftWrap ? 300 : 0;
   const totalPrice = product.price + finishPrice + engravingPrice + giftPrice;
@@ -132,7 +140,7 @@ const ProductDetail: React.FC = () => {
         giftWrap: hasGiftWrap,
         engravingText: hasEngraving ? engravingText : null,
         customization: {
-          hoopFinish,
+          ...(isHoopProduct && hoopFinish ? { hoopFinish } : {}),
           engravingFont: hasEngraving ? engravingFont : undefined,
           giftMessage: hasGiftWrap ? giftMessage : undefined,
         },
@@ -151,7 +159,7 @@ const ProductDetail: React.FC = () => {
         giftWrap: hasGiftWrap,
         engravingText: hasEngraving ? engravingText : null,
         customization: {
-          hoopFinish,
+          ...(isHoopProduct && hoopFinish ? { hoopFinish } : {}),
           engravingFont: hasEngraving ? engravingFont : undefined,
           giftMessage: hasGiftWrap ? giftMessage : undefined,
         },
@@ -210,10 +218,12 @@ const ProductDetail: React.FC = () => {
 
           {/* Product Info - Mobile First */}
           <div className="flex flex-col order-2 lg:order-1">
-            {/* Collection Badge */}
-            <p className="font-sans text-xs tracking-[0.25em] text-[#A34A38] uppercase mb-1.5 md:mb-2 font-medium">
-              {product.collection} Collection
-            </p>
+            {/* Collection Badge - Only rendered when collection is assigned */}
+            {product.collection && (
+              <p className="font-sans text-xs tracking-[0.25em] text-[#A34A38] uppercase mb-1.5 md:mb-2 font-medium">
+                {product.collection} Collection
+              </p>
+            )}
 
             {/* Product Name */}
             <h1 className="font-serif text-3xl md:text-4xl xl:text-5xl font-light text-[#1C1C1B] mb-2 leading-tight">
@@ -247,35 +257,39 @@ const ProductDetail: React.FC = () => {
             {/* Customization Options Panel - Mobile Optimized */}
             <div className="bg-[#FAF9F7] p-4 md:p-5 lg:p-6 border border-neutral-200/60 rounded-sm mb-4 md:mb-6 flex flex-col gap-4 md:gap-5">
               <h3 className="font-serif text-lg md:text-xl text-[#1C1C1B] border-b border-neutral-200 pb-2">
-                Bespoke Customizations
+                {isHoopProduct ? 'Bespoke Customizations' : 'Bespoke Add-ons & Gifting'}
               </h3>
 
-              {/* Wood Finish Selector - Mobile Optimized */}
-              <div>
-                <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">
-                  Hoop Finish Selection
-                </label>
-                <div className="grid grid-cols-2 gap-2 md:gap-3">
-                  <button
-                    onClick={() => setHoopFinish('bamboo')}
-                    className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all ${hoopFinish === 'bamboo'
-                      ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
-                      : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                      }`}
-                  >
-                    Bamboo Hoop
-                  </button>
-                  <button
-                    onClick={() => setHoopFinish('walnut')}
-                    className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all ${hoopFinish === 'walnut'
-                      ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
-                      : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                      }`}
-                  >
-                    Walnut Hoop +₹500
-                  </button>
+              {/* Wood Finish Selector - Only for Hoop Products */}
+              {isHoopProduct && (
+                <div>
+                  <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">
+                    Hoop Finish Selection
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 md:gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setHoopFinish('bamboo')}
+                      className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'bamboo'
+                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
+                        : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                        }`}
+                    >
+                      Bamboo Hoop
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHoopFinish('walnut')}
+                      className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'walnut'
+                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
+                        : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                        }`}
+                    >
+                      Walnut Hoop +₹500
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Engraving - Mobile Optimized */}
               <div>
@@ -360,7 +374,7 @@ const ProductDetail: React.FC = () => {
                   <span>Base Price</span>
                   <span>₹{product.price.toLocaleString('en-IN')}</span>
                 </div>
-                {hoopFinish === 'walnut' && (
+                {isHoopProduct && hoopFinish === 'walnut' && (
                   <div className="flex justify-between">
                     <span>Walnut Hoop</span>
                     <span>+ ₹500</span>

@@ -10,9 +10,10 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
   const removeCartItemMutation = useRemoveCartItem();
 
   const [showCustomization, setShowCustomization] = useState(false);
-  const [hoopFinish, setHoopFinish] = useState<string>(
-    item.customization?.hoopFinish || 'bamboo'
+  const [hoopFinish, setHoopFinish] = useState<string | null>(
+    item.customization?.hoopFinish || null
   );
+  const hasHoop = Boolean(item.customization?.hoopFinish);
   const [giftWrap, setGiftWrap] = useState<boolean>(item.giftWrap);
   const [engravingText, setEngravingText] = useState<string>(item.engravingText || '');
 
@@ -20,7 +21,9 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
     try {
       await updateCartItemMutation.mutateAsync({
         id: item.id,
-        customization: { hoopFinish },
+        customization: {
+          ...(hoopFinish ? { hoopFinish } : {}),
+        },
         giftWrap,
         engravingText: engravingText.trim() || null,
       });
@@ -139,31 +142,33 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <h4 className="font-serif text-sm text-[#1C1C1B]">Customization</h4>
           
           {/* Hoop Finish selection */}
-          <div className="space-y-1.5">
-            <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-mono">Hoop Finish Selection</label>
-            <div className="grid grid-cols-2 gap-2">
-              <button 
-                onClick={() => setHoopFinish('bamboo')}
-                className={`py-1.5 px-3 border text-[10px] uppercase tracking-wider font-mono ${
-                  hoopFinish === 'bamboo' 
-                    ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
-                    : 'border-neutral-200 bg-white text-neutral-600'
-                }`}
-              >
-                Bamboo
-              </button>
-              <button 
-                onClick={() => setHoopFinish('walnut')}
-                className={`py-1.5 px-3 border text-[10px] uppercase tracking-wider font-mono ${
-                  hoopFinish === 'walnut' 
-                    ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
-                    : 'border-neutral-200 bg-white text-neutral-600'
-                }`}
-              >
-                Walnut (+ ₹500)
-              </button>
+          {hasHoop && (
+            <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-widest text-neutral-400 font-mono">Hoop Finish Selection</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button 
+                  onClick={() => setHoopFinish('bamboo')}
+                  className={`py-1.5 px-3 border text-[10px] uppercase tracking-wider font-mono ${
+                    hoopFinish === 'bamboo' 
+                      ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
+                      : 'border-neutral-200 bg-white text-neutral-600'
+                  }`}
+                >
+                  Bamboo
+                </button>
+                <button 
+                  onClick={() => setHoopFinish('walnut')}
+                  className={`py-1.5 px-3 border text-[10px] uppercase tracking-wider font-mono ${
+                    hoopFinish === 'walnut' 
+                      ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white' 
+                      : 'border-neutral-200 bg-white text-neutral-600'
+                  }`}
+                >
+                  Walnut (+ ₹500)
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <label className="flex items-center gap-2 text-neutral-600 cursor-pointer">
