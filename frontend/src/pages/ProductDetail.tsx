@@ -270,6 +270,17 @@ const ProductDetail: React.FC = () => {
               )}
             </div>
 
+            {/* Product Overview / Description */}
+            {product.description && (
+              <div className="font-sans text-sm text-[#5a4a3f] leading-relaxed mb-6 space-y-2.5">
+                {product.description.split(/\n\s*\n/).map((paragraph, idx) => (
+                  <p key={idx} className="leading-relaxed whitespace-pre-line">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            )}
+
             {/* Customization Options Panel - Mobile Optimized */}
             {hasAnyCustomization && (
               <div className="bg-[#FAF9F7] p-4 md:p-5 lg:p-6 border border-neutral-200/60 rounded-sm mb-4 md:mb-6 flex flex-col gap-4 md:gap-5">
@@ -443,16 +454,18 @@ const ProductDetail: React.FC = () => {
       </section>
 
       {/* Editorial Story Section - Mobile Optimized */}
-      <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-[#ede6de]">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="font-sans text-[10px] md:text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-4 md:mb-6">
-            The Story
-          </p>
-          <p className="font-serif text-xl md:text-2xl lg:text-3xl leading-relaxed text-primary-container italic font-light">
-            "{product.story}"
-          </p>
-        </div>
-      </section>
+      {product.story && (
+        <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-[#ede6de]">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="font-sans text-[10px] md:text-xs tracking-[0.3em] uppercase text-on-secondary-container mb-4 md:mb-6">
+              The Story
+            </p>
+            <p className="font-serif text-xl md:text-2xl lg:text-3xl leading-relaxed text-primary-container italic font-light">
+              "{product.story}"
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Materials & Details - Mobile Optimized */}
       <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-16 bg-inverse-on-surface">
