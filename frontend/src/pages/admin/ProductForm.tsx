@@ -108,6 +108,8 @@ export const ProductForm: React.FC = () => {
     allowCod: true,
     isFreeShipping: false,
     isFragile: false,
+    whatsIncluded: '',
+    materialsIncluded: [],
     materials: [],
     searchKeywords: [],
     seoTitle: '',
@@ -390,6 +392,10 @@ export const ProductForm: React.FC = () => {
         estimatedShippingDays: num(product.estimatedShippingDays),
         collectionId: product.collectionId?.trim() ? product.collectionId.trim() : (isEdit ? null : undefined),
         sku: product.sku?.trim() ? product.sku : undefined,
+        whatsIncluded: product.whatsIncluded?.trim() || undefined,
+        materialsIncluded: product.whatsIncluded?.trim()
+          ? product.whatsIncluded.split(/\r?\n/).map(s => s.trim().replace(/^[-•*]\s*/, '')).filter(Boolean)
+          : (Array.isArray(product.materialsIncluded) ? product.materialsIncluded : []),
         ogImageUrl: cleanUrl(galleryImages.find(g => g.isPrimary)?.url || galleryImages[0]?.url || product.ogImageUrl),
         canonicalUrl: cleanUrl(product.canonicalUrl),
         images: galleryImages.map((g, idx) => ({
@@ -576,11 +582,28 @@ export const ProductForm: React.FC = () => {
                     name="description"
                     value={product.description || ''}
                     onChange={handleChange}
-                    rows={6}
+                    rows={5}
                     placeholder="Detailed story, craftsmanship notes, materials, and care instructions..."
                     className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none focus:border-[#4e3c30]"
                     required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-1.5">
+                    What's Included in Package (One item per line)
+                  </label>
+                  <textarea
+                    name="whatsIncluded"
+                    value={product.whatsIncluded || ''}
+                    onChange={handleChange}
+                    rows={4}
+                    placeholder={`e.g.\n1x Hand-embroidered 100% fine cotton handkerchief\nArtisan authentication certificate\nSignature presentation pouch\nTextile care guide`}
+                    className="w-full rounded-md border border-[#c8b5aa] dark:border-[#3d332b] bg-transparent px-3.5 py-2 text-sm text-[#1f1610] dark:text-[#ffffff] outline-none focus:border-[#4e3c30]"
+                  />
+                  <p className="text-[11px] text-[#786455] dark:text-[#a8998c] mt-1">
+                    Each line will appear as an artisan bullet point under "What's Included" on the product detail page.
+                  </p>
                 </div>
               </div>
             </motion.div>

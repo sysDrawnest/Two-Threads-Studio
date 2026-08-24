@@ -86,6 +86,64 @@ export function mapApiProductToFrontend(apiProd: any): Product {
   // Category and Product Category mappings
   const categoryName = apiProd.category?.name || 'Kit';
   
+  // Resolve materials / what's included list
+  let materialsIncluded: string[] = [];
+  if (Array.isArray(apiProd.materialsIncluded) && apiProd.materialsIncluded.length > 0) {
+    materialsIncluded = apiProd.materialsIncluded.filter((m: any) => typeof m === 'string' && m.trim().length > 0);
+  } else if (typeof apiProd.whatsIncluded === 'string' && apiProd.whatsIncluded.trim()) {
+    materialsIncluded = apiProd.whatsIncluded
+      .split(/\r?\n|,/)
+      .map((s: string) => s.trim().replace(/^[-•*]\s*/, ''))
+      .filter((s: string) => s.length > 0);
+  } else if (Array.isArray(apiProd.materials) && apiProd.materials.length > 0) {
+    materialsIncluded = apiProd.materials.filter((m: any) => typeof m === 'string' && m.trim().length > 0);
+  }
+
+  // If empty, provide intelligent craft & packaging fallback based on product type/category
+  if (materialsIncluded.length === 0) {
+    const isHandkerchief = /handkerchief|hankie|scarf|linen/i.test(`${apiProd.name} ${categoryName}`);
+    const isPattern = /pattern|digital/i.test(`${apiProd.name} ${categoryName}`);
+    const isHoop = /hoop/i.test(`${apiProd.name} ${categoryName}`);
+    const isKit = /kit/i.test(`${apiProd.name} ${categoryName}`);
+
+    if (isHandkerchief) {
+      materialsIncluded = [
+        '1x Hand-embroidered 100% fine cotton handkerchief',
+        'Artisan authentication certificate & craft lineage card',
+        'Signature Two Threads protective presentation pouch',
+        'Handcraft textile care & gentle washing guide',
+      ];
+    } else if (isPattern) {
+      materialsIncluded = [
+        'Instant digital high-resolution printable PDF pattern',
+        'Comprehensive DMC embroidery thread color guide',
+        'Illustrated stitch dictionary & technique index',
+        'Beginner-friendly step-by-step assembly instructions',
+      ];
+    } else if (isHoop) {
+      materialsIncluded = [
+        '1x Finished artisan hand-embroidered textile artwork',
+        'Premium natural wooden display hoop (bamboo/walnut finish)',
+        'Felt-backed studio seal finish & hanging loop',
+        'Certificate of authenticity & preservation guide',
+      ];
+    } else if (isKit) {
+      materialsIncluded = [
+        'Pre-printed sustainable cotton fabric canvas',
+        'Full palette of premium DMC stranded cotton embroidery threads',
+        '2x High-grade Japanese embroidery needles & threader',
+        'Detailed full-color printed stitch guidebook',
+      ];
+    } else {
+      materialsIncluded = [
+        '1x Handcrafted artisan creation',
+        'Studio certificate of authenticity',
+        'Eco-friendly protective storage packaging',
+        'Care and handling instruction card',
+      ];
+    }
+  }
+
   return {
     id: apiProd.id,
     slug: apiProd.slug,
@@ -100,7 +158,7 @@ export function mapApiProductToFrontend(apiProd: any): Product {
     images,
     description: apiProd.description || '',
     story: apiProd.shortDescription || apiProd.description || '',
-    materialsIncluded: apiProd.materialsIncluded || [],
+    materialsIncluded,
     estimatedTime: apiProd.estimatedTime || 'Self-paced',
     reviews,
     rating,
@@ -110,7 +168,7 @@ export function mapApiProductToFrontend(apiProd: any): Product {
     isCustomizable: apiProd.isCustomizable || false,
     allowGiftWrap: apiProd.allowGiftWrap !== false,
     studioType: apiProd.studioType || undefined,
-    hasHoop: Boolean(apiProd.hasHoop || (apiProd.materialsIncluded && apiProd.materialsIncluded.some((m: string) => /hoop/i.test(m)))),
+    hasHoop: Boolean(apiProd.hasHoop || (materialsIncluded && materialsIncluded.some((m: string) => /hoop/i.test(m)))),
     isHandmade: apiProd.isHandmade ?? true,
     isSustainable: apiProd.isSustainable || false,
     hasCouponOffer: apiProd.hasCouponOffer || false,

@@ -461,25 +461,49 @@ const ProductDetail: React.FC = () => {
             <h3 className="font-serif text-2xl md:text-3xl font-light text-[#1C1C1B] mb-6 md:mb-8 border-b border-neutral-200 pb-3 md:pb-4">
               What's Included
             </h3>
-            <ul className="list-none p-0 flex flex-col gap-3 md:gap-4">
-              {product.materialsIncluded.map((mat, i) => (
-                <li key={i} className="flex gap-3 md:gap-4 items-start font-sans text-sm text-[#5a4a3f]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 mt-2 flex-shrink-0" />
-                  <span className="leading-relaxed">{mat}</span>
-                </li>
-              ))}
-            </ul>
+            {product.materialsIncluded && product.materialsIncluded.length > 0 ? (
+              <ul className="list-none p-0 flex flex-col gap-3 md:gap-4">
+                {product.materialsIncluded.map((mat, i) => (
+                  <li key={i} className="flex gap-3 md:gap-4 items-start font-sans text-sm text-[#5a4a3f]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#A34A38] mt-2 flex-shrink-0" />
+                    <span className="leading-relaxed">{mat}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="font-sans text-sm text-neutral-500 italic">
+                Studio-grade artisan craftsmanship and sustainable presentation packaging included.
+              </p>
+            )}
           </div>
           <div>
             <h3 className="font-serif text-2xl md:text-3xl font-light text-[#1C1C1B] mb-6 md:mb-8 border-b border-neutral-200 pb-3 md:pb-4">
-              Shipping & Returns
+              Shipping &amp; Returns
             </h3>
             <p className="font-sans text-sm text-[#5a4a3f] leading-loose mb-4">
-              All our materials are sustainably sourced and packaged without plastic. Orders are typically processed within 2-3 business days.
+              All our materials are sustainably sourced and packaged without plastic. Orders are typically dispatched from our studio within 2–3 business days.
             </p>
-            <p className="font-sans text-sm text-[#5a4a3f] leading-loose">
-              We accept returns on unopened kits within 30 days of receipt. Digital patterns are non-refundable.
+            <p className="font-sans text-sm text-[#5a4a3f] leading-loose mb-6">
+              We accept returns on unopened craft kits and physical merchandise within 30 days of delivery. Personalized and custom items are final sale.
             </p>
+            
+            <div className="pt-4 border-t border-neutral-200/80 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+              <Link
+                to="/legal?tab=shipping"
+                className="inline-flex items-center gap-1.5 font-sans text-xs uppercase tracking-wider text-[#A34A38] hover:text-[#83382a] font-semibold underline underline-offset-4 transition-colors"
+              >
+                <span>Full Shipping Policy</span>
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+              <span className="hidden sm:inline text-neutral-300">•</span>
+              <Link
+                to="/legal?tab=returns"
+                className="inline-flex items-center gap-1.5 font-sans text-xs uppercase tracking-wider text-[#A34A38] hover:text-[#83382a] font-semibold underline underline-offset-4 transition-colors"
+              >
+                <span>Full Returns &amp; Exchange Policy</span>
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
