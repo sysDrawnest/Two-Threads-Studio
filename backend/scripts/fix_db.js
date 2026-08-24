@@ -29,6 +29,17 @@ async function main() {
     }
 
     console.log('\nAll studio_settings columns verified!');
+
+    console.log('\nChecking products table columns...');
+    const prodCols = await prisma.$queryRawUnsafe("SELECT column_name FROM information_schema.columns WHERE table_name = 'products';");
+    const prodColNames = prodCols.map(c => c.column_name);
+    if (!prodColNames.includes('allowGiftWrap')) {
+      console.log('Adding missing column "allowGiftWrap" to products table...');
+      await prisma.$executeRawUnsafe('ALTER TABLE products ADD COLUMN IF NOT EXISTS "allowGiftWrap" BOOLEAN NOT NULL DEFAULT true;');
+      console.log('✅ Column "allowGiftWrap" added successfully to products table!');
+    } else {
+      console.log('Column "allowGiftWrap" already exists on products table.');
+    }
   } catch (err) {
     console.error('Error checking/updating database:', err);
   } finally {

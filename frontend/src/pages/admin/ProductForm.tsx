@@ -87,6 +87,7 @@ export const ProductForm: React.FC = () => {
     studioType: undefined,
     isCustomizable: false,
     isPersonalizable: false,
+    allowGiftWrap: true,
     price: undefined,
     comparePrice: undefined,
     costPrice: undefined,
@@ -377,6 +378,7 @@ export const ProductForm: React.FC = () => {
         studioType,
         isCustomizable: Boolean(product.isCustomizable),
         isPersonalizable: Boolean(product.isPersonalizable),
+        allowGiftWrap: product.allowGiftWrap !== false,
         price: num(product.price),
         comparePrice: num(product.comparePrice),
         costPrice: num(product.costPrice),
@@ -932,7 +934,7 @@ export const ProductForm: React.FC = () => {
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4e3c30] dark:text-[#ccb08a] mb-3">
                     Bespoke Customization Capabilities
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     <label className="flex items-start gap-2.5 p-3 rounded border border-[#c8b5aa]/40 bg-surface-container/20 cursor-pointer">
                       <input
                         type="checkbox"
@@ -942,8 +944,8 @@ export const ProductForm: React.FC = () => {
                         className="mt-0.5 rounded text-[#4e3c30]"
                       />
                       <div>
-                        <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Hoop Finish Selection</span>
-                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Allow customers to select Walnut or Bamboo hoop finish (+₹500 for Walnut)</span>
+                        <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Hoop Selection</span>
+                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Walnut / Bamboo (+₹500 for Walnut)</span>
                       </div>
                     </label>
 
@@ -957,7 +959,21 @@ export const ProductForm: React.FC = () => {
                       />
                       <div>
                         <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Engraved Brass Plate</span>
-                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Allow customers to add a custom engraved brass plate / message (+₹500)</span>
+                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Custom engraved plaque (+₹500)</span>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start gap-2.5 p-3 rounded border border-[#c8b5aa]/40 bg-surface-container/20 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="allowGiftWrap"
+                        checked={Boolean(product.allowGiftWrap ?? true)}
+                        onChange={handleChange}
+                        className="mt-0.5 rounded text-[#4e3c30]"
+                      />
+                      <div>
+                        <span className="text-xs font-semibold text-[#1f1610] dark:text-white block">Luxury Gift Packaging</span>
+                        <span className="text-[11px] text-[#786455] dark:text-[#a8998c]">Luxury gift wrap &amp; note (+₹300)</span>
                       </div>
                     </label>
                   </div>

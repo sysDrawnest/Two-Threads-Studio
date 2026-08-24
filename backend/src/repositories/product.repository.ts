@@ -193,7 +193,7 @@ export const productRepository = {
         whatsIncluded: dto.whatsIncluded, barcode: dto.barcode, searchKeywords: dto.searchKeywords ?? [],
         
         isHandmade: dto.isHandmade ?? true, isSustainable: dto.isSustainable ?? false,
-        isCustomizable: dto.isCustomizable ?? false, isPersonalizable: dto.isPersonalizable ?? false, madeToOrder: dto.madeToOrder ?? false,
+        isCustomizable: dto.isCustomizable ?? false, isPersonalizable: dto.isPersonalizable ?? false, allowGiftWrap: dto.allowGiftWrap ?? true, madeToOrder: dto.madeToOrder ?? false,
         estimatedProductionDays: dto.estimatedProductionDays, estimatedShippingDays: dto.estimatedShippingDays, estimatedTime: dto.estimatedTime,
         
         materials: dto.materials ?? [], materialsIncluded: dto.materialsIncluded ?? [],
@@ -274,6 +274,7 @@ export const productRepository = {
       ...(dto.isSustainable !== undefined && { isSustainable: dto.isSustainable }),
       ...(dto.isCustomizable !== undefined && { isCustomizable: dto.isCustomizable }),
       ...(dto.isPersonalizable !== undefined && { isPersonalizable: dto.isPersonalizable }),
+      ...(dto.allowGiftWrap !== undefined && { allowGiftWrap: dto.allowGiftWrap }),
       ...(dto.madeToOrder !== undefined && { madeToOrder: dto.madeToOrder }),
       ...(dto.estimatedProductionDays !== undefined && { estimatedProductionDays: dto.estimatedProductionDays }),
       ...(dto.estimatedShippingDays !== undefined && { estimatedShippingDays: dto.estimatedShippingDays }),

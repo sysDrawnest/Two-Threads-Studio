@@ -456,6 +456,7 @@ model Product {
   isSustainable           Boolean @default(false)
   isCustomizable          Boolean @default(false)
   isPersonalizable        Boolean @default(false)
+  allowGiftWrap           Boolean @default(true)
   madeToOrder             Boolean @default(false)
   estimatedProductionDays Int?
   estimatedShippingDays   Int?

@@ -114,6 +114,7 @@ const productBaseSchema = z.object({
   isSustainable:            z.boolean().default(false),
   isCustomizable:           z.boolean().default(false),
   isPersonalizable:         z.boolean().default(false),
+  allowGiftWrap:            z.boolean().default(true),
   madeToOrder:              z.boolean().default(false),
   estimatedProductionDays:  z.coerce.number().int().positive().optional(),
   estimatedShippingDays:    z.coerce.number().int().positive().optional(),

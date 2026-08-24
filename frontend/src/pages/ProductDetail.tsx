@@ -127,9 +127,13 @@ const ProductDetail: React.FC = () => {
     (/hoop/i.test(`${product.name}`) && !/handkerchief|fabric|cloth|apparel|accessory|tote|bag|pattern/i.test(`${product.name} ${product.category || ''}`))
   );
 
+  const allowGiftWrap = product.allowGiftWrap !== false;
+  const hasPersonalization = Boolean(product.isPersonalizable ?? true);
+  const hasAnyCustomization = isHoopProduct || hasPersonalization || allowGiftWrap;
+
   const finishPrice = isHoopProduct && hoopFinish === 'walnut' ? 500 : 0;
-  const engravingPrice = hasEngraving ? 500 : 0;
-  const giftPrice = hasGiftWrap ? 300 : 0;
+  const engravingPrice = hasPersonalization && hasEngraving ? 500 : 0;
+  const giftPrice = allowGiftWrap && hasGiftWrap ? 300 : 0;
   const totalPrice = product.price + finishPrice + engravingPrice + giftPrice;
 
   const handleAddToBag = async () => {
@@ -137,12 +141,12 @@ const ProductDetail: React.FC = () => {
       await addToCartMutation.mutateAsync({
         productId: product.id,
         quantity: 1,
-        giftWrap: hasGiftWrap,
-        engravingText: hasEngraving ? engravingText : null,
+        giftWrap: allowGiftWrap ? hasGiftWrap : false,
+        engravingText: hasPersonalization && hasEngraving ? engravingText : null,
         customization: {
           ...(isHoopProduct && hoopFinish ? { hoopFinish } : {}),
-          engravingFont: hasEngraving ? engravingFont : undefined,
-          giftMessage: hasGiftWrap ? giftMessage : undefined,
+          engravingFont: (hasPersonalization && hasEngraving) ? engravingFont : undefined,
+          giftMessage: (allowGiftWrap && hasGiftWrap) ? giftMessage : undefined,
         },
       });
       setCartOpen(true);
@@ -156,12 +160,12 @@ const ProductDetail: React.FC = () => {
       await addToCartMutation.mutateAsync({
         productId: product.id,
         quantity: 1,
-        giftWrap: hasGiftWrap,
-        engravingText: hasEngraving ? engravingText : null,
+        giftWrap: allowGiftWrap ? hasGiftWrap : false,
+        engravingText: hasPersonalization && hasEngraving ? engravingText : null,
         customization: {
           ...(isHoopProduct && hoopFinish ? { hoopFinish } : {}),
-          engravingFont: hasEngraving ? engravingFont : undefined,
-          giftMessage: hasGiftWrap ? giftMessage : undefined,
+          engravingFont: (hasPersonalization && hasEngraving) ? engravingFont : undefined,
+          giftMessage: (allowGiftWrap && hasGiftWrap) ? giftMessage : undefined,
         },
       });
       navigate('/checkout');
@@ -230,10 +234,22 @@ const ProductDetail: React.FC = () => {
               {product.name}
             </h1>
 
-            {/* Price - Mobile Optimized */}
-            <p className="font-sans text-2xl md:text-3xl font-semibold text-[#1C1C1B] mb-4 md:mb-6">
-              ₹{product.price.toLocaleString('en-IN')}
-            </p>
+            {/* Price - Mobile Optimized with Compare Price / MRP Display */}
+            <div className="flex items-baseline gap-3 mb-4 md:mb-6">
+              <p className="font-sans text-2xl md:text-3xl font-semibold text-[#1C1C1B]">
+                ₹{product.price.toLocaleString('en-IN')}
+              </p>
+              {product.mrp && product.mrp > product.price && (
+                <>
+                  <span className="font-sans text-base md:text-lg text-neutral-400 line-through font-normal">
+                    ₹{product.mrp.toLocaleString('en-IN')}
+                  </span>
+                  <span className="font-sans text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#A34A38]/10 text-[#A34A38] uppercase tracking-wider">
+                    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+                  </span>
+                </>
+              )}
+            </div>
 
             {/* Product Meta Info - Mobile Friendly Grid */}
             <div className="flex flex-col gap-3 border-y border-neutral-200 py-4 md:py-6 mb-4 md:mb-6">
@@ -255,149 +271,155 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Customization Options Panel - Mobile Optimized */}
-            <div className="bg-[#FAF9F7] p-4 md:p-5 lg:p-6 border border-neutral-200/60 rounded-sm mb-4 md:mb-6 flex flex-col gap-4 md:gap-5">
-              <h3 className="font-serif text-lg md:text-xl text-[#1C1C1B] border-b border-neutral-200 pb-2">
-                {isHoopProduct ? 'Bespoke Customizations' : 'Bespoke Add-ons & Gifting'}
-              </h3>
+            {hasAnyCustomization && (
+              <div className="bg-[#FAF9F7] p-4 md:p-5 lg:p-6 border border-neutral-200/60 rounded-sm mb-4 md:mb-6 flex flex-col gap-4 md:gap-5">
+                <h3 className="font-serif text-lg md:text-xl text-[#1C1C1B] border-b border-neutral-200 pb-2">
+                  {isHoopProduct ? 'Bespoke Customizations' : allowGiftWrap ? 'Bespoke Add-ons & Gifting' : 'Bespoke Personalization'}
+                </h3>
 
-              {/* Wood Finish Selector - Only for Hoop Products */}
-              {isHoopProduct && (
-                <div>
-                  <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">
-                    Hoop Finish Selection
-                  </label>
-                  <div className="grid grid-cols-2 gap-2 md:gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setHoopFinish('bamboo')}
-                      className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'bamboo'
-                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
-                        : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                        }`}
-                    >
-                      Bamboo Hoop
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setHoopFinish('walnut')}
-                      className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'walnut'
-                        ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
-                        : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
-                        }`}
-                    >
-                      Walnut Hoop +₹500
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Engraving - Mobile Optimized */}
-              <div>
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={hasEngraving}
-                    onChange={(e) => setHasEngraving(e.target.checked)}
-                    className="mt-1 rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38] focus:ring-1"
-                  />
-                  <span className="font-sans text-xs uppercase tracking-wider text-neutral-600 font-medium leading-tight">
-                    Add Engraved Brass Plate <span className="block text-[10px] text-neutral-400 font-normal">+ ₹500</span>
-                  </span>
-                </label>
-
-                {hasEngraving && (
-                  <div className="mt-3 p-3 md:p-4 bg-white border border-neutral-200/50 rounded-sm flex flex-col gap-3">
-                    <div>
-                      <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
-                        Engraving text (max 25 chars)
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={25}
-                        value={engravingText}
-                        onChange={(e) => setEngravingText(e.target.value)}
-                        placeholder="e.g. J.H. 2026"
-                        className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
-                        Typography Font
-                      </label>
-                      <select
-                        value={engravingFont}
-                        onChange={(e) => setEngravingFont(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm bg-white"
-                      >
-                        <option value="serif">Elegant Serif</option>
-                        <option value="sans">Modern Minimalist</option>
-                        <option value="script">Artisanal Script</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Gift Packaging - Mobile Optimized */}
-              <div>
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={hasGiftWrap}
-                    onChange={(e) => setHasGiftWrap(e.target.checked)}
-                    className="mt-1 rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38] focus:ring-1"
-                  />
-                  <span className="font-sans text-xs uppercase tracking-wider text-neutral-600 font-medium leading-tight">
-                    Luxury Gift Packaging <span className="block text-[10px] text-neutral-400 font-normal">+ ₹300</span>
-                  </span>
-                </label>
-
-                {hasGiftWrap && (
-                  <div className="mt-3 p-3 md:p-4 bg-white border border-neutral-200/50 rounded-sm">
-                    <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
-                      Gift Message
+                {/* Wood Finish Selector - Only for Hoop Products */}
+                {isHoopProduct && (
+                  <div>
+                    <label className="block font-sans text-xs uppercase tracking-wider text-neutral-500 mb-2">
+                      Hoop Finish Selection
                     </label>
-                    <textarea
-                      value={giftMessage}
-                      onChange={(e) => setGiftMessage(e.target.value)}
-                      placeholder="Write your note..."
-                      className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm"
-                      rows={2}
-                    />
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setHoopFinish('bamboo')}
+                        className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'bamboo'
+                          ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
+                          : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                          }`}
+                      >
+                        Bamboo Hoop
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHoopFinish('walnut')}
+                        className={`py-2.5 px-3 md:px-4 font-sans text-xs tracking-wider uppercase border transition-all cursor-pointer ${hoopFinish === 'walnut'
+                          ? 'border-[#1C1C1B] bg-[#1C1C1B] text-white'
+                          : 'border-neutral-200 text-neutral-600 bg-white hover:border-neutral-400'
+                          }`}
+                      >
+                        Walnut Hoop +₹500
+                      </button>
+                    </div>
                   </div>
                 )}
-              </div>
 
-              {/* Price Summary - Mobile Optimized */}
-              <div className="border-t border-neutral-200 pt-3 flex flex-col gap-1.5 text-xs text-neutral-600">
-                <div className="flex justify-between">
-                  <span>Base Price</span>
-                  <span>₹{product.price.toLocaleString('en-IN')}</span>
-                </div>
-                {isHoopProduct && hoopFinish === 'walnut' && (
-                  <div className="flex justify-between">
-                    <span>Walnut Hoop</span>
-                    <span>+ ₹500</span>
+                {/* Engraving - Mobile Optimized */}
+                {hasPersonalization && (
+                  <div>
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={hasEngraving}
+                        onChange={(e) => setHasEngraving(e.target.checked)}
+                        className="mt-1 rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38] focus:ring-1"
+                      />
+                      <span className="font-sans text-xs uppercase tracking-wider text-neutral-600 font-medium leading-tight">
+                        Add Engraved Brass Plate <span className="block text-[10px] text-neutral-400 font-normal">+ ₹500</span>
+                      </span>
+                    </label>
+
+                    {hasEngraving && (
+                      <div className="mt-3 p-3 md:p-4 bg-white border border-neutral-200/50 rounded-sm flex flex-col gap-3">
+                        <div>
+                          <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
+                            Engraving text (max 25 chars)
+                          </label>
+                          <input
+                            type="text"
+                            maxLength={25}
+                            value={engravingText}
+                            onChange={(e) => setEngravingText(e.target.value)}
+                            placeholder="e.g. J.H. 2026"
+                            className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
+                            Typography Font
+                          </label>
+                          <select
+                            value={engravingFont}
+                            onChange={(e) => setEngravingFont(e.target.value as any)}
+                            className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm bg-white"
+                          >
+                            <option value="serif">Elegant Serif</option>
+                            <option value="sans">Modern Minimalist</option>
+                            <option value="script">Artisanal Script</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
-                {hasEngraving && (
-                  <div className="flex justify-between">
-                    <span>Engraved Plate</span>
-                    <span>+ ₹500</span>
+
+                {/* Gift Packaging - Mobile Optimized (Only shown when allowGiftWrap is true) */}
+                {allowGiftWrap && (
+                  <div>
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={hasGiftWrap}
+                        onChange={(e) => setHasGiftWrap(e.target.checked)}
+                        className="mt-1 rounded border-neutral-300 text-[#A34A38] focus:ring-[#A34A38] focus:ring-1"
+                      />
+                      <span className="font-sans text-xs uppercase tracking-wider text-neutral-600 font-medium leading-tight">
+                        Luxury Gift Packaging <span className="block text-[10px] text-neutral-400 font-normal">+ ₹300</span>
+                      </span>
+                    </label>
+
+                    {hasGiftWrap && (
+                      <div className="mt-3 p-3 md:p-4 bg-white border border-neutral-200/50 rounded-sm">
+                        <label className="block font-sans text-[10px] tracking-wider uppercase text-neutral-400 mb-1">
+                          Gift Message
+                        </label>
+                        <textarea
+                          value={giftMessage}
+                          onChange={(e) => setGiftMessage(e.target.value)}
+                          placeholder="Write your note..."
+                          className="w-full px-3 py-2 border border-neutral-200 text-sm font-sans focus:outline-none focus:border-[#A34A38] rounded-sm"
+                          rows={2}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
-                {hasGiftWrap && (
+
+                {/* Price Summary - Mobile Optimized */}
+                <div className="border-t border-neutral-200 pt-3 flex flex-col gap-1.5 text-xs text-neutral-600">
                   <div className="flex justify-between">
-                    <span>Gift Packaging</span>
-                    <span>+ ₹300</span>
+                    <span>Base Price</span>
+                    <span>₹{product.price.toLocaleString('en-IN')}</span>
                   </div>
-                )}
-                <div className="flex justify-between border-t border-neutral-200 pt-2 font-semibold text-sm text-[#1C1C1B]">
-                  <span>Total</span>
-                  <span>₹{totalPrice.toLocaleString('en-IN')}</span>
+                  {isHoopProduct && hoopFinish === 'walnut' && (
+                    <div className="flex justify-between">
+                      <span>Walnut Hoop</span>
+                      <span>+ ₹500</span>
+                    </div>
+                  )}
+                  {hasPersonalization && hasEngraving && (
+                    <div className="flex justify-between">
+                      <span>Engraved Plate</span>
+                      <span>+ ₹500</span>
+                    </div>
+                  )}
+                  {allowGiftWrap && hasGiftWrap && (
+                    <div className="flex justify-between">
+                      <span>Gift Packaging</span>
+                      <span>+ ₹300</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-neutral-200 pt-2 font-semibold text-sm text-[#1C1C1B]">
+                    <span>Total</span>
+                    <span>₹{totalPrice.toLocaleString('en-IN')}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Add to Cart & Buy Now Dual Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">

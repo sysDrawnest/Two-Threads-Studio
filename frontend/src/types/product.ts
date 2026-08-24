@@ -146,6 +146,7 @@ export interface Product {
   isSustainable: boolean;
   isCustomizable: boolean;
   isPersonalizable: boolean;
+  allowGiftWrap?: boolean;
   madeToOrder: boolean;
   estimatedProductionDays?: number | null;
   estimatedShippingDays?: number | null;

@@ -108,6 +108,7 @@ export function mapApiProductToFrontend(apiProd: any): Product {
     stock,
     isPersonalizable: apiProd.isPersonalizable || false,
     isCustomizable: apiProd.isCustomizable || false,
+    allowGiftWrap: apiProd.allowGiftWrap !== false,
     studioType: apiProd.studioType || undefined,
     hasHoop: Boolean(apiProd.hasHoop || (apiProd.materialsIncluded && apiProd.materialsIncluded.some((m: string) => /hoop/i.test(m)))),
     isHandmade: apiProd.isHandmade ?? true,

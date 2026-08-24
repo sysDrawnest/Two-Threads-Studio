@@ -32,6 +32,7 @@ export interface Product {
   stock?: "In Stock" | "Low Stock" | "Out of Stock";
   isPersonalizable?: boolean;
   isCustomizable?: boolean;
+  allowGiftWrap?: boolean;
   studioType?: string;
   hasHoop?: boolean;
   isHandmade?: boolean;
