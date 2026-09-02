@@ -13,7 +13,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import heroPhotoImg from '../../assets/hero_crafting_heirlooms_photo.jpg';
-import heroLinenTexture from '../../assets/hero_linen_texture.jpg';
 
 export default function HeroTemplate4() {
   return (
@@ -21,19 +20,8 @@ export default function HeroTemplate4() {
       {/* ─── DESKTOP VIEW (Pixel-Perfect Dual Panel: Text Left + Photo Right) ─── */}
       <div className="hidden lg:flex w-full min-h-[calc(100vh-70px)] max-h-[840px] items-stretch relative overflow-hidden">
         
-        {/* Left Column: Linen Texture, Typography & CTA Button */}
-        <div
-          className="w-[38%] xl:w-[36.8%] flex flex-col justify-center px-8 sm:px-12 lg:px-12 xl:px-16 2xl:px-20 py-12 lg:py-16 z-10 relative border-r border-[#E8E2D8]/60"
-          style={{
-            backgroundColor: '#FAF7F2',
-            backgroundImage: `url(${heroLinenTexture})`,
-            backgroundRepeat: 'repeat',
-            backgroundSize: '180px 200px',
-          }}
-        >
-          {/* Subtle semi-transparent wash to match exact luminosity */}
-          <div className="absolute inset-0 bg-[#FAF7F2]/40 pointer-events-none" />
-
+        {/* Left Column: Pure Clean Solid Linen (#FAF7F2), Typography & CTA Button */}
+        <div className="w-[38%] xl:w-[36.8%] flex flex-col justify-center px-8 sm:px-12 lg:px-12 xl:px-16 2xl:px-20 py-12 lg:py-16 z-10 relative bg-[#FAF7F2] border-r border-[#E8E2D8]/70">
           <div className="relative z-10 max-w-[420px]">
             {/* Main Headline */}
             <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.08] text-3xl sm:text-4xl md:text-5xl lg:text-[42px] xl:text-[50px] 2xl:text-[54px]">
@@ -85,17 +73,7 @@ export default function HeroTemplate4() {
         </div>
 
         {/* Bottom: Typography & CTA Button */}
-        <div
-          className="relative px-6 py-10 sm:px-10 sm:py-12 flex flex-col justify-center border-t border-[#E8E2D8]/60"
-          style={{
-            backgroundColor: '#FAF7F2',
-            backgroundImage: `url(${heroLinenTexture})`,
-            backgroundRepeat: 'repeat',
-            backgroundSize: '180px 200px',
-          }}
-        >
-          <div className="absolute inset-0 bg-[#FAF7F2]/40 pointer-events-none" />
-
+        <div className="relative px-6 py-10 sm:px-10 sm:py-12 flex flex-col justify-center bg-[#FAF7F2] border-t border-[#E8E2D8]/70">
           <div className="relative z-10 max-w-md">
             {/* Main Headline */}
             <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.1] text-3xl sm:text-4xl">
