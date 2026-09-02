@@ -8,7 +8,7 @@ const trustItems = [
   { icon: <Leaf size={14} />, label: 'Sustainable Materials' },
   { icon: <Gift size={14} />, label: 'Gift Ready' },
   { icon: <ShieldCheck size={14} />, label: 'Secure Checkout' },
-  { icon: <Star size={14} className="fill-[#c4973a] text-[#c4973a]" />, label: '4.8+ Customer Rating' },
+  { icon: <Star size={14} className="fill-[#c4973a] text-[#c4973a]" />, label: '4.9★ Customer Rating' },
 ];
 
 // Duplicate for seamless loop

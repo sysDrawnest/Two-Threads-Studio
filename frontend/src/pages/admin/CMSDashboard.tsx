@@ -28,7 +28,6 @@ import {
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import heroLippanImg from '../../assets/hero_lippan_ref.webp';
 import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
-import heroCraftImg from '../../assets/hero_heirloom_craft.webp';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -121,21 +120,20 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 4,
-    name: 'Crafting Mindful Heirlooms',
-    description: 'Quiet luxury split editorial — warm textured linen, bold serif typography & artisan craft flatlay.',
+    name: 'Soul of Handmade',
+    description: 'Contemporary quiet luxury editorial — torn paper artwork layer, serif typography & double-ring pill CTA.',
     icon: Layout,
-    tag: 'Mindful Heirlooms',
-    tagColor: 'bg-[#B35C41]/15 text-[#B35C41]',
+    tag: 'Editorial Refined',
+    tagColor: 'bg-[#8C5A3E]/15 text-[#8C5A3E]',
     preview: (
-      <div className="w-full h-full bg-[#F2EFEA] relative overflow-hidden rounded-sm flex items-center justify-between p-2 text-[#422E23]">
-        <div className="space-y-0.5 max-w-[50%]">
-          <span className="block text-[6px] font-serif uppercase tracking-tight font-bold">CRAFTING</span>
-          <span className="block text-[6px] font-serif uppercase tracking-tight font-bold">MINDFUL</span>
-          <span className="block text-[6px] font-serif uppercase tracking-tight font-bold text-[#B35C41]">HEIRLOOMS</span>
+      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex items-center justify-between p-2 text-[#2D2520]">
+        <div className="space-y-0.5 max-w-[55%]">
+          <span className="block text-[6px] font-serif uppercase tracking-tight">UNVEILING <span className="italic lowercase">the</span></span>
+          <span className="block text-[6px] font-serif uppercase font-bold text-[#8C5A3E]">SOUL <span className="italic font-normal text-[#2D2520] lowercase">of</span> HANDMADE</span>
         </div>
-        <div className="w-14 h-11 bg-[#EDE6DE] border border-[#2D2520]/10 rounded-sm overflow-hidden flex-shrink-0">
+        <div className="w-12 h-10 bg-[#EDE6DE] border border-[#2D2520]/10 rounded-sm overflow-hidden flex-shrink-0">
           <img
-            src={heroCraftImg}
+            src={heroLippanImg}
             alt=""
             className="w-full h-full object-cover"
           />

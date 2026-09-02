@@ -1,79 +1,125 @@
 /**
  * HeroTemplate4 — "Crafting Mindful Heirlooms"
  *
- * Pixel-perfect implementation of the user's approved quiet luxury artisan hero design:
- * - Layout: Split-screen desktop (Warm linen textured left column + Artisan flatlay right column)
- * - Typography: Bold serif uppercase headline ("CRAFTING MINDFUL HEIRLOOMS") & delicate italic subtitle
- * - Palette: Warm Linen (#F2EFEA), Espresso Charcoal (#422E23), Terracotta Clay (#B35C41 / #865C4C)
- * - CTA: Sleek rectangular terracotta button ("EXPLORE THE STUDIO")
- * - Imagery: High-resolution artisan flatlay featuring botanical embroidery, macramé, DIY kit box, and textiles
+ * Exact replication of the user-provided reference design:
+ * - Left Panel (approx 37% width):
+ *   - Background: Soft natural cream linen texture (#F7F5F0 / #FAF7F2)
+ *   - Main Headline: "CRAFTING MINDFUL HEIRLOOMS" in elegant high-contrast serif (Cormorant Garamond), deep bronze espresso (#473429)
+ *   - Subtitle: "Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits." in Cormorant Garamond italic, terracotta earth tone (#A15742)
+ *   - CTA Button: Crisp rectangular "EXPLORE THE STUDIO" in rich terracotta (#AD5B43) with white uppercase typography
+ * - Right Panel (approx 63% width):
+ *   - High-resolution photograph of the botanical wildflower embroidery hoop, macramé tassel, embroidered linen handkerchief, open kraft craft kit box with wooden hoops, brass pouch, thread skeins, scissors, and terracotta tiles bathed in warm sunlight.
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import heroCraftImg from '../../assets/hero_heirloom_craft_2x.webp';
-import heroCraftFallback from '../../assets/hero_heirloom_craft.webp';
-import linenTexture from '../../assets/linen_seamless.webp';
+import heroPhotoImg from '../../assets/hero_crafting_heirlooms_photo.jpg';
+import heroLinenTexture from '../../assets/hero_linen_texture.jpg';
 
 export default function HeroTemplate4() {
   return (
-    <section className="relative w-full bg-[#F2EFEA] overflow-hidden">
-      <div className="w-full flex flex-col lg:flex-row items-stretch min-h-[500px] lg:min-h-[560px] xl:min-h-[600px] 2xl:min-h-[640px]">
+    <section className="relative w-full bg-[#FAF7F2] text-[#473429] flex flex-col justify-center overflow-hidden">
+      {/* ─── DESKTOP VIEW (Pixel-Perfect Dual Panel: Text Left + Photo Right) ─── */}
+      <div className="hidden lg:flex w-full min-h-[calc(100vh-70px)] max-h-[840px] items-stretch relative overflow-hidden">
         
-        {/* ─── LEFT COLUMN: TYPOGRAPHY & CTA (Warm Textured Linen) ─── */}
+        {/* Left Column: Linen Texture, Typography & CTA Button */}
         <div
-          className="w-full lg:w-[38%] xl:w-[36%] flex flex-col justify-center px-6 sm:px-12 md:px-14 lg:px-10 xl:px-16 py-12 sm:py-16 lg:py-16 relative z-10 bg-[#F2EFEA]"
+          className="w-[38%] xl:w-[36.8%] flex flex-col justify-center px-8 sm:px-12 lg:px-12 xl:px-16 2xl:px-20 py-12 lg:py-16 z-10 relative border-r border-[#E8E2D8]/60"
           style={{
-            backgroundImage: `url(${linenTexture})`,
+            backgroundColor: '#FAF7F2',
+            backgroundImage: `url(${heroLinenTexture})`,
             backgroundRepeat: 'repeat',
+            backgroundSize: '180px 200px',
           }}
         >
-          <div className="max-w-md mx-auto lg:mx-0 w-full flex flex-col items-start">
-            
+          {/* Subtle semi-transparent wash to match exact luminosity */}
+          <div className="absolute inset-0 bg-[#FAF7F2]/40 pointer-events-none" />
+
+          <div className="relative z-10 max-w-[420px]">
             {/* Main Headline */}
-            <h1 className="font-serif text-[#422E23] tracking-[0.035em] uppercase leading-[1.08] select-none text-left">
-              <span className="block text-4xl sm:text-5xl lg:text-[44px] xl:text-[54px] 2xl:text-[60px] font-normal">
-                CRAFTING
-              </span>
-              <span className="block text-4xl sm:text-5xl lg:text-[44px] xl:text-[54px] 2xl:text-[60px] font-normal mt-0.5 sm:mt-1">
-                MINDFUL
-              </span>
-              <span className="block text-4xl sm:text-5xl lg:text-[44px] xl:text-[54px] 2xl:text-[60px] font-normal mt-0.5 sm:mt-1">
-                HEIRLOOMS
-              </span>
+            <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.08] text-3xl sm:text-4xl md:text-5xl lg:text-[42px] xl:text-[50px] 2xl:text-[54px]">
+              <span className="block">CRAFTING</span>
+              <span className="block">MINDFUL</span>
+              <span className="block">HEIRLOOMS</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="font-serif italic text-base sm:text-lg lg:text-[18px] xl:text-[20px] 2xl:text-[21px] text-[#865C4C] leading-[1.38] font-normal mt-5 sm:mt-6 lg:mt-7 max-w-sm text-left">
+            <p className="font-serif italic text-[#A15742] text-base sm:text-lg lg:text-[18px] xl:text-[21px] leading-snug mt-4 lg:mt-6 font-normal">
               Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits.
             </p>
 
-            {/* CTA Button */}
-            <div className="mt-7 sm:mt-8 lg:mt-9">
+            {/* Crisp Rectangular CTA Button */}
+            <div className="mt-7 lg:mt-8">
               <Link
                 to="/shop"
-                className="inline-flex items-center justify-center bg-[#B35C41] hover:bg-[#9B4A31] active:bg-[#863D27] text-white px-7 sm:px-8 py-3.5 rounded-[1px] font-sans text-xs tracking-[0.16em] uppercase font-medium shadow-xs hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+                className="inline-block bg-[#AD5B43] hover:bg-[#964a34] active:bg-[#823e2b] text-white font-sans text-xs tracking-[0.16em] uppercase px-7 py-3.5 font-semibold transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer text-center"
               >
                 EXPLORE THE STUDIO
               </Link>
             </div>
-
           </div>
         </div>
 
-        {/* ─── RIGHT COLUMN: ARTISAN CRAFT PHOTOGRAPHY ─── */}
-        <div className="w-full lg:w-[62%] xl:w-[64%] relative bg-[#EDE6DE] flex items-center justify-center min-h-[340px] sm:min-h-[420px] lg:min-h-full overflow-hidden">
-          <picture className="w-full h-full block">
-            <source srcSet={heroCraftImg} type="image/webp" />
-            <img
-              src={heroCraftFallback}
-              alt="Crafting Mindful Heirlooms - Artisan botanical embroidery, macramé, and slow-living craft kits"
-              className="w-full h-full object-cover object-center filter contrast-[1.01]"
-              // @ts-ignore
-              fetchpriority="high"
-            />
-          </picture>
+        {/* Right Column: Artisan Flatlay Photograph */}
+        <div className="w-[62%] xl:w-[63.2%] relative min-h-full overflow-hidden bg-[#E7DFC6]">
+          <img
+            src={heroPhotoImg}
+            alt="Handcrafted botanical embroidery hoop, slow-living DIY craft kit, and embroidered textiles"
+            className="w-full h-full object-cover object-left-center"
+            // @ts-ignore
+            fetchpriority="high"
+          />
+        </div>
+      </div>
+
+      {/* ─── MOBILE & TABLET VIEW (Responsive Stacked Layout) ─── */}
+      <div className="lg:hidden w-full flex flex-col">
+        {/* Top: Flatlay Photography */}
+        <div className="w-full relative aspect-[16/11] sm:aspect-[16/10] max-h-[460px] overflow-hidden bg-[#E7DFC6]">
+          <img
+            src={heroPhotoImg}
+            alt="Handcrafted botanical embroidery hoop, slow-living DIY craft kit, and embroidered textiles"
+            className="w-full h-full object-cover object-center"
+            // @ts-ignore
+            fetchpriority="high"
+          />
         </div>
 
+        {/* Bottom: Typography & CTA Button */}
+        <div
+          className="relative px-6 py-10 sm:px-10 sm:py-12 flex flex-col justify-center border-t border-[#E8E2D8]/60"
+          style={{
+            backgroundColor: '#FAF7F2',
+            backgroundImage: `url(${heroLinenTexture})`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '180px 200px',
+          }}
+        >
+          <div className="absolute inset-0 bg-[#FAF7F2]/40 pointer-events-none" />
+
+          <div className="relative z-10 max-w-md">
+            {/* Main Headline */}
+            <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.1] text-3xl sm:text-4xl">
+              <span className="block">CRAFTING</span>
+              <span className="block">MINDFUL</span>
+              <span className="block">HEIRLOOMS</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="font-serif italic text-[#A15742] text-base sm:text-lg leading-snug mt-3.5 font-normal">
+              Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits.
+            </p>
+
+            {/* CTA Button */}
+            <div className="mt-6">
+              <Link
+                to="/shop"
+                className="inline-block bg-[#AD5B43] hover:bg-[#964a34] active:bg-[#823e2b] text-white font-sans text-xs tracking-[0.16em] uppercase px-7 py-3.5 font-semibold transition-all duration-300 shadow-sm text-center"
+              >
+                EXPLORE THE STUDIO
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
