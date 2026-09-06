@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import heroTriptychLeft from '../../assets/hero_triptych_left.jpg';
 import heroTriptychCenter from '../../assets/hero_triptych_center.jpg';
 import heroTriptychRight from '../../assets/hero_triptych_right.jpg';
-import heroTriptychFull from '../../assets/hero_triptych_full.png';
+import heroTriptychFull from '../../assets/hero_triptych_full.jpg';
 
 export default function HeroTemplate3() {
   return (
