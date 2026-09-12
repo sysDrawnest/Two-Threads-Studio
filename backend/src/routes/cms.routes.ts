@@ -23,6 +23,7 @@ export const publicCmsRouter = Router();
 
 publicCmsRouter.get('/hero-config', cmsController.getHeroConfig);
 publicCmsRouter.get('/homepage-config', cmsController.getHomepageConfig);
+publicCmsRouter.get('/community-gallery', cmsController.getCommunityGallery);
 
 // ── Admin router ──────────────────────────────────────────────────────────────
 // Mounted at /api/v1/admin/cms — all routes require auth + ADMIN role
@@ -34,3 +35,10 @@ adminCmsRouter.get('/hero-config', cmsController.getHeroConfig);
 adminCmsRouter.patch('/hero-config', cmsController.updateHeroConfig);
 adminCmsRouter.get('/homepage-config', cmsController.getHomepageConfig);
 adminCmsRouter.patch('/homepage-config', cmsController.updateHomepageConfig);
+
+adminCmsRouter.get('/community-gallery', cmsController.getAdminCommunityGallery);
+adminCmsRouter.post('/community-gallery', cmsController.upsertCommunityGalleryItem);
+adminCmsRouter.delete('/community-gallery/:id', cmsController.deleteCommunityGalleryItem);
+adminCmsRouter.patch('/community-gallery/reorder', cmsController.reorderCommunityGallery);
+adminCmsRouter.patch('/instagram-url', cmsController.updateInstagramUrl);
+

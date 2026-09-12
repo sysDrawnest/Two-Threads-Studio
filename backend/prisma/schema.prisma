@@ -1372,6 +1372,8 @@ model StudioSettings {
   homepageMenswearConfig      Json?
   homepageWomenswearConfig    Json?
   homepageCategoriesConfig    Json?
+  homepageCommunityGallery    Json?
+  instagramUrl                String?
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

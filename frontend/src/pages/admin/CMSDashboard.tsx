@@ -24,6 +24,14 @@ import {
   Shirt,
   Scissors,
   Check,
+  Camera,
+  Plus,
+  Trash2,
+  Edit2,
+  ArrowUp,
+  ArrowDown,
+  Upload,
+  X,
 } from 'lucide-react';
 import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
 import heroLippanImg from '../../assets/hero_lippan_ref.webp';
@@ -33,10 +41,18 @@ import {
   useUpdateHeroConfig,
   useAdminHomepageConfig,
   useUpdateHomepageConfig,
+  useAdminCommunityGallery,
+  useUpsertCommunityGalleryItem,
+  useDeleteCommunityGalleryItem,
+  useReorderCommunityGallery,
+  useUpdateInstagramUrl,
 } from '../../hooks/useCms';
 import { AdminSkeleton } from '../../components/admin/ui';
 import { productService } from '../../services/productService';
+import { adminService } from '../../services/adminService';
 import type { Product } from '../../data/products';
+import type { CommunityGalleryItem } from '../../services/cmsService';
+import { toast } from 'react-hot-toast';
 
 // ─── Hero Template Metadata ───────────────────────────────────────────────────
 
@@ -173,7 +189,26 @@ export const CMSDashboard: React.FC = () => {
   const { data: cmsData, isLoading: cmsLoading } = useAdminHomepageConfig();
   const { mutate: updateConfig, isPending: isSavingConfig } = useUpdateHomepageConfig();
 
-  const [activeTab, setActiveTab] = useState<'hero' | 'bestsellers' | 'newarrivals' | 'menswear' | 'womenswear' | 'categories'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'bestsellers' | 'newarrivals' | 'menswear' | 'womenswear' | 'categories' | 'community'>('hero');
+
+  // Community Gallery state & hooks
+  const { data: communityData, isLoading: communityLoading } = useAdminCommunityGallery();
+  const { mutate: upsertGalleryItem, isPending: isSavingItem } = useUpsertCommunityGalleryItem();
+  const { mutate: deleteGalleryItem, isPending: isDeletingItem } = useDeleteCommunityGalleryItem();
+  const { mutate: reorderGallery, isPending: isReordering } = useReorderCommunityGallery();
+  const { mutate: updateIgUrl, isPending: isUpdatingIg } = useUpdateInstagramUrl();
+
+  const [instagramUrlInput, setInstagramUrlInput] = useState('');
+  const [isAddingItem, setIsAddingItem] = useState(false);
+  const [editingItem, setEditingItem] = useState<Partial<CommunityGalleryItem> | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Sync instagram url
+  useEffect(() => {
+    if (communityData?.instagramUrl !== undefined) {
+      setInstagramUrlInput(communityData.instagramUrl);
+    }
+  }, [communityData?.instagramUrl]);
 
   // Local state for edits
   const [selectedTemplate, setSelectedTemplate] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
@@ -309,6 +344,12 @@ export const CMSDashboard: React.FC = () => {
           onClick={() => setActiveTab('womenswear')}
           icon={Scissors}
           label="Womenswear Section"
+        />
+        <TabButton
+          active={activeTab === 'community'}
+          onClick={() => setActiveTab('community')}
+          icon={Camera}
+          label="Community Gallery"
         />
       </div>
 
@@ -722,6 +763,392 @@ export const CMSDashboard: React.FC = () => {
             <p className="text-neutral-500 text-[11px]">
               This section displays artisan fashion pieces (Shirts, Denim, Crochet Tops, One Pieces, Bikinis) from your catalog.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 7: COMMUNITY GALLERY MODULE ─── */}
+      {activeTab === 'community' && (
+        <div className="rounded-2xl border border-[#c8b5aa]/60 dark:border-[#3d332b] bg-[#fef8f3] dark:bg-[#1e1610] p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#1f1610] dark:text-white">
+                Our Community / Styled by You
+              </h2>
+              <p className="text-xs text-[#786455] dark:text-[#ccb08a]/70 mt-1">
+                Manage shoppable community photos, customer Instagram handles, and linked products.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setEditingItem({
+                  imageUrl: '',
+                  userHandle: '@',
+                  productName: '',
+                  productSlug: '',
+                  productId: '',
+                  tall: false,
+                  active: true,
+                });
+                setIsAddingItem(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] transition-all self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              Add Community Photo
+            </button>
+          </div>
+
+          {/* Instagram URL Setting */}
+          <div className="p-4 rounded-xl border border-[#c8b5aa]/40 bg-white dark:bg-[#251b14] space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="font-semibold text-sm text-[#1f1610] dark:text-white flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-[#ab5a46]" />
+                  Studio Instagram Profile Link
+                </h3>
+                <p className="text-[11px] text-neutral-500 mt-0.5">
+                  Destination URL for the "View Instagram Feed" and "@TwoThreadsStudio" links on the storefront.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="url"
+                  value={instagramUrlInput}
+                  onChange={(e) => setInstagramUrlInput(e.target.value)}
+                  placeholder="https://instagram.com/TwoThreadsStudio"
+                  className="flex-1 sm:w-72 px-3 py-2 text-xs border border-[#c8b5aa]/60 dark:border-[#3d332b] rounded-lg bg-[#faf6f1] dark:bg-[#19110b] text-[#1f1610] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#ab5a46]"
+                />
+                <button
+                  onClick={() => updateIgUrl(instagramUrlInput)}
+                  disabled={isUpdatingIg}
+                  className="px-3 py-2 rounded-lg bg-[#2D2520] hover:bg-[#1f1610] text-[#faf6f1] text-xs font-mono uppercase tracking-wider transition-colors disabled:opacity-50"
+                >
+                  {isUpdatingIg ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Add / Edit Form Modal / Card */}
+          {isAddingItem && editingItem && (
+            <div className="p-5 rounded-xl border-2 border-[#ab5a46]/40 bg-white dark:bg-[#251b14] space-y-4 shadow-md">
+              <div className="flex items-center justify-between border-b border-[#c8b5aa]/30 pb-3">
+                <h3 className="font-serif font-bold text-base text-[#1f1610] dark:text-white">
+                  {editingItem.id ? 'Edit Community Photo' : 'Add New Community Photo'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsAddingItem(false);
+                    setEditingItem(null);
+                  }}
+                  className="text-neutral-400 hover:text-neutral-600 dark:hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                {/* Photo Preview & Upload */}
+                <div className="space-y-2">
+                  <label className="block font-semibold text-[#1f1610] dark:text-white">
+                    Photo Image URL or File Upload *
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editingItem.imageUrl || ''}
+                      onChange={(e) => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
+                      placeholder="https://... or click Upload"
+                      className="flex-1 px-3 py-2 border border-[#c8b5aa]/60 dark:border-[#3d332b] rounded-lg bg-[#faf6f1] dark:bg-[#19110b] text-[#1f1610] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#ab5a46]"
+                    />
+                    <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#ab5a46]/10 text-[#ab5a46] hover:bg-[#ab5a46]/20 cursor-pointer border border-[#ab5a46]/30">
+                      <Upload className="w-4 h-4" />
+                      <span>{isUploadingImage ? 'Uploading...' : 'Upload'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={isUploadingImage}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            setIsUploadingImage(true);
+                            const res: any = await adminService.uploadImage(file);
+                            const uploadedUrl = res?.data?.url || res?.url || res?.data?.secure_url;
+                            if (uploadedUrl) {
+                              setEditingItem((prev) => ({ ...prev, imageUrl: uploadedUrl }));
+                              toast.success('Image uploaded successfully');
+                            }
+                          } catch (err: any) {
+                            toast.error(err?.message || 'Failed to upload image');
+                          } finally {
+                            setIsUploadingImage(false);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {editingItem.imageUrl && (
+                    <div className="mt-2 relative w-24 h-24 rounded-lg overflow-hidden border border-[#c8b5aa]/50 bg-[#e8e1d9]">
+                      <img
+                        src={editingItem.imageUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Maker Handle */}
+                <div className="space-y-2">
+                  <label className="block font-semibold text-[#1f1610] dark:text-white">
+                    Creator Instagram Handle
+                  </label>
+                  <input
+                    type="text"
+                    value={editingItem.userHandle || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, userHandle: e.target.value })}
+                    placeholder="@maya.stitches"
+                    className="w-full px-3 py-2 border border-[#c8b5aa]/60 dark:border-[#3d332b] rounded-lg bg-[#faf6f1] dark:bg-[#19110b] text-[#1f1610] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#ab5a46]"
+                  />
+                  <p className="text-[10px] text-neutral-400">Displayed on photo overlay</p>
+                </div>
+
+                {/* Linked Catalog Product */}
+                <div className="space-y-2">
+                  <label className="block font-semibold text-[#1f1610] dark:text-white">
+                    Link Catalog Product (Shoppable Link)
+                  </label>
+                  <select
+                    value={editingItem.productId || ''}
+                    onChange={(e) => {
+                      const prod = availableProducts.find((p) => p.id === e.target.value);
+                      if (prod) {
+                        setEditingItem({
+                          ...editingItem,
+                          productId: prod.id,
+                          productName: prod.name,
+                          productSlug: prod.slug,
+                        });
+                      } else {
+                        setEditingItem({
+                          ...editingItem,
+                          productId: '',
+                        });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-[#c8b5aa]/60 dark:border-[#3d332b] rounded-lg bg-[#faf6f1] dark:bg-[#19110b] text-[#1f1610] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#ab5a46]"
+                  >
+                    <option value="">-- Choose from Catalog --</option>
+                    {availableProducts.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} (₹{p.price})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Display Product Name */}
+                <div className="space-y-2">
+                  <label className="block font-semibold text-[#1f1610] dark:text-white">
+                    Display Product Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editingItem.productName || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, productName: e.target.value })}
+                    placeholder="Wildflower Hoop Kit"
+                    className="w-full px-3 py-2 border border-[#c8b5aa]/60 dark:border-[#3d332b] rounded-lg bg-[#faf6f1] dark:bg-[#19110b] text-[#1f1610] dark:text-white focus:outline-none focus:ring-1 focus:ring-[#ab5a46]"
+                  />
+                </div>
+
+                {/* Toggles */}
+                <div className="md:col-span-2 flex flex-wrap gap-6 pt-2">
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editingItem.tall ?? false}
+                      onChange={(e) => setEditingItem({ ...editingItem, tall: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#ab5a46] focus:ring-[#ab5a46]"
+                    />
+                    <span className="text-xs text-[#1f1610] dark:text-white">
+                      Tall Tile (spans 2 rows in desktop masonry grid)
+                    </span>
+                  </label>
+
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editingItem.active !== false}
+                      onChange={(e) => setEditingItem({ ...editingItem, active: e.target.checked })}
+                      className="w-4 h-4 rounded text-[#ab5a46] focus:ring-[#ab5a46]"
+                    />
+                    <span className="text-xs text-[#1f1610] dark:text-white">
+                      Active (visible on storefront)
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end gap-3 pt-3 border-t border-[#c8b5aa]/30">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAddingItem(false);
+                    setEditingItem(null);
+                  }}
+                  className="px-4 py-2 rounded-xl border border-[#c8b5aa]/60 text-[#786455] text-xs font-mono tracking-wider hover:bg-[#faf6f1]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!editingItem.imageUrl) {
+                      toast.error('Please provide an image URL');
+                      return;
+                    }
+                    upsertGalleryItem(editingItem, {
+                      onSuccess: () => {
+                        setIsAddingItem(false);
+                        setEditingItem(null);
+                      },
+                    });
+                  }}
+                  disabled={isSavingItem || !editingItem.imageUrl}
+                  className="px-5 py-2 rounded-xl bg-[#ab5a46] text-white text-xs font-mono uppercase tracking-wider hover:bg-[#83382a] disabled:opacity-50 transition-colors"
+                >
+                  {isSavingItem ? 'Saving...' : 'Save Item'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Items Gallery List */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm text-[#1f1610] dark:text-white">
+              Current Showcase Photos ({(communityData?.items || []).length})
+            </h3>
+
+            {communityLoading ? (
+              <AdminSkeleton className="h-48 w-full" />
+            ) : (communityData?.items || []).length === 0 ? (
+              <div className="p-8 text-center text-xs font-mono text-neutral-500 border border-dashed border-[#c8b5aa]/60 rounded-xl">
+                No community photos yet. Click "Add Community Photo" to add one!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(communityData?.items || []).map((item: CommunityGalleryItem, idx: number, arr: CommunityGalleryItem[]) => (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-xl border border-[#c8b5aa]/40 dark:border-[#3d332b] bg-white dark:bg-[#251b14] flex gap-3 relative group"
+                  >
+                    <div className="w-20 h-24 rounded-lg overflow-hidden bg-[#e8e1d9] flex-shrink-0 relative">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.userHandle}
+                        className="w-full h-full object-cover"
+                      />
+                      {item.tall && (
+                        <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[8px] px-1 py-0.5 rounded font-mono uppercase">
+                          Tall
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5 text-xs font-mono">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-[#ab5a46] truncate">
+                            {item.userHandle || '@community'}
+                          </span>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded ${
+                              item.active !== false
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                : 'bg-neutral-100 text-neutral-600'
+                            }`}
+                          >
+                            {item.active !== false ? 'Active' : 'Hidden'}
+                          </span>
+                        </div>
+                        <p className="font-serif text-[#1f1610] dark:text-white text-sm truncate mt-1">
+                          {item.productName || 'No linked product'}
+                        </p>
+                        {item.productSlug && (
+                          <p className="text-[10px] text-neutral-400 truncate">
+                            /{item.productSlug}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Reorder and Action Buttons */}
+                      <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-[#33261c] mt-2">
+                        <div className="flex items-center gap-1">
+                          <button
+                            title="Move Up"
+                            disabled={idx === 0 || isReordering}
+                            onClick={() => {
+                              const newItems = [...arr];
+                              const temp = newItems[idx - 1];
+                              newItems[idx - 1] = newItems[idx];
+                              newItems[idx] = temp;
+                              reorderGallery({ items: newItems });
+                            }}
+                            className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-[#33261c] disabled:opacity-25"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            title="Move Down"
+                            disabled={idx === arr.length - 1 || isReordering}
+                            onClick={() => {
+                              const newItems = [...arr];
+                              const temp = newItems[idx + 1];
+                              newItems[idx + 1] = newItems[idx];
+                              newItems[idx] = temp;
+                              reorderGallery({ items: newItems });
+                            }}
+                            className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-[#33261c] disabled:opacity-25"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            title="Edit"
+                            onClick={() => {
+                              setEditingItem(item);
+                              setIsAddingItem(true);
+                            }}
+                            className="p-1 text-neutral-600 hover:text-[#ab5a46] dark:text-neutral-300"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            title="Delete"
+                            disabled={isDeletingItem}
+                            onClick={() => {
+                              if (window.confirm(`Delete showcase photo for ${item.userHandle}?`)) {
+                                deleteGalleryItem(item.id);
+                              }
+                            }}
+                            className="p-1 text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

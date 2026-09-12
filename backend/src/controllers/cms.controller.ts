@@ -90,6 +90,83 @@ const DEFAULT_CATEGORIES = [
   },
 ];
 
+export interface CommunityGalleryItem {
+  id: string;
+  imageUrl: string;
+  userHandle: string;
+  productName: string;
+  productSlug?: string;
+  productId?: string;
+  tall?: boolean;
+  active?: boolean;
+  order?: number;
+}
+
+const DEFAULT_INSTAGRAM_URL = 'https://instagram.com';
+
+const DEFAULT_COMMUNITY_GALLERY: CommunityGalleryItem[] = [
+  {
+    id: 'g1',
+    imageUrl: 'https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@priya.stitches',
+    productName: 'Meadow Floral Kit',
+    productSlug: 'meadow-floral-kit',
+    tall: true,
+    active: true,
+    order: 1,
+  },
+  {
+    id: 'g2',
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@craft.with.neha',
+    productName: 'Boho Macramé Hanging',
+    productSlug: 'boho-macrame-hanging',
+    tall: false,
+    active: true,
+    order: 2,
+  },
+  {
+    id: 'g3',
+    imageUrl: 'https://images.unsplash.com/photo-1598444778129-c88c7ff4191c?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@threads.and.tea',
+    productName: 'Cottage Garden Bundle',
+    productSlug: 'cottage-garden-bundle',
+    tall: false,
+    active: true,
+    order: 3,
+  },
+  {
+    id: 'g4',
+    imageUrl: 'https://images.unsplash.com/photo-1617896848219-aab8a02eed8c?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@handmade.meera',
+    productName: 'Crochet Flower Bunch',
+    productSlug: 'crochet-flower-bunch',
+    tall: true,
+    active: true,
+    order: 4,
+  },
+  {
+    id: 'g5',
+    imageUrl: 'https://images.unsplash.com/photo-1595166415582-895180f2d5e2?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@slowcraft.life',
+    productName: 'Wildflower Hoop',
+    productSlug: 'wildflower-hoop',
+    tall: false,
+    active: true,
+    order: 5,
+  },
+  {
+    id: 'g6',
+    imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@gifted.by.aanya',
+    productName: 'Festival Gift Box',
+    productSlug: 'festival-gift-box',
+    tall: false,
+    active: true,
+    order: 6,
+  },
+];
+
 export const cmsController = {
   /**
    * GET /api/v1/cms/hero-config
@@ -172,6 +249,8 @@ export const cmsController = {
           homepageMenswearConfig: true,
           homepageWomenswearConfig: true,
           homepageCategoriesConfig: true,
+          homepageCommunityGallery: true,
+          instagramUrl: true,
         },
       });
       if (!settings) {
@@ -184,9 +263,16 @@ export const cmsController = {
             homepageMenswearConfig: true,
             homepageWomenswearConfig: true,
             homepageCategoriesConfig: true,
+            homepageCommunityGallery: true,
+            instagramUrl: true,
           },
         });
       }
+
+      const rawCommunity = (settings.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || DEFAULT_COMMUNITY_GALLERY;
+      const activeCommunity = rawCommunity
+        .filter((it) => it.active !== false)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
       return successResponse(res, {
         activeHeroTemplate: settings.activeHeroTemplate ?? 1,
@@ -195,6 +281,8 @@ export const cmsController = {
         menswearConfig: settings.homepageMenswearConfig || { productIds: [], title: 'Premium Menswear Collection', enabled: true },
         womenswearConfig: settings.homepageWomenswearConfig || { productIds: [], title: 'Premium Womenswear Collection', enabled: true },
         categoriesConfig: settings.homepageCategoriesConfig || DEFAULT_CATEGORIES,
+        communityGallery: activeCommunity,
+        instagramUrl: settings.instagramUrl || DEFAULT_INSTAGRAM_URL,
       });
     } catch (err) {
       // Graceful fallback: Return default configuration instead of HTTP 400
@@ -205,6 +293,8 @@ export const cmsController = {
         menswearConfig: { productIds: [], title: 'Premium Menswear Collection', enabled: true },
         womenswearConfig: { productIds: [], title: 'Premium Womenswear Collection', enabled: true },
         categoriesConfig: DEFAULT_CATEGORIES,
+        communityGallery: DEFAULT_COMMUNITY_GALLERY,
+        instagramUrl: DEFAULT_INSTAGRAM_URL,
       });
     }
   },
@@ -222,6 +312,8 @@ export const cmsController = {
         menswearConfig,
         womenswearConfig,
         categoriesConfig,
+        communityGallery,
+        instagramUrl,
       } = req.body;
 
       const updateData: any = {};
@@ -231,6 +323,8 @@ export const cmsController = {
       if (menswearConfig !== undefined) updateData.homepageMenswearConfig = menswearConfig;
       if (womenswearConfig !== undefined) updateData.homepageWomenswearConfig = womenswearConfig;
       if (categoriesConfig !== undefined) updateData.homepageCategoriesConfig = categoriesConfig;
+      if (communityGallery !== undefined) updateData.homepageCommunityGallery = communityGallery;
+      if (instagramUrl !== undefined) updateData.instagramUrl = instagramUrl;
 
       const settings = await prisma.studioSettings.upsert({
         where: SINGLETON_WHERE,
@@ -247,9 +341,238 @@ export const cmsController = {
           menswearConfig: settings.homepageMenswearConfig,
           womenswearConfig: settings.homepageWomenswearConfig,
           categoriesConfig: settings.homepageCategoriesConfig,
+          communityGallery: settings.homepageCommunityGallery,
+          instagramUrl: settings.instagramUrl,
         },
         'Homepage CMS configuration updated successfully'
       );
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * GET /api/v1/cms/community-gallery
+   * Public endpoint — returns active community gallery items and Instagram URL.
+   */
+  getCommunityGallery: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: {
+          homepageCommunityGallery: true,
+          instagramUrl: true,
+        },
+      });
+
+      const rawItems = (settings?.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || DEFAULT_COMMUNITY_GALLERY;
+      const activeItems = rawItems
+        .filter((item) => item.active !== false)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+      return successResponse(res, {
+        items: activeItems,
+        instagramUrl: settings?.instagramUrl || DEFAULT_INSTAGRAM_URL,
+      });
+    } catch (err) {
+      return successResponse(res, {
+        items: DEFAULT_COMMUNITY_GALLERY,
+        instagramUrl: DEFAULT_INSTAGRAM_URL,
+      });
+    }
+  },
+
+  /**
+   * GET /api/v1/admin/cms/community-gallery
+   * Admin endpoint — returns all community gallery items (active & inactive) and Instagram URL.
+   */
+  getAdminCommunityGallery: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: {
+          homepageCommunityGallery: true,
+          instagramUrl: true,
+        },
+      });
+
+      const items = ((settings?.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || DEFAULT_COMMUNITY_GALLERY)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+      return successResponse(res, {
+        items,
+        instagramUrl: settings?.instagramUrl || DEFAULT_INSTAGRAM_URL,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * POST /api/v1/admin/cms/community-gallery
+   * Admin endpoint — creates or updates a single community gallery item.
+   */
+  upsertCommunityGalleryItem: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const itemData: Partial<CommunityGalleryItem> = req.body;
+
+      if (!itemData.imageUrl) {
+        res.status(400).json({
+          success: false,
+          code: 'IMAGE_URL_REQUIRED',
+          message: 'Image URL is required',
+        });
+        return;
+      }
+
+      const settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: { homepageCommunityGallery: true },
+      });
+
+      let currentItems: CommunityGalleryItem[] = (settings?.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || [...DEFAULT_COMMUNITY_GALLERY];
+
+      let updatedItem: CommunityGalleryItem;
+
+      if (itemData.id) {
+        const existingIdx = currentItems.findIndex((it) => it.id === itemData.id);
+        if (existingIdx !== -1) {
+          updatedItem = {
+            ...currentItems[existingIdx],
+            ...itemData,
+            order: itemData.order !== undefined ? itemData.order : currentItems[existingIdx].order,
+          };
+          currentItems[existingIdx] = updatedItem;
+        } else {
+          const maxOrder = currentItems.reduce((max, it) => Math.max(max, it.order ?? 0), 0);
+          updatedItem = {
+            id: itemData.id,
+            imageUrl: itemData.imageUrl,
+            userHandle: itemData.userHandle || '',
+            productName: itemData.productName || '',
+            productSlug: itemData.productSlug || '',
+            productId: itemData.productId || '',
+            tall: Boolean(itemData.tall),
+            active: itemData.active !== undefined ? itemData.active : true,
+            order: itemData.order !== undefined ? itemData.order : maxOrder + 1,
+          };
+          currentItems.push(updatedItem);
+        }
+      } else {
+        const maxOrder = currentItems.reduce((max, it) => Math.max(max, it.order ?? 0), 0);
+        updatedItem = {
+          id: `cg_${Date.now()}`,
+          imageUrl: itemData.imageUrl,
+          userHandle: itemData.userHandle || '',
+          productName: itemData.productName || '',
+          productSlug: itemData.productSlug || '',
+          productId: itemData.productId || '',
+          tall: Boolean(itemData.tall),
+          active: itemData.active !== undefined ? itemData.active : true,
+          order: itemData.order !== undefined ? itemData.order : maxOrder + 1,
+        };
+        currentItems.push(updatedItem);
+      }
+
+      await prisma.studioSettings.upsert({
+        where: SINGLETON_WHERE,
+        create: { homepageCommunityGallery: currentItems as any },
+        update: { homepageCommunityGallery: currentItems as any },
+      });
+
+      return successResponse(res, { item: updatedItem, items: currentItems }, 'Community gallery item saved');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * DELETE /api/v1/admin/cms/community-gallery/:id
+   * Admin endpoint — removes a gallery item by id.
+   */
+  deleteCommunityGalleryItem: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: { homepageCommunityGallery: true },
+      });
+
+      let currentItems: CommunityGalleryItem[] = (settings?.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || [...DEFAULT_COMMUNITY_GALLERY];
+      currentItems = currentItems.filter((it) => it.id !== id);
+
+      await prisma.studioSettings.upsert({
+        where: SINGLETON_WHERE,
+        create: { homepageCommunityGallery: currentItems as any },
+        update: { homepageCommunityGallery: currentItems as any },
+      });
+
+      return successResponse(res, { items: currentItems }, 'Community gallery item deleted');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PATCH /api/v1/admin/cms/community-gallery/reorder
+   * Admin endpoint — bulk updates the order of community gallery items.
+   */
+  reorderCommunityGallery: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { itemIds, items: reorderedList } = req.body;
+
+      const settings = await prisma.studioSettings.findUnique({
+        where: SINGLETON_WHERE,
+        select: { homepageCommunityGallery: true },
+      });
+
+      let currentItems: CommunityGalleryItem[] = (settings?.homepageCommunityGallery as unknown as CommunityGalleryItem[]) || [...DEFAULT_COMMUNITY_GALLERY];
+
+      if (Array.isArray(reorderedList) && reorderedList.length > 0) {
+        currentItems = reorderedList.map((item, idx) => ({ ...item, order: idx + 1 }));
+      } else if (Array.isArray(itemIds)) {
+        const itemMap = new Map(currentItems.map((it) => [it.id, it]));
+        const orderedItems: CommunityGalleryItem[] = [];
+        itemIds.forEach((id: string, idx: number) => {
+          const item = itemMap.get(id);
+          if (item) {
+            orderedItems.push({ ...item, order: idx + 1 });
+            itemMap.delete(id);
+          }
+        });
+        // append any remaining
+        itemMap.forEach((item) => orderedItems.push({ ...item, order: orderedItems.length + 1 }));
+        currentItems = orderedItems;
+      }
+
+      await prisma.studioSettings.upsert({
+        where: SINGLETON_WHERE,
+        create: { homepageCommunityGallery: currentItems as any },
+        update: { homepageCommunityGallery: currentItems as any },
+      });
+
+      return successResponse(res, { items: currentItems }, 'Community gallery order updated');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PATCH /api/v1/admin/cms/instagram-url
+   * Admin endpoint — updates studio Instagram URL.
+   */
+  updateInstagramUrl: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { instagramUrl } = req.body;
+
+      const settings = await prisma.studioSettings.upsert({
+        where: SINGLETON_WHERE,
+        create: { instagramUrl: instagramUrl || DEFAULT_INSTAGRAM_URL },
+        update: { instagramUrl: instagramUrl || DEFAULT_INSTAGRAM_URL },
+        select: { instagramUrl: true },
+      });
+
+      return successResponse(res, { instagramUrl: settings.instagramUrl }, 'Instagram URL updated');
     } catch (err) {
       next(err);
     }

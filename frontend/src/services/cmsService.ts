@@ -27,6 +27,23 @@ export interface CMSCategoryConfig {
   sortOrder?: number;
 }
 
+export interface CommunityGalleryItem {
+  id: string;
+  imageUrl: string;
+  userHandle: string;
+  productName: string;
+  productSlug?: string;
+  productId?: string;
+  tall?: boolean;
+  active?: boolean;
+  order?: number;
+}
+
+export interface CommunityGalleryResponse {
+  items: CommunityGalleryItem[];
+  instagramUrl: string;
+}
+
 export interface HomepageCMSConfig {
   activeHeroTemplate: 1 | 2 | 3 | 4 | 5;
   bestSellersConfig: CMSSectionConfig;
@@ -34,6 +51,8 @@ export interface HomepageCMSConfig {
   menswearConfig: CMSSectionConfig;
   womenswearConfig: CMSSectionConfig;
   categoriesConfig: CMSCategoryConfig[];
+  communityGallery?: CommunityGalleryItem[];
+  instagramUrl?: string;
 }
 
 export const cmsService = {
@@ -60,4 +79,40 @@ export const cmsService = {
    */
   updateHomepageConfig: (payload: Partial<HomepageCMSConfig>): Promise<{ success: boolean; message: string; data: HomepageCMSConfig }> =>
     apiClient.patch('/admin/cms/homepage-config', payload),
+
+  /**
+   * Public endpoint — fetches active community gallery items and Instagram URL.
+   */
+  getCommunityGallery: (): Promise<{ success: boolean; data: CommunityGalleryResponse }> =>
+    apiClient.get('/cms/community-gallery'),
+
+  /**
+   * Admin endpoint — fetches all community gallery items.
+   */
+  getAdminCommunityGallery: (): Promise<{ success: boolean; data: CommunityGalleryResponse }> =>
+    apiClient.get('/admin/cms/community-gallery'),
+
+  /**
+   * Admin endpoint — creates or updates a community gallery item.
+   */
+  upsertCommunityGalleryItem: (item: Partial<CommunityGalleryItem>): Promise<{ success: boolean; message: string; data: { item: CommunityGalleryItem; items: CommunityGalleryItem[] } }> =>
+    apiClient.post('/admin/cms/community-gallery', item),
+
+  /**
+   * Admin endpoint — deletes a community gallery item.
+   */
+  deleteCommunityGalleryItem: (id: string): Promise<{ success: boolean; message: string; data: { items: CommunityGalleryItem[] } }> =>
+    apiClient.delete(`/admin/cms/community-gallery/${id}`),
+
+  /**
+   * Admin endpoint — reorders community gallery items.
+   */
+  reorderCommunityGallery: (payload: { itemIds?: string[]; items?: CommunityGalleryItem[] }): Promise<{ success: boolean; message: string; data: { items: CommunityGalleryItem[] } }> =>
+    apiClient.patch('/admin/cms/community-gallery/reorder', payload),
+
+  /**
+   * Admin endpoint — updates studio Instagram URL.
+   */
+  updateInstagramUrl: (instagramUrl: string): Promise<{ success: boolean; message: string; data: { instagramUrl: string } }> =>
+    apiClient.patch('/admin/cms/instagram-url', { instagramUrl }),
 };

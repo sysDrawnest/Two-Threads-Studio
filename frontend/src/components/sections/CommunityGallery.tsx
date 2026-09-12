@@ -1,7 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ScrollReveal } from '../ui/ScrollReveal';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useCommunityGallery } from '../../hooks/useCms';
+import type { CommunityGalleryItem } from '../../services/cmsService';
 
 // Inline Instagram icon (not available in lucide-react v1.23)
 const InstagramIcon = ({ size = 14, className = '' }: { size?: number; className?: string }) => (
@@ -22,53 +25,72 @@ const InstagramIcon = ({ size = 14, className = '' }: { size?: number; className
   </svg>
 );
 
-// Using local stitch assets + lifestyle images for the UGC grid
-const galleryItems = [
+// Fallback items if API is initializing
+const FALLBACK_ITEMS: CommunityGalleryItem[] = [
   {
     id: 'g1',
-    image: 'https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=600&auto=format&fit=crop',
-    user: '@priya.stitches',
-    product: 'Meadow Floral Kit',
+    imageUrl: 'https://images.unsplash.com/photo-1584446927514-633215c0e0b3?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@priya.stitches',
+    productName: 'Meadow Floral Kit',
+    productSlug: 'meadow-floral-kit',
     tall: true,
   },
   {
     id: 'g2',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
-    user: '@craft.with.neha',
-    product: 'Boho Macramé Hanging',
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@craft.with.neha',
+    productName: 'Boho Macramé Hanging',
+    productSlug: 'boho-macrame-hanging',
     tall: false,
   },
   {
     id: 'g3',
-    image: 'https://images.unsplash.com/photo-1598444778129-c88c7ff4191c?q=80&w=600&auto=format&fit=crop',
-    user: '@threads.and.tea',
-    product: 'Cottage Garden Bundle',
+    imageUrl: 'https://images.unsplash.com/photo-1598444778129-c88c7ff4191c?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@threads.and.tea',
+    productName: 'Cottage Garden Bundle',
+    productSlug: 'cottage-garden-bundle',
     tall: false,
   },
   {
     id: 'g4',
-    image: 'https://images.unsplash.com/photo-1617896848219-aab8a02eed8c?q=80&w=600&auto=format&fit=crop',
-    user: '@handmade.meera',
-    product: 'Crochet Flower Bunch',
+    imageUrl: 'https://images.unsplash.com/photo-1617896848219-aab8a02eed8c?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@handmade.meera',
+    productName: 'Crochet Flower Bunch',
+    productSlug: 'crochet-flower-bunch',
     tall: true,
   },
   {
     id: 'g5',
-    image: 'https://images.unsplash.com/photo-1595166415582-895180f2d5e2?q=80&w=600&auto=format&fit=crop',
-    user: '@slowcraft.life',
-    product: 'Wildflower Hoop',
+    imageUrl: 'https://images.unsplash.com/photo-1595166415582-895180f2d5e2?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@slowcraft.life',
+    productName: 'Wildflower Hoop',
+    productSlug: 'wildflower-hoop',
     tall: false,
   },
   {
     id: 'g6',
-    image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=600&auto=format&fit=crop',
-    user: '@gifted.by.aanya',
-    product: 'Festival Gift Box',
+    imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=600&auto=format&fit=crop',
+    userHandle: '@gifted.by.aanya',
+    productName: 'Festival Gift Box',
+    productSlug: 'festival-gift-box',
     tall: false,
   },
 ];
 
 export default function CommunityGallery() {
+  const { data } = useCommunityGallery();
+
+  const items: CommunityGalleryItem[] = data?.items && data.items.length > 0 ? data.items : FALLBACK_ITEMS;
+  const instagramUrl = data?.instagramUrl || 'https://instagram.com';
+
+  // Format instagram display handle
+  const cleanUrl = instagramUrl.trim().replace(/\/$/, '');
+  const urlParts = cleanUrl.split('/');
+  const rawHandle = urlParts[urlParts.length - 1]?.replace(/^@/, '');
+  const displayHandle = rawHandle && rawHandle !== 'instagram.com' && !rawHandle.includes('.')
+    ? `@${rawHandle}`
+    : '@TwoThreadsStudio';
+
   return (
     <section className="py-16 sm:py-20 md:py-24 px-4 sm:px-6 md:px-16 bg-[#FBFBFA]">
       <div className="max-w-7xl mx-auto">
@@ -85,19 +107,19 @@ export default function CommunityGallery() {
             <span className="text-[#A34A38] font-medium">#TwoThreadsStudio</span> to be featured here.
           </p>
           <a
-            href="https://instagram.com"
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 font-sans text-[10px] tracking-[0.18em] uppercase text-[#735947] hover:text-[#A34A38] transition-colors no-underline"
           >
             <InstagramIcon size={13} />
-            @TwoThreadsStudio
+            {displayHandle}
           </a>
         </ScrollReveal>
 
         {/* Desktop masonry-style grid */}
         <div className="hidden sm:grid grid-cols-3 gap-3 md:gap-4">
-          {galleryItems.map((item, i) => (
+          {items.map((item: CommunityGalleryItem, i: number) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 24 }}
@@ -113,7 +135,7 @@ export default function CommunityGallery() {
 
         {/* Mobile 2-col grid */}
         <div className="grid sm:hidden grid-cols-2 gap-2.5">
-          {galleryItems.map((item, i) => (
+          {items.map((item: CommunityGalleryItem, i: number) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 20 }}
@@ -129,7 +151,7 @@ export default function CommunityGallery() {
         {/* CTA */}
         <ScrollReveal direction="up" className="text-center mt-10">
           <a
-            href="https://instagram.com"
+            href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 font-sans text-[11px] tracking-[0.2em] uppercase text-[#A34A38] hover:gap-3 transition-all duration-300 no-underline border-b border-[#A34A38]/40 pb-0.5"
@@ -143,26 +165,39 @@ export default function CommunityGallery() {
   );
 }
 
-function GalleryTile({ item, tall }: { item: (typeof galleryItems)[0]; tall: boolean }) {
+function GalleryTile({ item, tall }: { item: CommunityGalleryItem; tall?: boolean }) {
+  const productTarget = item.productSlug
+    ? `/product/${item.productSlug}`
+    : item.productId
+      ? `/product/${item.productId}`
+      : '/products';
+
   return (
     <div
       className={`group relative overflow-hidden bg-[#e8e1d9] ${tall ? 'h-[480px] md:h-[600px]' : 'h-[220px] md:h-[280px]'}`}
     >
       <img
-        src={item.image}
-        alt={`Community creation by ${item.user}`}
+        src={item.imageUrl}
+        alt={`Community creation by ${item.userHandle || 'our community'}`}
         loading="lazy"
         className="w-full h-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
       />
       {/* Hover overlay */}
       <div className="absolute inset-0 bg-[#1C1C1B]/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2 px-4 text-center">
-        <span className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#d2c4bc]">
-          {item.user}
-        </span>
-        <p className="font-serif text-sm text-white leading-tight">{item.product}</p>
-        <span className="mt-2 inline-flex items-center gap-1.5 font-sans text-[9px] tracking-[0.18em] uppercase text-white border border-white/40 px-3 py-1.5 hover:bg-white/10 transition-colors cursor-pointer">
+        {item.userHandle && (
+          <span className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#d2c4bc]">
+            {item.userHandle}
+          </span>
+        )}
+        {item.productName && (
+          <p className="font-serif text-sm text-white leading-tight">{item.productName}</p>
+        )}
+        <Link
+          to={productTarget}
+          className="mt-2 inline-flex items-center gap-1.5 font-sans text-[9px] tracking-[0.18em] uppercase text-white border border-white/40 px-3 py-1.5 hover:bg-white/10 transition-colors no-underline"
+        >
           Shop this look <ArrowRight size={9} />
-        </span>
+        </Link>
       </div>
 
       {/* Instagram icon */}
@@ -172,3 +207,4 @@ function GalleryTile({ item, tall }: { item: (typeof galleryItems)[0]; tall: boo
     </div>
   );
 }
+
