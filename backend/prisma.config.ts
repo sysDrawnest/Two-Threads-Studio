@@ -12,6 +12,7 @@ export default defineConfig({
     // Runtime queries use the pooled connection (port 6543 via Supavisor)
     url: process.env["DATABASE_URL"],
     // Migrations use the direct connection (port 5432, required by Prisma migrate)
+    // @ts-expect-error directUrl is required by Prisma for migrations but not yet typed in defineConfig
     directUrl: process.env["DIRECT_URL"],
   },
 });
