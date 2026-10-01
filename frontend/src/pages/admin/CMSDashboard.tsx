@@ -33,9 +33,12 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import portraitCutout from '../../assets/1F78D49-EC80-4B90-A90F-D848BECFD893.webp';
-import heroLippanImg from '../../assets/hero_lippan_ref.webp';
-import heroMacrameImg from '../../assets/hero_macrame_ref.webp';
+import heroPcImg from '../../assets/hero section pc.webp';
+import heroVideo from '../../assets/hero_template2_video.mp4';
+import heroT3Slide1 from '../../assets/hero_template3_slide1.jpg';
+import heroT3Slide2 from '../../assets/hero_template3_slide2.jpg';
+import heroT3Slide3 from '../../assets/hero_template3_slide3.jpg';
+import heroCraftingPhoto from '../../assets/hero_crafting_heirlooms_photo.jpg';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -70,18 +73,33 @@ const TEMPLATES: TemplateOption[] = [
   {
     id: 1,
     name: 'Original Hero',
-    description: 'Terracotta full-bleed image with animated serif typography and product showcase overlay.',
+    description: 'Signature terracotta background with bold serif typography, artisanal ceramic pottery showcase, and floating CTA.',
     icon: Image,
-    tag: 'Default',
+    tag: 'Terracotta Classic',
     tagColor: 'bg-[#ab5a46]/15 text-[#ab5a46]',
     preview: (
-      <div className="w-full h-full bg-gradient-to-b from-[#ab5a46] to-[#7a3d30] relative overflow-hidden rounded-sm">
-        <div className="absolute inset-0 flex flex-col items-center justify-start pt-2 overflow-hidden">
-          <span className="font-serif text-[#f4ebd9]/20 text-[36px] tracking-tighter leading-none select-none">TWO THREAD</span>
-          <span className="font-serif text-[#f4ebd9]/20 text-[36px] tracking-tighter leading-none select-none">STUDIO</span>
+      <div className="w-full h-full bg-[#ab5a46] relative overflow-hidden rounded-sm flex flex-col justify-between select-none">
+        {/* Giant Serif Background Watermark */}
+        <div className="absolute inset-0 flex flex-col items-center justify-start pt-1.5 overflow-hidden pointer-events-none opacity-40">
+          <span className="font-serif text-[#f4ebd9] text-[22px] tracking-tighter leading-none select-none font-normal">TWO THREAD</span>
+          <span className="font-serif text-[#f4ebd9] text-[22px] tracking-tighter leading-none select-none font-normal">STUDIO</span>
         </div>
-        <div className="absolute bottom-0 inset-x-0 h-[55%] flex items-end justify-center pb-3">
-          <div className="w-16 h-16 rounded-full bg-[#f4ebd9]/10 border border-[#f4ebd9]/20" />
+        {/* Real Pottery / Ceramic Rock Sculpture */}
+        <div className="absolute inset-0 flex items-end justify-center pointer-events-none z-10">
+          <img
+            src={heroPcImg}
+            alt="Original Hero"
+            className="w-auto h-[82%] object-contain object-bottom drop-shadow-md"
+          />
+        </div>
+        {/* Text & Button Overlay */}
+        <div className="absolute bottom-1.5 inset-x-0 flex flex-col items-center justify-center z-20 pointer-events-none px-2 text-center">
+          <span className="text-[5px] text-[#f4ebd9]/90 uppercase tracking-[0.2em] font-sans mb-1 font-medium drop-shadow-sm">
+            Indigo Kits &bull; Mindful Craft
+          </span>
+          <div className="px-2.5 py-0.5 bg-[#f4ebd9] text-[#ab5a46] text-[5px] font-sans font-semibold tracking-wider uppercase rounded-[1px] shadow-sm">
+            Shop Collection
+          </div>
         </div>
       </div>
     ),
@@ -89,24 +107,33 @@ const TEMPLATES: TemplateOption[] = [
   {
     id: 2,
     name: 'Artisan Textile Studio',
-    description: 'Reference design — full-bleed macramé & embroidery artwork top header with warm linen typography card below.',
+    description: 'Cinematic textile craftsmanship video header paired with warm linen typography card and deep charcoal CTA.',
     icon: Eye,
-    tag: 'Reference Hero',
+    tag: 'Video Editorial',
     tagColor: 'bg-[#8B6F5C]/20 text-[#8B6F5C]',
     preview: (
-      <div className="w-full h-full bg-[#F5F0EB] relative overflow-hidden rounded-sm flex flex-col justify-between">
-        <div className="w-full h-[50%] overflow-hidden bg-[#EDE6DE]">
-          <img
-            src={heroMacrameImg}
-            alt=""
-            className="w-full h-full object-cover"
+      <div className="w-full h-full bg-[#F5F0EB] relative overflow-hidden rounded-sm flex flex-col justify-between select-none">
+        {/* Top Video Header */}
+        <div className="w-full h-[52%] overflow-hidden bg-[#EDE6DE] relative">
+          <video
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover filter brightness-[0.98]"
           />
         </div>
-        <div className="w-full h-[50%] p-2 flex flex-col items-center justify-center text-center">
-          <span className="block font-serif text-[10px] text-[#2D2520] font-normal leading-tight">Two Threads Studio</span>
-          <span className="block text-[6px] text-[#786455] leading-tight mt-0.5 max-w-[120px] truncate">Handcrafted Textile Décor</span>
-          <div className="mt-1 px-2 py-0.5 bg-[#2D2520] text-[#F5F0EB] text-[5px] font-sans tracking-widest uppercase rounded-[1px]">
-            EXPLORE
+        {/* Bottom Linen Typography Card */}
+        <div className="w-full h-[48%] px-2 py-1 flex flex-col items-center justify-center text-center bg-[#F5F0EB]">
+          <span className="block font-serif text-[10px] text-[#2D2520] font-normal leading-tight">
+            Two Threads Studio
+          </span>
+          <span className="block text-[5.5px] text-[#786455] font-serif leading-tight mt-0.5 max-w-[140px] truncate">
+            Contemporary Embroidery, Crochet &amp; Macramé
+          </span>
+          <div className="mt-1 px-2.5 py-0.5 bg-[#2D2520] text-[#F5F0EB] text-[5px] font-sans tracking-widest uppercase rounded-[1px] shadow-sm font-medium">
+            EXPLORE THE STUDIO
           </div>
         </div>
       </div>
@@ -114,44 +141,74 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 3,
-    name: 'Editorial Portfolio',
-    description: 'Black & cream luxury editorial layout with scrolling marquee typography and center portrait cutout.',
+    name: 'Meditative Craft (Triptych)',
+    description: '3-panel split triptych featuring botanical linen, heritage loom studio, and macramé slides with centered luxury typography.',
     icon: Sparkles,
-    tag: 'Portfolio',
-    tagColor: 'bg-[#efeee9]/20 text-[#efeee9]',
+    tag: '3-Panel Triptych',
+    tagColor: 'bg-[#3d332b]/25 text-[#786455] dark:text-[#ccb08a]',
     preview: (
-      <div className="w-full h-full bg-black relative overflow-hidden rounded-sm flex items-center justify-center">
-        <img
-          src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=300&q=80"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-50"
-        />
-        <img
-          src={portraitCutout}
-          alt="Preview"
-          className="absolute inset-0 h-full w-full object-contain object-bottom z-20"
-        />
+      <div className="w-full h-full bg-[#171310] relative overflow-hidden rounded-sm flex items-center justify-center select-none">
+        {/* 3-Panel Split Triptych Grid */}
+        <div className="grid grid-cols-3 w-full h-full">
+          <div className="relative h-full overflow-hidden border-r border-white/30 bg-[#2b241d]">
+            <img src={heroT3Slide1} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+          </div>
+          <div className="relative h-full overflow-hidden border-r border-white/30 bg-[#2b241d]">
+            <img src={heroT3Slide2} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/25 to-black/20 pointer-events-none" />
+          </div>
+          <div className="relative h-full overflow-hidden bg-[#2b241d]">
+            <img src={heroT3Slide3} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+          </div>
+        </div>
+        {/* Center Typography & CTA Overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-2 text-center pointer-events-none bg-black/25">
+          <span className="font-serif uppercase text-white font-normal tracking-[0.06em] leading-[1.1] text-[8px] drop-shadow-md">
+            MEDITATIVE CRAFT.<br />SILENT LUXURY.
+          </span>
+          <span className="text-[5px] text-white/90 font-sans mt-0.5 max-w-[130px] truncate drop-shadow-sm">
+            Handcrafted textile art &amp; slow-living kits
+          </span>
+          <div className="mt-1 px-2 py-0.5 bg-white text-[#171310] text-[4.5px] font-sans tracking-widest uppercase font-semibold rounded-[1px] shadow">
+            EXPLORE COLLECTION
+          </div>
+        </div>
       </div>
     ),
   },
   {
     id: 4,
-    name: 'Soul of Handmade',
-    description: 'Contemporary quiet luxury editorial — torn paper artwork layer, serif typography & double-ring pill CTA.',
+    name: 'Crafting Mindful Heirlooms',
+    description: 'Dual-panel editorial layout — warm linen typography and terracotta button on the left, artisan craft flatlay on the right.',
     icon: Layout,
-    tag: 'Editorial Refined',
-    tagColor: 'bg-[#8C5A3E]/15 text-[#8C5A3E]',
+    tag: 'Split Editorial',
+    tagColor: 'bg-[#AD5B43]/15 text-[#AD5B43]',
     preview: (
-      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex items-center justify-between p-2 text-[#2D2520]">
-        <div className="space-y-0.5 max-w-[55%]">
-          <span className="block text-[6px] font-serif uppercase tracking-tight">UNVEILING <span className="italic lowercase">the</span></span>
-          <span className="block text-[6px] font-serif uppercase font-bold text-[#8C5A3E]">SOUL <span className="italic font-normal text-[#2D2520] lowercase">of</span> HANDMADE</span>
+      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex items-stretch select-none border border-[#E8E2D8]/60">
+        {/* Left Column (approx 42%): Typography & CTA */}
+        <div className="w-[42%] bg-[#FAF7F2] border-r border-[#E8E2D8] p-2 flex flex-col justify-center">
+          <div className="space-y-0.5">
+            <span className="block font-serif uppercase font-bold text-[#473429] tracking-[0.03em] text-[6.5px] leading-tight">
+              CRAFTING<br />MINDFUL<br />HEIRLOOMS
+            </span>
+            <span className="block font-serif italic text-[#A15742] text-[4.5px] leading-tight line-clamp-1">
+              Explore quiet luxury collections
+            </span>
+            <div className="pt-0.5">
+              <span className="inline-block bg-[#AD5B43] text-white text-[4px] font-sans tracking-wider uppercase px-1.5 py-0.5 font-semibold rounded-[1px] shadow-sm">
+                EXPLORE THE STUDIO
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="w-12 h-10 bg-[#EDE6DE] border border-[#2D2520]/10 rounded-sm overflow-hidden flex-shrink-0">
+        {/* Right Column (approx 58%): Flatlay Photography */}
+        <div className="w-[58%] relative overflow-hidden bg-[#E7DFC6]">
           <img
-            src={heroLippanImg}
-            alt=""
-            className="w-full h-full object-cover"
+            src={heroCraftingPhoto}
+            alt="Crafting Mindful Heirlooms"
+            className="w-full h-full object-cover object-left-center"
           />
         </div>
       </div>
@@ -165,15 +222,51 @@ const TEMPLATES: TemplateOption[] = [
     tag: 'Monogram Heritage',
     tagColor: 'bg-[#8C6F5A]/20 text-[#8C6F5A]',
     preview: (
-      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex flex-col items-center justify-center p-2 text-[#2D2520] text-center">
-        <span className="absolute font-serif italic text-[54px] text-[#8C6F5A]/25 select-none font-normal">T</span>
-        <div className="relative z-10 space-y-0.5">
-          <span className="block font-serif text-[7px] uppercase tracking-widest font-bold">TWO THREADS</span>
-          <span className="block font-serif text-[12px] uppercase tracking-wider font-bold leading-none">STUDIO</span>
-          <span className="block text-[5px] text-[#5A4A3F] font-serif">Artisan Luxury. Est. 2023</span>
-          <div className="mt-1 mx-auto w-[65px] py-0.5 bg-[#85634B] text-[#FAF7F2] text-[4px] font-sans tracking-widest uppercase rounded-[1px]">
-            EXPLORE
+      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex flex-col justify-between p-1.5 text-[#2D2520] select-none">
+        {/* Delicate Side Line-Art Decorations */}
+        <div className="absolute left-1 top-1.5 w-6 h-6 opacity-35 pointer-events-none">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#8C6F5A" strokeWidth="2">
+            <circle cx="50" cy="50" r="40" />
+            <circle cx="50" cy="50" r="34" strokeDasharray="3 3" />
+            <line x1="50" y1="5" x2="50" y2="12" />
+          </svg>
+        </div>
+        <div className="absolute right-1 top-1.5 w-6 h-6 opacity-35 pointer-events-none">
+          <svg viewBox="0 0 100 100" fill="none" stroke="#8C6F5A" strokeWidth="2">
+            <polygon points="50,15 20,40 80,40" />
+            <line x1="30" y1="40" x2="30" y2="85" />
+            <line x1="50" y1="40" x2="50" y2="90" />
+            <line x1="70" y1="40" x2="70" y2="85" />
+          </svg>
+        </div>
+
+        {/* Center Monogram & Typography */}
+        <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10 py-1">
+          {/* Giant 'T' Monogram Watermark */}
+          <span className="absolute font-serif italic text-[58px] text-[#8C6F5A]/25 select-none font-normal leading-none transform -translate-y-1">
+            T
+          </span>
+          <div className="relative z-10 space-y-0.5 flex flex-col items-center">
+            <span className="block font-serif text-[6.5px] uppercase tracking-[0.2em] font-bold text-[#2D2520] leading-none">
+              TWO THREADS
+            </span>
+            <span className="block font-serif text-[11px] uppercase tracking-[0.16em] font-bold leading-none text-[#2D2520]">
+              STUDIO
+            </span>
+            <span className="block text-[4.5px] text-[#5A4A3F] font-serif tracking-wide">
+              Artisan Luxury. Est. 2023
+            </span>
+            <div className="mt-0.5 px-2 py-0.5 bg-[#85634B] text-[#FAF7F2] text-[4.5px] font-sans tracking-widest uppercase rounded-[1px] border border-dashed border-white/60 shadow-sm">
+              EXPLORE COLLECTION
+            </div>
           </div>
+        </div>
+
+        {/* Bottom Category Bar with Wavy Thread */}
+        <div className="relative z-10 w-full pt-1 border-t border-[#8C6F5A]/20 flex items-center justify-center">
+          <span className="text-[4px] font-serif text-[#8C6F5A] tracking-wider uppercase font-medium">
+            Embroidery &bull; Crochet &bull; Macramé &bull; Lippan Art
+          </span>
         </div>
       </div>
     ),
@@ -253,7 +346,7 @@ export const CMSDashboard: React.FC = () => {
 
   const handleSaveHero = () => {
     if (!isHeroDirty) return;
-    updateHero(activeSelection as 1 | 2 | 3 | 4, {
+    updateHero(activeSelection as 1 | 2 | 3 | 4 | 5, {
       onSuccess: () => setSelectedTemplate(null),
     });
   };
@@ -375,7 +468,7 @@ export const CMSDashboard: React.FC = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {TEMPLATES.map(template => {
               const isSelected = activeSelection === template.id;
               const isCurrentServer = serverTemplate === template.id;
@@ -383,27 +476,35 @@ export const CMSDashboard: React.FC = () => {
               return (
                 <button
                   key={template.id}
+                  type="button"
                   onClick={() => setSelectedTemplate(template.id)}
                   className={`
-                    group relative text-left rounded-xl border-2 overflow-hidden transition-all duration-200 p-3
+                    group relative text-left rounded-xl border-2 overflow-hidden transition-all duration-200 p-3 flex flex-col justify-between
                     ${isSelected
                       ? 'border-[#ab5a46] bg-white dark:bg-[#251b14] ring-2 ring-[#ab5a46]/30 shadow-lg'
                       : 'border-[#c8b5aa]/40 dark:border-[#3d332b] bg-[#faf6f1] dark:bg-[#19110b] hover:border-[#ab5a46]/50'
                     }
                   `}
                 >
-                  <div className="aspect-video w-full rounded-lg overflow-hidden mb-3">
-                    {template.preview}
-                  </div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-serif text-sm font-semibold text-[#1f1610] dark:text-white">
-                      {template.name}
-                    </span>
-                    {isCurrentServer && (
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600">
-                        Active
+                  <div className="w-full">
+                    <div className="aspect-video w-full rounded-lg overflow-hidden mb-3 shadow-inner border border-black/5 dark:border-white/5">
+                      {template.preview}
+                    </div>
+                    <div className="flex items-start justify-between gap-1 mb-1.5">
+                      <span className="font-serif text-sm font-semibold text-[#1f1610] dark:text-white leading-snug">
+                        {template.name}
                       </span>
-                    )}
+                      {isCurrentServer && (
+                        <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 flex-shrink-0">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <div className="mb-2">
+                      <span className={`inline-block text-[9px] font-mono font-medium px-1.5 py-0.5 rounded ${template.tagColor}`}>
+                        {template.tag}
+                      </span>
+                    </div>
                   </div>
                   <p className="text-[11px] text-[#786455] dark:text-[#ccb08a]/70 leading-relaxed">
                     {template.description}
