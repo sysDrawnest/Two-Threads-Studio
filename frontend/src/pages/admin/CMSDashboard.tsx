@@ -181,30 +181,24 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 4,
-    name: 'Crafting Mindful Heirlooms (Cinematic Video)',
-    description: 'Full-bleed cinematic video hero — responsive PC & Mobile craftsmanship video loops with overlaid serif typography & terracotta CTA.',
+    name: 'Crafting Mindful Heirlooms (Pure Video Edition)',
+    description: 'Full-bleed cinematic video hero — responsive PC & Mobile craftsmanship video loops with zero text obstruction and clean bottom CTA button.',
     icon: Camera,
-    tag: 'Cinematic Video',
+    tag: 'Pure Video',
     tagColor: 'bg-[#AD5B43]/20 text-[#AD5B43]',
     preview: (
-      <div className="w-full h-full bg-[#171310] relative overflow-hidden rounded-sm flex items-center justify-center select-none">
+      <div className="w-full h-full bg-[#171310] relative overflow-hidden rounded-sm flex flex-col justify-end items-center select-none">
         <video
           src={heroT4Video}
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover filter brightness-[0.88]"
+          className="w-full h-full object-cover filter brightness-[0.95]"
         />
-        <div className="absolute inset-0 bg-black/45 pointer-events-none" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center z-10 pointer-events-none">
-          <span className="font-serif uppercase text-white font-normal tracking-[0.05em] text-[7.5px] leading-tight drop-shadow">
-            CRAFTING MINDFUL<br />HEIRLOOMS
-          </span>
-          <span className="text-[4.5px] text-[#F0DFD1] font-serif italic mt-0.5 max-w-[130px] truncate">
-            Artisan embroidery &amp; slow-living kits
-          </span>
-          <div className="mt-1 px-2 py-0.5 bg-[#AD5B43] text-white text-[4px] font-sans tracking-wider uppercase font-semibold rounded-[1px] shadow">
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+        <div className="relative z-10 pb-2 text-center pointer-events-none">
+          <div className="px-2 py-0.5 bg-[#AD5B43] text-white text-[4.5px] font-sans tracking-wider uppercase font-semibold rounded-[1px] shadow">
             EXPLORE THE STUDIO
           </div>
         </div>
