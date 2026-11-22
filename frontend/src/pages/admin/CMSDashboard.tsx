@@ -39,6 +39,7 @@ import heroT3Slide1 from '../../assets/hero_template3_slide1.jpg';
 import heroT3Slide2 from '../../assets/hero_template3_slide2.jpg';
 import heroT3Slide3 from '../../assets/hero_template3_slide3.jpg';
 import heroCraftingPhoto from '../../assets/hero_crafting_heirlooms_photo.jpg';
+import heroT4Video from '../../assets/hero_template4_pc.mp4';
 import {
   useAdminHeroConfig,
   useUpdateHeroConfig,
@@ -180,36 +181,32 @@ const TEMPLATES: TemplateOption[] = [
   },
   {
     id: 4,
-    name: 'Crafting Mindful Heirlooms',
-    description: 'Dual-panel editorial layout — warm linen typography and terracotta button on the left, artisan craft flatlay on the right.',
-    icon: Layout,
-    tag: 'Split Editorial',
-    tagColor: 'bg-[#AD5B43]/15 text-[#AD5B43]',
+    name: 'Crafting Mindful Heirlooms (Cinematic Video)',
+    description: 'Full-bleed cinematic video hero — responsive PC & Mobile craftsmanship video loops with overlaid serif typography & terracotta CTA.',
+    icon: Camera,
+    tag: 'Cinematic Video',
+    tagColor: 'bg-[#AD5B43]/20 text-[#AD5B43]',
     preview: (
-      <div className="w-full h-full bg-[#FAF7F2] relative overflow-hidden rounded-sm flex items-stretch select-none border border-[#E8E2D8]/60">
-        {/* Left Column (approx 42%): Typography & CTA */}
-        <div className="w-[42%] bg-[#FAF7F2] border-r border-[#E8E2D8] p-2 flex flex-col justify-center">
-          <div className="space-y-0.5">
-            <span className="block font-serif uppercase font-bold text-[#473429] tracking-[0.03em] text-[6.5px] leading-tight">
-              CRAFTING<br />MINDFUL<br />HEIRLOOMS
-            </span>
-            <span className="block font-serif italic text-[#A15742] text-[4.5px] leading-tight line-clamp-1">
-              Explore quiet luxury collections
-            </span>
-            <div className="pt-0.5">
-              <span className="inline-block bg-[#AD5B43] text-white text-[4px] font-sans tracking-wider uppercase px-1.5 py-0.5 font-semibold rounded-[1px] shadow-sm">
-                EXPLORE THE STUDIO
-              </span>
-            </div>
+      <div className="w-full h-full bg-[#171310] relative overflow-hidden rounded-sm flex items-center justify-center select-none">
+        <video
+          src={heroT4Video}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover filter brightness-[0.88]"
+        />
+        <div className="absolute inset-0 bg-black/45 pointer-events-none" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center z-10 pointer-events-none">
+          <span className="font-serif uppercase text-white font-normal tracking-[0.05em] text-[7.5px] leading-tight drop-shadow">
+            CRAFTING MINDFUL<br />HEIRLOOMS
+          </span>
+          <span className="text-[4.5px] text-[#F0DFD1] font-serif italic mt-0.5 max-w-[130px] truncate">
+            Artisan embroidery &amp; slow-living kits
+          </span>
+          <div className="mt-1 px-2 py-0.5 bg-[#AD5B43] text-white text-[4px] font-sans tracking-wider uppercase font-semibold rounded-[1px] shadow">
+            EXPLORE THE STUDIO
           </div>
-        </div>
-        {/* Right Column (approx 58%): Flatlay Photography */}
-        <div className="w-[58%] relative overflow-hidden bg-[#E7DFC6]">
-          <img
-            src={heroCraftingPhoto}
-            alt="Crafting Mindful Heirlooms"
-            className="w-full h-full object-cover object-left-center"
-          />
         </div>
       </div>
     ),

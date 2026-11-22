@@ -1,104 +1,123 @@
 /**
- * HeroTemplate4 — "Crafting Mindful Heirlooms"
+ * HeroTemplate4 — "Crafting Mindful Heirlooms" (Cinematic Video Edition)
  *
- * Exact replication of the user-provided reference design:
- * - Left Panel (approx 37% width):
- *   - Background: Soft natural cream linen texture (#F7F5F0 / #FAF7F2)
- *   - Main Headline: "CRAFTING MINDFUL HEIRLOOMS" in elegant high-contrast serif (Cormorant Garamond), deep bronze espresso (#473429)
- *   - Subtitle: "Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits." in Cormorant Garamond italic, terracotta earth tone (#A15742)
- *   - CTA Button: Crisp rectangular "EXPLORE THE STUDIO" in rich terracotta (#AD5B43) with white uppercase typography
- * - Right Panel (approx 63% width):
- *   - High-resolution photograph of the botanical wildflower embroidery hoop, macramé tassel, embroidered linen handkerchief, open kraft craft kit box with wooden hoops, brass pouch, thread skeins, scissors, and terracotta tiles bathed in warm sunlight.
+ * Full-bleed cinematic video hero section:
+ * - Desktop View: High-definition PC video (hero_template4_pc.mp4)
+ * - Mobile View: Tailored vertical Mobile video (hero_template4_mobile.mp4)
+ * - Typography: Centered quiet luxury typography in Cormorant Garamond
+ * - Headline: "CRAFTING MINDFUL HEIRLOOMS"
+ * - Subtitle: "Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits."
+ * - CTA Button: Crisp rectangular terracotta "EXPLORE THE STUDIO" linking to /shop
+ * - Features: Autoplay, loop, muted, playsinline with optional audio toggle
  */
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import heroPhotoImg from '../../assets/hero_crafting_heirlooms_photo.jpg';
+import { Volume2, VolumeX } from 'lucide-react';
+import heroPcVideo from '../../assets/hero_template4_pc.mp4';
+import heroMobileVideo from '../../assets/hero_template4_mobile.mp4';
 
 export default function HeroTemplate4() {
+  const pcVideoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleSound = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    if (pcVideoRef.current) pcVideoRef.current.muted = nextMuted;
+    if (mobileVideoRef.current) mobileVideoRef.current.muted = nextMuted;
+  };
+
+  // Ensure autoplay starts reliably across browsers
+  useEffect(() => {
+    const startPlay = async (video: HTMLVideoElement | null) => {
+      if (!video) return;
+      try {
+        video.muted = true;
+        await video.play();
+      } catch (e) {
+        // Autoplay policy fallback
+      }
+    };
+    startPlay(pcVideoRef.current);
+    startPlay(mobileVideoRef.current);
+  }, []);
+
   return (
-    <section className="relative w-full bg-[#FAF7F2] text-[#473429] flex flex-col justify-center overflow-hidden">
-      {/* ─── DESKTOP VIEW (Pixel-Perfect Dual Panel: Text Left + Photo Right) ─── */}
-      <div className="hidden lg:flex w-full min-h-[calc(100vh-70px)] max-h-[840px] items-stretch relative overflow-hidden">
-        
-        {/* Left Column: Pure Clean Solid Linen (#FAF7F2), Typography & CTA Button */}
-        <div className="w-[38%] xl:w-[36.8%] flex flex-col justify-center px-8 sm:px-12 lg:px-12 xl:px-16 2xl:px-20 py-12 lg:py-16 z-10 relative bg-[#FAF7F2] border-r border-[#E8E2D8]/70">
-          <div className="relative z-10 max-w-[420px]">
-            {/* Main Headline */}
-            <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.08] text-3xl sm:text-4xl md:text-5xl lg:text-[42px] xl:text-[50px] 2xl:text-[54px]">
-              <span className="block">CRAFTING</span>
-              <span className="block">MINDFUL</span>
-              <span className="block">HEIRLOOMS</span>
-            </h1>
+    <section className="relative w-full h-[90vh] min-h-[580px] max-h-[920px] lg:h-[calc(100vh-70px)] bg-[#171310] text-[#FAF7F2] overflow-hidden flex items-center justify-center">
+      {/* ─── DESKTOP VIDEO (PC Version) ─── */}
+      <div className="hidden lg:block absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          ref={pcVideoRef}
+          src={heroPcVideo}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.04]"
+        />
+      </div>
 
-            {/* Subtitle */}
-            <p className="font-serif italic text-[#A15742] text-base sm:text-lg lg:text-[18px] xl:text-[21px] leading-snug mt-4 lg:mt-6 font-normal">
-              Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits.
-            </p>
+      {/* ─── MOBILE & TABLET VIDEO (Mobile Version) ─── */}
+      <div className="lg:hidden absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          ref={mobileVideoRef}
+          src={heroMobileVideo}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.04]"
+        />
+      </div>
 
-            {/* Crisp Rectangular CTA Button */}
-            <div className="mt-7 lg:mt-8">
-              <Link
-                to="/shop"
-                className="inline-block bg-[#AD5B43] hover:bg-[#964a34] active:bg-[#823e2b] text-white font-sans text-xs tracking-[0.16em] uppercase px-7 py-3.5 font-semibold transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer text-center"
-              >
-                EXPLORE THE STUDIO
-              </Link>
-            </div>
-          </div>
+      {/* ─── LUXURY CINEMATIC OVERLAYS ─── */}
+      {/* Vignette Scrim for typography readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/35 pointer-events-none" />
+
+      {/* ─── HERO CONTENT OVERLAY ─── */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 text-center flex flex-col items-center justify-center py-12">
+        {/* Studio Kicker Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-[#EBDBC8] font-sans text-[10px] sm:text-xs tracking-[0.28em] uppercase mb-4 sm:mb-6 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#AD5B43] animate-pulse" />
+          <span>Two Threads Studio</span>
         </div>
 
-        {/* Right Column: Artisan Flatlay Photograph */}
-        <div className="w-[62%] xl:w-[63.2%] relative min-h-full overflow-hidden bg-[#E7DFC6]">
-          <img
-            src={heroPhotoImg}
-            alt="Handcrafted botanical embroidery hoop, slow-living DIY craft kit, and embroidered textiles"
-            className="w-full h-full object-cover object-left-center"
-            // @ts-ignore
-            fetchpriority="high"
-          />
+        {/* Main Headline */}
+        <h1 className="font-serif uppercase font-normal text-white tracking-[0.04em] leading-[1.08] text-4xl sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
+          <span className="block">CRAFTING MINDFUL</span>
+          <span className="block mt-1 sm:mt-2 text-[#F5EDE3]">HEIRLOOMS</span>
+        </h1>
+
+        {/* Subtitle Statement */}
+        <p className="font-serif italic text-[#F0DFD1] text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed mt-4 sm:mt-6 max-w-2xl font-light drop-shadow-md">
+          Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits.
+        </p>
+
+        {/* Primary Action Button */}
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-4">
+          <Link
+            to="/shop"
+            className="inline-flex items-center justify-center bg-[#AD5B43] hover:bg-[#964a34] active:bg-[#823e2b] text-white font-sans text-xs sm:text-sm tracking-[0.18em] uppercase px-8 sm:px-10 py-3.5 sm:py-4 font-semibold transition-all duration-300 shadow-[0_8px_24px_rgba(173,91,67,0.35)] hover:shadow-[0_12px_32px_rgba(173,91,67,0.5)] hover:-translate-y-0.5 rounded-[2px]"
+          >
+            EXPLORE THE STUDIO
+          </Link>
         </div>
       </div>
 
-      {/* ─── MOBILE & TABLET VIEW (Responsive Stacked Layout) ─── */}
-      <div className="lg:hidden w-full flex flex-col">
-        {/* Top: Flatlay Photography */}
-        <div className="w-full relative aspect-[16/11] sm:aspect-[16/10] max-h-[460px] overflow-hidden bg-[#E7DFC6]">
-          <img
-            src={heroPhotoImg}
-            alt="Handcrafted botanical embroidery hoop, slow-living DIY craft kit, and embroidered textiles"
-            className="w-full h-full object-cover object-center"
-            // @ts-ignore
-            fetchpriority="high"
-          />
-        </div>
-
-        {/* Bottom: Typography & CTA Button */}
-        <div className="relative px-6 py-10 sm:px-10 sm:py-12 flex flex-col justify-center bg-[#FAF7F2] border-t border-[#E8E2D8]/70">
-          <div className="relative z-10 max-w-md">
-            {/* Main Headline */}
-            <h1 className="font-serif uppercase font-semibold text-[#473429] tracking-[0.04em] leading-[1.1] text-3xl sm:text-4xl">
-              <span className="block">CRAFTING</span>
-              <span className="block">MINDFUL</span>
-              <span className="block">HEIRLOOMS</span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="font-serif italic text-[#A15742] text-base sm:text-lg leading-snug mt-3.5 font-normal">
-              Explore our quiet luxury collections of artisan embroidery, textiles, and slow-living DIY kits.
-            </p>
-
-            {/* CTA Button */}
-            <div className="mt-6">
-              <Link
-                to="/shop"
-                className="inline-block bg-[#AD5B43] hover:bg-[#964a34] active:bg-[#823e2b] text-white font-sans text-xs tracking-[0.16em] uppercase px-7 py-3.5 font-semibold transition-all duration-300 shadow-sm text-center"
-              >
-                EXPLORE THE STUDIO
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ─── SOUND TOGGLE (Bottom Right) ─── */}
+      <button
+        onClick={toggleSound}
+        type="button"
+        title={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+        className="absolute bottom-5 right-5 z-20 p-2.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/25 text-white/90 hover:text-white transition-all shadow-md focus:outline-none focus:ring-1 focus:ring-white/40 cursor-pointer"
+      >
+        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#EBDBC8]" />}
+      </button>
     </section>
   );
 }
+
